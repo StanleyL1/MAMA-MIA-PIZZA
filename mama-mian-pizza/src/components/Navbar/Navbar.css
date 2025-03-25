@@ -1,0 +1,64 @@
+@import '../../styles/variables.css';
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--primary-color);
+  padding: 1rem 2rem;
+  color: var(--text-color);
+}
+
+.navbar__brand {
+  display: flex;
+  align-items: center;
+}
+
+.brand-logo {
+  width: 20px;         
+  height: 20px;
+  margin-right: 2px;   
+}
+
+.navbar__brand h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--text-color);
+  
+}
+
+.navbar__links ul {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+margin-right: 26rem;     
+}
+
+.navbar__links a {
+  color: var(--text-color);
+  font-weight: normal;    
+  text-decoration: none;  
+  transition: color 0.3s ease;
+}
+
+.navbar__links a:hover {
+  color: var(--accent-color);
+}
+
+.navbar__icons .icon-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.navbar__icons .icon-button:hover {
+  opacity: 0.8;
+}
+.icon-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
