@@ -125,7 +125,6 @@ const Home = () => {
       </section>
 
    
-    {/* SECCIÓN "Las más populares" */}
 <section className="popular-section">
   <div className="popular-wrapper">
     <h2 className="popular-title">
@@ -134,7 +133,6 @@ const Home = () => {
     </h2>
     
     <div className="popular-cards">
-      {/* Card 1 */}
       <div className="popular-card">
         <img
           src={burrataImg}
@@ -161,7 +159,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Card 2 */}
       <div className="popular-card">
         <img
           src={burrataImg}
@@ -188,7 +185,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Card 3 */}
       <div className="popular-card">
         <img
           src={burrataImg}
@@ -219,12 +215,10 @@ const Home = () => {
 </section>
 
 
-    {/* SECCIÓN "¿Por qué elegir Mama Mian Pizza?" */}
     <section className="why-section">
         <h2 className="why-title">¿Por qué elegir Mama Mian Pizza?</h2>
         
         <div className="why-cards">
-          {/* Card 1: Entrega rápida */}
           <div className="why-card">
             <img 
               src={relojIcon} 
@@ -238,7 +232,6 @@ const Home = () => {
             </p>
           </div>
 
-          {/* Card 2: Recetas premiadas */}
           <div className="why-card">
             <img 
               src={medallaIcon} 
@@ -252,7 +245,6 @@ const Home = () => {
             </p>
           </div>
 
-          {/* Card 3: Envío gratuito */}
           <div className="why-card">
             <img 
               src={envioIcon} 
@@ -266,7 +258,6 @@ const Home = () => {
             </p>
           </div>
 
-          {/* Card 4: Ingredientes frescos */}
           <div className="why-card">
             <img 
               src={ingredienteIcon} 
@@ -297,9 +288,7 @@ const Home = () => {
       
       <div className="feedback-cards">
         
-        {/* Card 1 */}
         <div className="feedback-card">
-          {/* Encabezado con foto a la izquierda y nombre + tiempo a la derecha */}
           <div className="feedback-card-header">
             <img
               src={comentarioImg}
@@ -312,7 +301,6 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Estrellas */}
           <div className="feedback-rating">
             <img src={starFull} alt="Estrella completa" className="feedback-star-icon" />
             <img src={starFull} alt="Estrella completa" className="feedback-star-icon" />
@@ -328,7 +316,6 @@ const Home = () => {
           </p>
         </div>
 
-        {/* Card 2 */}
         <div className="feedback-card">
         <div className="feedback-card-header">
             <img
@@ -342,7 +329,6 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Estrellas */}
           <div className="feedback-rating">
             <img src={starFull} alt="Estrella completa" className="feedback-star-icon" />
             <img src={starFull} alt="Estrella completa" className="feedback-star-icon" />
@@ -358,7 +344,6 @@ const Home = () => {
           </p>
         </div>
 
-        {/* Card 3 */}
         <div className="feedback-card">
            <div className="feedback-card-header">
             <img
@@ -372,7 +357,6 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Estrellas */}
           <div className="feedback-rating">
             <img src={starFull} alt="Estrella completa" className="feedback-star-icon" />
             <img src={starFull} alt="Estrella completa" className="feedback-star-icon" />

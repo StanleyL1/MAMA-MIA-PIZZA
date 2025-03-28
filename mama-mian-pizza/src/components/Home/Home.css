@@ -163,9 +163,7 @@
   max-width: 1200px;
 }
 
-/* ======================
-   SECCIÓN "Las más populares"
-   ====================== */
+
    .popular-section {
     margin: 2rem auto; 
     max-width: 1200px;
@@ -173,21 +171,18 @@
     
   }
   
-  /* Fondo rojo, bordes redondeados y padding interno */
   .popular-wrapper {
-    background-color: var(--primary-color); /* O var(--primary-color) si usas variables */
+    background-color: var(--primary-color); 
     border-radius: 8px;
     padding: 2rem;
   }
   
-  /* Título en naranja */
   .popular-title {
     font-size: 2rem;
-    color: var(--accent-color); /* O var(--accent-color) */
+    color: var(--accent-color); 
     margin-bottom: 1.5rem;
   }
   
-  /* Ícono de fuego al lado del texto */
   .popular-icon {
     width: 24px;
     height: 24px;
@@ -195,18 +190,16 @@
     vertical-align: middle;
   }
   
-  /* Contenedor de las 3 tarjetas */
   .popular-cards {
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;           /* Espacio horizontal/vertical entre tarjetas */
+    gap: 2rem;           
     justify-content: center;
     
   }
   
-  /* Tarjeta individual */
   .popular-card {
-    width: 280px;        /* Ajusta para que coincida con tu referencia */
+    width: 280px;        
     background-color: var(--text-color);
     border-radius: 8px;
     text-align: left;
@@ -214,19 +207,17 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
   
-  /* Imagen de la pizza */
   .popular-card-image {
     width: 100%;
-    height: 160px;       /* Ajusta según la proporción de tu imagen */
-    object-fit: cover;   /* Recorta la imagen sin dejar espacio en blanco */
+    height: 160px;       
+    object-fit: cover;   
     border-radius: 4px;
     margin-bottom: 0.75rem;
   }
   
-  /* Título de la pizza (Burrata) */
   .popular-card-title {
     font-size: 1.2rem;
-    color: var(--primary-color);      /* Rojo intenso */
+    color: var(--primary-color);      
     margin: 0.5rem 0;
   }
   
@@ -238,18 +229,16 @@
     margin-bottom: 1rem;
   }
   
-  /* Rating (estrellas) */
   .popular-card-rating {
     margin-bottom: 0.75rem;
   }
   
   .popular-star-icon {
-    width: 20px;         /* Ajusta el tamaño de las estrellas */
+    width: 20px;         
     height: 20px;
     margin-right: 2px;
   }
   
-  /* Footer con precio y carrito */
   .popular-card-footer {
     display: flex;
     align-items: center;
@@ -274,12 +263,10 @@
     object-fit: contain;
   }
   
-  /* ===== SECCIÓN "¿Por qué elegir Mama Mian Pizza?" ===== */
-/* Sección contenedora */
+ 
 .why-section {
   background-color: var(--secondary-color);
   border-radius: 8px;
-  /* Aumenta padding para más espacio vertical y horizontal */
   padding: 1rem 2rem; 
   margin: 2rem auto;
   max-width: auto;
@@ -287,24 +274,20 @@
 }
 .why-title {
   font-size: 2rem;
-  color: var(--primary-color);  /* Rojo intenso */
+  color: var(--primary-color);  
   margin-bottom: 2rem;
 }
 
-/* Contenedor de las tarjetas */
 .why-cards {
   display: flex;
   flex-wrap: wrap;
-  /* Aumenta el gap para más espacio entre tarjetas */
   gap: 2rem;
   justify-content: center;
 }
 
-/* Tarjeta individual */
 .why-card {
   background-color: var(--primary-color); 
   border-radius: 8px;
-  /* Aumenta el width si quieres tarjetas más anchas */
   width: 240px; 
   padding: 1.5rem;
   text-align: center;
@@ -312,7 +295,6 @@
 }
 
 
-/* Ícono en la parte superior */
 .why-card-icon {
   width: 40px;
   height: 40px;
@@ -320,14 +302,12 @@
   margin: 0 auto 1rem;
 }
 
-/* Título dentro de la tarjeta */
 .why-card-heading {
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
   color: var(--accent-color);
 }
 
-/* Texto de la tarjeta */
 .why-card-text {
   font-size: 0.9rem;
   line-height: 1.4;
@@ -335,58 +315,55 @@
 }
 
 
-/* ===== SECCIÓN TESTIMONIOS ===== */
 .home-testimonials-section {
-  background-color: var(--secondary-color); /* Fondo crema */
+  background-color: var(--secondary-color); 
   padding: 3rem 1rem;
   text-align: center;
 }
 
 .home-testimonials-title {
   font-size: 2rem;
-  color:var(--primary-color); /* Título en rojo intenso */
+  color:var(--primary-color); 
   margin-bottom: 2rem;
-}/* ===== BOTÓN FLOTANTE DE CHAT (actualizado) ===== */
+}
 .chat-floating-button {
-  position: fixed;     /* Permite que quede fijo en la pantalla */
-  top: 1rem;           /* Ajusta según prefieras; también podrías usar bottom */
+  position: fixed;    
+  top: 1rem;          
   right: 1rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;         /* Espacio entre el círculo y el texto */
-  z-index: 9999;       /* Para que quede por encima de otros elementos */
+  gap: 0.5rem;         
+  z-index: 9999;      
   cursor: pointer;
 }
 
 .chat-icon-circle {
-  width: 48px;         /* Tamaño del círculo */
+  width: 48px;        
   height: 48px;
-  background-color: var(--accent-color);  /* Color de fondo (puedes usar var(--primary-color)) */
-  border-radius: 50%;  /* Hace que sea un círculo */
+  background-color: var(--accent-color);  
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .chat-robot-icon {
-  width: 24px;         /* Ajusta el tamaño del ícono dentro del círculo */
+  width: 24px;        
   height: 24px;
   object-fit: contain;
 }
 
 .chat-button-text {
   color: var(--text-dark);
-  padding: 0.5rem 1rem;  /* Espacio interno para el texto */
-  border-radius: 20px;   /* Opcional: da forma de burbuja al texto */
+  padding: 0.5rem 1rem;  
+  border-radius: 20px;  
   font-size: 0.9rem;
 }
 
 
-/* ===== SECCIÓN DE TESTIMONIOS - CLASES ÚNICAS feedback- ===== */
 
-/* Contenedor principal de la sección */
 .feedback-section {
-  background-color: var(--secondary-color); /* Fondo crema */
+  background-color: var(--secondary-color); 
   padding: 2rem 1rem;
   margin: 2rem auto;
   max-width: 1200px;
@@ -394,14 +371,12 @@
   border-radius: 8px;
 }
 
-/* Título de la sección */
 .feedback-title {
   font-size: 2rem;
-  color: var(--accent-color); /* Naranja */
+  color: var(--accent-color);
   margin-bottom: 2rem;
 }
 
-/* Contenedor de todas las tarjetas */
 .feedback-cards {
   display: flex;
   flex-wrap: wrap;
@@ -409,25 +384,21 @@
   justify-content: center;
 }
 
-/* Tarjeta individual */
 .feedback-card {
   background-color: var(--text-color);
   width: 300px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   padding: 2rem;
-  /* Alineación de texto principal */
   text-align: left;
 }
 
-/* Encabezado (avatar + user info) */
 .feedback-card-header {
   display: flex;
   align-items: center; 
   margin-bottom: 1rem; 
 }
 
-/* Avatar (foto del usuario) */
 .feedback-avatar {
   width: 60px;
   height: 60px;
@@ -435,33 +406,28 @@
   object-fit: cover;
 }
 
-/* Contenedor para el nombre y el tiempo, a la derecha del avatar */
 .feedback-user-info {
-  margin-left: 1rem; /* Espacio entre avatar y texto */
+  margin-left: 1rem; 
   display: flex;
   flex-direction: column;
 }
 
-/* Nombre del usuario */
 .feedback-name {
   margin: 0;
   font-size: 1.1rem;
-  color: var(--primary-color); /* Rojo */
+  color: var(--primary-color); 
 }
 
-/* Tiempo transcurrido */
 .feedback-time {
   font-size: 0.8rem;
   color: var(--primary-color);
   margin-top: 0.25rem;
 }
 
-/* Contenedor de estrellas (imágenes) */
 .feedback-rating {
   margin-bottom: 1rem;
 }
 
-/* Ícono de estrella (imagen PNG) */
 .feedback-star-icon {
   width: 24px;
   height: 24px;
@@ -469,7 +435,6 @@
   object-fit: contain;
 }
 
-/* Texto del testimonio */
 .feedback-text {
   font-size: 1rem;
   color: var(--text-dark);
