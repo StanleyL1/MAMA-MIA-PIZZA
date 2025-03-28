@@ -1,0 +1,80 @@
+/* ===== FOOTER CON CLASES ÚNICAS (final-footer-*) ===== */
+
+/* Contenedor principal del footer */
+.final-footer-section {
+    display: flex;
+    flex-direction: column; /* Imagen arriba, franja abajo */
+    margin-top: 2rem;       /* Separación con el contenido anterior */
+  }
+  
+  /* Fondo con la imagen */
+  .final-footer-background {
+    background-position: center;
+    background-color: var(--primary-color);
+    background-size: cover;
+    background-repeat: no-repeat;
+    min-height: 400px;      /* Ajusta la altura del fondo */
+    position: relative;
+  }
+  
+  /* Capa superpuesta para colocar textos (overlay) */
+  .final-footer-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    justify-content: space-between; /* Texto izq y der */
+    align-items: center;            /* Centra verticalmente */
+    padding: 2rem;
+  }
+  
+  /* Bloques de texto (izquierdo y derecho) */
+  .final-footer-text-right {
+    background:var(--text); /* Fondo semitransparente */
+    color: var(--primary-color);
+    font-size: 2rem;
+    padding: 1rem;
+    border-radius: 8px;
+    font-family:'Arial Narrow', Arial, sans-serif;
+    max-width: 400px;
+    text-align: center; /* Centra el texto dentro del recuadro */
+  }
+  .final-footer-text-left {
+    color: var(--accent-color);
+    font-size: 2rem;
+    padding: 1rem;
+    border-radius: 8px;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    max-width: 400px;
+  }
+  
+  /* Franja inferior con derechos y redes */
+  .final-footer-bottom {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    padding: 0.5rem;
+    text-align: center;      /* Centra el contenido horizontalmente */
+    display: flex;
+    justify-content: center;
+    align-items: center;     /* Centra en horizontal */
+    gap: 0.5rem;
+    /* Si deseas todo en una sola línea:
+       display: flex; justify-content: center; align-items: center; gap: 1rem;
+    */
+  }
+  .final-footer-rights {
+    margin: 0; /* Para quitar márgenes por defecto */
+  }
+  
+  /* Contenedor de redes sociales */
+  .final-footer-social {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  /* Íconos */
+  .final-footer-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    cursor: pointer;
+  }

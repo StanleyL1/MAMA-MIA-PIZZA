@@ -2,6 +2,7 @@
 
 .home-container {
   margin: 0 auto;
+  background-color: var(--secondary-color);
 }
 
 
@@ -92,7 +93,7 @@
 
 
 .home-card {
-  background-color: #fff; 
+  background-color: var(--text-color); 
   border-radius: 8px;
   width: 280px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -174,7 +175,7 @@
   
   /* Fondo rojo, bordes redondeados y padding interno */
   .popular-wrapper {
-    background-color: #991B1B; /* O var(--primary-color) si usas variables */
+    background-color: var(--primary-color); /* O var(--primary-color) si usas variables */
     border-radius: 8px;
     padding: 2rem;
   }
@@ -182,7 +183,7 @@
   /* Título en naranja */
   .popular-title {
     font-size: 2rem;
-    color: #EAB308; /* O var(--accent-color) */
+    color: var(--accent-color); /* O var(--accent-color) */
     margin-bottom: 1.5rem;
   }
   
@@ -206,7 +207,7 @@
   /* Tarjeta individual */
   .popular-card {
     width: 280px;        /* Ajusta para que coincida con tu referencia */
-    background-color: #fff;
+    background-color: var(--text-color);
     border-radius: 8px;
     text-align: left;
     padding: 1rem;
@@ -225,14 +226,14 @@
   /* Título de la pizza (Burrata) */
   .popular-card-title {
     font-size: 1.2rem;
-    color: #991B1B;      /* Rojo intenso */
+    color: var(--primary-color);      /* Rojo intenso */
     margin: 0.5rem 0;
   }
   
   /* Descripción */
   .popular-card-desc {
     font-size: 0.9rem;
-    color: #333; 
+    color: var(--text-dark); 
     line-height: 1.4;
     margin-bottom: 1rem;
   }
@@ -258,7 +259,7 @@
   .popular-card-price {
     font-weight: bold;
     font-size: 1rem;
-    color: #991B1B; 
+    color: var(--primary-color); 
   }
   
   .popular-cart-button {
@@ -336,14 +337,14 @@
 
 /* ===== SECCIÓN TESTIMONIOS ===== */
 .home-testimonials-section {
-  background-color: #FFFBEB; /* Fondo crema */
+  background-color: var(--secondary-color); /* Fondo crema */
   padding: 3rem 1rem;
   text-align: center;
 }
 
 .home-testimonials-title {
   font-size: 2rem;
-  color: #991B1B; /* Título en rojo intenso */
+  color:var(--primary-color); /* Título en rojo intenso */
   margin-bottom: 2rem;
 }/* ===== BOTÓN FLOTANTE DE CHAT (actualizado) ===== */
 .chat-floating-button {
@@ -381,12 +382,11 @@
 }
 
 
-
 /* ===== SECCIÓN DE TESTIMONIOS - CLASES ÚNICAS feedback- ===== */
 
 /* Contenedor principal de la sección */
 .feedback-section {
-  background-color: #FEFCE8; /* Fondo crema */
+  background-color: var(--secondary-color); /* Fondo crema */
   padding: 2rem 1rem;
   margin: 2rem auto;
   max-width: 1200px;
@@ -397,7 +397,7 @@
 /* Título de la sección */
 .feedback-title {
   font-size: 2rem;
-  color: #F59E0B; /* Naranja */
+  color: var(--accent-color); /* Naranja */
   margin-bottom: 2rem;
 }
 
@@ -405,17 +405,26 @@
 .feedback-cards {
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 3rem;
+  justify-content: center;
 }
 
 /* Tarjeta individual */
 .feedback-card {
-  background-color: #fff;
-  width: 280px;
+  background-color: var(--text-color);
+  width: 300px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  padding: 1.5rem;
-  text-align: center;
+  padding: 2rem;
+  /* Alineación de texto principal */
+  text-align: left;
+}
+
+/* Encabezado (avatar + user info) */
+.feedback-card-header {
+  display: flex;
+  align-items: center; 
+  margin-bottom: 1rem; 
 }
 
 /* Avatar (foto del usuario) */
@@ -426,10 +435,17 @@
   object-fit: cover;
 }
 
+/* Contenedor para el nombre y el tiempo, a la derecha del avatar */
+.feedback-user-info {
+  margin-left: 1rem; /* Espacio entre avatar y texto */
+  display: flex;
+  flex-direction: column;
+}
+
 /* Nombre del usuario */
 .feedback-name {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: var(--primary-color); /* Rojo */
 }
 
@@ -437,7 +453,7 @@
 .feedback-time {
   font-size: 0.8rem;
   color: var(--primary-color);
-  margin-bottom: 0.5rem;
+  margin-top: 0.25rem;
 }
 
 /* Contenedor de estrellas (imágenes) */
@@ -455,7 +471,7 @@
 
 /* Texto del testimonio */
 .feedback-text {
-  font-size: 0.9rem;
-  color: #333;
+  font-size: 1rem;
+  color: var(--text-dark);
   line-height: 1.4;
 }

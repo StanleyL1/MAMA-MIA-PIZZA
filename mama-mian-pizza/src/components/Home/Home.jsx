@@ -1,7 +1,5 @@
 import React from 'react';
 import './Home.css';
-
-
 import pizzaHero from '../../assets/PizzaPrin.png';
 import burrataImg from '../../assets/PizzaCard.png';
 import pizzaIcon from '../../assets/PizzaR.png';
@@ -294,7 +292,6 @@ const Home = () => {
 
 
 
-
 <section className="feedback-section">
       <h2 className="feedback-title">Lo que dicen nuestros clientes</h2>
       
@@ -302,13 +299,18 @@ const Home = () => {
         
         {/* Card 1 */}
         <div className="feedback-card">
-          <img
-            src={comentarioImg}
-            alt="Foto de María Rodríguez"
-            className="feedback-avatar"
-          />
-          <h3 className="feedback-name">María Rodríguez</h3>
-          <p className="feedback-time">hace 2 semanas</p>
+          {/* Encabezado con foto a la izquierda y nombre + tiempo a la derecha */}
+          <div className="feedback-card-header">
+            <img
+              src={comentarioImg}
+              alt="Foto de María Rodríguez"
+              className="feedback-avatar"
+            />
+            <div className="feedback-user-info">
+              <h3 className="feedback-name">María Rodríguez</h3>
+              <p className="feedback-time">hace 2 semanas</p>
+            </div>
+          </div>
 
           {/* Estrellas */}
           <div className="feedback-rating">
@@ -328,14 +330,19 @@ const Home = () => {
 
         {/* Card 2 */}
         <div className="feedback-card">
-          <img
-            src={comentarioImg}
-            alt="Foto de Juan Pérez"
-            className="feedback-avatar"
-          />
-          <h3 className="feedback-name">Juan Pérez</h3>
-          <p className="feedback-time">hace 1 semana</p>
+        <div className="feedback-card-header">
+            <img
+              src={comentarioImg}
+              alt="Foto de María Rodríguez"
+              className="feedback-avatar"
+            />
+            <div className="feedback-user-info">
+              <h3 className="feedback-name">María Rodríguez</h3>
+              <p className="feedback-time">hace 2 semanas</p>
+            </div>
+          </div>
 
+          {/* Estrellas */}
           <div className="feedback-rating">
             <img src={starFull} alt="Estrella completa" className="feedback-star-icon" />
             <img src={starFull} alt="Estrella completa" className="feedback-star-icon" />
@@ -345,22 +352,27 @@ const Home = () => {
           </div>
 
           <p className="feedback-text">
-            Me encanta el sabor auténtico de sus pizzas. 
-            Se nota que usan ingredientes frescos y 
-            orgánicos.
+            Garantizan su entrega en 30 min y si no se hace 
+            me devuelven mi dinero. Masa fresca y 
+            artesanal. ¡100% recomendados!
           </p>
         </div>
 
         {/* Card 3 */}
         <div className="feedback-card">
-          <img
-            src={comentarioImg}
-            alt="Foto de Carlos Lima"
-            className="feedback-avatar"
-          />
-          <h3 className="feedback-name">Carlos Lima</h3>
-          <p className="feedback-time">hace 3 días</p>
+           <div className="feedback-card-header">
+            <img
+              src={comentarioImg}
+              alt="Foto de María Rodríguez"
+              className="feedback-avatar"
+            />
+            <div className="feedback-user-info">
+              <h3 className="feedback-name">María Rodríguez</h3>
+              <p className="feedback-time">hace 2 semanas</p>
+            </div>
+          </div>
 
+          {/* Estrellas */}
           <div className="feedback-rating">
             <img src={starFull} alt="Estrella completa" className="feedback-star-icon" />
             <img src={starFull} alt="Estrella completa" className="feedback-star-icon" />
@@ -370,14 +382,15 @@ const Home = () => {
           </div>
 
           <p className="feedback-text">
-            Las mejores pizzas que he probado. 
-            El envío fue muy rápido y el sabor 
-            simplemente delicioso.
+            Garantizan su entrega en 30 min y si no se hace 
+            me devuelven mi dinero. Masa fresca y 
+            artesanal. ¡100% recomendados!
           </p>
         </div>
 
       </div>
     </section>
+    
     </div>
   );
 };
