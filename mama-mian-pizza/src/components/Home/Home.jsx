@@ -14,6 +14,7 @@ import starFull from '../../assets/EstrellaCom.png';
 import starHalf from '../../assets/EstrellaMedia.png';
 import cartIcon from '../../assets/Comprar.png';
 import { Link } from 'react-router-dom';
+import Footer from '../footer/footer';
 
 const Home = () => {
   return (
@@ -377,7 +378,8 @@ const Home = () => {
 
       </div>
     </section>
-    
+    <Footer/>
+
     </div>
   );
 };
