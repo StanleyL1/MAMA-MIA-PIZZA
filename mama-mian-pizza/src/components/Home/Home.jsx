@@ -13,6 +13,7 @@ import ingredienteIcon from '../../assets/ingrediente.png';
 import starFull from '../../assets/EstrellaCom.png';
 import starHalf from '../../assets/EstrellaMedia.png';
 import cartIcon from '../../assets/Comprar.png';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   return (
@@ -25,7 +26,9 @@ const Home = () => {
         <div className="home-hero-text">
           <h2>Las mejores pizzas</h2>
           <p>Ingredientes frescos, masa artesanal y sabores únicos que te harán volver por más.</p>
-          <button className="home-hero-button">Ver Menú</button>
+          <button className="hero-button">
+        <Link to="/menu">Ver Menú</Link>
+      </button>
         </div>
       </section>
 

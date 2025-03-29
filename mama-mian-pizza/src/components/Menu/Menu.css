@@ -1,0 +1,131 @@
+/* ===== SECCIÓN MENÚ - Clases con prefijo menu- para evitar colisiones ===== */
+
+.menu-section {
+    background-color: #FEFCE8; /* Fondo crema suave, ajusta si deseas */
+    padding: 2rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .menu-title {
+    font-size: 2rem;
+    color: #991B1B;
+    margin-bottom: 2rem;
+  }
+  
+  /* Contenedor de categorías y search */
+  .menu-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  
+  /* Botones de categoría */
+  .menu-category-button {
+    background-color: #fff;
+    color: #991B1B;
+    border: 2px solid #991B1B;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .menu-category-button:hover {
+    background-color: #991B1B;
+    color: #fff;
+  }
+  
+  .menu-category-button.active {
+    background-color: #991B1B;
+    color: #fff;
+  }
+  
+  /* Barra de búsqueda */
+  .menu-search {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .menu-search input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .menu-search-button {
+    background-color: #991B1B;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  /* Grid de productos */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 2rem;
+    justify-items: center; /* Centra las cards en su columna */
+  }
+  
+  /* Cada tarjeta del menú */
+  .menu-card {
+    background-color: #fff;
+    width: 220px;
+    border-radius: 8px;
+    text-align: left;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 1rem;
+  }
+  
+  /* Imagen del producto */
+  .menu-card-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Título del producto */
+  .menu-card-title {
+    font-size: 1.1rem;
+    color: #991B1B;
+    margin: 0.5rem 0;
+  }
+  
+  /* Descripción */
+  .menu-card-description {
+    font-size: 0.9rem;
+    color: #333;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Rating (estrellas) */
+  .menu-card-rating {
+    margin-bottom: 0.5rem;
+  }
+  
+  .menu-star-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 2px;
+  }
+  
+  /* Precio */
+  .menu-card-price {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #991B1B;
+  }
+  
