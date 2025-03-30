@@ -1,0 +1,83 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+.home-card {
+    /* Fondo blanco, esquinas redondeadas, sombra y un borde tenue */
+    background-color: var(--text-color);
+    border-radius: 10px;
+
+    width: 411px; /* Ajusta el ancho según tu preferencia */
+    height: 25%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+  }
+  
+  /* Imagen de la pizza */
+  .home-card-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover; 
+    border-radius: 4px;
+  }
+  
+  /* Título (ej: "Burrata") */
+  .home-card-title {
+    font-size: 1.1rem;
+    color: var(--primary-color); /* Rojo intenso */
+    padding: 0 20px;
+  }
+  
+  /* Descripción */
+  .home-card-desc {
+    font-size: 1.2rem;
+    color: #333;
+    line-height: 1.1rem ;
+    text-align: justify;
+    padding: 0 20px;
+    font-weight: 400;
+
+  }
+  
+  /* Sección de estrellas */
+  .home-card-stars {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 90%;
+    padding: 1rem;
+}
+  
+  /* Iconos de estrella (Lucide) */
+  .home-card-stars svg {
+    color: var(--accent-color); /* Naranja para las estrellas */
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Footer con precio y carrito */
+  .home-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 20px;
+    margin-top: auto;
+  }
+  .home-card-price {
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--primary-color);
+  }
+  
+  .home-card-cart {
+    width: 24px;
+    height: 24px;
+    color: var(--primary-color);
+    cursor: pointer;
+  }
