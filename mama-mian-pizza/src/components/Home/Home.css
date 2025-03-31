@@ -31,19 +31,29 @@
   margin-bottom: 1.5rem;
 }
 
-.home-hero-button {
-  background-color: var(--accent-color); 
-  border: none;
+.hero-button {
+  display: inline-block;         /* Permite tratar el botón como un bloque */
+  background-color: #F59E0B;     /* Naranja */
+  border: 2px solid #991B1B;     /* Borde rojo */
+  border-radius: 8px;            /* Ajusta la curvatura de esquinas */
   padding: 0.75rem 1.25rem;
-  color: var(--text-color);
-  font-size: 1rem;
   cursor: pointer;
-  border-radius: 4px;
-  transition: opacity 0.3s ease;
+  transition: background-color 0.3s ease;
+  /* Si deseas alinear texto dentro, puedes usar text-align: center; */
 }
 
-.home-hero-button:hover {
-  opacity: 0.8;
+/* Para quitar estilos de enlace y heredar color */
+.hero-button-link {
+  color: #991B1B;                /* Texto rojo */
+  text-decoration: none;         /* Quita subrayado */
+  font-size: 1rem;
+  font-weight: bold;
+  display: inline-block;         /* Asegura que rellene el botón */
+}
+
+/* Efecto hover (opcional) */
+.hero-button:hover {
+  background-color: #e18e00;     /* Un tono más oscuro de naranja al pasar el mouse */
 }
 
 
@@ -77,3 +87,133 @@
   justify-content: space-around;
   padding: 20px;
 }
+
+
+
+
+.home-popular-section {
+  text-align: center;
+  margin: 2rem auto;    
+}
+
+
+.home-popular-section h3 {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
+
+  .home-popular-section h4 {
+    font-size: 1.8rem;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+  }
+
+
+.home-popular-card{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--primary-color);
+  margin: 10px 20px;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+
+.home-card-container{
+  width: 85%;
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+}
+
+
+
+.why-section {
+  background-color: var(--secondary-color);
+  border-radius: 8px;
+  padding: 1rem 2rem; 
+  margin: 2rem auto;
+  max-width: auto;
+  text-align: center;
+}
+.why-title {
+  font-size: 2rem;
+  color: var(--primary-color);  
+  margin-bottom: 2rem;
+}
+
+.why-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.why-card {
+  background-color: var(--primary-color); 
+  border-radius: 8px;
+  width: 312px;
+  height: 214px; 
+  padding: 1.5rem;
+  text-align: center;
+}
+
+
+.why-card-icon {
+  width: 32px;
+  height: 32px;
+  display: block;
+  margin: 0 auto 1rem;
+}
+
+.why-card-heading {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--accent-color);
+}
+
+.why-card-text {
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: var(--text-color);
+}
+
+
+
+.chat-floating-button {
+  position: fixed;    
+  top: 1rem;          
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;         
+  z-index: 9999;      
+  cursor: pointer;
+}
+
+.chat-icon-circle {
+  width: 48px;        
+  height: 48px;
+  background-color: var(--accent-color);  
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-robot-icon {
+  width: 24px;        
+  height: 24px;
+  object-fit: contain;
+}
+
+.chat-button-text {
+  color: var(--text-dark);
+  padding: 0.5rem 1rem;  
+  border-radius: 20px;  
+  font-size: 0.9rem;
+}
+

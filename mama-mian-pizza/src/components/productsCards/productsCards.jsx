@@ -9,7 +9,6 @@ function ProductsCards({ data: { title, Descripcion, img, price } }) {
   return (
     <div className="home-card">
       <img src={img} alt={title} className="home-card-image" />
-      
       <h3 className="home-card-title">{title}</h3>
       <p className="home-card-desc">{Descripcion}</p>
       

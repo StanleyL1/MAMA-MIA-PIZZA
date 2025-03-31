@@ -1,0 +1,87 @@
+/* Sección completa: fondo crema, título en naranja */
+.testimonials-section {
+    padding: 2rem 1rem;
+    margin: 2rem auto;
+    text-align: center;
+    border-radius: 8px; /* Opcional, esquinas suaves */
+  }
+  
+  .testimonials-title {
+    font-size: 2rem;
+    color: var(--accent-color); /* Naranja */
+    margin-bottom: 2rem;
+  }
+  
+  /* Contenedor de tarjetas */
+  .testimonials-container {
+    display: flex;
+    flex-wrap: column;
+    gap: 3rem; /* Espacio horizontal/vertical entre tarjetas */
+margin-left: 18rem;
+}
+  
+  /* Tarjeta individual */
+  .testimonial-card {
+    background-color: #fff;
+    border-radius: 8px;
+    width: 411px; /* Ajusta según tu diseño */
+    height: 391px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 1rem;
+    text-align: left;
+  }
+  
+  /* Encabezado: avatar + nombre + tiempo */
+  .testimonial-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .testimonial-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .testimonial-user-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .testimonial-name {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #991B1B; /* Rojo intenso */
+  }
+  
+  .testimonial-time {
+    font-size: 0.8rem;
+    color: #999;
+    margin: 0;
+    margin-top: 0.25rem;
+  }
+  
+  /* Sección de estrellas */
+  .testimonial-stars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 1rem;
+  }
+  
+  .testimonial-star-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+  
+  /* Texto del testimonio */
+  .testimonial-text {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.8;
+    margin: 0;
+  }
+  

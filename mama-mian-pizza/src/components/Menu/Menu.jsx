@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './Menu.css';
 import Footer from '../footer/footer';
-
+//import { FaSearch } from 'react-icons/fa';
 // Imágenes e íconos (ajusta las rutas según tu estructura)
 import burrataImg from '../../assets/PizzaCard.png';
 import starFull from '../../assets/EstrellaCom.png';
@@ -15,7 +15,7 @@ const Menu = () => {
   const products = [
     {
       id: 1,
-      name: "Burrata",
+      name: "Pizaa",
       description: "Mozzarella, cebolla caramelizada, jamón, rúgula y vinagre balsámico",
       price: "$5.00",
       image: burrataImg,
@@ -92,7 +92,8 @@ const Menu = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="menu-search-button">🔍</button>
+            <button className="menu-search-button">
+            </button>
           </div>
         </div>
 
