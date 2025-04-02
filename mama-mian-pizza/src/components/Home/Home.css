@@ -1,63 +1,74 @@
 @import '../../styles/variables.css';
 
-.home-container {
-  margin: 0 auto;
-  background-color: var(--secondary-color);
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+body{
+  background-color: var(--bg_color);
+}
 
-.home-hero-section {
-  height: 400px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+:root{
+  --red_primario: #991B1B;
+  --bg_color:#FFFBEB;
+  --font-nav:#FFFBEB;
+}
+
+.main__content{
   display: flex;
-  align-items: center; 
-  justify-content: flex-start;
-  color: var(--text-color);   
-  padding-left: 2rem;
+  flex-direction: column;
+  gap: 40px;
 }
 
-.home-hero-text {
-  max-width: 400px;
+.hero__container{
+  background-image: url(../../assets/PizzaPrin.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 540px;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  padding: 40px;
+  color: #FFFFFF;
+  margin: 1px 0;
+  justify-content: center;
 }
 
-.home-hero-text h2 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+.hero__text__container{
+  width: 400px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  margin: 10px 0px;
 }
 
-.home-hero-text p {
-  margin-bottom: 1.5rem;
+.hero__title{
+  font-size: 3.5rem;
+  margin-bottom: 10px;
 }
 
-.hero-button {
-  display: inline-block;         /* Permite tratar el botón como un bloque */
-  background-color: #F59E0B;     /* Naranja */
-  border: 2px solid #991B1B;     /* Borde rojo */
-  border-radius: 8px;            /* Ajusta la curvatura de esquinas */
-  padding: 0.75rem 1.25rem;
+.hero__text{
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  text-align: justify;
+}
+
+.hero__button{
+  background-color: #FEB248;
+  color: #821717;
+  padding: 10px 20px;
+  border: none;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  /* Si deseas alinear texto dentro, puedes usar text-align: center; */
-}
-
-/* Para quitar estilos de enlace y heredar color */
-.hero-button-link {
-  color: #991B1B;                /* Texto rojo */
-  text-decoration: none;         /* Quita subrayado */
-  font-size: 1rem;
+  font-size: 1.4rem;
   font-weight: bold;
-  display: inline-block;         /* Asegura que rellene el botón */
+  border-radius: 10px;
 }
 
-/* Efecto hover (opcional) */
-.hero-button:hover {
-  background-color: #e18e00;     /* Un tono más oscuro de naranja al pasar el mouse */
-}
-
-
-.home-recommendation-section {
+.house__choice__section{
+  background-color: #fcd6a0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -65,166 +76,202 @@
   margin: 10px 20px;
   padding: 20px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-  background: var(--text);
-  flex-wrap: wrap;
 }
 
-.home-recomendation-header{
-  margin: 0;
-
-}
-.home-recommendation-section h1 {
+.house__choice__title{
   font-size: 2.5rem;
-  color: var(--primary-color);
-  margin: 20px;
+  margin-bottom: 20px;
+  color: #991B1B;
 }
 
-.home-recommendation-card{
+.trending__section {
+  background-color: #821717;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 10px;
+  margin: 10px 20px;
+  padding: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.trending__title {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #EAB308;
+}
+
+.whyus__section{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  margin: 10px 20px;
+}
+
+.whyus__header{
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #991B1B;
+}
+
+.whyus__content{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+}
+
+.whyus__cards{
+  background-color: #991B1B;
+  max-width: 400px;
+  max-height: 300px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: var(--text);
-  margin: 10px 20px;
-  border-radius: 10px;
-  padding: 10px;
-  flex-wrap: wrap;
-}
-
-
-.home-card-container{
-  width: 85%;
-  display: flex;
-  justify-content: space-around;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
   padding: 20px;
 }
 
-
-
-
-.home-popular-section {
-  text-align: center;
-  margin: 2rem auto;    
+.whyus__cards i {
+  font-size: 1.8rem;
+  color: #FCD6A0;
+  padding: 10px;
 }
 
+.whyus__card__title{
+  font-size: 1.8rem;
+  color: #FEB248;
+  font-weight: bold;
+  padding: 10px;
+}
 
-.home-popular-section h3 {
-    font-size: 1.8rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-  }
+.whyus__card__description{
+  font-size: 1rem;
+  color: #FFFFFF;
+  text-align: justify;
+  padding: 10px;
+}
 
-  .home-popular-section h4 {
-    font-size: 1.8rem;
-    color: var(--accent-color);
-    margin-bottom: 1rem;
-  }
-
-
-.home-popular-card{
+.review__section{
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  background-color: var(--primary-color);
   margin: 10px 20px;
-  border-radius: 10px;
-  padding: 10px;
 }
 
+.review__header{
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #EAB308;
+}
 
-.home-card-container{
-  width: 85%;
+.review__content{
   display: flex;
-  justify-content: space-around;
-  padding: 20px;
-}
-
-
-
-.why-section {
-  background-color: var(--secondary-color);
-  border-radius: 8px;
-  padding: 1rem 2rem; 
-  margin: 2rem auto;
-  max-width: auto;
-  text-align: center;
-}
-.why-title {
-  font-size: 2rem;
-  color: var(--primary-color);  
-  margin-bottom: 2rem;
-}
-
-.why-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  justify-content: center;
-}
-
-.why-card {
-  background-color: var(--primary-color); 
-  border-radius: 8px;
-  width: 312px;
-  height: 214px; 
-  padding: 1.5rem;
-  text-align: center;
-}
-
-
-.why-card-icon {
-  width: 32px;
-  height: 32px;
-  display: block;
-  margin: 0 auto 1rem;
-}
-
-.why-card-heading {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  color: var(--accent-color);
-}
-
-.why-card-text {
-  font-size: 1.05rem;
-  line-height: 1.4;
-  color: var(--text-color);
-}
-
-
-
-.chat-floating-button {
-  position: fixed;    
-  top: 1rem;          
-  right: 1rem;
-  display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 0.5rem;         
-  z-index: 9999;      
-  cursor: pointer;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  width: 100%;
+  justify-content: space-around;
 }
 
-.chat-icon-circle {
-  width: 48px;        
-  height: 48px;
-  background-color: var(--accent-color);  
+.card__review{
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  height: 265px;
+  background-color: #FFFFFF;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.review__card__user{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  padding: 15px;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+}
+
+.review__card__user img{
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
+}
+
+.review__card__user__information{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.review__card__user__information h5{
+  font-size: 1.5rem;
+  color: #991B1B;
+}
+
+.review__card__user__information p{
+  font-size: 1rem;
+  color: #991B1B;
+  opacity: 44%;
+}
+
+.review__comment{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px;
+}
+
+.review__comment p{
+  font-size: 1rem;
+  text-align: justify;
+  margin: 0 20px;
+}
+
+.cta__section{
+  background-image: url("../../assets/footer.png");
+  object-fit: cover;
+  min-height: 700px;
+  max-height: 700px;
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
-.chat-robot-icon {
-  width: 24px;        
-  height: 24px;
-  object-fit: contain;
+.cta__section h3{
+  color: #eab308;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
 }
 
-.chat-button-text {
-  color: var(--text-dark);
-  padding: 0.5rem 1rem;  
-  border-radius: 20px;  
-  font-size: 0.9rem;
+.hero__button a{
+  text-decoration: none;
+  color: #991B1B;
 }
 
+.cta__text{
+  margin-left: 5vw;
+  width: 600px;
+}
+
+.cta__button{
+  background-color: #FCD6A0;
+  color: #991B1B;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 2rem;
+  border-radius: 10px;
+}
