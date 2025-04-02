@@ -1,34 +1,31 @@
 import './productsCards.css';
-import { ShoppingCart } from 'lucide-react';
-
-// Importa tus imágenes de estrella
-import estrellaCom from '../../assets/EstrellaCom.png';
-import estrellaMedia from '../../assets/EstrellaMedia.png';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar, faStarHalf, faCartShopping } from '@fortawesome/free-solid-svg-icons';
 
 function ProductsCards({ data: { title, Descripcion, img, price } }) {
   return (
-    <div className="home-card">
-      <img src={img} alt={title} className="home-card-image" />
-      <h3 className="home-card-title">{title}</h3>
-      <p className="home-card-desc">{Descripcion}</p>
+    <div className="products__cards">
+      <img src={img} alt={title} />
+      <h3>{title}</h3>
+      <p className="card__product__description">{Descripcion}</p>
       
-      {/* Estrellas usando imágenes */}
-      <div className="home-card-stars">
-        <img src={estrellaCom} alt="Estrella completa" className="home-card-star-icon" />
-        <img src={estrellaCom} alt="Estrella completa" className="home-card-star-icon" />
-        <img src={estrellaCom} alt="Estrella completa" className="home-card-star-icon" />
-        <img src={estrellaCom} alt="Estrella completa" className="home-card-star-icon" />
-        <img src={estrellaMedia} alt="Estrella media" className="home-card-star-icon" />
+      <div className="stars__containers">
+        <FontAwesomeIcon icon={faStar} />
+        <FontAwesomeIcon icon={faStar} />
+        <FontAwesomeIcon icon={faStar} />
+        <FontAwesomeIcon icon={faStar} />
+        <FontAwesomeIcon icon={faStar} />
+        <FontAwesomeIcon icon={faStarHalf} />      
       </div>
       
-      {/* Precio y carrito */}
-      <div className="home-card-footer">
-        <span className="home-card-price">{price}</span>
-        <ShoppingCart className="home-card-cart" />
+      <div className="card__footer">
+        <p className="card__product__price">{price}</p>
+        <button className="show__modal">
+          <FontAwesomeIcon icon={faCartShopping} />
+        </button>
       </div>
     </div>
   );
 }
-
 
 export default ProductsCards;
