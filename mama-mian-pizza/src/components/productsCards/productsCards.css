@@ -47,7 +47,7 @@
   align-items: center;
   justify-content: flex-start;
   width: 90%;
-  padding: 0px 20px;
+  padding: 0 20px;
 }
 
 .card__footer {
@@ -80,4 +80,76 @@
 .card__footer button:hover {
   color: #FEB248;
   transform: scale(1.1);
+}
+
+/* RESPONSIVE STYLES */
+
+/* Para dispositivos móviles */
+@media (max-width: 768px) {
+  .products__cards {
+    max-width: 90%;
+    margin: 15px auto;
+  }
+  
+  .products__cards h3 {
+    font-size: 1.3rem;
+    margin: 0 10px 8px 10px;
+  }
+  
+  .card__product__description {
+    font-size: 0.9rem;
+    width: 100%;
+    padding: 0 10px;
+  }
+  
+  .stars__containers {
+    font-size: 24px;
+    gap: 16px;
+    padding: 0 10px;
+  }
+  
+  .card__product__price {
+    font-size: 1.2rem;
+    margin: 0 10px;
+  }
+  
+  .card__footer button {
+    font-size: 1.5rem;
+    padding: 8px 16px;
+  }
+}
+
+/* Para dispositivos tipo tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .products__cards {
+    max-width: 80%;
+    margin: 15px auto;
+  }
+  
+  .products__cards h3 {
+    font-size: 1.4rem;
+    margin: 0 15px 8px 15px;
+  }
+  
+  .card__product__description {
+    font-size: 0.95rem;
+    width: 90%;
+    padding: 0 15px;
+  }
+  
+  .stars__containers {
+    font-size: 26px;
+    gap: 20px;
+    padding: 0 15px;
+  }
+  
+  .card__product__price {
+    font-size: 1.3rem;
+    margin: 0 15px;
+  }
+  
+  .card__footer button {
+    font-size: 1.6rem;
+    padding: 9px 18px;
+  }
 }
