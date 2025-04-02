@@ -13,8 +13,8 @@ body{
 
 :root{
   --red_primario: #991B1B;
-  --bg_color:#FFFBEB;
-  --font-nav:#FFFBEB;
+  --bg_color: #FFFBEB;
+  --font-nav: #FFFBEB;
 }
 
 .main__content{
@@ -40,9 +40,8 @@ body{
 .hero__text__container{
   width: 400px;
   display: flex;
-  flex-wrap: wrap;
   flex-direction: column;
-  margin: 10px 0px;
+  margin: 10px 0;
 }
 
 .hero__title{
@@ -65,6 +64,11 @@ body{
   font-size: 1.4rem;
   font-weight: bold;
   border-radius: 10px;
+}
+
+.hero__button a{
+  text-decoration: none;
+  color: #991B1B;
 }
 
 .house__choice__section{
@@ -135,6 +139,7 @@ body{
   align-items: center;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
   padding: 20px;
+  margin-bottom: 20px;
 }
 
 .whyus__cards i {
@@ -256,11 +261,6 @@ body{
   margin-bottom: 20px;
 }
 
-.hero__button a{
-  text-decoration: none;
-  color: #991B1B;
-}
-
 .cta__text{
   margin-left: 5vw;
   width: 600px;
@@ -274,4 +274,142 @@ body{
   cursor: pointer;
   font-size: 2rem;
   border-radius: 10px;
+}
+
+/* ===================== */
+/*    RESPONSIVE STYLES   */
+/* ===================== */
+
+/* Mobile */
+@media (max-width: 768px) {
+  .hero__container {
+    height: 400px;
+    padding: 20px;
+  }
+  .hero__text__container {
+    width: 100%;
+    margin: 10px 0;
+  }
+  .hero__title {
+    font-size: 2.5rem;
+  }
+  .hero__text {
+    font-size: 1.2rem;
+  }
+  .hero__button {
+    font-size: 1.2rem;
+    padding: 8px 16px;
+  }
+  .house__choice__section,
+  .trending__section,
+  .whyus__section,
+  .review__section {
+    margin: 10px 10px;
+    padding: 15px;
+  }
+  .house__choice__title,
+  .trending__title,
+  .whyus__header,
+  .review__header {
+    font-size: 2rem;
+    margin-bottom: 15px;
+  }
+  .whyus__content {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+  .whyus__cards {
+    max-width: 90%;
+    margin-bottom: 20px;
+  }
+  .review__content {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+  .card__review {
+    max-width: 90%;
+    height: auto;
+    margin-bottom: 20px;
+  }
+  .cta__section {
+    min-height: 500px;
+    max-height: none;
+    flex-direction: column;
+    padding: 20px;
+  }
+  .cta__text {
+    width: 90%;
+    margin-left: 0;
+    text-align: center;
+  }
+  .cta__button {
+    font-size: 1.6rem;
+    padding: 8px 16px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hero__container {
+    height: 480px;
+    padding: 30px;
+  }
+  .hero__text__container {
+    width: 80%;
+  }
+  .hero__title {
+    font-size: 3rem;
+  }
+  .hero__text {
+    font-size: 1.3rem;
+  }
+  .hero__button {
+    font-size: 1.3rem;
+    padding: 9px 18px;
+  }
+  .house__choice__section,
+  .trending__section,
+  .whyus__section,
+  .review__section {
+    margin: 10px 15px;
+    padding: 18px;
+  }
+  .house__choice__title,
+  .trending__title,
+  .whyus__header,
+  .review__header {
+    font-size: 2.2rem;
+    margin-bottom: 18px;
+  }
+  .whyus__content {
+    padding: 15px;
+  }
+  .whyus__cards {
+    max-width: 45%;
+    margin-bottom: 20px;
+  }
+  .review__content {
+    justify-content: center;
+    padding: 15px;
+  }
+  .card__review {
+    max-width: 45%;
+    height: auto;
+    margin-bottom: 20px;
+  }
+  .cta__section {
+    min-height: 600px;
+    padding: 30px;
+  }
+  .cta__text {
+    width: 80%;
+    margin-left: 0;
+    text-align: center;
+  }
+  .cta__button {
+    font-size: 1.8rem;
+    padding: 10px 18px;
+  }
 }
