@@ -101,13 +101,13 @@ const Home = () => {
 
 
       <section className="home-recommendation-section">
-        <div className="home-recommendation-card">
-  
-          <h3>
+        <header className='home-recommendation-header'>
+        <h1>
             Recomendación de la Casa{" "}
             <img src={pizzaIcon} alt="Pizza Icon" className="home-pizza-icon" />
-          </h3>
-
+          </h1>
+        </header>
+          
           <div className="home-card-container"> 
 
           {datosPrueba.map((item, index) => (
@@ -117,7 +117,6 @@ const Home = () => {
         ))}
 
           </div>
-        </div>
       </section>
   
 
