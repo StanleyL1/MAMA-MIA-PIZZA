@@ -7,6 +7,10 @@
   background-color: var(--primary-color);
   padding: 1rem 2rem;
   color: var(--text-color);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar__brand {
@@ -15,15 +19,18 @@
 }
 
 .brand-logo {
-  width: 20px;
-  height: 20px;
-  margin-right: 2px;
+  width: 32px;
+  height: 32px;
+  margin-right: 8px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .navbar__brand h1 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: var(--text-color);
+  letter-spacing: 0.05rem;
 }
 
 .navbar__links ul {
@@ -32,29 +39,40 @@
   gap: 1.5rem;
   margin: 0;
   padding: 0;
-  margin-right: 26rem;
+}
+
+.navbar__links li {
+  position: relative;
 }
 
 .navbar__links a {
   color: var(--text-color);
-  font-weight: normal;
+  font-weight: 500;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, transform 0.3s ease;
 }
 
 .navbar__links a:hover {
   color: var(--accent-color);
+  transform: translateY(-2px);
+}
+
+.navbar__icons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .navbar__icons .icon-button {
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .navbar__icons .icon-button:hover {
   opacity: 0.8;
+  transform: scale(1.1);
 }
 
 .icon-img {
@@ -63,42 +81,41 @@
   object-fit: contain;
 }
 
-/* ======================== */
-/*   RESPONSIVE STYLES      */
-/* ======================== */
+/* Botón de menú hamburguesa (oculto en escritorio) */
+.navbar__toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.8rem;
+  color: var(--text-color);
+}
 
-/* Mobile devices */
+
 @media (max-width: 768px) {
   .navbar {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
     padding: 1rem;
   }
-  .navbar__brand {
-    margin-bottom: 0.5rem;
+  .navbar__links {
+    display: none;
   }
-  .navbar__brand h1 {
-    font-size: 1rem;
+  .navbar__icons {
+    gap: 0.5rem;
   }
-  .navbar__links ul {
-    flex-direction: column;
-    margin-right: 0;
-    gap: 1rem;
-    width: 100%;
-    margin-top: 1rem;
+  .navbar__toggle {
+    display: block;
   }
 }
 
-/* Tablet devices */
 @media (min-width: 769px) and (max-width: 1024px) {
   .navbar {
     padding: 1rem 1.5rem;
   }
   .navbar__brand h1 {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
   }
-  .navbar__links ul {
-    margin-right: 5rem;
-    gap: 1rem;
+  .navbar__links a {
+    font-size: 0.9rem;
   }
 }
