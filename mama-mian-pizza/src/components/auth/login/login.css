@@ -1,0 +1,108 @@
+.login{
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content: center;
+    height: 100%;
+}
+
+.login__container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #991B1B;
+    border-radius: 10px;
+    padding: 20px;
+    width: 45%;
+    height: 50%;
+    background-color: #FFFFFF;
+    gap: 20px;
+}
+
+.login__header{
+    display: flex;
+    padding: 10px;
+    flex-direction:column;
+    align-items: center;
+    width: 100%; 
+}
+
+.login__header h3{
+    font-size: 1.8rem;
+    color: #991B1B;
+    margin: 0;
+}
+
+.login__main{
+    width: 100%;
+    height: 40%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+}
+
+.login__form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    height: 100%;
+}
+
+.login__form input{
+    width: 70%;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid #991B1B;
+    padding: 10px;
+    font-size: 1.2rem;
+    color: #991B1B;
+}
+
+.login__btn{
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #feb248;
+    border: none;
+    font-size: 1.1rem;
+    width: 20%;
+    color: #991B1B;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.login__btn:hover{
+    background-color: #991B1B;
+    color: #FFFFFF;
+}
+
+.login__footer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 20%;
+    gap: 10px;
+}
+
+.login__footer p{
+    font-size: 1.2rem;
+    color: #991B1B;
+    margin: 0;
+}
+.login__footer a{
+    font-size: 1.2rem;
+    color: #991B1B;
+    text-decoration: none;
+}
+
+.login__footer a:hover{
+    text-decoration: underline;
+}
+.login__footer a:visited{
+    color: #991B1B;
+}
