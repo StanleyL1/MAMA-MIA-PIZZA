@@ -11,14 +11,25 @@ const Navbar = () => {
     <header className="navbar">
       <div className="navbar__brand">
         
-        <h1>Mama Mian <br />Pizza <img src={pizzaLogo} alt="Logo Pizza" className="brand-logo" /></h1>
+      <nav className="navbar__links">
+
+      <ul><li>
+  <a href="/">
+    <h1>
+      Mama Mian <br />Pizza 
+      <img src={pizzaLogo} alt="Logo Pizza" className="brand-logo" />
+    </h1>
+  </a>
+</li>
+</ul>
+</nav>
       </div>
       
       <nav className="navbar__links">
         <ul>
           <li><a href="#servicios">Servicios</a></li>
           <li><a href="#pide-ahora">Pide Ahora!!</a></li>
-          <li><a href="#sobre-nosotros">Sobre Nosotros</a></li>
+          <li><a href="SobreNosotros">Sobre Nosotros</a></li>
         </ul>
       </nav>
       

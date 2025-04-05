@@ -1,131 +1,116 @@
-/* ===== SECCIÓN MENÚ - Clases con prefijo menu- para evitar colisiones ===== */
 
-.menu-section {
-    background-color: #FEFCE8; /* Fondo crema suave, ajusta si deseas */
-    padding: 2rem 1rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    text-align: center;
-  }
-  
-  .menu-title {
-    font-size: 2rem;
-    color: #991B1B;
-    margin-bottom: 2rem;
-  }
-  
-  /* Contenedor de categorías y search */
-  .menu-categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 2rem;
-  }
-  
-  /* Botones de categoría */
-  .menu-category-button {
-    background-color: #fff;
-    color: #991B1B;
-    border: 2px solid #991B1B;
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-  }
-  
-  .menu-category-button:hover {
-    background-color: #991B1B;
-    color: #fff;
-  }
-  
-  .menu-category-button.active {
-    background-color: #991B1B;
-    color: #fff;
-  }
-  
-  /* Barra de búsqueda */
-  .menu-search {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-  }
-  
-  .menu-search input {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .menu-search-button {
-    background-color: #991B1B;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 0.5rem 0.75rem;
-    cursor: pointer;
-    font-size: 1rem;
-  }
-  
-  /* Grid de productos */
-  .menu-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 2rem;
-    justify-items: center; /* Centra las cards en su columna */
-  }
-  
-  /* Cada tarjeta del menú */
-  .menu-card {
-    background-color: #fff;
-    width: 220px;
-    border-radius: 8px;
-    text-align: left;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    padding: 1rem;
-  }
-  
-  /* Imagen del producto */
-  .menu-card-image {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-bottom: 0.75rem;
-  }
-  
-  /* Título del producto */
-  .menu-card-title {
-    font-size: 1.1rem;
-    color: #991B1B;
-    margin: 0.5rem 0;
-  }
-  
-  /* Descripción */
-  .menu-card-description {
-    font-size: 0.9rem;
-    color: #333;
-    line-height: 1.4;
-    margin-bottom: 0.5rem;
-  }
-  
-  /* Rating (estrellas) */
-  .menu-card-rating {
-    margin-bottom: 0.5rem;
-  }
-  
-  .menu-star-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 2px;
-  }
-  
-  /* Precio */
-  .menu-card-price {
-    font-weight: bold;
-    font-size: 1rem;
-    color: #991B1B;
-  }
-  
+.menu-container{
+  background-color: #FFF9E6;
+}
+/* SECCIÓN: CATEGORÍAS Y BÚSQUEDA */
+.menu-categories-section {
+  text-align: center;
+  background-color: #FFF9E6;
+}
+
+.menu-section-title {
+
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.menu-title-icon {
+  width: 32px;
+  height: auto;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.menu-categories {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.menu-category-button {
+  background-color: #F59E0B;
+  color: var(--primary-color);
+  border: none;
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.menu-category-button:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.menu-category-button.active {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.menu-search-container {
+  position: relative;
+  width: 250px; /* Ajusta según sea necesario */
+}
+
+.menu-search-input {
+  width: 100%;
+  padding: 0.5rem 2.5rem 0.5rem 0.5rem; /* Espacio a la derecha para el ícono */
+  border: 2px solid var(--accent-color);
+  border-radius: 4px;
+  outline: none;
+  color: #991B1B;
+  font-weight: bold;
+}
+
+.menu-search-input::placeholder {
+  color: var(--accent-color);
+  opacity: 0.6;
+}
+
+.menu-search-icon {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  cursor: pointer;
+  pointer-events: none; /* Opcional: para que no interfiera con la escritura */
+}
+
+/* SECCIÓN: RECOMENDACIÓN DE LA CASA */
+.menu-recommendation-section {
+  text-align: center;
+  margin: 1rem auto;
+  max-width: 90%;
+  background-color: #FFF9E6; /* Fondo crema suave */
+  border-radius: 8px;
+  padding: 3rem 1rem;
+}
+
+.recommendation-title {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.menu-pizza-icon {
+  width: 32px;
+  height: auto;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.menu-card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}

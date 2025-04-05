@@ -1,0 +1,50 @@
+/* Contenedor principal sin max-width */
+.sobrenos-container {
+    margin: 0 auto;
+    padding: 4rem 1rem;
+    background-color: #FFF9E6;
+    font-family: sans-serif;
+  }
+  
+  /* Contenedor principal para la imagen y el texto */
+  .sobrenos-content {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Contenedor exclusivo para la imagen centrada */
+  .sobrenos-image-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Imagen */
+  .sobrenos-image {
+    width: 60%; /* Ajusta según tu diseño */
+    
+  }
+  
+  /* Contenedor del texto */
+  .sobrenos-text {
+    flex: 1;
+    text-align: center; /* El texto se alinea a la izquierda */
+    color: var(--primary-color);
+  }
+  
+  /* Título */
+  .sobrenos-text h2 {
+    color: var(--primary-color);
+    margin-bottom: 5rem;
+    font-size: 1.5rem;
+  }
+  
+  /* Párrafo descriptivo */
+  .sobrenos-text p {
+    line-height: 1.5;
+    font-size: 1.3rem;
+  }
+  
+ 
+  

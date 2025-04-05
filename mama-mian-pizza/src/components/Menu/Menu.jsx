@@ -1,58 +1,90 @@
 import React, { useState } from 'react';
+import ProductsCards from '../productsCards/productsCards';
+import pizzaIcon from '../../assets/PizzaR.png';
+import pizzaCardImg from '../../assets/PizzaCard.png';
+import menuBookIcon from '../../assets/menuBook.png';
+import searchIcon from '../../assets/search.png';
 import './Menu.css';
 import Footer from '../footer/footer';
-//import { FaSearch } from 'react-icons/fa';
-// Imágenes e íconos (ajusta las rutas según tu estructura)
-import burrataImg from '../../assets/PizzaCard.png';
-import starFull from '../../assets/EstrellaCom.png';
+
+// Datos de prueba para "Recomendación de la Casa"
+const datosPrueba = [
+  {
+    title: "Burrata",
+    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
+    img: pizzaCardImg,
+    price: "$15.00",
+  },
+  {
+    title: "Peperoni",
+    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
+    img: pizzaCardImg,
+    price: "$15.00",
+  },
+  {
+    title: "Jamon",
+    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
+    img: pizzaCardImg,
+    price: "$15.00",
+  },
+  {
+    title: "Burrata",
+    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
+    img: pizzaCardImg,
+    price: "$15.00",
+  },
+  {
+    title: "Peperoni",
+    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
+    img: pizzaCardImg,
+    price: "$15.00",
+  },
+  {
+    title: "Jamon",
+    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
+    img: pizzaCardImg,
+    price: "$15.00",
+  },
+  {
+    title: "Burrata",
+    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
+    img: pizzaCardImg,
+    price: "$15.00",
+  },
+  {
+    title: "Peperoni",
+    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
+    img: pizzaCardImg,
+    price: "$15.00",
+  },
+  {
+    title: "Jamon",
+    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
+    img: pizzaCardImg,
+    price: "$15.00",
+  }
+];
+
+// (Opcional) Datos para otra sección "Las más populares"
+// const DatosPopular = [ ... ];
 
 const Menu = () => {
-  // Estados para categoría y búsqueda (lógica de filtrado de ejemplo)
-  const [activeCategory, setActiveCategory] = useState("Todos");
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // Datos de ejemplo para productos (puedes reemplazar con datos reales)
-  const products = [
-    {
-      id: 1,
-      name: "Pizaa",
-      description: "Mozzarella, cebolla caramelizada, jamón, rúgula y vinagre balsámico",
-      price: "$5.00",
-      image: burrataImg,
-      rating: 5
-    },
-    {
-      id: 2,
-      name: "Margherita",
-      description: "Mozzarella, tomate, albahaca fresca y aceite de oliva",
-      price: "$6.00",
-      image: burrataImg,
-      rating: 4
-    },
-    {
-      id: 3,
-      name: "Pepperoni",
-      description: "Mozzarella, pepperoni, salsa de tomate y orégano",
-      price: "$7.00",
-      image: burrataImg,
-      rating: 5
-    }
-    // Agrega más productos según necesites
-  ];
-
-  // Filtrado básico (en este ejemplo solo se filtra por nombre)
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [activeCategory, setActiveCategory] = useState('Todos');
+  const [searchTerm, setSearchTerm] = useState('');
 
   return (
     <div className="menu-container">
-      <section className="menu-section">
-        <h2 className="menu-title">
-          Nuestro Menú <span role="img" aria-label="libro">📖</span>
+      
+      {/* SECCIÓN: CATEGORÍAS Y BÚSQUEDA */}
+      <section className="menu-categories-section">
+        <h2 className="menu-section-title">
+          Nuestro Menú
+          <img 
+            src={menuBookIcon} 
+            alt="Ícono Libro Menú" 
+            className="menu-title-icon" 
+          />
         </h2>
-
-        {/* Categorías y búsqueda */}
         <div className="menu-categories">
           <button
             className={`menu-category-button ${activeCategory === "Todos" ? "active" : ""}`}
@@ -84,40 +116,42 @@ const Menu = () => {
           >
             Complementos
           </button>
+          <div className="menu-search-container">
+  <input
+    type="text"
+    placeholder="Buscar..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="menu-search-input"
+  />
+  <img 
+    src={searchIcon} 
+    alt="Buscar" 
+    className="menu-search-icon" 
+  />
+</div>
 
-          <div className="menu-search">
-            <input
-              type="text"
-              placeholder="Buscar..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button className="menu-search-button">
-            </button>
-          </div>
-        </div>
-
-        {/* Grid de productos */}
-        <div className="menu-grid">
-          {filteredProducts.map(product => (
-            <div key={product.id} className="menu-card">
-              <img src={product.image} alt={product.name} className="menu-card-image" />
-              <h3 className="menu-card-title">{product.name}</h3>
-              <p className="menu-card-description">{product.description}</p>
-              <div className="menu-card-rating">
-                {[...Array(product.rating)].map((_, index) => (
-                  <img key={index} src={starFull} alt="Estrella completa" className="menu-star-icon" />
-                ))}
-              </div>
-              <p className="menu-card-price">{product.price}</p>
-            </div>
-          ))}
         </div>
       </section>
 
-      {/* Footer sin imagen de fondo */}
-      <Footer noImage />
-    </div>
+      {/* SECCIÓN: RECOMENDACIÓN DE LA CASA */}
+      <section className="menu-recommendation-section">
+        <div className="menu-recommendation-card">
+          <h3 className="recommendation-title">
+            Recomendación de la Casa{" "}
+            <img src={pizzaIcon} alt="Pizza Icon" className="menu-pizza-icon" />
+          </h3>
+          <div className="menu-card-container">
+            {datosPrueba.map((item, index) => (
+              <ProductsCards data={item} key={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Footer noImage={true}/>
+          </div>
+    
   );
 };
 
