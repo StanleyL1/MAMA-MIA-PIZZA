@@ -1,0 +1,124 @@
+/* Contenedor principal: Ocupa toda la pantalla y centra el contenido */
+.register {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+  }
+  
+  /* Contenedor del formulario */
+  .register__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #991B1B;
+    border-radius: 10px;
+    padding: 2rem;
+    width: clamp(300px, 45%, 600px);
+    background-color: #FFFFFF;
+    gap: 1.25rem;
+  }
+  
+  /* Cabecera */
+  .register__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem;
+  }
+  
+  .register__header h3 {
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    color: #991B1B;
+    margin: 0;
+  }
+  
+  /* Área principal del formulario */
+  .register__main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Formulario de registro */
+  .register__form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  /* Inputs del formulario */
+  .register__input {
+    width: 90%;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid #991B1B;
+    padding: 0 0.75rem;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: #991B1B;
+  }
+  
+  /* Instrucciones adicionales */
+  .register__instructions {
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    color: #991B1B;
+    margin: 0;
+    text-align: center;
+  }
+  
+  /* Botón de registro */
+  .register__btn {
+    border-radius: 10px;
+    padding: 0.75rem;
+    background-color: #feb248;
+    border: none;
+    font-size: clamp(1rem, 2vw, 1.1rem);
+    width: 50%;
+    color: #991B1B;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .register__btn:hover {
+    background-color: #991B1B;
+    color: #FFFFFF;
+  }
+  
+  /* Pie de página del formulario */
+  .register__footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem;
+  }
+  
+  .register__footer p {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: #991B1B;
+    margin: 0;
+  }
+  
+  .register__footer a {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: #991B1B;
+    text-decoration: none;
+  }
+  
+  .register__footer a:hover {
+    text-decoration: underline;
+  }
+  
+  .register__footer a:visited {
+    color: #991B1B;
+  }
+  
