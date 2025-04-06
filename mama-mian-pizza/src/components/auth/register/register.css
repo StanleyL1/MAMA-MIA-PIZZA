@@ -1,123 +1,232 @@
-/* Contenedor principal: Ocupa toda la pantalla y centra el contenido */
+/* General */
+* {
+  box-sizing: border-box;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* Contenedor principal */
 .register {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-  }
-  
-  /* Contenedor del formulario */
-  .register__container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #991B1B;
-    border-radius: 10px;
-    padding: 2rem;
-    width: clamp(300px, 45%, 600px);
-    background-color: #FFFFFF;
-    gap: 1.25rem;
-  }
-  
-  /* Cabecera */
-  .register__header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    padding: 0.5rem;
-  }
-  
-  .register__header h3 {
-    font-size: clamp(1.5rem, 2.5vw, 2rem);
-    color: #991B1B;
-    margin: 0;
-  }
-  
-  /* Área principal del formulario */
-  .register__main {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  /* Formulario de registro */
-  .register__form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-  }
-  
-  /* Inputs del formulario */
-  .register__input {
-    width: 90%;
-    height: 40px;
-    border-radius: 10px;
-    border: 1px solid #991B1B;
-    padding: 0 0.75rem;
-    font-size: clamp(1rem, 2vw, 1.2rem);
-    color: #991B1B;
-  }
-  
-  /* Instrucciones adicionales */
-  .register__instructions {
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-    color: #991B1B;
-    margin: 0;
-    text-align: center;
-  }
-  
-  /* Botón de registro */
-  .register__btn {
-    border-radius: 10px;
-    padding: 0.75rem;
-    background-color: #feb248;
-    border: none;
-    font-size: clamp(1rem, 2vw, 1.1rem);
-    width: 50%;
-    color: #991B1B;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-  }
-  
-  .register__btn:hover {
-    background-color: #991B1B;
-    color: #FFFFFF;
-  }
-  
-  /* Pie de página del formulario */
-  .register__footer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 0.5rem;
-  }
-  
-  .register__footer p {
-    font-size: clamp(1rem, 2vw, 1.2rem);
-    color: #991B1B;
-    margin: 0;
-  }
-  
-  .register__footer a {
-    font-size: clamp(1rem, 2vw, 1.2rem);
-    color: #991B1B;
-    text-decoration: none;
-  }
-  
-  .register__footer a:hover {
-    text-decoration: underline;
-  }
-  
-  .register__footer a:visited {
-    color: #991B1B;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+  padding: 1rem;
+}
+
+/* Contenedor del formulario */
+.register__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #991B1B;
+  border-radius: 10px;
+  padding: 2rem;
+  width: clamp(300px, 45%, 600px);
+  background-color: #ffffff;
+  gap: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Cabecera */
+.register__header {
+  text-align: center;
+  width: 100%;
+}
+
+.register__header h3 {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  color: #991B1B;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+/* Área principal del formulario */
+.register__main {
+  width: 100%;
+}
+
+/* Formulario de registro */
+.register__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Inputs y select */
+.register__input {
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #991B1B;
+  padding: 0 0.75rem;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #991B1B;
+  background-color: #fff;
+  transition: border-color 0.3s;
+}
+
+.register__input:focus {
+  outline: none;
+  border-color: #feb248;
+}
+
+/* Select adicional */
+.register__select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg fill='%23991B1B' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+}
+
+/* Instrucciones */
+.register__instructions {
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  color: #991B1B;
+  text-align: center;
+  margin: 0;
+}
+
+/* Botón */
+.register__btn {
+  border-radius: 8px;
+  padding: 0.75rem;
+  background-color: #feb248;
+  border: none;
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  width: 50%;
+  color: #991B1B;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.register__btn:hover {
+  background-color: #991B1B;
+  color: #ffffff;
+}
+
+/* Pie de página */
+.register__footer {
+  text-align: center;
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.register__footer p {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #991B1B;
+  margin: 0;
+}
+
+.register__footer a {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #991B1B;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.register__footer a:hover {
+  color: #feb248;
+}
+
+/* ------------------------------------------------------------------ */
+/*         ESTILOS DEL DATEPICKER PERSONALIZADO MODERNO                */
+/* ------------------------------------------------------------------ */
+
+.custom-datepicker-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.custom-datepicker-input {
+  cursor: pointer;
+}
+
+/* Calendario emergente */
+.custom-calendar {
+  position: absolute;
+  top: 45px;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #991B1B;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+/* Encabezado del calendario */
+.custom-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #991B1B;
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px 8px 0 0;
+}
+
+.custom-calendar-nav {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.custom-calendar-nav:hover {
+  opacity: 0.7;
+}
+
+.custom-calendar-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.custom-calendar-year-select {
+  font-size: 0.9rem;
+  padding: 0.2rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #991B1B;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Cuerpo del calendario */
+.custom-calendar-body {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0.5rem;
+}
+
+.custom-calendar-day {
+  width: calc(100% / 7 - 0.5rem);
+  margin: 0.25rem;
+  text-align: center;
+  padding: 0.5rem 0;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #991B1B;
+  transition: background-color 0.2s;
+}
+
+.custom-calendar-day:hover {
+  background-color: #feb248;
+  color: #991B1B;
+}
+
+.custom-calendar-day.selected {
+  background-color: #feb248;
+  color: #991B1B;
+}
