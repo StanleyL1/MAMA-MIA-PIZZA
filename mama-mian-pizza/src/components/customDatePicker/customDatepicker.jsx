@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../auth/register/register.css"; // Importa el CSS del componente de registro
+import "../auth/register/register.css"; // Asegúrate de que la ruta sea correcta
 
 const CustomDatePicker = ({ value, onChange }) => {
   const [showCalendar, setShowCalendar] = useState(false);
@@ -19,7 +19,7 @@ const CustomDatePicker = ({ value, onChange }) => {
     yearOptions.push(y);
   }
 
-  // Retorna la cantidad de días del mes
+  // Calcula la cantidad de días en el mes actual
   const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
 
   const getDaysArray = () => {
@@ -71,10 +71,13 @@ const CustomDatePicker = ({ value, onChange }) => {
     }
   };
 
+  // Nombres de los meses y días (en español)
   const monthNames = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
   ];
+
+  const dayNames = ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"];
 
   return (
     <div className="custom-datepicker-wrapper" ref={wrapperRef}>
@@ -117,6 +120,14 @@ const CustomDatePicker = ({ value, onChange }) => {
             >
               &#10095;
             </button>
+          </div>
+          {/* Fila de nombres de días */}
+          <div className="custom-calendar-days-row">
+            {dayNames.map((day) => (
+              <span key={day} className="custom-calendar-day-name">
+                {day}
+              </span>
+            ))}
           </div>
           <div className="custom-calendar-body">
             {getDaysArray().map((day) => (

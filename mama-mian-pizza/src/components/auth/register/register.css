@@ -1,21 +1,21 @@
-/* General */
+/* -------------------------------------------------- */
+/*            ESTILOS GENERALES DEL FORMULARIO        */
+/* -------------------------------------------------- */
+
 * {
   box-sizing: border-box;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-/* Contenedor principal */
 .register {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: #f9f9f9;
   padding: 1rem;
 }
 
-/* Contenedor del formulario */
 .register__container {
   display: flex;
   flex-direction: column;
@@ -29,7 +29,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Cabecera */
 .register__header {
   text-align: center;
   width: 100%;
@@ -42,12 +41,10 @@
   letter-spacing: 1px;
 }
 
-/* Área principal del formulario */
 .register__main {
   width: 100%;
 }
 
-/* Formulario de registro */
 .register__form {
   display: flex;
   flex-direction: column;
@@ -73,18 +70,84 @@
   border-color: #feb248;
 }
 
-/* Select adicional */
+/* Select */
+.register__select-container {
+  position: relative;
+  width: 100%;
+}
+
 .register__select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg fill='%23991B1B' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1rem;
+  background-image: none;
+  padding-right: 2.5rem;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-/* Instrucciones */
+.register__select:focus {
+  border-color: #feb248;
+  box-shadow: 0 0 0 2px rgba(254, 178, 72, 0.25);
+}
+
+/* Select animation */
+.register__select-container.open .register__select {
+  border-color: #feb248;
+  box-shadow: 0 0 0 3px rgba(254, 178, 72, 0.3);
+  animation: selectPulse 0.5s ease-in-out;
+}
+
+@keyframes selectPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.register__select option {
+  background-color: #fff;
+  color: #991B1B;
+  padding: 0.75rem;
+}
+
+.register__select option:hover {
+  background-color: #feb248;
+}
+
+.register__select-arrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid #991B1B;
+  pointer-events: none;
+  transition: transform 0.3s;
+}
+
+.register__select-container.open .register__select-arrow {
+  transform: translateY(-50%) rotate(180deg);
+  animation: arrowBounce 0.5s ease-in-out;
+}
+
+@keyframes arrowBounce {
+  0%, 100% {
+    transform: translateY(-50%) rotate(180deg);
+  }
+  50% {
+    transform: translateY(-65%) rotate(180deg);
+  }
+}
+
 .register__instructions {
   font-size: clamp(0.8rem, 2vw, 0.9rem);
   color: #991B1B;
@@ -92,7 +155,6 @@
   margin: 0;
 }
 
-/* Botón */
 .register__btn {
   border-radius: 8px;
   padding: 0.75rem;
@@ -111,7 +173,6 @@
   color: #ffffff;
 }
 
-/* Pie de página */
 .register__footer {
   text-align: center;
   width: 100%;
@@ -135,9 +196,9 @@
   color: #feb248;
 }
 
-/* ------------------------------------------------------------------ */
-/*         ESTILOS DEL DATEPICKER PERSONALIZADO MODERNO                */
-/* ------------------------------------------------------------------ */
+/* -------------------------------------------------- */
+/*        ESTILOS DEL DATEPICKER CON TEMA OSCURO      */
+/* -------------------------------------------------- */
 
 .custom-datepicker-wrapper {
   position: relative;
@@ -148,17 +209,31 @@
   cursor: pointer;
 }
 
-/* Calendario emergente */
+/* Calendario emergente (fondo oscuro) */
 .custom-calendar {
   position: absolute;
   top: 45px;
   left: 0;
   width: 100%;
-  background: #fff;
+  background: #fffbeb; /* Fondo oscuro */
   border: 1px solid #991B1B;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
   z-index: 10;
+  animation: calendarAppear 0.3s ease-out;
+  transform-origin: top center;
+}
+
+/* Animación para el calendario */
+@keyframes calendarAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Encabezado del calendario */
@@ -196,11 +271,27 @@
 .custom-calendar-year-select {
   font-size: 0.9rem;
   padding: 0.2rem;
-  border: none;
+  border: 1px solid #fff;
   border-radius: 4px;
   background-color: #991B1B;
   color: #fff;
   cursor: pointer;
+}
+
+/* Fila de nombres de días */
+.custom-calendar-days-row {
+  display: flex;
+  background-color: #991B1B;
+  color: #fff;
+  padding: 0.5rem;
+  border-bottom: 1px solid #991B1B;
+}
+
+.custom-calendar-day-name {
+  width: calc(100% / 7);
+  text-align: center;
+  color: #fff;
+  font-size: 0.9rem;
 }
 
 /* Cuerpo del calendario */
@@ -208,17 +299,18 @@
   display: flex;
   flex-wrap: wrap;
   padding: 0.5rem;
+  color: #f0f0f0;
 }
 
 .custom-calendar-day {
-  width: calc(100% / 7 - 0.5rem);
-  margin: 0.25rem;
+  width: calc(100% / 7);
+  margin: 0.1rem 0;
   text-align: center;
   padding: 0.5rem 0;
   border-radius: 4px;
   cursor: pointer;
-  color: #991B1B;
-  transition: background-color 0.2s;
+  color: #ff9500;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .custom-calendar-day:hover {
@@ -227,6 +319,24 @@
 }
 
 .custom-calendar-day.selected {
-  background-color: #feb248;
-  color: #991B1B;
+  background-color: #991B1B;
+  color: #ffffff;
+  animation: daySelect 0.3s ease;
 }
+
+/* Animación para el día seleccionado */
+@keyframes daySelect {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+
+
