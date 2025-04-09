@@ -128,10 +128,7 @@ const Home = () => {
     }
   };
 
-  // Alterna la visibilidad del carrito
-  const toggleCart = () => {
-    setIsCartOpen(!isCartOpen);
-  };
+
 
   return (
     <div className="main__content">
