@@ -3,12 +3,12 @@ import './productsCards.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faStarHalf, faCartShopping } from '@fortawesome/free-solid-svg-icons';
 
-function ProductsCards({ data: { title, Descripcion, img, price }, onCardClick }) {
+function ProductsCards({ data: { titulo, descripcion, imagen, price }, onCardClick }) {
   return (
     <div className="prodcard-container" onClick={onCardClick}>
-      <img src={img} alt={title} className="prodcard-image" />
-      <h3 className="prodcard-title">{title}</h3>
-      <p className="card__product__description">{Descripcion}</p>
+      <imagen src={imagen} alt={titulo} className="prodcard-image" />
+      <h3 className="prodcard-titulo">{titulo}</h3>
+      <p className="card__product__description">{descripcion}</p>
       
       <div className="stars__containers">
         <FontAwesomeIcon icon={faStar} />

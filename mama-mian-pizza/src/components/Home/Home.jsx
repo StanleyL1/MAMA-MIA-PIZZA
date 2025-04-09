@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faMedal, faTruck, faCarrot } from '@fortawesome/free-solid-svg-icons';
@@ -84,6 +84,26 @@ const datosTestimonios = [
 ];
 
 const Home = () => {
+  const [popular, setPopular] = useState([]);
+
+
+  useEffect(() => {
+    const fetchPopular = async () => {
+      try{
+        const response = await fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/MostPopular');
+        const data = await response.json();
+        setPopular(data.productos);
+      }catch (error) {
+        console.log(error)
+      }finally {
+        console.log('Petición realizada')
+      }
+    }
+    fetchPopular();
+  }, [])
+
+  console.log(popular[0]);
+
   // Estado para el modal de pizza
   const [selectedPizza, setSelectedPizza] = useState(null);
   // Estado para el carrito de compras
@@ -157,7 +177,7 @@ const Home = () => {
           Recomendación de la Casa <img src={pizzaIcon} alt="Pizza Icon" />
         </h1>
         <div className="whyus__content">
-          {datosPrueba.map((item, index) => (
+          {popular.map((item, index) => (
             <ProductsCards 
               data={item} 
               key={index}
