@@ -3,7 +3,7 @@ import './productsCards.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faStarHalf, faCartShopping } from '@fortawesome/free-solid-svg-icons';
 
-function ProductsCards({ data: { titulo, descripcion, imagen, price }, onCardClick }) {
+function ProductsCards({ data: { titulo, descripcion, imagen, precio }, onCardClick }) {
   return (
     <div className="prodcard-container" onClick={onCardClick}>
       <img src={imagen} alt={titulo} className="prodcard-image" />
@@ -20,7 +20,7 @@ function ProductsCards({ data: { titulo, descripcion, imagen, price }, onCardCli
       </div>
       
       <div className="card__footer">
-        <p className="card__product__price">{price}</p>
+        <p className="card__product__price">{precio}</p>
         {/* Si deseas que también se active el modal al hacer click en el botón, 
             asegúrate de evitar que el click se duplique usando e.stopPropagation() */}
         <button 
