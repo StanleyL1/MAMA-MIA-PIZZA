@@ -6,7 +6,7 @@ import { faStar, faStarHalf, faCartShopping } from '@fortawesome/free-solid-svg-
 function ProductsCards({ data: { titulo, descripcion, imagen, price }, onCardClick }) {
   return (
     <div className="prodcard-container" onClick={onCardClick}>
-      <imagen src={imagen} alt={titulo} className="prodcard-image" />
+      <img src={imagen} alt={titulo} className="prodcard-image" />
       <h3 className="prodcard-titulo">{titulo}</h3>
       <p className="card__product__description">{descripcion}</p>
       
