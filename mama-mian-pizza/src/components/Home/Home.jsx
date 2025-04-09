@@ -17,27 +17,7 @@ import comentarioImg from '../../assets/comentario.png';
 
 import './Home.css';
 
-// Datos para "Recomendación de la Casa"
-const datosPrueba = [
-  {
-    title: "Burrata",
-    Descripcion: "Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Peperoni",
-    Descripcion: "Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Jamon",
-    Descripcion: "Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  }
-];
+
 
 // Datos para "La más populares"
 const DatosPopular = [
