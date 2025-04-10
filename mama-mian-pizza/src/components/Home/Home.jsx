@@ -18,29 +18,6 @@ import comentarioImg from '../../assets/comentario.png';
 import './Home.css';
 
 
-
-// Datos para "La más populares"
-const DatosPopular = [
-  {
-    title: "Burrata",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Peperoni",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Jamon",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  }
-];
-
 // Datos de testimonios
 const datosTestimonios = [
   {
@@ -65,9 +42,22 @@ const datosTestimonios = [
 
 const Home = () => {
   const [popular, setPopular] = useState([]);
-
+  const [recomendacion, setRecomendaciones] = useState([]);
 
   useEffect(() => {
+    
+    const fetchRecomendations = async () => {
+      try{
+        const response = await fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/recomendacion');
+        const data = await response.json();
+        setRecomendaciones(data.productos);
+      }catch (error) {
+        console.log(error)
+      }finally {
+        console.log('Petición realizada')
+      }
+    }
+
     const fetchPopular = async () => {
       try{
         const response = await fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/MostPopular');
@@ -80,6 +70,7 @@ const Home = () => {
       }
     }
     fetchPopular();
+    fetchRecomendations();
   }, [])
 
   console.log(popular[0]);
@@ -153,7 +144,7 @@ const Home = () => {
           Recomendación de la Casa <img src={pizzaIcon} alt="Pizza Icon" />
         </h1>
         <div className="whyus__content">
-          {popular.map((item, index) => (
+          {recomendacion.map((item, index) => (
             <ProductsCards 
               data={item} 
               key={index}
@@ -169,7 +160,7 @@ const Home = () => {
           La más populares <img src={fireIcon} alt="Fire Icon" />
         </h2>
         <div className="whyus__content">
-          {DatosPopular.map((item, index) => (
+          {popular.map((item, index) => (
             <ProductsCards 
               data={item} 
               key={index}

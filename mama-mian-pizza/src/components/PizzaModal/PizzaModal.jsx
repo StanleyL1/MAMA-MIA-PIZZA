@@ -20,10 +20,10 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
         <button className="modal-close-button" onClick={onClose}>X</button>
         <div className="modal-layout">
           <div className="modal-left">
-            <img src={pizza.img} alt={pizza.title} className="modal-pizza-image" />
+            <img src={pizza.imagen} alt={pizza.titulo} className="modal-pizza-image" />
           </div>
           <div className="modal-right">
-            <h2 className="modal-pizza-title">{pizza.title}</h2>
+            <h2 className="modal-pizza-title">{pizza.titulo}</h2>
             <div className="modal-selectors">
               <div className="selector-item">
                 <label htmlFor="masaSelect">Masa</label>
@@ -51,9 +51,9 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
               </div>
             </div>
             <h3 className="modal-desc-title">Descripción</h3>
-            <p className="modal-pizza-description">{pizza.Descripcion}</p>
+            <p className="modal-pizza-description">{pizza.descripcion}</p>
             <div className="modal-bottom-row">
-              <span className="modal-pizza-price">{pizza.price}</span>
+              <span className="modal-pizza-price">{pizza.precio}</span>
               <button className="modal-add-button" onClick={handleAddToOrder}>
                 Añadir a mi orden <FontAwesomeIcon icon={faCartShopping} />
               </button>
