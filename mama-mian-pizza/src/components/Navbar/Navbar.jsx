@@ -15,20 +15,21 @@ const Navbar = ({ onCartToggle }) => {
 
   return (
     <header className="navbar">
-      <div className="navbar__brand">
-        <nav className="navbar__links">
-          <ul>
-            <li>
-              <a href="/">
-                <h1>
-                  Mama Mian <br /> Pizza
-                  <img src={pizzaLogo} alt="Logo Pizza" className="brand-logo" />
-                </h1>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
+     <div className="navbar__brand">
+  <nav className="navbar-title">
+    <ul>
+      <li>
+        <a href="/" className="brand-link">
+          <h1>
+            Mama Mian <br /> Pizza 
+            <img src={pizzaLogo} alt="Logo Pizza" className="brand-logo" />
+          </h1>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
 
       <nav className="navbar__links">
         <ul>
@@ -41,21 +42,20 @@ const Navbar = ({ onCartToggle }) => {
       <div className="navbar__icons">
         {/* Sección de usuario */}
         <div className="navbar__user-section">
-          <button 
-            className="icon-button" 
-            aria-label="Usuario"
-            onClick={toggleUserLinks}
-          >
-            <img src={userIcon} alt="Usuario" className="icon-img" />
-          </button>
+  <button 
+    className="icon-button" 
+    aria-label="Usuario"
+    onClick={toggleUserLinks}
+  >
+    <img src={userIcon} alt="Usuario" className="icon-img" />
+  </button>
 
-          {mostrarLinks && (
-            <div className="navbar__user-links">
-              <a href="/login">Iniciar sesión</a>
-              <a href="/register">Registrar</a>
-            </div>
-          )}
-        </div>
+  <div className={`navbar__user-links ${!mostrarLinks ? 'hidden' : ''}`}>
+    <a href="/login">Iniciar sesión</a>
+    <a href="/register">Registrar</a>
+  </div>
+</div>
+
 
         {/* Icono de Carrito */}
         <button 

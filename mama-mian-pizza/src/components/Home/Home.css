@@ -8,26 +8,22 @@
 }
 
 body{
-  background-color: var(--bg_color);
+  background-color: var(--secondary_color);
 }
 
-:root{
-  --red_primario: #991B1B;
-  --bg_color: #FFFBEB;
-  --font-nav: #FFFBEB;
-}
 
 .main__content{
   display: flex;
   flex-direction: column;
+  background-color: var(--secondary-color);
   gap: 40px;
 }
 
 .hero__container{
   background-image: url(../../assets/PizzaPrin.png);
-  background-size: cover;
+  background-size: 100%;
   background-repeat: no-repeat;
-  height: 540px;
+  height: 600px;
   display: flex;
   align-items: flex-start;
   flex-direction: column;
@@ -45,13 +41,13 @@ body{
 }
 
 .hero__title{
-  font-size: 3.5rem;
-  margin-bottom: 10px;
+  font-size: 2.5rem;
+  margin-bottom: 40px;
 }
 
 .hero__text{
   font-size: 1.4rem;
-  margin-bottom: 20px;
+  margin-bottom: 50px;
   text-align: justify;
 }
 
@@ -62,6 +58,8 @@ body{
   border: none;
   cursor: pointer;
   font-size: 1.4rem;
+  width: 38%;
+  height: 18%;
   font-weight: bold;
   border-radius: 10px;
 }
@@ -77,7 +75,8 @@ body{
   flex-direction: column;
   align-items: center;
   border-radius: 10px;
-  margin: 10px 20px;
+  margin: 10px 80px;
+  width: 90%;
   padding: 20px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
 }
@@ -94,7 +93,8 @@ body{
   flex-direction: column;
   align-items: center;
   border-radius: 10px;
-  margin: 10px 20px;
+  margin: 10px 80px;
+  width: 90%;
   padding: 20px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
 }
@@ -120,6 +120,14 @@ body{
 }
 
 .whyus__content{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 82%;
+  padding: 20px;
+}
+.whyus__contentt{
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -162,16 +170,17 @@ body{
   padding: 10px;
 }
 
-.review__section{
+.review__section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 10px 20px;
+  margin: 0 12% 10px; /* 0 de margen arriba, 12% horizontal, 10px abajo */
 }
+
 
 .review__header{
   font-size: 2.5rem;
-  margin-bottom: 20px;
+  margin-bottom: 64px;
   color: #EAB308;
 }
 
@@ -241,6 +250,45 @@ body{
   text-align: justify;
   margin: 0 20px;
 }
+
+/*CHAT BOT*/
+/* Botón flotante de Chat */
+.chat-floating-button {
+  position: fixed;
+  bottom: 50%;   /* Aumentado para que quede más arriba */
+  right: 20px;
+  display: flex;
+  align-items: center;
+  color: var(--text-dark);
+  border-radius: 50px;
+  cursor: pointer;
+}
+
+/* Texto del botón */
+.chat-button-text {
+  margin-right: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* Círculo del ícono */
+.chat-icon-circle {
+  width: 40px;
+  height: 40px;
+  background-color: var(--accent-color);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Ícono del robot */
+.chat-robot-icon {
+  width: 24px;
+  height: 24px;
+}
+
+
 
 .cta__section{
   background-image: url("../../assets/footer.png");

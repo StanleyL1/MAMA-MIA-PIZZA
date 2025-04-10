@@ -4,11 +4,10 @@
   display: flex;
   align-items: center;
   background-color: var(--primary-color);
-  padding: 1rem 2rem;
+  padding: 1rem 1rem;
   color: var(--text-color);
-  position: sticky;
+  position: block;
   top: 0;
-  z-index: 1000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -18,25 +17,35 @@
 }
 /* Contenedor de íconos en la Navbar */
 .navbar__icons {
+  margin-left: auto;
   display: flex;
-  align-items: center;
-  gap: 1rem;  /* Separación general entre elementos */
+  gap: 2rem;  
 }
 
 /* Sección del usuario: ícono y enlaces */
 .navbar__user-section {
   display: flex;
   flex-direction: column;
+  margin-top: 10px;
   align-items: center;
-  margin-right: 2rem; /* Más espacio entre usuario y carrito */
+  margin-right: 0.2rem; /* Más espacio entre usuario y carrito */
 }
 
-/* Enlaces debajo del ícono de usuario */
 .navbar__user-links {
+  visibility: visible;
   margin-top: 0.5rem;
+  opacity: 1;
   display: flex;
+  transition: opacity 0.3 ease;
   flex-direction: row; /* Si se quieren en línea */
   gap: 0.5rem;
+}
+
+
+.navbar__user-links.hidden{
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .navbar__user-links a {
@@ -57,28 +66,31 @@
 margin-bottom: 24px;}
 
 /* Ajusta la imagen del ícono (si es necesario) */
-.icon-img {
-  width: 40px;   /* Ajusta el tamaño según tu diseño */
-  height: 40px;
-  object-fit: contain;
-}
+
 
 
 .brand-logo {
   width: 32px;
-  height: 32px;
-  margin-right: 8px;
-  border-radius: 50%;
+  height: 31px;
   object-fit: cover;
+  margin-left: 1rem;
+  
+  
 }
+
 
 .navbar__brand h1 {
   margin: 0;
   font-size: 1.5rem;
   color: var(--text-color);
   letter-spacing: 0.05rem;
+  
 }
-
+.navbar__brand ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 .navbar__links ul {
   list-style: none;
   display: flex;
@@ -86,9 +98,22 @@ margin-bottom: 24px;}
   margin: 0;
   padding: 0;
 }
+.navbar__links{
+  margin-left: 7%; /* Esto empuja el bloque hacia la derecha */
+  font-size: 21px;
+  color: var(--secondary-color);
+}
 
 .navbar__links li {
   position: relative;
+
+}
+
+.navbar-title a {
+  color: var(--text-color);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
 }
 
 .navbar__links a {

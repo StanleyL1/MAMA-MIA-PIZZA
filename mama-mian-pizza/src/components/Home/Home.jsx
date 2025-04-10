@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faMedal, faTruck, faCarrot } from '@fortawesome/free-solid-svg-icons';
-
 import ProductsCards from '../productsCards/productsCards';
 import PizzaModal from '../PizzaModal/PizzaModal';
 import Footer from '../footer/footer';
@@ -86,6 +85,7 @@ const datosTestimonios = [
 const Home = () => {
   const [selectedPizza, setSelectedPizza] = useState(null);
   const [cartItems, setCartItems] = useState([]);
+  
 
   const handleOpenPizza = (pizza) => {
     setSelectedPizza(pizza);
@@ -122,7 +122,6 @@ const Home = () => {
     }
   };
 
-  // Alterna la visibilidad del carrito
   
   return (
     <div className="main__content">
@@ -177,7 +176,7 @@ const Home = () => {
       {/* Sección "¿Por qué elegir Mama Mian Pizza?" */}
       <section className="whyus__section">
         <h2 className="whyus__header">¿Por qué elegir Mama Mian Pizza?</h2>
-        <div className="whyus__content">
+        <div className="whyus__contentt">
           <div className="whyus__cards">
             <i><FontAwesomeIcon icon={faClock} /></i>
             <h3 className="whyus__card__title">Entrega rápida</h3>
@@ -211,7 +210,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      
+ 
       {/* Botón flotante de Chat */}
       <div className="chat-floating-button">
         <span className="chat-button-text">¡Chatea conmigo!</span>
@@ -219,7 +218,6 @@ const Home = () => {
           <img src={robotIcon} alt="Robot" className="chat-robot-icon" />
         </div>
       </div>
-      
       {/* Sección de Testimonios */}
       <section className="review__section">
         <h2 className="review__header">Lo que dicen nuestros clientes</h2>

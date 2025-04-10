@@ -402,7 +402,7 @@ body {
   /* ===== Toggle de dirección (Llenar Formulario / Ubicación de tiempo real) ===== */
   .toggle-direccion {
     display: flex;
-    padding: 12px;
+    padding: 22px;
   }
   
   .toggle-dir-btn {
@@ -415,6 +415,7 @@ body {
     color: var(--primary-color);
     text-align: center;
     transition: background-color 0.2s;
+    border-radius: 6px;
   }
   
   .toggle-dir-btn.activo {
@@ -442,11 +443,11 @@ body {
   /* Los inputs de ancho completo en esta sección */
   .contenido-direccion .input-full {
     width: 100%;
-    padding: 14px;
+    padding: 12px;
     font-size: 0.9rem;
     border: 1px solid var(--primary-color);
     border-radius: 9px;
-    margin-bottom: 20px;
+    margin-bottom: 54px;
     background-color: var(--secondary-color);
     color: var(--text-dark);
   }
@@ -471,7 +472,17 @@ body {
     color: var(--primary-color);
     font-size: 0.9rem;
   }
-  
+  .input-pais,
+.input-municipio {
+  width: 100%;
+  height: 40px;
+  padding: 8px;
+  border: 1px solid var(--primary-color);
+  border-radius: 12px;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  font-size: 0.9rem;
+}
   .instruccion {
     text-align: center;
     text-align: center;
@@ -880,7 +891,7 @@ font-size: 13px;
     justify-content: space-between;
     align-items: center;
     gap: 1x;
-    margin-top: 20px;
+    margin-top: auto;
   }
   
   /* Botón "Atrás" más pequeño, con ancho fijo */

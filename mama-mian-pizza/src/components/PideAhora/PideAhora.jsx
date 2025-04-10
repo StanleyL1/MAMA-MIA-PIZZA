@@ -293,46 +293,45 @@ const PideAhora = () => {
                       className="input-full"
                     />
                   </div>
-                  {/* Campos para País, Departamento y Municipio */}
                   <div className="campos-tres">
-                    <div className="campo">
-                      <label htmlFor="pais">País</label>
-                      <input
-                        type="text"
-                        name="pais"
-                        id="pais"
-                        value={direccionData.pais}
-                        onChange={handleInputDireccion}
-                        className="input-full"
-                      />
-                    </div>
-                    <div className="campo">
-                      <label htmlFor="departamento">Departamento</label>
-                      <select
-                        name="departamento"
-                        id="departamento"
-                        value={direccionData.departamento}
-                        onChange={handleInputDireccion}
-                        className="select-departamento"
-                      >
-                        <option value="">Seleccionar...</option>
-                        <option value="Usulután">Usulután</option>
-                        <option value="San Salvador">San Salvador</option>
-                        <option value="La Libertad">La Libertad</option>
-                      </select>
-                    </div>
-                    <div className="campo">
-                      <label htmlFor="municipio">Municipio</label>
-                      <input
-                        type="text"
-                        name="municipio"
-                        id="municipio"
-                        value={direccionData.municipio}
-                        onChange={handleInputDireccion}
-                        className="input-full"
-                      />
-                    </div>
-                  </div>
+  <div className="campo">
+    <label htmlFor="pais">País</label>
+    <input
+      type="text"
+      name="pais"
+      id="pais"
+      value={direccionData.pais}
+      onChange={handleInputDireccion}
+      className="input-pais"
+    />
+  </div>
+  <div className="campo">
+    <label htmlFor="departamento">Departamento</label>
+    <select
+      name="departamento"
+      id="departamento"
+      value={direccionData.departamento}
+      onChange={handleInputDireccion}
+      className="select-departamento"
+    >
+      <option value="">Seleccionar...</option>
+      <option value="Usulután">Jiquilisco</option>
+      <option value="San Salvador">Usulutan</option>
+      <option value="La Libertad">La Libertad</option>
+    </select>
+  </div>
+  <div className="campo">
+    <label htmlFor="municipio">Municipio</label>
+    <input
+      type="text"
+      name="municipio"
+      id="municipio"
+      value={direccionData.municipio}
+      onChange={handleInputDireccion}
+      className="input-municipio"
+    />
+  </div>
+</div>
                 </div>
               )}
 
