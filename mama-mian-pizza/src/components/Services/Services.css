@@ -1,0 +1,174 @@
+/* Contenedor principal */
+.services-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  background-color: #FFF8EE; /* Fondo crema claro */
+  font-family: sans-serif;
+}
+
+/* Título principal */
+.services-title {
+  text-align: center;
+  font-size: 2rem;
+  color: #991B1B;
+  margin-bottom: 2rem;
+}
+
+/* Sección superior: dos cards lado a lado */
+.services-top-row {
+  display: flex;
+  flex-wrap: wrap; /* Para ser responsive en pantallas pequeñas */
+  gap: 2rem;
+  margin-bottom: 4.5rem;
+}
+
+/* Card general */
+.services-card {
+  background-color: #d3cdcd;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(255, 117, 117, 0.1);
+  overflow: hidden;
+  flex: 1 1 ; /* Cada card mínimo 400px ancho */
+  width: 517px;
+  height: 457px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Contenedor de la imagen (con overlay del título) */
+.services-card-image-container {
+  position: relative;
+  width: 619px;
+  height: 225px; /* Ajusta la altura de la imagen */
+  overflow: hidden;
+}
+
+.services-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Título centrado en el medio de la imagen */
+.services-card-title-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;            /* Texto en blanco */
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+  padding: 0.5rem;
+}
+
+/* Cuerpo de la tarjeta (descripción) */
+.services-card-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+}
+.services-card-icon-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  color: #991B1B;
+}
+
+.services-bottom-text ul li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.services-card-body p {
+  margin: 0;
+  line-height: 1.14;
+  color: var(--primary-color);
+}
+
+.services-highlight {
+  font-weight: bold;
+  color: #BF6D0A; /* Texto destacado */
+}
+
+/* Card inferior: rojo a la izquierda, foto a la derecha */
+.services-bottom-card {
+  display: flex;
+  flex-wrap: wrap;
+  /* Card con borde redondeado y sombra, si deseas */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden; /* para que no se salga la imagen */
+}
+
+/* Bloque rojo a la izquierda */
+.services-bottom-text {
+  background-color: #991B1B;
+  color: #fff;
+  flex: 1 1 400px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Título en la sección inferior */
+.services-bottom-text h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #fdac48;
+}
+
+/* Texto y lista en blanco */
+.services-bottom-text p {
+  margin: 0;
+  line-height: 1.5;
+  font-size: 17px;
+  color: var(--secondary-color);
+}
+
+.services-bottom-text ul {
+  list-style: disc;
+  font-size: 17px;
+  line-height: 2.8;
+  margin: 1rem 0 1rem 1.5rem;
+}
+
+/* Botón "Reservar" */
+.services-reserve-button {
+  background-color: #FEB248;
+  color: #991B1B;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  width: fit-content;
+}
+
+.services-reserve-button:hover {
+  background-color: #BF6D0A;
+}
+
+/* Imagen a la derecha */
+.services-bottom-image-container {
+  width: 490px;
+  height: 490px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-color); /* si deseas ver un fondo blanco */
+}
+
+.services-bottom-image {
+  width: 90%;
+  object-fit: cover;
+  border-radius: 0 0 0 0; /* Ajusta si deseas borde redondeado */
+}

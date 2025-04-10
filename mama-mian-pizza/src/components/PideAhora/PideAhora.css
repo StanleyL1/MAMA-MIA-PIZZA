@@ -1,0 +1,379 @@
+
+  
+  
+  /* ===== Global ===== */
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--text-color); /* Fondo crema */
+    font-family: Arial, sans-serif;
+  }
+  
+  .contenedor-pideahora {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* ===== Layout principal ===== */
+  .layout {
+    display: flex;
+    gap: 130px;
+  }
+  
+  /* Columna izquierda: Barra de navegación y Card-Cuenta */
+  .col-izquierda {
+    flex: 1;
+  }
+  
+  /* Columna derecha: Card Resumen */
+  .col-derecha {
+    width: 400px;
+  }
+  
+  /* ===== Barra de progreso ===== */
+  .barra-progreso {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+  }
+  
+  .paso {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 25%;
+    position: relative;
+    color: var(--primary-color);
+  }
+  
+  .paso .circulo {
+    width: 40px;
+    height: 40px;
+    background-color: var(--text-color);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 1rem;
+  }
+  
+  /* Línea que conecta los pasos */
+  .paso:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 20px; /* Mitad del círculo */
+    right: -50%;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary-color);
+    z-index: -1;
+  }
+  
+  /* Paso activo */
+  .paso.activo .circulo {
+    background-color: var(--primary-color);
+    color: var(--accent-color);
+  }
+  .paso.activo .texto-paso {
+    color: var(--primary-color);
+    font-weight: bold;
+  }
+  
+  .texto-paso {
+    font-size: 0.9rem;
+  }
+  
+  /* ===== Card (Cuenta) ===== */
+  .card-cuenta {
+    background-color: #fff;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    margin-top: 30px; /* Espacio desde la barra de progreso */
+  }
+  
+  .titulo-compra {
+    font-size: 1rem;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+  }
+  
+  .icono-pizza {
+    width: 25px;
+    height: 25px;
+    margin-left: 8px;
+  }
+  
+  .descripcion-compra {
+    font-size: 0.80rem;
+    color: var(--primary-color);
+    margin-bottom: 18px;
+  }
+  
+  /* ===== Toggle ===== */
+  .toggle-compra {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 48px;
+  }
+  
+  .toggle-btn {
+    flex: 1;
+    background-color: var(--text-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 6px;
+    padding: 1px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Estado activo en el toggle: fondo y color cambian */
+  .toggle-btn.activo {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+  }
+  
+  .toggle-btn.activo .toggle-titulo,
+  .toggle-btn.activo .toggle-desc {
+    color: var(--accent-color);
+  }
+  
+ 
+  
+  .icono-usuario {
+    width: 22px;
+    height: 22px;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .toggle-titulo {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+  
+  .toggle-desc {
+    font-size: 0.75rem;
+    color: var(--primary-color);
+  }
+  
+  /* ===== Formularios ===== */
+  .formulario-invitado,
+  .formulario-cuenta {
+    margin-bottom: 20px;
+  }
+  
+  .campos-dobles {
+    display: flex;
+    gap: 29px;
+    margin-bottom: 10px;
+  }
+  
+  .input-small {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--primary-color);
+    background-color: var(--text-color);
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+  /* Contenedor del teléfono con prefijo */
+.telefono-container {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--primary-color);
+    border-radius: 9px;
+    background-color: var(--text-color);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  
+  /* Prefijo fijo */
+  .telefono-prefix {
+    padding: 12px;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+  }
+  
+  /* Línea separadora */
+  .separador {
+    width: 1px;
+    height: 40px;
+    background-color: var(--primary-color);
+  }
+  
+  /* Input para el número de teléfono */
+  .input-telefono {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 12px;
+    font-size: 0.9rem;
+    background-color: var(--text-color);
+  }
+  
+  .input-full {
+    width: 100%;
+    padding: 14px;
+    font-size: 0.9rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 9px;
+    margin-bottom: 20px;
+  }
+  
+  /* ===== Botones de abajo ===== */
+  .botones {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 29px;
+  }
+  
+  .btn-volver,
+  .btn-continuar {
+    padding: 8px 16px;
+    border-radius: 9px; 
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  
+  .btn-volver {
+    background-color: #fff;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+  }
+  .btn-volver:hover {
+    background-color: #fce6d9;
+  }
+  
+  .btn-continuar {
+    background-color: #FEB248;
+    color: var(--primary-color);
+    font-weight: bold;
+  }
+  
+  /* ===== Card (Resumen) ===== */
+  .card-resumen {
+    background-color: #fff;
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    width: 400px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    height: fit-content;
+  }
+  
+  .resumen-titulo {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  
+  .resumen-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .resumen-img {
+    width: 138px;
+    height: 138px;
+    border-radius: 64px;
+    object-fit: cover;
+  }
+  
+  .resumen-detalle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .resumen-detalle h4 {
+    font-size: 0.95rem;
+    margin: 0;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+  }
+  
+  .resumen-detalle p {
+    margin: 0 0 10px;
+    font-size: 0.8rem;
+    color: var(--text-dark);
+  }
+  
+  .cantidad {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+  }
+  
+  .cantidad button {
+    width: 24px;
+    height: 24px;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  
+  .cantidad span {
+    min-width: 20px;
+    text-align: center;
+  }
+  
+  .resumen-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .precio {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .eliminar {
+    background-color: transparent;
+    border: none;
+    font-size: 0.8rem;
+    color: #c73e1d;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .eliminar img {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .resumen-total {
+    border-top: 1px solid #eee;
+    padding-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    color: #333;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  

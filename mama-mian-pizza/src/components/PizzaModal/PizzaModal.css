@@ -1,0 +1,165 @@
+/* Fondo oscuro que cubre toda la pantalla */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenedor del modal con alto fijo */
+.modal-content {
+  position: relative;
+  width: 957px;   /* Ancho total del modal */
+  height: 457px;  /* Alto fijo para que la imagen tenga referencia */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;  /* Utilizamos row para 2 columnas */
+}
+
+/* Botón "X" para cerrar */
+.modal-close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  color: #ff0303;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.modal-close-button:hover {
+  opacity: 0.8;
+}
+
+/* Layout interno: 2 columnas */
+.modal-layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* Columna izquierda: imagen */
+.modal-left {
+  width: 425px;   /* Ancho fijo para la imagen */
+  height: 457px;   /* Usará el alto del modal (457px) */
+ 
+}
+
+.modal-pizza-image {
+  width: 425px;   /* Ancho fijo para la imagen */
+  height: 457px;   /* Usará el alto del modal (457px) */
+}
+
+/* Columna derecha: contenido */
+.modal-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  gap: 2rem;
+  text-align: left;
+}
+
+/* Título de la pizza */
+.modal-pizza-title {
+  font-size: 1.8rem;
+  color: var(--primary-color); /* O #991B1B si no usas variable */
+  margin: 0;
+}
+
+/* Selectores (Masa, Tamaño) */
+.modal-selectors {
+  display: flex;
+  gap: 2rem;
+}
+
+.selector-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.selector-item label {
+  margin-bottom: 0.25rem;
+}
+
+.selector-item select {
+  background-color: #fff;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 0.5rem;
+  border-radius: 9px;
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  background-image: url('../../assets/arrowRed.png'); /* Ajusta la ruta a tu asset de flecha roja */
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 10px 7px;
+  padding-right: 2rem;
+}
+
+.selector-item select:focus {
+  outline: none;
+  border: 1px solid var(--primary-color);
+}
+
+/* Título "Descripción" */
+.modal-desc-title {
+  font-size: 1rem;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+/* Descripción */
+.modal-pizza-description {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+/* Fila inferior: price a la izquierda, botón a la derecha */
+.modal-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+/* price */
+.modal-pizza-price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+/* Botón "Añadir a mi orden" */
+.modal-add-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #FEB248;
+  color: var(--primary-color);
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+

@@ -1,9 +1,12 @@
-import React from 'react';
-import './Home.css';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faMedal, faTruck, faCarrot } from '@fortawesome/free-solid-svg-icons';
 
-import { Link } from 'react-router-dom';
+import ProductsCards from '../productsCards/productsCards';
+import PizzaModal from '../PizzaModal/PizzaModal';
+import Footer from '../footer/footer';
+import TestimonialCard from '../ComentsCards/ComentCards';
 
 import pizzaHero from '../../assets/PizzaPrin.png';
 import pizzaCardImg from '../../assets/PizzaCard.png';
@@ -12,31 +15,31 @@ import fireIcon from '../../assets/fuego.png';
 import robotIcon from '../../assets/Robot.png';
 import comentarioImg from '../../assets/comentario.png';
 
-import Footer from '../footer/footer';
-import ProductsCards from '../productsCards/productsCards';
-import TestimonialCard from '../ComentsCards/ComentCards';
+import './Home.css';
 
+// Datos para "Recomendación de la Casa"
 const datosPrueba = [
   {
     title: "Burrata",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
+    Descripcion: "Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico",
     img: pizzaCardImg,
     price: "$15.00",
   },
   {
     title: "Peperoni",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
+    Descripcion: "Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico",
     img: pizzaCardImg,
     price: "$15.00",
   },
   {
     title: "Jamon",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
+    Descripcion: "Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico",
     img: pizzaCardImg,
     price: "$15.00",
   }
 ];
 
+// Datos para "La más populares"
 const DatosPopular = [
   {
     title: "Burrata",
@@ -58,6 +61,7 @@ const DatosPopular = [
   }
 ];
 
+// Datos de testimonios
 const datosTestimonios = [
   {
     avatar: comentarioImg,
@@ -80,9 +84,57 @@ const datosTestimonios = [
 ];
 
 const Home = () => {
+  // Estado para el modal de pizza
+  const [selectedPizza, setSelectedPizza] = useState(null);
+  // Estado para el carrito de compras
+  const [cartItems, setCartItems] = useState([]);
+  // Estado para controlar la visibilidad del carrito (ahora se usa)
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Abre el modal con la pizza seleccionada
+  const handleOpenPizza = (pizza) => {
+    setSelectedPizza(pizza);
+  };
+
+  // Cierra el modal
+  const handleCloseModal = () => {
+    setSelectedPizza(null);
+  };
+
+  // Función para agregar la pizza al carrito (incluye opciones)
+  const handleAddToCart = (pizza, masa, tamano) => {
+    const exists = cartItems.find(
+      (item) => item.title === pizza.title && item.masa === masa && item.tamano === tamano
+    );
+    if (exists) {
+      setCartItems(
+        cartItems.map((item) =>
+          item === exists ? { ...item, cantidad: item.cantidad + 1 } : item
+        )
+      );
+    } else {
+      const newItem = {
+        id: Date.now(),
+        title: pizza.title,
+        Descripcion: pizza.Descripcion,
+        img: pizza.img,
+        price: pizza.price,
+        cantidad: 1,
+        masa,
+        tamano,
+        disponible: true,
+      };
+      setCartItems([...cartItems, newItem]);
+    }
+  };
+
+  // Alterna la visibilidad del carrito
+  const toggleCart = () => {
+    setIsCartOpen(!isCartOpen);
+  };
+
   return (
     <div className="main__content">
-      
       {/* Sección HERO */}
       <section
         className="hero__container"
@@ -94,7 +146,7 @@ const Home = () => {
             Ingredientes frescos, masa artesanal y sabores únicos que te harán volver por más.
           </p>
           <button className="hero__button">
-            <Link to="/menu" className='link'>Ver Menú</Link>
+            <Link to="/menu" className="link">Ver Menú</Link>
           </button>
         </div>
       </section>
@@ -106,7 +158,11 @@ const Home = () => {
         </h1>
         <div className="whyus__content">
           {datosPrueba.map((item, index) => (
-            <ProductsCards data={item} key={index} />
+            <ProductsCards 
+              data={item} 
+              key={index}
+              onCardClick={() => handleOpenPizza(item)}
+            />
           ))}
         </div>
       </section>
@@ -118,7 +174,11 @@ const Home = () => {
         </h2>
         <div className="whyus__content">
           {DatosPopular.map((item, index) => (
-            <ProductsCards data={item} key={index} />
+            <ProductsCards 
+              data={item} 
+              key={index}
+              onCardClick={() => handleOpenPizza(item)}
+            />
           ))}
         </div>
       </section>
@@ -128,9 +188,7 @@ const Home = () => {
         <h2 className="whyus__header">¿Por qué elegir Mama Mian Pizza?</h2>
         <div className="whyus__content">
           <div className="whyus__cards">
-            <i>
-              <FontAwesomeIcon icon={faClock} />
-            </i>
+            <i><FontAwesomeIcon icon={faClock} /></i>
             <h3 className="whyus__card__title">Entrega rápida</h3>
             <p className="whyus__card__description">
               Garantizamos tu entrega en 30 minutos o menos. Nuestro equipo de reparto es rápido, eficiente y siempre puntual.
@@ -138,9 +196,7 @@ const Home = () => {
           </div>
           
           <div className="whyus__cards">
-            <i>
-              <FontAwesomeIcon icon={faMedal} />
-            </i>
+            <i><FontAwesomeIcon icon={faMedal} /></i>
             <h3 className="whyus__card__title">Recetas premiadas</h3>
             <p className="whyus__card__description">
               Nuestras pizzas han ganado múltiples premios por su sabor único. Desde Nápoles, la cuna de la pizza.
@@ -148,9 +204,7 @@ const Home = () => {
           </div>
           
           <div className="whyus__cards">
-            <i>
-              <FontAwesomeIcon icon={faTruck} />
-            </i>
+            <i><FontAwesomeIcon icon={faTruck} /></i>
             <h3 className="whyus__card__title">Envío gratuito</h3>
             <p className="whyus__card__description">
               Disfruta de envío gratis en todos los pedidos superiores a $25. No hay costos ocultos ni restricciones, ¡tu pizza llega sin costos extra!
@@ -158,9 +212,7 @@ const Home = () => {
           </div>
           
           <div className="whyus__cards">
-            <i>
-              <FontAwesomeIcon icon={faCarrot} />
-            </i>
+            <i><FontAwesomeIcon icon={faCarrot} /></i>
             <h3 className="whyus__card__title">Ingredientes frescos</h3>
             <p className="whyus__card__description">
               Obtenemos nuestros ingredientes directamente de productores locales. Sin conservantes ni sabores artificiales.
@@ -188,7 +240,18 @@ const Home = () => {
       </section>
       
       <Footer />
+
+     
+      {/* Modal de Pizza */}
+      {selectedPizza && (
+        <PizzaModal 
+          pizza={selectedPizza}
+          onClose={handleCloseModal}
+          onAddToCart={handleAddToCart}
+        />
+      )}
       
+     
     </div>
   );
 };

@@ -17,6 +17,53 @@
   display: flex;
   align-items: center;
 }
+/* Contenedor de íconos en la Navbar */
+.navbar__icons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;  /* Separación general entre elementos */
+}
+
+/* Sección del usuario: ícono y enlaces */
+.navbar__user-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 2rem; /* Más espacio entre usuario y carrito */
+}
+
+/* Enlaces debajo del ícono de usuario */
+.navbar__user-links {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: row; /* Si se quieren en línea */
+  gap: 0.5rem;
+}
+
+.navbar__user-links a {
+  color: #fff;            /* Color blanco */
+  text-decoration: none;  /* Sin subrayado */
+  font-size: 0.9rem;
+}
+
+/* Opcional: si deseas asegurarte de que tanto el botón de usuario como el de carrito tengan el mismo alto */
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* El botón de carrito puede tener ajustes adicionales (si fuera necesario) */
+.cart-button {
+margin-bottom: 24px;}
+
+/* Ajusta la imagen del ícono (si es necesario) */
+.icon-img {
+  width: 40px;   /* Ajusta el tamaño según tu diseño */
+  height: 40px;
+  object-fit: contain;
+}
+
 
 .brand-logo {
   width: 32px;
@@ -60,7 +107,6 @@
 .navbar__icons {
   display: flex;
   align-items: center;
-  gap: 1rem;
 }
 
 .navbar__icons .icon-button {

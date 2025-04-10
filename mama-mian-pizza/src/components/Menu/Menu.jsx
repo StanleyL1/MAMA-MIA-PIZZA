@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import ProductsCards from '../productsCards/productsCards';
+import Footer from '../footer/footer';
+import PizzaModal from '../PizzaModal/PizzaModal';
 import pizzaIcon from '../../assets/PizzaR.png';
 import pizzaCardImg from '../../assets/PizzaCard.png';
 import menuBookIcon from '../../assets/menuBook.png';
 import searchIcon from '../../assets/search.png';
 import './Menu.css';
-import Footer from '../footer/footer';
 
 // Datos de prueba para "Recomendación de la Casa"
 const datosPrueba = [
@@ -65,12 +66,20 @@ const datosPrueba = [
   }
 ];
 
-// (Opcional) Datos para otra sección "Las más populares"
-// const DatosPopular = [ ... ];
-
 const Menu = () => {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPizza, setSelectedPizza] = useState(null);
+
+  // Función para abrir el modal con la pizza seleccionada
+  const handleOpenPizza = (pizza) => {
+    setSelectedPizza(pizza);
+  };
+
+  // Función para cerrar el modal
+  const handleCloseModal = () => {
+    setSelectedPizza(null);
+  };
 
   return (
     <div className="menu-container">
@@ -117,20 +126,19 @@ const Menu = () => {
             Complementos
           </button>
           <div className="menu-search-container">
-  <input
-    type="text"
-    placeholder="Buscar..."
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-    className="menu-search-input"
-  />
-  <img 
-    src={searchIcon} 
-    alt="Buscar" 
-    className="menu-search-icon" 
-  />
-</div>
-
+            <input
+              type="text"
+              placeholder="Buscar..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="menu-search-input"
+            />
+            <img 
+              src={searchIcon} 
+              alt="Buscar" 
+              className="menu-search-icon" 
+            />
+          </div>
         </div>
       </section>
 
@@ -143,15 +151,21 @@ const Menu = () => {
           </h3>
           <div className="menu-card-container">
             {datosPrueba.map((item, index) => (
-              <ProductsCards data={item} key={index} />
+              // Se pasa la función handleOpenPizza a la card para abrir el modal
+              <ProductsCards data={item} key={index} onCardClick={() => handleOpenPizza(item)} />
             ))}
           </div>
         </div>
       </section>
 
-      <Footer noImage={true}/>
-          </div>
-    
+      <Footer noImage={true} />
+
+      {/* Modal para mostrar los detalles de la pizza */}
+      {selectedPizza && (
+  <PizzaModal pizza={selectedPizza} onClose={handleCloseModal} />
+)}
+
+    </div>
   );
 };
 

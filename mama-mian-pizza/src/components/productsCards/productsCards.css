@@ -1,4 +1,4 @@
-.products__cards {
+.prodcard-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -10,19 +10,19 @@
   margin: 20px 0;
 }
 
-.products__cards:hover {
+.prodcard-container:hover {
   transform: scale(1.05);
   transition: all 0.3s ease;
 }
 
-.products__cards img {
+.prodcard-container img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   margin-bottom: 10px;
 }
 
-.products__cards h3 {
+.prodcard-container h3 {
   font-size: 1.5rem;
   margin-bottom: 10px;
   align-self: flex-start;

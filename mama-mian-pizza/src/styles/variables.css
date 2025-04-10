@@ -2,7 +2,7 @@
     --primary-color: #991B1B;  /*  rojo intenso */
     --secondary-color: #FFFBEB; /* Gris claro  */
     --text-color: #FFFFFF;      /* Texto blanco */
-    --text-dark: #333333;       /* Texto oscuro */
+    --text-dark: #000000;       /* Texto oscuro */
     --accent-color: #EAB308;    /* naranja */
     --text : #FCD6A0;
 }
