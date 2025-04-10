@@ -84,18 +84,13 @@ const datosTestimonios = [
 ];
 
 const Home = () => {
-  // Estado para el modal de pizza
   const [selectedPizza, setSelectedPizza] = useState(null);
-  // Estado para el carrito de compras
   const [cartItems, setCartItems] = useState([]);
-  // Estado para controlar la visibilidad del carrito (ahora se usa)
 
-  // Abre el modal con la pizza seleccionada
   const handleOpenPizza = (pizza) => {
     setSelectedPizza(pizza);
   };
 
-  // Cierra el modal
   const handleCloseModal = () => {
     setSelectedPizza(null);
   };
