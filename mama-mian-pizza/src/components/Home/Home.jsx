@@ -2,17 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faMedal, faTruck, faCarrot } from '@fortawesome/free-solid-svg-icons';
-
 import ProductsCards from '../productsCards/productsCards';
 import PizzaModal from '../PizzaModal/PizzaModal';
 import Footer from '../footer/footer';
 import TestimonialCard from '../ComentsCards/ComentCards';
-
 import pizzaHero from '../../assets/PizzaPrin.png';
 import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png'; 
 import robotIcon from '../../assets/Robot.png';
 import comentarioImg from '../../assets/comentario.png';
+ 
 
 import './Home.css';
 
@@ -75,17 +74,17 @@ const Home = () => {
   console.log(popular[0]);
 
   // Estado para el modal de pizza
+
   const [selectedPizza, setSelectedPizza] = useState(null);
-  // Estado para el carrito de compras
   const [cartItems, setCartItems] = useState([]);
+
   // Estado para controlar la visibilidad del carrito (ahora se usa)
 
-  // Abre el modal con la pizza seleccionada
+
   const handleOpenPizza = (pizza) => {
     setSelectedPizza(pizza);
   };
 
-  // Cierra el modal
   const handleCloseModal = () => {
     setSelectedPizza(null);
   };
@@ -116,8 +115,6 @@ const Home = () => {
       setCartItems([...cartItems, newItem]);
     }
   };
-
-
 
   return (
     <div className="main__content">
@@ -172,7 +169,7 @@ const Home = () => {
       {/* Sección "¿Por qué elegir Mama Mian Pizza?" */}
       <section className="whyus__section">
         <h2 className="whyus__header">¿Por qué elegir Mama Mian Pizza?</h2>
-        <div className="whyus__content">
+        <div className="whyus__contentt">
           <div className="whyus__cards">
             <i><FontAwesomeIcon icon={faClock} /></i>
             <h3 className="whyus__card__title">Entrega rápida</h3>
@@ -206,7 +203,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      
+ 
       {/* Botón flotante de Chat */}
       <div className="chat-floating-button">
         <span className="chat-button-text">¡Chatea conmigo!</span>
@@ -214,7 +211,6 @@ const Home = () => {
           <img src={robotIcon} alt="Robot" className="chat-robot-icon" />
         </div>
       </div>
-      
       {/* Sección de Testimonios */}
       <section className="review__section">
         <h2 className="review__header">Lo que dicen nuestros clientes</h2>

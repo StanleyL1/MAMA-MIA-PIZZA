@@ -70,8 +70,10 @@ const Menu = () => {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPizza, setSelectedPizza] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
 
-  // Función para abrir el modal con la pizza seleccionada
+
+
   const handleOpenPizza = (pizza) => {
     setSelectedPizza(pizza);
   };
@@ -79,6 +81,33 @@ const Menu = () => {
   // Función para cerrar el modal
   const handleCloseModal = () => {
     setSelectedPizza(null);
+  };
+
+
+  const handleAddToCart = (pizza, masa, tamano) => {
+    const exists = cartItems.find(
+      (item) => item.title === pizza.title && item.masa === masa && item.tamano === tamano
+    );
+    if (exists) {
+      setCartItems(
+        cartItems.map((item) =>
+          item === exists ? { ...item, cantidad: item.cantidad + 1 } : item
+        )
+      );
+    } else {
+      const newItem = {
+        id: Date.now(),
+        title: pizza.title,
+        Descripcion: pizza.Descripcion,
+        img: pizza.img,
+        price: pizza.price,
+        cantidad: 1,
+        masa,
+        tamano,
+        disponible: true,
+      };
+      setCartItems([...cartItems, newItem]);
+    }
   };
 
   return (
@@ -160,12 +189,16 @@ const Menu = () => {
 
       <Footer noImage={true} />
 
-      {/* Modal para mostrar los detalles de la pizza */}
-      {selectedPizza && (
-  <PizzaModal pizza={selectedPizza} onClose={handleCloseModal} />
-)}
+    {/* Modal de Pizza */}
+    {selectedPizza && (
+        <PizzaModal 
+          pizza={selectedPizza}
+          onClose={handleCloseModal}
+          onAddToCart={handleAddToCart}
+        />
+      )}
+              </div>
 
-    </div>
   );
 };
 
