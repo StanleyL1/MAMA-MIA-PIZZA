@@ -4,23 +4,38 @@
   align-items: center;
   border-radius: 10px;
   background-color: #fff;
+  width: 100%;
   max-width: 450px;
-  max-height: 600px;
+  height: 550px; /* Altura fija para mantener consistencia */
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
-  margin: 10px 0;  /* Se reduce el margen vertical de 20px a 10px */
+  margin: 10px 0;
+  overflow: hidden; /* Evita que el contenido sobresalga */
 }
-
 
 .prodcard-container:hover {
   transform: scale(1.05);
   transition: all 0.3s ease;
 }
 
-.prodcard-container img {
+.prodcard-image-container {
+  width: 100%;
+  height: 250px; /* Altura fija para todas las imágenes */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prodcard-image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  margin-bottom: 10px;
+  object-fit: cover; /* Cambiado a cover para llenar el espacio uniformemente */
+  object-position: center; /* Centra la imagen */
+  transition: transform 0.3s ease;
+}
+
+.prodcard-image:hover {
+  transform: scale(1.05);
 }
 
 .prodcard-container h3 {
@@ -28,16 +43,27 @@
   margin-bottom: 10px;
   align-self: flex-start;
   color: #991B1B;
-  margin: 0 20px 10px 20px;
+  margin: 15px 20px 10px 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 90%;
 }
 
 .card__product__description {
   font-size: 1rem;
   margin-bottom: 10px;
   text-align: left;
-  width: 340px;
+  width: 90%;
   padding: 0 20px;
   align-self: flex-start;
+  /* Limitar altura y añadir puntos suspensivos para descripciones largas */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stars__containers {
@@ -87,26 +113,35 @@
 
 /* Para dispositivos móviles */
 @media (max-width: 768px) {
-  .products__cards {
-    max-width: 90%;
-    margin: 15px auto;
+  .prodcard-container {
+    max-width: 100%;
+    height: 480px; /* Reducir altura en móviles */
+    margin: 10px auto;
   }
   
-  .products__cards h3 {
+  .prodcard-image-container {
+    height: 200px; /* Reducir altura de imágenes en móviles */
+  }
+  
+  .prodcard-container h3 {
     font-size: 1.3rem;
-    margin: 0 10px 8px 10px;
+    margin: 10px 10px 8px 10px;
+    width: 95%;
   }
   
   .card__product__description {
     font-size: 0.9rem;
-    width: 100%;
+    width: 95%;
     padding: 0 10px;
+    -webkit-line-clamp: 2; /* Menos líneas en móvil */
+    line-clamp: 2;
   }
   
   .stars__containers {
-    font-size: 24px;
-    gap: 16px;
+    font-size: 22px;
+    gap: 12px;
     padding: 0 10px;
+    margin: 5px 0;
   }
   
   .card__product__price {
@@ -115,21 +150,26 @@
   }
   
   .card__footer button {
-    font-size: 1.5rem;
-    padding: 8px 16px;
+    font-size: 1.4rem;
+    padding: 8px 12px;
   }
 }
 
 /* Para dispositivos tipo tablet */
 @media (min-width: 769px) and (max-width: 1024px) {
-  .products__cards {
-    max-width: 80%;
+  .prodcard-container {
+    max-width: 400px;
+    height: 520px;
     margin: 15px auto;
   }
   
-  .products__cards h3 {
+  .prodcard-image-container {
+    height: 220px;
+  }
+  
+  .prodcard-container h3 {
     font-size: 1.4rem;
-    margin: 0 15px 8px 15px;
+    margin: 12px 15px 8px 15px;
   }
   
   .card__product__description {
@@ -139,8 +179,8 @@
   }
   
   .stars__containers {
-    font-size: 26px;
-    gap: 20px;
+    font-size: 24px;
+    gap: 16px;
     padding: 0 15px;
   }
   
@@ -150,7 +190,7 @@
   }
   
   .card__footer button {
-    font-size: 1.6rem;
-    padding: 9px 18px;
+    font-size: 1.5rem;
+    padding: 9px 15px;
   }
 }
