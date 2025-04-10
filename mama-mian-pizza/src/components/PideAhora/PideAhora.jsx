@@ -11,6 +11,8 @@ import deleteIcon from '../../assets/Basurero.png';
 import pizzaCardImg from '../../assets/PizzaCard.png';
 
 const PideAhora = () => {
+  // Estado del paso actual: inicialmente "Cuenta"
+  const [step, setStep] = useState('Cuenta');
   // Modo de compra: 'invitado' o 'cuenta'
   const [modo, setModo] = useState('invitado');
 
@@ -43,15 +45,24 @@ const PideAhora = () => {
     });
   };
 
+  // Función para manejar el botón "Continuar"
+  const handleContinuar = () => {
+    // Aquí podrías validar los datos del paso actual
+    if (step === 'Cuenta') {
+      setStep('Dirección');
+    }
+    // Agrega más lógica para otros pasos según tu flujo
+  };
+
   return (
     <div className="contenedor-pideahora">
       <div className="layout">
-        {/* Columna izquierda: Barra de navegación y Card-Cuenta */}
+        {/* Columna izquierda: Barra de navegación y Card según el paso */}
         <div className="col-izquierda">
           {/* Barra de progreso */}
           <div className="barra-progreso">
             {['Cuenta', 'Dirección', 'Pago', 'Confirmar'].map((p, idx) => {
-              const isActive = idx === 0; // Simulamos que "Cuenta" está activo
+              const isActive = p === step;
               return (
                 <div key={p} className={`paso ${isActive ? 'activo' : ''}`}>
                   <div className="circulo">{idx + 1}</div>
@@ -61,113 +72,150 @@ const PideAhora = () => {
             })}
           </div>
 
-          {/* Card: Cómo continuar con la compra */}
-          <div className="card-cuenta">
-            <h3 className="titulo-compra">
-              ¿Cómo quieres continuar con tu compra?
-              <img src={pizzaIcon} alt="Pizza Icon" className="icono-pizza" />
-            </h3>
-            <p className="descripcion-compra">Elige cómo quieres continuar</p>
+          {step === 'Cuenta' && (
+            <div className="card-cuenta">
+              <h3 className="titulo-compra">
+                ¿Cómo quieres continuar con tu compra?
+                <img src={pizzaIcon} alt="Pizza Icon" className="icono-pizza" />
+              </h3>
+              <p className="descripcion-compra">Elige cómo quieres continuar</p>
 
-            {/* Toggle: Invitado / Cuenta */}
-            <div className="toggle-compra">
-              <button
-                className={`toggle-btn ${modo === 'invitado' ? 'activo' : ''}`}
-                onClick={() => setModo('invitado')}
-              >
-                <img
-                  src={modo === 'invitado' ? userIcon : userIcon4}
-                  alt="Invitado"
-                  className="icono-usuario"
-                />
-                <span className="toggle-titulo">Como invitado</span>
-                <span className="toggle-desc">Sin necesidad de registro</span>
-              </button>
+              {/* Toggle: Invitado / Cuenta */}
+              <div className="toggle-compra">
+                <button
+                  className={`toggle-btn ${modo === 'invitado' ? 'activo' : ''}`}
+                  onClick={() => setModo('invitado')}
+                >
+                  <img
+                    src={modo === 'invitado' ? userIcon4 : userIcon}
+                    alt="Invitado"
+                    className="icono-usuario"
+                  />
+                  <span className="toggle-titulo">Como invitado</span>
+                  <span className="toggle-desc">Sin necesidad de registro</span>
+                </button>
 
-              <button
-                className={`toggle-btn ${modo === 'cuenta' ? 'activo' : ''}`}
-                onClick={() => setModo('cuenta')}
-              >
-                <img
-                  src={modo === 'cuenta' ? userIcon5: userIcon2}
-                  alt="Cuenta"
-                  className="icono-usuario"
-                />
-                <span className="toggle-titulo">Con una cuenta</span>
-                <span className="toggle-desc">Guarda tu historial</span>
-              </button>
-            </div>
-            <div className="formulario-invitado">
-  <div className="campos-dobles">
-    <input
-      name="nombre"
-      type="text"
-      className="input-small"
-      placeholder="Nombre"
-      value={invitadoData.nombre}
-      onChange={handleInputInvitado}
-    />
-    <input
-      name="apellido"
-      type="text"
-      className="input-small"
-      placeholder="Apellido"
-      value={invitadoData.apellido}
-      onChange={handleInputInvitado}
-    />
-  </div>
-  <div className="telefono-container">
-    <span className="telefono-prefix">+503</span>
-    <span className="separador"></span>
-    <input
-      name="telefono"
-      type="tel"
-      className="input-telefono"
-      placeholder="000-0000"
-      value={invitadoData.telefono}
-      onChange={handleInputInvitado}
-    />
-  </div>
-</div>
-
-           
-
-            {/* Formulario de Cuenta */}
-            {modo === 'cuenta' && (
-              <div className="formulario-cuenta">
-                <input
-                  name="email"
-                  type="email"
-                  className="input-full"
-                  placeholder="Correo electrónico"
-                  value={cuentaData.email}
-                  onChange={handleInputCuenta}
-                />
-                <input
-                  name="password"
-                  type="password"
-                  className="input-full"
-                  placeholder="Contraseña"
-                  value={cuentaData.password}
-                  onChange={handleInputCuenta}
-                />
+                <button
+                  className={`toggle-btn ${modo === 'cuenta' ? 'activo' : ''}`}
+                  onClick={() => setModo('cuenta')}
+                >
+                  <img
+                    src={modo === 'cuenta' ? userIcon5 : userIcon2}
+                    alt="Cuenta"
+                    className="icono-usuario"
+                  />
+                  <span className="toggle-titulo">Con una cuenta</span>
+                  <span className="toggle-desc">Guarda tu historial</span>
+                </button>
               </div>
-            )}
 
-            {/* Botones: Volver / Continuar */}
-            <div className="botones">
-              <button className="btn-volver">Volver</button>
-              <button className="btn-continuar">Continuar</button>
+              {/* Formulario de Invitado */}
+              {modo === 'invitado' && (
+                <div className="formulario-invitado">
+                  <div className="campos-dobles">
+                    <div className="campo">
+                      <label htmlFor="nombre">Nombre</label>
+                      <input
+                        name="nombre"
+                        id="nombre"
+                        type="text"
+                        className="input-small"
+                        value={invitadoData.nombre}
+                        onChange={handleInputInvitado}
+                      />
+                    </div>
+                    <div className="campo">
+                      <label htmlFor="apellido">Apellido</label>
+                      <input
+                        name="apellido"
+                        id="apellido"
+                        type="text"
+                        className="input-small"
+                        value={invitadoData.apellido}
+                        onChange={handleInputInvitado}
+                      />
+                    </div>
+                  </div>
+                  <div className="campo">
+                    <label htmlFor="telefono">Numero de teléfono</label>
+                    <div className="telefono-container">
+                      <span className="telefono-prefix">+503</span>
+                      <span className="separador"></span>
+                      <input
+                        name="telefono"
+                        id="telefono"
+                        type="tel"
+                        className="input-telefono"
+                        placeholder="000-0000"
+                        value={invitadoData.telefono}
+                        onChange={handleInputInvitado}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Formulario de Cuenta */}
+              {modo === 'cuenta' && (
+                <div className="formulario-cuenta">
+                  <div className="campo">
+                    <label htmlFor="email">Correo electronico</label>
+                    <input
+                      name="email"
+                      id="email"
+                      type="email"
+                      className="input-full"
+                      value={cuentaData.email}
+                      onChange={handleInputCuenta}
+                    />
+                  </div>
+                  <div className="campo">
+                    <label htmlFor="password">Contraseña</label>
+                    <input
+                      name="password"
+                      id="password"
+                      type="password"
+                      className="input-full"
+                      value={cuentaData.password}
+                      onChange={handleInputCuenta}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Botones: Volver / Continuar */}
+              <div className="botones">
+                <button className="btn-volver">Volver</button>
+                <button className="btn-continuar" onClick={handleContinuar}>
+                  Continuar
+                </button>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Placeholder para el paso "Dirección" */}
+          {step === 'Dirección' && (
+            <div className="card-direccion">
+              <h3 className="titulo-compra">
+                Ingresa tu dirección
+              </h3>
+              <p>Aquí va el formulario de Dirección.</p>
+              <div className="botones">
+                <button className="btn-volver" onClick={() => setStep('Cuenta')}>
+                  Volver
+                </button>
+                <button className="btn-continuar">
+                  Continuar
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Columna derecha: Card Resumen */}
         <div className="col-derecha">
           <div className="card-resumen">
             <h3 className="resumen-titulo">Resumen de la orden</h3>
-
-            {/* Items de ejemplo */}
             {[1, 2].map((item, idx) => (
               <div className="resumen-item" key={item}>
                 <img src={pizzaCardImg} alt="Pizza" className="resumen-img" />
@@ -177,15 +225,11 @@ const PideAhora = () => {
                     Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula
                     y vinagre balsámico
                   </p>
-
-                  {/* Contador de cantidad */}
                   <div className="cantidad">
                     <button>-</button>
                     <span>1</span>
                     <button>+</button>
                   </div>
-
-                  {/* Footer: Precio y Eliminar */}
                   <div className="resumen-footer">
                     <span className="precio">
                       ${idx === 0 ? '5.00' : '8.00'}
@@ -198,8 +242,6 @@ const PideAhora = () => {
                 </div>
               </div>
             ))}
-
-            {/* Total */}
             <div className="resumen-total">
               <span>Total:</span>
               <span>$16.00</span>

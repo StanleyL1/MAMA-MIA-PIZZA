@@ -1,8 +1,5 @@
-
-  
-  
-  /* ===== Global ===== */
-  body {
+/* ===== Global ===== */
+body {
     margin: 0;
     padding: 0;
     background-color: var(--text-color); /* Fondo crema */
@@ -93,7 +90,7 @@
     border: 2px solid var(--primary-color);
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     margin-top: 30px; /* Espacio desde la barra de progreso */
   }
   
@@ -150,8 +147,6 @@
     color: var(--accent-color);
   }
   
- 
-  
   .icono-usuario {
     width: 22px;
     height: 22px;
@@ -176,6 +171,17 @@
     margin-bottom: 20px;
   }
   
+  .campo {
+    margin-bottom: 15px;
+  }
+  
+  .campo label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+  }
+  
   .campos-dobles {
     display: flex;
     gap: 29px;
@@ -190,8 +196,9 @@
     border-radius: 8px;
     font-size: 0.9rem;
   }
+  
   /* Contenedor del teléfono con prefijo */
-.telefono-container {
+  .telefono-container {
     display: flex;
     align-items: center;
     border: 1px solid var(--primary-color);
@@ -234,7 +241,7 @@
     margin-bottom: 20px;
   }
   
-  /* ===== Botones de abajo ===== */
+  /* ===== Botones ===== */
   .botones {
     display: flex;
     justify-content: space-between;
@@ -244,7 +251,7 @@
   .btn-volver,
   .btn-continuar {
     padding: 8px 16px;
-    border-radius: 9px; 
+    border-radius: 9px;
     border: none;
     font-size: 0.9rem;
     cursor: pointer;
@@ -272,7 +279,7 @@
     border-radius: 8px;
     width: 400px;
     padding: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     height: fit-content;
   }
   
