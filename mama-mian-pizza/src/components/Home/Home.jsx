@@ -89,7 +89,6 @@ const Home = () => {
   // Estado para el carrito de compras
   const [cartItems, setCartItems] = useState([]);
   // Estado para controlar la visibilidad del carrito (ahora se usa)
-  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Abre el modal con la pizza seleccionada
   const handleOpenPizza = (pizza) => {
@@ -129,10 +128,7 @@ const Home = () => {
   };
 
   // Alterna la visibilidad del carrito
-  const toggleCart = () => {
-    setIsCartOpen(!isCartOpen);
-  };
-
+  
   return (
     <div className="main__content">
       {/* Sección HERO */}

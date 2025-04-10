@@ -2,7 +2,7 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: var(--text-color); /* Fondo crema */
+    background-color: var(--text-color);
     font-family: Arial, sans-serif;
   }
   
@@ -18,9 +18,9 @@ body {
     gap: 130px;
   }
   
-  /* Columna izquierda: Barra de navegación y Card-Cuenta */
+  /* Columna izquierda: Barra de navegación y contenido (Cuenta/Dirección) */
   .col-izquierda {
-    flex: 1;
+    flex: 2;
   }
   
   /* Columna derecha: Card Resumen */
@@ -43,11 +43,11 @@ body {
     position: relative;
     color: var(--primary-color);
   }
-  
   .paso .circulo {
     width: 40px;
     height: 40px;
     background-color: var(--text-color);
+    border: 2px solid var(--primary-color);
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -57,20 +57,16 @@ body {
     margin-bottom: 8px;
     font-size: 1rem;
   }
-  
-  /* Línea que conecta los pasos */
   .paso:not(:last-child)::after {
     content: "";
     position: absolute;
-    top: 20px; /* Mitad del círculo */
+    top: 20px;
     right: -50%;
     width: 100%;
     height: 2px;
     background-color: var(--primary-color);
     z-index: -1;
   }
-  
-  /* Paso activo */
   .paso.activo .circulo {
     background-color: var(--primary-color);
     color: var(--accent-color);
@@ -79,49 +75,46 @@ body {
     color: var(--primary-color);
     font-weight: bold;
   }
-  
   .texto-paso {
     font-size: 0.9rem;
   }
   
   /* ===== Card (Cuenta) ===== */
+  /* Nota: No se añade padding global; se usan márgenes individuales para cada elemento */
   .card-cuenta {
     background-color: #fff;
     border: 2px solid var(--primary-color);
     border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    margin-top: 30px; /* Espacio desde la barra de progreso */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    margin-top: 30px;
   }
   
+  /* Posicionamiento individual en card-cuenta */
   .titulo-compra {
     font-size: 1rem;
     color: var(--primary-color);
-    margin-bottom: 5px;
+    margin: 20px 20px 5px 20px;
     display: flex;
     align-items: center;
     font-weight: 600;
   }
-  
   .icono-pizza {
     width: 25px;
     height: 25px;
     margin-left: 8px;
   }
-  
   .descripcion-compra {
     font-size: 0.80rem;
     color: var(--primary-color);
-    margin-bottom: 18px;
+    margin: 0 20px 18px 20px;
   }
-  
-  /* ===== Toggle ===== */
   .toggle-compra {
     display: flex;
     gap: 10px;
-    margin-bottom: 48px;
+    margin: 0 20px 48px 20px;
   }
   
+  /* Toggle botones en card-cuenta */
   .toggle-btn {
     flex: 1;
     background-color: var(--text-color);
@@ -135,59 +128,49 @@ body {
     flex-direction: column;
     align-items: center;
   }
-  
-  /* Estado activo en el toggle: fondo y color cambian */
   .toggle-btn.activo {
     border-color: var(--primary-color);
     background-color: var(--primary-color);
   }
-  
   .toggle-btn.activo .toggle-titulo,
   .toggle-btn.activo .toggle-desc {
     color: var(--accent-color);
   }
-  
   .icono-usuario {
     width: 22px;
     height: 22px;
     margin-bottom: 6px;
     transition: all 0.2s ease;
   }
-  
   .toggle-titulo {
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--primary-color);
   }
-  
   .toggle-desc {
     font-size: 0.75rem;
     color: var(--primary-color);
   }
   
-  /* ===== Formularios ===== */
+  /* ===== Formularios dentro de card-cuenta ===== */
   .formulario-invitado,
   .formulario-cuenta {
-    margin-bottom: 20px;
+    margin: 0 20px 20px 20px;
   }
-  
   .campo {
     margin-bottom: 15px;
   }
-  
   .campo label {
     display: block;
     margin-bottom: 5px;
     font-size: 0.9rem;
     color: var(--primary-color);
   }
-  
   .campos-dobles {
     display: flex;
     gap: 29px;
     margin-bottom: 10px;
   }
-  
   .input-small {
     flex: 1;
     padding: 8px;
@@ -195,6 +178,7 @@ body {
     background-color: var(--text-color);
     border-radius: 8px;
     font-size: 0.9rem;
+    color: var(--text-dark);
   }
   
   /* Contenedor del teléfono con prefijo */
@@ -207,22 +191,16 @@ body {
     overflow: hidden;
     margin-bottom: 20px;
   }
-  
-  /* Prefijo fijo */
   .telefono-prefix {
     padding: 12px;
     font-size: 0.9rem;
     color: var(--text-dark);
   }
-  
-  /* Línea separadora */
   .separador {
     width: 1px;
     height: 40px;
     background-color: var(--primary-color);
   }
-  
-  /* Input para el número de teléfono */
   .input-telefono {
     flex: 1;
     border: none;
@@ -230,8 +208,8 @@ body {
     padding: 12px;
     font-size: 0.9rem;
     background-color: var(--text-color);
+    color: var(--text-dark);
   }
-  
   .input-full {
     width: 100%;
     padding: 14px;
@@ -239,15 +217,16 @@ body {
     border: 1px solid var(--primary-color);
     border-radius: 9px;
     margin-bottom: 20px;
+    background-color: var(--secondary-color);
+    color: var(--text-dark);
   }
   
   /* ===== Botones ===== */
   .botones {
     display: flex;
     justify-content: space-between;
-    margin-top: 29px;
+    margin: 29px 20px 0 20px;
   }
-  
   .btn-volver,
   .btn-continuar {
     padding: 8px 16px;
@@ -256,7 +235,6 @@ body {
     font-size: 0.9rem;
     cursor: pointer;
   }
-  
   .btn-volver {
     background-color: #fff;
     color: var(--primary-color);
@@ -265,7 +243,6 @@ body {
   .btn-volver:hover {
     background-color: #fce6d9;
   }
-  
   .btn-continuar {
     background-color: #FEB248;
     color: var(--primary-color);
@@ -279,10 +256,9 @@ body {
     border-radius: 8px;
     width: 400px;
     padding: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     height: fit-content;
   }
-  
   .resumen-titulo {
     font-size: 1rem;
     font-weight: 600;
@@ -290,39 +266,33 @@ body {
     margin-bottom: 20px;
     text-align: left;
   }
-  
   .resumen-item {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
   }
-  
   .resumen-img {
     width: 138px;
     height: 138px;
     border-radius: 64px;
     object-fit: cover;
   }
-  
   .resumen-detalle {
     flex: 1;
     display: flex;
     flex-direction: column;
   }
-  
   .resumen-detalle h4 {
     font-size: 0.95rem;
     margin: 0;
     color: var(--primary-color);
     margin-bottom: 5px;
   }
-  
   .resumen-detalle p {
     margin: 0 0 10px;
     font-size: 0.8rem;
     color: var(--text-dark);
   }
-  
   .cantidad {
     display: flex;
     align-items: center;
@@ -330,7 +300,6 @@ body {
     margin-bottom: 10px;
     color: var(--primary-color);
   }
-  
   .cantidad button {
     width: 24px;
     height: 24px;
@@ -340,24 +309,20 @@ body {
     border-radius: 12px;
     cursor: pointer;
   }
-  
   .cantidad span {
     min-width: 20px;
     text-align: center;
   }
-  
   .resumen-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-  
   .precio {
     font-size: 0.9rem;
     font-weight: 600;
     color: #333;
   }
-  
   .eliminar {
     background-color: transparent;
     border: none;
@@ -368,12 +333,10 @@ body {
     align-items: center;
     gap: 4px;
   }
-  
   .eliminar img {
     width: 14px;
     height: 14px;
   }
-  
   .resumen-total {
     border-top: 1px solid #eee;
     padding-top: 30px;
@@ -384,3 +347,177 @@ body {
     font-weight: 600;
   }
   
+  /* ===== Otras Clases ===== */
+  
+  /* Input con ícono (contraseña) */
+  .input-with-icon {
+    position: relative;
+  }
+  .input-with-icon input {
+    width: 100%;
+    padding-right: 40px; /* Espacio para el ícono */
+  }
+  .toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 35%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* ===== Card (Dirección) SIN PADDING GLOBAL ===== */
+.card-direccion {
+    background-color: #fff;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    margin-top: 30px;
+    /* Sin padding global: cada elemento se posiciona con márgenes individuales */
+  }
+  
+  /* Título de la tarjeta (Dirección de entrega) */
+  .card-direccion .titulo-compra {
+    font-size: 1rem;
+    color: var(--primary-color);
+    font-weight: 600;
+    /* Márgenes individuales: top, right, bottom y left */
+    margin: 20px 20px 10px 20px;
+  }
+  
+  /* Párrafo descriptivo o instrucción (si lo hubiera) */
+  .card-direccion p {
+    margin: 0 20px 20px 20px;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+  }
+  
+  /* ===== Toggle de dirección (Llenar Formulario / Ubicación de tiempo real) ===== */
+  .toggle-direccion {
+    display: flex;
+    padding: 12px;
+  }
+  
+  .toggle-dir-btn {
+    flex: 1;
+    background-color: #fff;
+    border: 1px solid var(--primary-color);
+    padding: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    text-align: center;
+    transition: background-color 0.2s;
+  }
+  
+  .toggle-dir-btn.activo {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+  
+  /* ===== Contenido del formulario manual de dirección ===== */
+  .contenido-direccion {
+    margin: 0 20px 20px 20px;
+  }
+  
+  /* Asignar márgenes a cada campo individual */
+  .contenido-direccion .campo {
+    margin-bottom: 15px;
+  }
+  
+  .contenido-direccion .campo label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+  }
+  
+  /* Los inputs de ancho completo en esta sección */
+  .contenido-direccion .input-full {
+    width: 100%;
+    padding: 14px;
+    font-size: 0.9rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 9px;
+    margin-bottom: 20px;
+    background-color: var(--secondary-color);
+    color: var(--text-dark);
+  }
+  
+  /* Para la fila de tres campos: País, Departamento y Municipio */
+  .campos-tres {
+    display: flex;
+    gap: 39px;
+    margin-top: 10px;
+    margin-left: 20px;  /* Empieza desde el mismo margen que el contenido */
+    margin-right: 20px;
+  }
+  
+  /* Ajuste para el select de Departamento */
+  .select-departamento {
+    width: 100%;
+    height: 52px;
+    padding: 8px;
+    border: 1px solid var(--primary-color);
+    border-radius: 15px;
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    font-size: 0.9rem;
+  }
+  
+  .instruccion {
+    text-align: right;
+    position: relative;
+    right: 100px; /* Ajusta el valor según lo necesites */
+  }
+  
+  
+  
+  .btn-ubicacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    color: var(--text-color);
+    font-weight: bold;
+    padding: 9px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    gap: 8px;
+    margin-left: 40%;  /* Mueve el botón hacia la derecha */
+  }
+  
+  .btn-ubicacion:hover {
+    background-color: #fce6d9;
+    margin-top: 20px; /* Esto separa el botón del elemento anterior */
+  }
+  
+  /* Contenedor para la imagen del mapa */
+  .map-container {
+    text-align: center;
+  }
+  
+  .map-image {
+    width: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  /* Mensaje de cobertura: Alineado a la derecha */
+  .alerta-cobertura {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 10px;
+    font-size: 0.85rem;
+    color: var(--primary-color);
+    margin-right: 20px;
+  }
+  
+  .icono-advertencia {
+    color: #d9534f;
+    font-size: 1.2rem;
+  }
