@@ -6,80 +6,75 @@ import ProductsCards from '../productsCards/productsCards';
 import PizzaModal from '../PizzaModal/PizzaModal';
 import Footer from '../footer/footer';
 import TestimonialCard from '../ComentsCards/ComentCards';
+
+// Assets imports
 import pizzaHero from '../../assets/PizzaPrin.png';
 import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png'; 
 import robotIcon from '../../assets/Robot.png';
 import comentarioImg from '../../assets/comentario.png';
- 
+import usuario1Img from '../../assets/Usuario1.png';
+import usuario2Img from '../../assets/Usuario2.png';
+import usuario3Img from '../../assets/usuario3.png';
 
 import './Home.css';
 
-
-// Datos de testimonios
+// Datos de testimonios más variados y realistas
 const datosTestimonios = [
   {
-    avatar: comentarioImg,
+    avatar: usuario1Img,
     name: 'María Rodríguez',
     time: 'hace 2 semanas',
-    comment: 'Garantizamos la entrega en 30 minutos o su pizza es gratis. Nuestro equipo de entrega es rápido, eficiente y siempre puntual.'
+    comment: 'La pizza de pepperoni que pedí estaba increíble. La masa tenía el punto perfecto entre crujiente y esponjosa. ¡Definitivamente volveré a pedir!'
   },
   {
-    avatar: comentarioImg,
-    name: 'María Rodríguez',
-    time: 'hace 2 semanas',
-    comment: 'Garantizamos la entrega en 30 minutos o su pizza es gratis. Nuestro equipo de entrega es rápido, eficiente y siempre puntual.'
+    avatar: usuario2Img,
+    name: 'Carlos Méndez',
+    time: 'hace 3 días',
+    comment: 'El servicio de entrega fue super rápido. La pizza llegó caliente y el repartidor muy amable. La especialidad de la casa es realmente espectacular.'
   },
   {
-    avatar: comentarioImg,
-    name: 'María Rodríguez',
-    time: 'hace 2 semanas',
-    comment: 'Garantizamos la entrega en 30 minutos o su pizza es gratis. Nuestro equipo de entrega es rápido, eficiente y siempre puntual.'
+    avatar: usuario3Img,
+    name: 'Laura Sánchez',
+    time: 'hace 1 semana',
+    comment: 'Pedí para una reunión familiar y todos quedaron encantados. La variedad de ingredientes frescos se nota en el sabor. Su salsa de tomate es única.'
   },
 ];
 
 const Home = () => {
   const [popular, setPopular] = useState([]);
   const [recomendacion, setRecomendaciones] = useState([]);
-
-  useEffect(() => {
-    
-    const fetchRecomendations = async () => {
-      try{
-        const response = await fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/recomendacion');
-        const data = await response.json();
-        setRecomendaciones(data.productos);
-      }catch (error) {
-        console.log(error)
-      }finally {
-        console.log('Petición realizada')
-      }
-    }
-
-    const fetchPopular = async () => {
-      try{
-        const response = await fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/MostPopular');
-        const data = await response.json();
-        setPopular(data.productos);
-      }catch (error) {
-        console.log(error)
-      }finally {
-        console.log('Petición realizada')
-      }
-    }
-    fetchPopular();
-    fetchRecomendations();
-  }, [])
-
-  console.log(popular[0]);
-
-  // Estado para el modal de pizza
-
   const [selectedPizza, setSelectedPizza] = useState(null);
   const [cartItems, setCartItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Estado para controlar la visibilidad del carrito (ahora se usa)
-
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        // Realizar ambas peticiones en paralelo
+        const [recomendacionesRes, popularRes] = await Promise.all([
+          fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/recomendacion'),
+          fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/MostPopular')
+        ]);
+        
+        const recomendacionData = await recomendacionesRes.json();
+        const popularData = await popularRes.json();
+        
+        setRecomendaciones(recomendacionData.productos || []);
+        setPopular(popularData.productos || []);
+      } catch (error) {
+        console.error("Error al cargar los datos:", error);
+        // Establecer datos de respaldo en caso de error
+        setRecomendaciones([]);
+        setPopular([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
 
   const handleOpenPizza = (pizza) => {
     setSelectedPizza(pizza);
@@ -94,6 +89,7 @@ const Home = () => {
     const exists = cartItems.find(
       (item) => item.title === pizza.title && item.masa === masa && item.tamano === tamano
     );
+    
     if (exists) {
       setCartItems(
         cartItems.map((item) =>
@@ -119,10 +115,7 @@ const Home = () => {
   return (
     <div className="main__content">
       {/* Sección HERO */}
-      <section
-        className="hero__container"
-        style={{ backgroundImage: `url(${pizzaHero})` }}
-      >
+      <section className="hero__container">
         <div className="hero__text__container">
           <h1 className="hero__title">Las mejores pizzas</h1>
           <p className="hero__text">
@@ -136,33 +129,45 @@ const Home = () => {
       
       {/* Sección de Recomendación de la Casa */}
       <section className="house__choice__section">
-        <h1 className="house__choice__title">
+        <h2 className="house__choice__title">
           Recomendación de la Casa <img src={pizzaIcon} alt="Pizza Icon" />
-        </h1>
+        </h2>
         <div className="whyus__content">
-          {recomendacion.map((item, index) => (
-            <ProductsCards 
-              data={item} 
-              key={index}
-              onCardClick={() => handleOpenPizza(item)}
-            />
-          ))}
+          {isLoading ? (
+            <p>Cargando recomendaciones...</p>
+          ) : recomendacion && recomendacion.length > 0 ? (
+            recomendacion.map((item, index) => (
+              <ProductsCards 
+                data={item} 
+                key={index}
+                onCardClick={() => handleOpenPizza(item)}
+              />
+            ))
+          ) : (
+            <p>No hay recomendaciones disponibles en este momento.</p>
+          )}
         </div>
       </section>
       
       {/* Sección de Pizzas Populares */}
       <section className="trending__section">
         <h2 className="trending__title">
-          La más populares <img src={fireIcon} alt="Fire Icon" />
+          Las más populares <img src={fireIcon} alt="Fire Icon" />
         </h2>
         <div className="whyus__content">
-          {popular.map((item, index) => (
-            <ProductsCards 
-              data={item} 
-              key={index}
-              onCardClick={() => handleOpenPizza(item)}
-            />
-          ))}
+          {isLoading ? (
+            <p>Cargando pizzas populares...</p>
+          ) : popular && popular.length > 0 ? (
+            popular.map((item, index) => (
+              <ProductsCards 
+                data={item} 
+                key={index}
+                onCardClick={() => handleOpenPizza(item)}
+              />
+            ))
+          ) : (
+            <p>No hay pizzas populares disponibles en este momento.</p>
+          )}
         </div>
       </section>
       
@@ -204,13 +209,6 @@ const Home = () => {
         </div>
       </section>
  
-      {/* Botón flotante de Chat */}
-      <div className="chat-floating-button">
-        <span className="chat-button-text">¡Chatea conmigo!</span>
-        <div className="chat-icon-circle">
-          <img src={robotIcon} alt="Robot" className="chat-robot-icon" />
-        </div>
-      </div>
       {/* Sección de Testimonios */}
       <section className="review__section">
         <h2 className="review__header">Lo que dicen nuestros clientes</h2>
@@ -221,9 +219,16 @@ const Home = () => {
         </div>
       </section>
       
+      {/* Botón flotante de Chat */}
+      <div className="chat-floating-button">
+        <span className="chat-button-text">¡Chatea conmigo!</span>
+        <div className="chat-icon-circle">
+          <img src={robotIcon} alt="Robot" className="chat-robot-icon" />
+        </div>
+      </div>
+      
       <Footer />
 
-     
       {/* Modal de Pizza */}
       {selectedPizza && (
         <PizzaModal 
@@ -232,8 +237,6 @@ const Home = () => {
           onAddToCart={handleAddToCart}
         />
       )}
-      
-     
     </div>
   );
 };
