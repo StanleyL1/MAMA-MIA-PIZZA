@@ -8,63 +8,7 @@ import menuBookIcon from '../../assets/menuBook.png';
 import searchIcon from '../../assets/search.png';
 import './Menu.css';
 
-// Datos de prueba para "Recomendación de la Casa"
-const datosPrueba = [
-  {
-    title: "Burrata",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Peperoni",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Jamon",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Burrata",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Peperoni",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Jamon",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Burrata",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Peperoni",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Jamon",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  }
-];
+// Datos de prueba para "Recomendación de la Casa
 
 const Menu = () => {
   const [activeCategory, setActiveCategory] = useState('Todos');
