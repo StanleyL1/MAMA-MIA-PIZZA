@@ -146,7 +146,8 @@
   display: block;
   overflow: visible;
   /* Eliminar clamp y ellipsis */
-  -webkit-line-clamp: unset;
+  line-clamp: unset;          /* Standard property */
+  -webkit-line-clamp: unset;  /* Vendor prefixed version */
   -webkit-box-orient: unset;
   text-overflow: unset;
 }
