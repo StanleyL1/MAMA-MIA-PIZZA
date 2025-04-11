@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductsCards from '../productsCards/productsCards';
 import Footer from '../footer/footer';
 import PizzaModal from '../PizzaModal/PizzaModal';
@@ -71,8 +71,22 @@ const Menu = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPizza, setSelectedPizza] = useState(null);
   const [cartItems, setCartItems] = useState([]);
+  const [menu, setMenu] = useState([]);
 
 
+  useEffect(() => {
+    const fetchMenu = async () =>{
+      try {
+        const response = await fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/getMenu');
+        const data = await response.json();
+        setMenu(data.productos);
+      }catch (error){
+        console.log(error)
+      }finally{
+        console.log('Petición realizada')
+      }
+    }
+  })
 
   const handleOpenPizza = (pizza) => {
     setSelectedPizza(pizza);
@@ -109,7 +123,7 @@ const Menu = () => {
       setCartItems([...cartItems, newItem]);
     }
   };
-
+  console.log(menu)
   return (
     <div className="menu-container">
       
