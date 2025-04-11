@@ -1,3 +1,4 @@
+
 .menu-container{
   background-color: #FFF9E6;
 }
@@ -31,46 +32,40 @@
 }
 
 .menu-category-button {
-  padding: 8px 16px;
-  margin-right: 10px;
-  border: 2px solid #991B1B;
-  background-color: white;
-  color: #991B1B;
+  background-color: #F59E0B;
+  color: var(--primary-color);
+  border: none;
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
   font-weight: bold;
-  border-radius: 20px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease;
 }
 
 .menu-category-button:hover {
-  background-color: #fcd6a03d;
+  background-color: var(--primary-color);
+  color: #fff;
 }
 
 .menu-category-button.active {
-  background-color: #991B1B;
-  color: white;
+  background-color: var(--primary-color);
+  color: #fff;
 }
 
 .menu-search-container {
   position: relative;
   width: 250px; /* Ajusta según sea necesario */
-  margin-left: auto;
 }
 
 .menu-search-input {
   width: 100%;
-  padding: 8px 12px 8px 35px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-  font-size: 0.9rem;
-  background-color: white;
-  transition: all 0.3s ease;
-}
-
-.menu-search-input:focus {
+  padding: 0.5rem 2.5rem 0.5rem 0.5rem; /* Espacio a la derecha para el ícono */
+  border: 2px solid var(--accent-color);
+  border-radius: 4px;
   outline: none;
-  box-shadow: 0 0 5px rgba(153, 27, 27, 0.5);
-  width: 250px;
+  color: #991B1B;
+  font-weight: bold;
 }
 
 .menu-search-input::placeholder {
@@ -80,11 +75,11 @@
 
 .menu-search-icon {
   position: absolute;
-  left: 10px;
   top: 50%;
+  right: 0.5rem;
   transform: translateY(-50%);
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
   cursor: pointer;
   pointer-events: none; /* Opcional: para que no interfiera con la escritura */
@@ -118,26 +113,4 @@
   flex-wrap: wrap;
   gap: 2rem;
   justify-content: center;
-}
-
-/* Estilo para el mensaje de no resultados */
-.no-results-message {
-  text-align: center;
-  padding: 40px 20px;
-  margin: 20px 0;
-  background-color: #f8f8f8;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.no-results-message p:first-child {
-  font-size: 1.2rem;
-  color: #991B1B;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-.no-results-message p:last-child {
-  font-size: 1rem;
-  color: #666;
 }
