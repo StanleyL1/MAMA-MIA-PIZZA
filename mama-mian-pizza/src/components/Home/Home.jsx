@@ -7,7 +7,7 @@ import PizzaModal from '../PizzaModal/PizzaModal';
 import Footer from '../footer/footer';
 import TestimonialCard from '../ComentsCards/ComentCards';
 import pizzaHero from '../../assets/PizzaPrin.png';
-import PizzaCard from '../../assets/PizzaCard.png';
+import pizzaCardImg from '../../assets/PizzaCard.png';
 import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png'; 
 import robotIcon from '../../assets/Robot.png';
@@ -21,19 +21,19 @@ const datosPrueba = [
   {
     title: "Burrata",
     Descripcion: "Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico",
-    img: PizzaCard,
+    img: pizzaCardImg,
     price: "$15.00",
   },
   {
     title: "Peperoni",
     Descripcion: "Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico",
-    img: PizzaCard,
+    img: pizzaCardImg,
     price: "$15.00",
   },
   {
     title: "Jamon",
     Descripcion: "Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico",
-    img: PizzaCard,
+    img: pizzaCardImg,
     price: "$15.00",
   }
 ];
@@ -43,19 +43,19 @@ const DatosPopular = [
   {
     title: "Burrata",
     Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: PizzaCard,
+    img: pizzaCardImg,
     price: "$15.00",
   },
   {
     title: "Peperoni",
     Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: PizzaCard,
+    img: pizzaCardImg,
     price: "$15.00",
   },
   {
     title: "Jamon",
     Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: PizzaCard,
+    img: pizzaCardImg,
     price: "$15.00",
   }
 ];
