@@ -86,7 +86,8 @@ const Menu = () => {
         console.log('Petición realizada')
       }
     }
-  })
+    fetchMenu();
+  }, [])
 
   const handleOpenPizza = (pizza) => {
     setSelectedPizza(pizza);
