@@ -65,7 +65,7 @@ const Menu = () => {
       // Verificar si el producto coincide con el término de búsqueda
       const matchesSearch = 
         !searchTerm || 
-        (item.titulo && item.title.toLowerCase().includes(searchTerm.toLowerCase())) || 
+        (item.titulo && item.titulo.toLowerCase().includes(searchTerm.toLowerCase())) || 
         (item.descripcion && item.descripcion.toLowerCase().includes(searchTerm.toLowerCase()));
       
       // El producto debe coincidir con ambas condiciones para ser incluido
