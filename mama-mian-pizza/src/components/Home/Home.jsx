@@ -13,6 +13,7 @@ import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png'; 
 import robotIcon from '../../assets/Robot.png';
 import comentarioImg from '../../assets/comentario.png';
+ 
 
 import './Home.css';
 
