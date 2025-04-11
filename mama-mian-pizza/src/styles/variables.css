@@ -1,37 +1,9 @@
 :root {
-    /* Colores principales */
-    --primary-color: #991B1B;       /* rojo intenso */
-    --primary-dark: #7C1616;        /* rojo más oscuro para hover */
-    --primary-light: #B93939;       /* rojo más claro para detalles */
-    --secondary-color: #FFFBEB;     /* Fondo claro */
-    --text-color: #FFFFFF;          /* Texto blanco */
-    --text-dark: #111111;           /* Texto casi negro */
-    --text-gray: #4B5563;           /* Texto gris */
-    --accent-color: #EAB308;        /* Amarillo/dorado para acentos */
-    --accent-dark: #D79E07;         /* Amarillo más oscuro para hover */
-    --text: #FCD6A0;                /* Color melocotón claro */
-    
-    /* Estados */
-    --success: #22C55E;             /* Verde para éxito */
-    --error: #EF4444;               /* Rojo para errores */
-    --warning: #F59E0B;             /* Naranja para advertencias */
-    --info: #3B82F6;                /* Azul para información */
-    
-    /* Bordes y sombras */
-    --border-radius-sm: 4px;
-    --border-radius-md: 8px;
-    --border-radius-lg: 12px;
-    --border-radius-xl: 16px;
-    --border-radius-full: 9999px;
-    
-    /* Sombras */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-    
-    /* Transiciones */
-    --transition-fast: 0.15s ease;
-    --transition-normal: 0.3s ease;
-    --transition-slow: 0.5s ease;
+    --primary-color: #991B1B;  /*  rojo intenso */
+    --secondary-color: #FFFBEB; /* Gris claro  */
+    --text-color: #FFFFFF;      /* Texto blanco */
+    --text-dark: #000000;       /* Texto oscuro */
+    --accent-color: #EAB308;    /* naranja */
+    --text : #FCD6A0;
 }
+  
