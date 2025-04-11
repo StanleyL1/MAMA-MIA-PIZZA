@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ProductsCards from '../productsCards/productsCards';
 import Footer from '../footer/footer';
 import PizzaModal from '../PizzaModal/PizzaModal';
@@ -67,6 +67,48 @@ const Menu = () => {
       setCartItems([...cartItems, newItem]);
     }
   };
+
+  // Filtrar el menú basado en la categoría activa y el término de búsqueda
+  const filteredMenu = useMemo(() => {
+    return menu.filter((item) => {
+      // Filtro por categoría
+      const categoryMatch = 
+        activeCategory === 'Todos' || 
+        (item.categoria && item.categoria.toLowerCase() === activeCategory.toLowerCase());
+      
+      // Filtro por término de búsqueda (en título y descripción)
+      const searchMatch = 
+        searchTerm === '' || 
+        (item.title && item.title.toLowerCase().includes(searchTerm.toLowerCase())) || 
+        (item.Descripcion && item.Descripcion.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      return categoryMatch && searchMatch;
+    });
+  }, [menu, activeCategory, searchTerm]);
+
+  // Agregar mensaje para cuando no hay resultados
+  const noResultsMessage = useMemo(() => {
+    if (filteredMenu.length === 0) {
+      return (
+        <div className="no-results-message">
+          <p>No se encontraron productos que coincidan con tu búsqueda.</p>
+          <p>Intenta con otros términos o categorías.</p>
+        </div>
+      );
+    }
+    return null;
+  }, [filteredMenu]);
+
+  // Función para manejar cambios en el input de búsqueda
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Función para cambiar la categoría activa
+  const handleCategoryChange = (category) => {
+    setActiveCategory(category);
+  };
+
   console.log(menu)
   return (
     <div className="menu-container">
@@ -84,31 +126,31 @@ const Menu = () => {
         <div className="menu-categories">
           <button
             className={`menu-category-button ${activeCategory === "Todos" ? "active" : ""}`}
-            onClick={() => setActiveCategory("Todos")}
+            onClick={() => handleCategoryChange("Todos")}
           >
             Todos
           </button>
           <button
             className={`menu-category-button ${activeCategory === "Pizzas" ? "active" : ""}`}
-            onClick={() => setActiveCategory("Pizzas")}
+            onClick={() => handleCategoryChange("Pizzas")}
           >
             Pizzas
           </button>
           <button
             className={`menu-category-button ${activeCategory === "Bebidas" ? "active" : ""}`}
-            onClick={() => setActiveCategory("Bebidas")}
+            onClick={() => handleCategoryChange("Bebidas")}
           >
             Bebidas
           </button>
           <button
             className={`menu-category-button ${activeCategory === "Postres" ? "active" : ""}`}
-            onClick={() => setActiveCategory("Postres")}
+            onClick={() => handleCategoryChange("Postres")}
           >
             Postres
           </button>
           <button
             className={`menu-category-button ${activeCategory === "Complementos" ? "active" : ""}`}
-            onClick={() => setActiveCategory("Complementos")}
+            onClick={() => handleCategoryChange("Complementos")}
           >
             Complementos
           </button>
@@ -117,7 +159,7 @@ const Menu = () => {
               type="text"
               placeholder="Buscar..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className="menu-search-input"
             />
             <img 
@@ -129,15 +171,19 @@ const Menu = () => {
         </div>
       </section>
 
-      {/* SECCIÓN: RECOMENDACIÓN DE LA CASA */}
+      {/* SECCIÓN: PRODUCTOS FILTRADOS */}
       <section className="menu-recommendation-section">
         <div className="menu-recommendation-card">
           <h3 className="recommendation-title">
-            Recomendación de la Casa{" "}
+            {activeCategory === 'Todos' ? 'Todos los Productos' : activeCategory}{" "}
             <img src={pizzaIcon} alt="Pizza Icon" className="menu-pizza-icon" />
           </h3>
+          
+          {/* Mensaje cuando no hay resultados */}
+          {noResultsMessage}
+          
           <div className="menu-card-container">
-            {menu.map((item, index) => (
+            {filteredMenu.map((item, index) => (
               // Se pasa la función handleOpenPizza a la card para abrir el modal
               <ProductsCards data={item} key={index} onCardClick={() => handleOpenPizza(item)} />
             ))}
