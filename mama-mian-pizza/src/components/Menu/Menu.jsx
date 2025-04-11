@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ProductsCards from '../productsCards/productsCards';
 import Footer from '../footer/footer';
 import PizzaModal from '../PizzaModal/PizzaModal';
@@ -6,8 +6,6 @@ import pizzaIcon from '../../assets/PizzaR.png';
 import menuBookIcon from '../../assets/menuBook.png';
 import searchIcon from '../../assets/search.png';
 import './Menu.css';
-
-// Datos de prueba para "Recomendación de la Casa
 
 const Menu = () => {
   const [activeCategory, setActiveCategory] = useState('Todos');
@@ -30,7 +28,26 @@ const Menu = () => {
       }
     }
     fetchMenu();
-  }, [])
+  }, []);
+
+  // Filtrar productos en tiempo real según la categoría y término de búsqueda
+  const filteredMenu = useMemo(() => {
+    return menu.filter(item => {
+      // Primero filtrar por categoría
+      const matchesCategory = 
+        activeCategory === 'Todos' || 
+        (item.categoria && item.categoria.toLowerCase() === activeCategory.toLowerCase());
+      
+      // Luego filtrar por término de búsqueda (título y descripción)
+      const matchesSearch = 
+        searchTerm === '' || 
+        (item.title && item.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.Descripcion && item.Descripcion.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      // El producto se incluye si coincide con ambos filtros
+      return matchesCategory && matchesSearch;
+    });
+  }, [menu, activeCategory, searchTerm]);
 
   const handleOpenPizza = (pizza) => {
     setSelectedPizza(pizza);
@@ -41,6 +58,10 @@ const Menu = () => {
     setSelectedPizza(null);
   };
 
+  // Función para manejar el cambio en el input de búsqueda
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
 
   const handleAddToCart = (pizza, masa, tamano) => {
     const exists = cartItems.find(
@@ -67,7 +88,21 @@ const Menu = () => {
       setCartItems([...cartItems, newItem]);
     }
   };
-  console.log(menu)
+  
+  // Verificar si hay productos en la categoría filtrada
+  const noProductsMessage = useMemo(() => {
+    if (filteredMenu.length === 0) {
+      return (
+        <div className="no-products-message">
+          <p>No se encontraron productos {searchTerm ? `que coincidan con "${searchTerm}"` : ''} 
+             {activeCategory !== 'Todos' ? ` en la categoría "${activeCategory}"` : ''}</p>
+          <p>Intenta con otra búsqueda o categoría</p>
+        </div>
+      );
+    }
+    return null;
+  }, [filteredMenu, searchTerm, activeCategory]);
+
   return (
     <div className="menu-container">
       
@@ -117,7 +152,7 @@ const Menu = () => {
               type="text"
               placeholder="Buscar..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className="menu-search-input"
             />
             <img 
@@ -129,16 +164,19 @@ const Menu = () => {
         </div>
       </section>
 
-      {/* SECCIÓN: RECOMENDACIÓN DE LA CASA */}
+      {/* SECCIÓN: PRODUCTOS FILTRADOS */}
       <section className="menu-recommendation-section">
         <div className="menu-recommendation-card">
           <h3 className="recommendation-title">
-            Recomendación de la Casa{" "}
+            {activeCategory === 'Todos' ? 'Todos los Productos' : activeCategory}{" "}
             <img src={pizzaIcon} alt="Pizza Icon" className="menu-pizza-icon" />
           </h3>
+          
+          {/* Mostrar mensaje cuando no hay productos */}
+          {noProductsMessage}
+          
           <div className="menu-card-container">
-            {menu.map((item, index) => (
-              // Se pasa la función handleOpenPizza a la card para abrir el modal
+            {filteredMenu.map((item, index) => (
               <ProductsCards data={item} key={index} onCardClick={() => handleOpenPizza(item)} />
             ))}
           </div>
@@ -147,16 +185,15 @@ const Menu = () => {
 
       <Footer noImage={true} />
 
-    {/* Modal de Pizza */}
-    {selectedPizza && (
+      {/* Modal de Pizza */}
+      {selectedPizza && (
         <PizzaModal 
           pizza={selectedPizza}
           onClose={handleCloseModal}
           onAddToCart={handleAddToCart}
         />
       )}
-              </div>
-
+    </div>
   );
 };
 
