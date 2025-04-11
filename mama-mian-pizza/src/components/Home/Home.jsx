@@ -9,7 +9,6 @@ import Footer from '../footer/footer';
 import TestimonialCard from '../ComentsCards/ComentCards';
 
 import pizzaHero from '../../assets/PizzaPrin.png';
-import pizzaCardImg from '../../assets/PizzaCard.png';
 import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png'; 
 import robotIcon from '../../assets/Robot.png';
