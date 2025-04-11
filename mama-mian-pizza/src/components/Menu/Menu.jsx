@@ -194,7 +194,7 @@ const Menu = () => {
             <img src={pizzaIcon} alt="Pizza Icon" className="menu-pizza-icon" />
           </h3>
           <div className="menu-card-container">
-            {datosPrueba.map((item, index) => (
+            {menu.map((item, index) => (
               // Se pasa la función handleOpenPizza a la card para abrir el modal
               <ProductsCards data={item} key={index} onCardClick={() => handleOpenPizza(item)} />
             ))}
