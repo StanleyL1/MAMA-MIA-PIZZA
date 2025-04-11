@@ -9,8 +9,15 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
 
   if (!pizza) return null;
 
+  const isPizza = pizza.id_categoria === 1;
+
   const handleAddToOrder = () => {
-    onAddToCart(pizza, masa, tamano);
+    // Si es una pizza, incluir masa y tamaño, de lo contrario, enviar solo el producto
+    if (isPizza) {
+      onAddToCart(pizza, masa, tamano);
+    } else {
+      onAddToCart(pizza);
+    }
     onClose();
   };
 
@@ -20,40 +27,44 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
         <button className="modal-close-button" onClick={onClose}>X</button>
         <div className="modal-layout">
           <div className="modal-left">
-            <img src={pizza.img} alt={pizza.title} className="modal-pizza-image" />
+            <img src={pizza.imagen} alt={pizza.titulo} className="modal-pizza-image" />
           </div>
           <div className="modal-right">
-            <h2 className="modal-pizza-title">{pizza.title}</h2>
-            <div className="modal-selectors">
-              <div className="selector-item">
-                <label htmlFor="masaSelect">Masa</label>
-                <select 
-                  id="masaSelect" 
-                  value={masa} 
-                  onChange={(e) => setMasa(e.target.value)}
-                >
-                  <option value="Pan">Pan</option>
-                  <option value="Delgada">Delgada</option>
-                  <option value="Integral">Integral</option>
-                </select>
+            <h2 className="modal-pizza-title">{pizza.titulo}</h2>
+            
+            {isPizza && (
+              <div className="modal-selectors">
+                <div className="selector-item">
+                  <label htmlFor="masaSelect">Masa</label>
+                  <select 
+                    id="masaSelect" 
+                    value={masa} 
+                    onChange={(e) => setMasa(e.target.value)}
+                  >
+                    <option value="Pan">Pan</option>
+                    <option value="Delgada">Delgada</option>
+                    <option value="Integral">Integral</option>
+                  </select>
+                </div>
+                <div className="selector-item">
+                  <label htmlFor="tamanoSelect">Tamaño</label>
+                  <select 
+                    id="tamanoSelect" 
+                    value={tamano} 
+                    onChange={(e) => setTamano(e.target.value)}
+                  >
+                    <option value="Personal (4 porciones)">Personal (4 porciones)</option>
+                    <option value="Mediana (6 porciones)">Mediana (6 porciones)</option>
+                    <option value="Grande (8 porciones)">Grande (8 porciones)</option>
+                  </select>
+                </div>
               </div>
-              <div className="selector-item">
-                <label htmlFor="tamanoSelect">Tamaño</label>
-                <select 
-                  id="tamanoSelect" 
-                  value={tamano} 
-                  onChange={(e) => setTamano(e.target.value)}
-                >
-                  <option value="Personal (4 porciones)">Personal (4 porciones)</option>
-                  <option value="Mediana (6 porciones)">Mediana (6 porciones)</option>
-                  <option value="Grande (8 porciones)">Grande (8 porciones)</option>
-                </select>
-              </div>
-            </div>
+            )}
+            
             <h3 className="modal-desc-title">Descripción</h3>
-            <p className="modal-pizza-description">{pizza.Descripcion}</p>
+            <p className="modal-pizza-description">{pizza.descripcion}</p>
             <div className="modal-bottom-row">
-              <span className="modal-pizza-price">{pizza.price}</span>
+              <span className="modal-pizza-price">{pizza.precio}</span>
               <button className="modal-add-button" onClick={handleAddToOrder}>
                 Añadir a mi orden <FontAwesomeIcon icon={faCartShopping} />
               </button>

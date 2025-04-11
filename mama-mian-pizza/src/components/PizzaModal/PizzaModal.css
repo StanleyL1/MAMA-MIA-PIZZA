@@ -12,14 +12,14 @@
   justify-content: center;
 }
 
-/* Contenedor del modal con alto fijo */
+/* Contenedor del modal con alto ajustado */
 .modal-content {
   position: relative;
   width: 45%;   /* Ancho total del modal */
-  height: 400px;  /* Alto fijo para que la imagen tenga referencia */
+  height: 500px;  /* Aumentado para mostrar la descripción completa */
   background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border-radius: 10px; /* Consistente con otros componentes */
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3); /* Consistente con las tarjetas */
   overflow: hidden;
   display: flex;
   flex-direction: row;  /* Utilizamos row para 2 columnas */
@@ -33,13 +33,15 @@
   background: none;
   color: #ff0303;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.8rem; /* Ligeramente más grande para mejor visibilidad */
   cursor: pointer;
   z-index: 2;
+  transition: all 0.3s ease;
 }
 
 .modal-close-button:hover {
   opacity: 0.8;
+  transform: scale(1.1);
 }
 
 /* Layout interno: 2 columnas */
@@ -50,10 +52,15 @@
   gap: 2px;
 }
 
+.modal-left {
+  flex: 1;
+  overflow: hidden;
+}
 
 .modal-pizza-image {
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
 /* Columna derecha: contenido */
@@ -62,15 +69,18 @@
   display: flex;
   flex-direction: column;
   width: auto;
-  padding: 2rem;
-  gap: 2rem;
+  padding: 2.5rem; /* Espaciado para el contenido */
+  padding-bottom: 1.5rem; /* Reducir el padding inferior */
+  gap: 1.5rem; /* Reducir el gap para dar más espacio al footer */
   text-align: left;
+  justify-content: space-between; /* Distribuir espacio verticalmente */
 }
 
 /* Título de la pizza */
 .modal-pizza-title {
-  font-size: 1.8rem;
-  color: var(--primary-color); /* O #991B1B si no usas variable */
+  font-size: 2.2rem; /* Aumentado para consistencia con otros títulos */
+  color: #991B1B; /* Color consistente */
+  font-weight: 700; /* Negrita para consistencia */
   margin: 0;
 }
 
@@ -78,55 +88,68 @@
 .modal-selectors {
   display: flex;
   gap: 6rem;
+  margin: 0.5rem 0;
 }
 
 .selector-item {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  color: var(--primary-color);
+  color: #991B1B;
   font-weight: bold;
 }
 
 .selector-item label {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem; /* Aumentado para mejor legibilidad */
 }
 
 .selector-item select {
   background-color: #fff;
-  border: 1px solid var(--primary-color);
-  color: var(--primary-color);
-  padding: 0.5rem;
+  border: 1px solid #991B1B;
+  color: #991B1B;
+  padding: 0.6rem; /* Ligeramente aumentado */
   border-radius: 9px;
   appearance: none;
   -moz-appearance: none;
   -webkit-appearance: none;
-  background-image: url('../../assets/arrowRed.png'); /* Ajusta la ruta a tu asset de flecha roja */
+  background-image: url('../../assets/arrowRed.png');
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   background-size: 10px 7px;
   padding-right: 2rem;
+  font-size: 1.1rem; /* Aumentado para mejor legibilidad */
+  transition: all 0.2s ease;
 }
 
 .selector-item select:focus {
   outline: none;
-  border: 1px solid var(--primary-color);
+  border: 2px solid #991B1B; /* Más visible al enfocar */
 }
 
 /* Título "Descripción" */
 .modal-desc-title {
-  font-size: 1rem;
-  color: var(--primary-color);
-  margin: 0;
+  font-size: 1.4rem; /* Aumentado para consistencia con otros subtítulos */
+  color: #991B1B;
+  margin: 0.5rem 0 0.75rem 0; /* Mejor espaciado */
+  font-weight: 600; /* Semi-negrita para distinguir */
 }
 
 /* Descripción */
 .modal-pizza-description {
-  font-size: 0.95rem;
+  font-size: 1.1rem; /* Tamaño de fuente consistente */
   color: #333;
-  line-height: 1.4;
+  line-height: 1.5; /* Espaciado de líneas */
   margin-bottom: 1rem;
   text-align: left;
+  /* Eliminar truncamiento para mostrar texto completo */
+  display: block;
+  overflow: visible;
+  /* Eliminar clamp y ellipsis */
+  line-clamp: unset;          /* Standard property */
+  -webkit-line-clamp: unset;  /* Vendor prefixed version */
+  -webkit-box-orient: unset;
+  text-overflow: unset;
 }
 
 /* Fila inferior: price a la izquierda, botón a la derecha */
@@ -134,15 +157,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: auto;
-  margin-top: -12px;
+  width: 100%;
+  margin-top: auto; /* Empujar hacia abajo */
+  padding-top: 0.5rem;
 }
 
 /* price */
 .modal-pizza-price {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--primary-color);
+  font-size: 1.5rem; /* Aumentado para consistencia */
+  font-weight: 700; /* Negrita más pronunciada */
+  color: #991B1B;
+  display: inline-block; /* Asegurar visibilidad */
 }
 
 /* Botón "Añadir a mi orden" */
@@ -151,12 +176,82 @@
   align-items: center;
   gap: 0.5rem;
   background-color: #FEB248;
-  color: var(--primary-color);
-  padding: 0.5rem 1rem;
+  color: #991B1B;
+  padding: 0.8rem 1.2rem; /* Aumentado para mejor clickabilidad */
   border: none;
-  border-radius: 4px;
+  border-radius: 10px; /* Consistente con otros botones */
   font-weight: bold;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1.3rem; /* Aumentado ligeramente */
+  transition: all 0.3s ease; /* Transición suave */
+  white-space: nowrap; /* Evitar que el texto se divida */
+}
+
+.modal-add-button:hover {
+  transform: scale(1.05);
+  background-color: #fcd6a0; /* Color más claro al hover */
+}
+
+/* Estilos responsivos */
+@media (max-width: 1024px) {
+  .modal-content {
+    width: 70%;
+  }
+  
+  .modal-selectors {
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 90%;
+    height: 600px; /* Aumentado para mostrar contenido completo en móvil */
+    flex-direction: column;
+  }
+  
+  .modal-layout {
+    flex-direction: column;
+  }
+  
+  .modal-left {
+    height: 40%;
+  }
+  
+  .modal-right {
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+  
+  .modal-pizza-title {
+    font-size: 1.8rem;
+  }
+  
+  .modal-selectors {
+    gap: 2rem;
+  }
+  
+  .selector-item label {
+    font-size: 1.1rem;
+  }
+  
+  .modal-desc-title {
+    font-size: 1.2rem;
+  }
+  
+  .modal-pizza-description {
+    font-size: 1rem;
+    line-height: 1.4;
+    margin-bottom: 0.75rem;
+  }
+  
+  .modal-pizza-price {
+    font-size: 1.4rem;
+  }
+  
+  .modal-add-button {
+    padding: 0.7rem 1rem;
+    font-size: 1.1rem;
+  }
 }
 

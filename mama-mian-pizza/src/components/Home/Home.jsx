@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faMedal, faTruck, faCarrot } from '@fortawesome/free-solid-svg-icons';
@@ -7,7 +7,6 @@ import PizzaModal from '../PizzaModal/PizzaModal';
 import Footer from '../footer/footer';
 import TestimonialCard from '../ComentsCards/ComentCards';
 import pizzaHero from '../../assets/PizzaPrin.png';
-import pizzaCardImg from '../../assets/PizzaCard.png';
 import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png'; 
 import robotIcon from '../../assets/Robot.png';
@@ -16,49 +15,6 @@ import comentarioImg from '../../assets/comentario.png';
 
 import './Home.css';
 
-// Datos para "Recomendación de la Casa"
-const datosPrueba = [
-  {
-    title: "Burrata",
-    Descripcion: "Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Peperoni",
-    Descripcion: "Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Jamon",
-    Descripcion: "Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  }
-];
-
-// Datos para "La más populares"
-const DatosPopular = [
-  {
-    title: "Burrata",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Peperoni",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  },
-  {
-    title: "Jamon",
-    Descripcion: "Mozzarella, cebolla caramelizada, jamón y vinagre balsámico",
-    img: pizzaCardImg,
-    price: "$15.00",
-  }
-];
 
 // Datos de testimonios
 const datosTestimonios = [
@@ -83,9 +39,47 @@ const datosTestimonios = [
 ];
 
 const Home = () => {
+  const [popular, setPopular] = useState([]);
+  const [recomendacion, setRecomendaciones] = useState([]);
+
+  useEffect(() => {
+    
+    const fetchRecomendations = async () => {
+      try{
+        const response = await fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/recomendacion');
+        const data = await response.json();
+        setRecomendaciones(data.productos);
+      }catch (error) {
+        console.log(error)
+      }finally {
+        console.log('Petición realizada')
+      }
+    }
+
+    const fetchPopular = async () => {
+      try{
+        const response = await fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/MostPopular');
+        const data = await response.json();
+        setPopular(data.productos);
+      }catch (error) {
+        console.log(error)
+      }finally {
+        console.log('Petición realizada')
+      }
+    }
+    fetchPopular();
+    fetchRecomendations();
+  }, [])
+
+  console.log(popular[0]);
+
+  // Estado para el modal de pizza
+
   const [selectedPizza, setSelectedPizza] = useState(null);
   const [cartItems, setCartItems] = useState([]);
-  
+
+  // Estado para controlar la visibilidad del carrito (ahora se usa)
+
 
   const handleOpenPizza = (pizza) => {
     setSelectedPizza(pizza);
@@ -122,7 +116,6 @@ const Home = () => {
     }
   };
 
-  
   return (
     <div className="main__content">
       {/* Sección HERO */}
@@ -147,7 +140,7 @@ const Home = () => {
           Recomendación de la Casa <img src={pizzaIcon} alt="Pizza Icon" />
         </h1>
         <div className="whyus__content">
-          {datosPrueba.map((item, index) => (
+          {recomendacion.map((item, index) => (
             <ProductsCards 
               data={item} 
               key={index}
@@ -163,7 +156,7 @@ const Home = () => {
           La más populares <img src={fireIcon} alt="Fire Icon" />
         </h2>
         <div className="whyus__content">
-          {DatosPopular.map((item, index) => (
+          {popular.map((item, index) => (
             <ProductsCards 
               data={item} 
               key={index}
