@@ -26,7 +26,7 @@
 .navbar__user-section {
   display: flex;
   flex-direction: column;
-  margin-top: 10px;
+  margin-top: 1px;
   align-items: center;
   margin-right: 0.2rem; /* Más espacio entre usuario y carrito */
 }
@@ -63,7 +63,7 @@
 
 /* El botón de carrito puede tener ajustes adicionales (si fuera necesario) */
 .cart-button {
-margin-bottom: 24px;}
+margin-bottom: 0px;}
 
 /* Ajusta la imagen del ícono (si es necesario) */
 
@@ -131,6 +131,10 @@ margin-bottom: 24px;}
 .navbar__icons {
   display: flex;
   align-items: center;
+  gap: 2rem;
+  margin-left: auto;
+  justify-content: center;
+  
 }
 
 .navbar__icons .icon-button {
@@ -149,6 +153,9 @@ margin-bottom: 24px;}
   width: 24px;
   height: 24px;
   object-fit: contain;
+  font-weight: bold;
+  color: "#fff";
+  background: "transparent" ; 
 }
 
 /* Botón de menú hamburguesa (oculto en escritorio) */

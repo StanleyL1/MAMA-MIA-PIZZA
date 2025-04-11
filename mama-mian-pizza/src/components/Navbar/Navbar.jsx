@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import './Navbar.css';
+// Importa el componente de Font Awesome y los íconos necesarios
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// Nota: faUser en free-regular para que se vea como outline
+import { faUser } from '@fortawesome/free-regular-svg-icons';
+// Los siguientes íconos se usan en versión sólida (porque no tienen variante outline gratuita)
+import { faPizzaSlice, faCartShopping } from '@fortawesome/free-solid-svg-icons';
 
-// Importa tus imágenes
-import pizzaLogo from '../../assets/Pizza.png';
-import userIcon from '../../assets/Usuario.png';
-import cartIcon from '../../assets/Carrito.png';
+import './Navbar.css';
 
 const Navbar = ({ onCartToggle }) => {
   const [mostrarLinks, setMostrarLinks] = useState(false);
@@ -15,21 +17,25 @@ const Navbar = ({ onCartToggle }) => {
 
   return (
     <header className="navbar">
-     <div className="navbar__brand">
-  <nav className="navbar-title">
-    <ul>
-      <li>
-        <a href="/" className="brand-link">
-          <h1>
-            Mama Mian <br /> Pizza 
-            <img src={pizzaLogo} alt="Logo Pizza" className="brand-logo" />
-          </h1>
-        </a>
-      </li>
-    </ul>
-  </nav>
-</div>
-
+      <div className="navbar__brand">
+        <nav className="navbar-title">
+          <ul>
+            <li>
+              <a href="/" className="brand-link">
+                <h1>
+                  Mama Mian <br /> Pizza
+                  {/* Ícono de Pizza (sólido, ya que no hay versión outline gratuita) */}
+                  <FontAwesomeIcon 
+                    icon={faPizzaSlice} 
+                    className="brand-logo" 
+                    style={{ color: "#fff", background: "transparent" }} 
+                  />
+                </h1>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
 
       <nav className="navbar__links">
         <ul>
@@ -42,28 +48,32 @@ const Navbar = ({ onCartToggle }) => {
       <div className="navbar__icons">
         {/* Sección de usuario */}
         <div className="navbar__user-section">
-  <button 
-    className="icon-button" 
-    aria-label="Usuario"
-    onClick={toggleUserLinks}
-  >
-    <img src={userIcon} alt="Usuario" className="icon-img" />
-  </button>
+          <button
+            className="icon-button"
+            aria-label="Usuario"
+            onClick={toggleUserLinks}
+          >
+            {/* Ícono de usuario outline */}
+            <FontAwesomeIcon 
+              icon={faUser} 
+              className="icon-img" 
+              style={{ color: "#fff", background: "transparent" }} 
+            />
+          </button>
+        </div>
 
-  <div className={`navbar__user-links ${!mostrarLinks ? 'hidden' : ''}`}>
-    <a href="/login">Iniciar sesión</a>
-    <a href="/register">Registrar</a>
-  </div>
-</div>
-
-
-        {/* Icono de Carrito */}
-        <button 
-          className="icon-button cart-button" 
+        {/* Botón del carrito */}
+        <button
+          className="icon-button cart-button"
           aria-label="Carrito"
           onClick={onCartToggle}
         >
-          <img src={cartIcon} alt="Carrito" className="icon-img" />
+          {/* Ícono del carrito (sólido) */}
+          <FontAwesomeIcon 
+            icon={faCartShopping} 
+            className="icon-img" 
+            style={{ color: "#fff", background: "transparent" }} 
+          />
         </button>
       </div>
     </header>
