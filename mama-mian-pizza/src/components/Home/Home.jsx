@@ -8,11 +8,9 @@ import Footer from '../footer/footer';
 import TestimonialCard from '../ComentsCards/ComentCards';
 
 // Assets imports
-import pizzaHero from '../../assets/PizzaPrin.png';
 import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png'; 
 import robotIcon from '../../assets/Robot.png';
-import comentarioImg from '../../assets/comentario.png';
 import usuario1Img from '../../assets/Usuario1.png';
 import usuario2Img from '../../assets/Usuario2.png';
 import usuario3Img from '../../assets/usuario3.png';
