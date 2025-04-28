@@ -39,8 +39,8 @@
 /* Contenedor de la imagen (con overlay del título) */
 .services-card-image-container {
   position: relative;
-  width: 619px;
-  height: 225px; /* Ajusta la altura de la imagen */
+  width: 100%;
+  height: 100%; /* Ajusta la altura de la imagen */
   overflow: hidden;
 }
 
@@ -159,8 +159,8 @@
 
 /* Imagen a la derecha */
 .services-bottom-image-container {
-  width: 490px;
-  height: 490px;
+  width: 470px;
+  height: 470px;
   display: flex;
   align-items: center;
   justify-content: center;

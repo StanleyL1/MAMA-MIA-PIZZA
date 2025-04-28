@@ -1,9 +1,9 @@
 import React from 'react';
 import './Services.css';
 
-import pizzaMovilImg from '../../assets/pizzaMovil.png';
-import cateringImg from '../../assets/catering.png';
-import bigPizzaImg from '../../assets/bigPizza.png';
+import pizzaMovilImg from '../../assets/domicilio.jpeg';
+import cateringImg from '../../assets/Retiro.jpeg';
+import bigPizzaImg from '../../assets/Consumo.jpeg';
 
 // Iconos
 import iconoCamion from '../../assets/iconoCamion.png';
@@ -31,7 +31,7 @@ function Services() {
           <div className="services-card-image-container">
             <img src={pizzaMovilImg} alt="Pizza Móvil" className="services-card-image" />
             <div className="services-card-title-overlay">
-              Nuestra Experiencia de Pizza Móvil
+              Envio a Domicilio
             </div>
           </div>
           <div className="services-card-body">
@@ -52,7 +52,7 @@ function Services() {
           <div className="services-card-image-container">
             <img src={cateringImg} alt="Catering para eventos" className="services-card-image" />
             <div className="services-card-title-overlay">
-              Catering para eventos
+              Retiro en restaurante
             </div>
           </div>
           <div className="services-card-body">
@@ -72,7 +72,7 @@ function Services() {
       {/* Card inferior */}
       <div className="services-bottom-card">
         <div className="services-bottom-text">
-          <h2>Reserva nuestro servicio de pizza móvil</h2>
+          <h2>Contratacion para eventos</h2>
           <p>¡Lleva la experiencia PizzaMía a tu próximo evento! Nuestro servicio de pizza móvil es perfecto para:</p>
           <ul>
             <li><img src={iconoGrupo1} alt="Icono evento" /> Bodas y fiestas de compromiso</li>
