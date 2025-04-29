@@ -20,11 +20,7 @@ const socialPlatforms = [
     color: '#E1306C',
     url: 'https://instagram.com/',
   },
-  {
-    name: 'tiktok',
-    color: '#000000',
-    url: 'https://tiktok.com/',
-  },
+
 ];
 
 export default function SocialMediaButton() {

@@ -1,6 +1,7 @@
 // SocialIcon.jsx
 import React from 'react';
-import { MessageCircle, Instagram, Send, Video } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWhatsapp, faFacebookMessenger, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import PropTypes from 'prop-types';
 
 export default function SocialIcon({ platform, index, total, isOpen }) {
@@ -22,13 +23,11 @@ export default function SocialIcon({ platform, index, total, isOpen }) {
   const getIcon = () => {
     switch (platform.name) {
       case 'whatsapp':
-        return <MessageCircle size={20} />;
+        return <FontAwesomeIcon icon={faWhatsapp} size="lg" color="white" />;
       case 'messenger':
-        return <Send size={20} />;
+        return <FontAwesomeIcon icon={faFacebookMessenger} size="lg" color="white" />;
       case 'instagram':
-        return <Instagram size={20} />;
-      case 'tiktok':
-        return <Video size={20} />;
+        return <FontAwesomeIcon icon={faInstagram} size="lg" color="white" />;
       default:
         return null;
     }
