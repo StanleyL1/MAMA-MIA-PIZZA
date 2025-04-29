@@ -8,7 +8,7 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
   const [tamano, setTamano] = useState('Personal (4 porciones)');
   const [instrucciones, setInstrucciones] = useState('');
   const [personalizarIngredientes, setPersonalizarIngredientes] = useState(false);
-  const [cambiosIngredientes, setCambiosIngredientes] = useState(0);
+  const [cambiosIngredientes, ] = useState(0);
   const maxCambios = 4;
 
   if (!pizza) return null;
