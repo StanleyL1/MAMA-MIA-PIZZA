@@ -9,11 +9,10 @@ import TestimonialCard from '../ComentsCards/ComentCards';
 import pizzaHero from '../../assets/PizzaPrin.png';
 import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png'; 
-import robotIcon from '../../assets/Robot.png';
 import comentarioImg from '../../assets/comentario.png';
- 
 
 import './Home.css';
+import SocialMediaButton from '../socialMediaButton/SocialMediaButton';
 
 
 // Datos de testimonios
@@ -206,10 +205,7 @@ const Home = () => {
  
       {/* Botón flotante de Chat */}
       <div className="chat-floating-button">
-        <span className="chat-button-text">¡Chatea conmigo!</span>
-        <div className="chat-icon-circle">
-          <img src={robotIcon} alt="Robot" className="chat-robot-icon" />
-        </div>
+        <SocialMediaButton/>
       </div>
       {/* Sección de Testimonios */}
       <section className="review__section">
