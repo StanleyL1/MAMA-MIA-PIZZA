@@ -31,8 +31,9 @@
   }
   
   .toggle-button:hover {
-    background-color: #2563eb;
+    background-color: #821717;
     transform: scale(1.05);
+    color: #FEB248;
   }
   
   .social-media-button.active .toggle-button {
