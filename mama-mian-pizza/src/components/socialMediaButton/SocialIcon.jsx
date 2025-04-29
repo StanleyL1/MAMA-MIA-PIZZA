@@ -10,7 +10,7 @@ export default function SocialIcon({ platform, index, total, isOpen }) {
     const angle = Math.PI / 2;            // 90°
     const arcStartAngle = Math.PI / 4;    // 45°
     const itemAngle = arcStartAngle + (angle * index) / (total - 1);
-    const radius = 80;
+    const radius = 100; // increased radius to add more space between icons
     const x = Math.cos(itemAngle) * radius;
     const y = -Math.sin(itemAngle) * radius;
 
