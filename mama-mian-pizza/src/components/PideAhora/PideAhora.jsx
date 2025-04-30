@@ -3,8 +3,6 @@ import './PideAhora.css';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 /* IMPORTA TUS ASSETS: íconos, imágenes, etc. Ajusta las rutas según tu proyecto */
-// Removing unused mapIcon import
-// import mapIcon from '../../assets/Map.png';  
 import { 
   FaCheck, 
   FaFilePdf, 
@@ -14,14 +12,12 @@ import {
   FaSpinner, 
   FaUser, 
   FaUserTie,
-  
   FaLock,
   FaCreditCard,
   FaMoneyBillWave,
-
   FaExclamationTriangle,
   FaPizzaSlice
-} from 'react-icons/fa'; // Importamos todos los iconos que vamos a usar
+} from 'react-icons/fa';
 
 // Google Maps API key
 const GOOGLE_MAPS_API_KEY = 'AIzaSyDAiO05_RG1ycHFVfvcUyCEG6g4pfWQ8VY';
@@ -54,9 +50,13 @@ const PideAhora = ({ cartItems = [] }) => {
   const [loadingAddress, setLoadingAddress] = useState(false);
   
   // Estados adicionales para manejo del pedido
+  // eslint-disable-next-line no-unused-vars
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [orderError, setOrderError] = useState('');
+  // eslint-disable-next-line no-unused-vars
   const [orderSuccess, setOrderSuccess] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [orderCode, setOrderCode] = useState('');
   
   const [invitadoData, setInvitadoData] = useState({
@@ -298,6 +298,7 @@ const PideAhora = ({ cartItems = [] }) => {
               password: cuentaData.password // Para autenticación del usuario
             },
               
+
         // Datos de la dirección según el modo seleccionado
         direccion: {
           tipo_direccion: modoDireccion,
@@ -317,6 +318,7 @@ const PideAhora = ({ cartItems = [] }) => {
           })
         },
               
+
         // Datos de pago
         metodo_pago: pagoMetodo,
         ...(pagoMetodo === 'tarjeta' && {
@@ -324,6 +326,7 @@ const PideAhora = ({ cartItems = [] }) => {
           num_tarjeta_masked: numeroTarjeta.slice(-4).padStart(16, '*'),
         }),
               
+
         // Detalles del pedido
         productos: cartItems.map(item => ({
           id_producto: item.id,
@@ -337,12 +340,14 @@ const PideAhora = ({ cartItems = [] }) => {
           ingredientes: item.ingredientes || []
         })),
               
+
         // Datos financieros
         subtotal: cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0),
         costo_envio: 0.00, // O el valor que determines
         impuestos: 0.00,   // O el valor que determines
         total: cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0),
               
+
         // Datos adicionales
         aceptado_terminos: true,
         tiempo_estimado_entrega: 45 // En minutos
@@ -660,6 +665,7 @@ const PideAhora = ({ cartItems = [] }) => {
                     </div>
                   )}
                   
+
                   {locationError && (
                     <div className="ubicacion-error">
                       <p className="error-mensaje">{locationError}</p>
@@ -669,6 +675,7 @@ const PideAhora = ({ cartItems = [] }) => {
                     </div>
                   )}
                   
+
                   {locationShared && userLocation && (
                     <div className="ubicacion-compartida">
                       <div className="ubicacion-header">
