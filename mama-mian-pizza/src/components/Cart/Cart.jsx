@@ -2,37 +2,19 @@ import React, { useState, useEffect } from 'react';
 import './Cart.css';
 import PizzaIcon from '../../assets/PizzaR.png';
 import trashIcon from '../../assets/Basurero.png';
-import defaultPizza from '../../assets/PizzaCard.png';
 import { useNavigate } from 'react-router-dom';
 
-// Datos iniciales de ejemplo para el carrito (agrega la propiedad "disponible")
-const initialCartItems = [
-  {
-    id: 1,
-    nombre: 'Burrata',
-    descripcion: 'Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico',
-    precio: 5.0,
-    cantidad: 2,
-    imagen: defaultPizza,
-    disponible: true,
-  },
-  {
-    id: 2,
-    nombre: 'Burrata',
-    descripcion: 'Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico',
-    precio: 5.0,
-    cantidad: 2,
-    imagen: defaultPizza,
-    disponible: true, // Simulamos que este producto no está disponible
-  }
-];
+const Cart = ({ isOpen, onClose, cartItems, setCartItems }) => {
+  // Evitar scroll de fondo cuando el carrito está abierto
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = 'auto';
+    return () => { document.body.style.overflow = 'auto'; };
+  }, [isOpen]);
 
-const Cart = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-
-  const [cartItems, setCartItems] = useState(
-    initialCartItems);
   const [animateTotal, setAnimateTotal] = useState(false);
+  const [newItemId, setNewItemId] = useState(null);
 
   // Calcula el total solo de los productos disponibles
   const total = cartItems.reduce((acc, item) => {
@@ -47,6 +29,21 @@ const Cart = ({ isOpen, onClose }) => {
     const timer = setTimeout(() => setAnimateTotal(false), 300);
     return () => clearTimeout(timer);
   }, [total]);
+
+  // Detectar cuando se añade un nuevo producto al carrito
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      const lastItem = cartItems[cartItems.length - 1];
+      setNewItemId(lastItem.id);
+      
+      // Quitar la animación después de 1.5 segundos
+      const timer = setTimeout(() => {
+        setNewItemId(null);
+      }, 1500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [cartItems]);
 
   // Manejo de cantidad
   const handleRemove = (id) => {
@@ -85,83 +82,92 @@ const Cart = ({ isOpen, onClose }) => {
     <>
       {/* Overlay oscuro */}
       <div
-        className={`cart-overlay ${isOpen ? 'open' : ''}`}
+        className={`cart__overlay ${isOpen ? 'cart__open' : ''}`}
         onClick={handleSeguirNavegando}
       />
 
       {/* Panel lateral */}
-      <div className={`cart-panel ${isOpen ? 'open' : ''}`}>
+      <div className={`cart__panel ${isOpen ? 'cart__open' : ''}`}>
         {/* Encabezado con la imagen PizzaR.png en lugar del emoji */}
-        <div className="cart-header">
+        <div className="cart__header">
           <h2>
             Tu orden <img src={PizzaIcon} alt="Pizza Icon" className="cart-header-icon" />
           </h2>
         </div>
 
         {/* Lista de productos */}
-        <div className="cart-items">
-          {cartItems.map((item) => (
-            <div key={item.id} className="cart-item">
-              <img
-                src={item.imagen}
-                alt={item.nombre}
-                className="cart-item-image"
-              />
-              <div className="cart-item-details">
-                {item.disponible !== false ? (
-                  <>
-                    {/* Línea 1: nombre y precio */}
-                    <div className="cart-item-line1">
-                      <h4 className="cart-item-name">{item.nombre}</h4>
-                      <span className="cart-item-price">
-                        ${item.precio.toFixed(2)}
-                      </span>
-                    </div>
-                    {/* Línea 2: descripción */}
-                    <p className="cart-item-desc">{item.descripcion}</p>
-                    {/* Línea 3: cantidad y botón eliminar */}
-                    <div className="cart-item-line2">
-                      <div className="cart-item-quantity">
-                        <button onClick={() => handleDecrement(item.id)}>-</button>
-                        <span>{item.cantidad}</span>
-                        <button onClick={() => handleIncrement(item.id)}>+</button>
-                      </div>
-                      <button
-                        className="cart-item-remove"
-                        onClick={() => handleRemove(item.id)}
-                      >
-                        <img
-                          src={trashIcon}
-                          alt="Eliminar"
-                          className="trash-icon"
-                        />
-                        Eliminar
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <p className="cart-item-error">Producto no disponible</p>
-                )}
-              </div>
+        <div className="cart__items">
+          {cartItems.length === 0 ? (
+            <div className="cart__empty">
+              <p>Tu carrito está vacío</p>
+              <small>Añade productos para continuar con tu compra</small>
             </div>
-          ))}
+          ) : (
+            cartItems.map((item) => (
+              <div 
+                key={item.id} 
+                className={`cart__item ${item.id === newItemId ? 'cart__item-new' : ''}`}
+              >
+                <img
+                  src={item.imagen}
+                  alt={item.nombre}
+                  className="cart__item-image"
+                />
+                <div className="cart__item-details">
+                  {item.disponible !== false ? (
+                    <>
+                      {/* Línea 1: nombre y precio */}
+                      <div className="cart__item-line1">
+                        <h4 className="cart-item-name">{item.nombre}</h4>
+                        <span className="cart-item-price">
+                          ${item.precio.toFixed(2)}
+                        </span>
+                      </div>
+                      {/* Línea 2: descripción */}
+                      <p className="cart__item-desc">{item.descripcion}</p>
+                      {/* Línea 3: cantidad y botón eliminar */}
+                      <div className="cart__item-line2">
+                        <div className="cart-item-quantity">
+                          <button onClick={() => handleDecrement(item.id)}>-</button>
+                          <span>{item.cantidad}</span>
+                          <button onClick={() => handleIncrement(item.id)}>+</button>
+                        </div>
+                        <button
+                          className="cart__item-remove"
+                          onClick={() => handleRemove(item.id)}
+                        >
+                          <img
+                            src={trashIcon}
+                            alt="Eliminar"
+                            className="cart__trash-icon"
+                          />
+                          Eliminar
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="cart__item-error">Producto no disponible</p>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Footer: total y botones */}
-        <div className="cart-footer">
-          <div className={`cart-total ${animateTotal ? 'animate' : ''}`}>
+        <div className="cart__footer">
+          <div className={`cart__total ${animateTotal ? 'cart__animate' : ''}`}>
             <span>Total:</span>
             <span>${total.toFixed(2)}</span>
           </div>
           <button
-            className={`checkout-button ${cartItems.length === 0 ? 'disabled' : ''}`}
+            className={`cart__checkout-button ${cartItems.length === 0 ? 'disabled' : ''}`}
             onClick={handleContinuarPago}
             disabled={cartItems.length === 0}
-            
           >
             Continuar con el pago
           </button>
-          <button className="seguir-button" onClick={handleSeguirNavegando}>
+          <button className="cart__seguir-button" onClick={handleSeguirNavegando}>
             Seguir navegando
           </button>
         </div>

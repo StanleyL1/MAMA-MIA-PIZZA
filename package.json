@@ -1,6 +1,9 @@
 {
   "dependencies": {
+    "@react-google-maps/api": "^2.20.6",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.484.0",
+    "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.4.1"
   }
 }

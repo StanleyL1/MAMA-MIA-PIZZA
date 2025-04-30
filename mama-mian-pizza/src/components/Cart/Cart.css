@@ -1,5 +1,5 @@
 /* Overlay oscuro a pantalla completa */
-.cart-overlay {
+.cart__overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -10,19 +10,25 @@
   visibility: hidden;
   transition: opacity 0.5s ease, visibility 0.5s ease;
   z-index: 9998;
+  pointer-events: none; /* Evita que capture clics cuando está oculto */
 }
-.cart-overlay.open {
+
+.cart__overlay.cart__open {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto; /* Permite capturar clics cuando está visible */
 }
 
 /* Panel lateral del carrito */
-.cart-panel {
+.cart__panel {
   position: fixed;
   top: 0;
-  right: -400px; /* Inicia oculto */
+  right: -600px; /* Inicialmente más lejos para asegurar que esté completamente fuera de la vista */
   width: 587px;  /* Ajusta al tamaño según diseño */
-  height: 865px;
+  max-width: 90vw; /* Limitar el ancho en dispositivos pequeños */
+  height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
   background-color: #FFF8EE; /* Fondo crema claro */
   box-shadow: -2px 0 8px rgba(0,0,0,0.1);
   display: flex;
@@ -31,45 +37,78 @@
   transition: right 0.5s ease;
   z-index: 9999;
   font-family: sans-serif;
+  visibility: hidden; /* Oculto por defecto */
 }
-.cart-panel.open {
+
+.cart__panel.cart__open {
   background-color: var(--secondary-color);
-height: 690px
-;
-right: 0;
+  right: 0;
+  visibility: visible; /* Visible cuando está abierto */
 }
 
 /* Encabezado del carrito */
-.cart-header {
+.cart__header {
   margin-bottom: 2rem;
 }
-.cart-header h2 {
+.cart__header h2 {
   font-size: 2.4rem;
   color: var(--primary-color);
   display: flex;
   align-items: center;
   gap: 0.9rem;
 }
-.cart-header-icon {
+.cart__header-icon {
   width: 34px;
   height: 34px;
   object-fit: contain;
 }
 
 /* Lista de productos */
-.cart-items {
+.cart__items {
   overflow-y: auto;
 }
 
 /* Cada producto en el carrito */
-.cart-item {
+.cart__item {
   display: flex;
   gap: 3rem;
   margin-bottom: 1rem;
   padding-bottom: 3rem;
+  transition: all 0.3s ease;
 }
+
+/* Animación para nuevo producto añadido al carrito */
+.cart__item-new {
+  animation: highlightNewItem 1.5s ease;
+}
+
+@keyframes highlightNewItem {
+  0% { transform: scale(0.95); background-color: rgba(255, 193, 7, 0.2); }
+  10% { transform: scale(1.02); background-color: rgba(255, 193, 7, 0.3); }
+  20% { transform: scale(1); background-color: rgba(255, 193, 7, 0.2); }
+  100% { transform: scale(1); background-color: transparent; }
+}
+
+/* Carrito vacío */
+.cart__empty {
+  text-align: center;
+  padding: 2rem 0;
+  color: var(--text-dark);
+}
+
+.cart__empty p {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.cart__empty small {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
 /* Imagen circular del producto */
-.cart-item-image {
+.cart__item-image {
   width: 138px;
   height: 138px;
   border-radius: 50%;
@@ -77,14 +116,13 @@ right: 0;
 }
 
 /* Detalles del producto */
-.cart-item-details {
+.cart__item-details {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
 }
-/* Línea 1: Nombre y price */
-.cart-item-line1 {
+.cart__item-line1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -100,20 +138,17 @@ right: 0;
   font-weight: bold;
   font-size: 1rem;
 }
-/* Línea 2: Descripción */
-.cart-item-desc {
+.cart__item-desc {
   font-size: 0.97rem;
   color: var(--text-dark);
   display: flex;
   align-items: center;
 }
-/* Línea 3: Cantidad y eliminar */
-.cart-item-line2 {
+.cart__item-line2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-/* Controles de cantidad */
 .cart-item-quantity {
   display: flex;
   align-items: center;
@@ -130,13 +165,12 @@ right: 0;
   border-radius: 29px;
   cursor: pointer;
   font-size: 1rem;
-  
+  border: none;
 }
 .cart-item-quantity button:hover {
   background-color: var(--primary-color); /* Puedes ajustarlo si necesitas efecto hover más notorio */
 }
-/* Botón eliminar */
-.cart-item-remove {
+.cart__item-remove {
   background-color: transparent;
   border: none;
   color: #f12424;
@@ -147,38 +181,37 @@ right: 0;
   font-size: 1rem;
   transition: color 0.3s;
 }
-.cart-item-remove:hover {
+.cart__item-remove:hover {
   color: var(--primary-color);
   }
-.trash-icon {
+.cart__trash-icon {
   width: 20px;
   height:23px;
   object-fit: contain;
 }
 
 /* Footer del carrito */
-.cart-footer {
+.cart__footer {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-top: auto;
 }
-.cart-total {
+.cart__total {
   display: flex;
   justify-content: space-between;
   font-size: 1.2rem;
   color: var(--text-dark);
   font-weight: bold;
 }
-/* Animación para el total actualizado */
 @keyframes updateTotal {
   0% { transform: scale(0.95); opacity: 0.5; }
   100% { transform: scale(1); opacity: 1; }
 }
-.cart-total.animate {
+.cart__total.cart__animate {
   animation: updateTotal 0.3s ease;
 }
-/* Botón continuar con el pago */
-.checkout-button {
+.cart__checkout-button {
   background-color: #FEB248;
   color: var(--primary-color);
   border: none;
@@ -191,13 +224,14 @@ right: 0;
 }
 
 /* Botón desactivado */
-.checkout-button.disabled,
-.checkout-button:disabled {
+.cart__checkout-button.disabled,
+.cart__checkout-button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }
+
 /* Botón seguir navegando */
-.seguir-button {
+.cart__seguir-button {
   background-color: transparent;
   border: none;
   color: var(--text-dark);
@@ -205,12 +239,13 @@ right: 0;
   cursor: pointer;
   text-decoration: none;
 }
-.seguir-button:hover {
+
+.cart__seguir-button:hover {
   color: #bb0000;
 }
 
 /* Error de producto no disponible */
-.cart-item-error {
+.cart__item-error {
   color: red;
   font-size: 1rem;
   font-weight: bold;

@@ -8,7 +8,7 @@ import { faPizzaSlice, faCartShopping } from '@fortawesome/free-solid-svg-icons'
 
 import './Navbar.css';
 
-const Navbar = ({ onCartToggle }) => {
+const Navbar = ({ onCartToggle, cartItemCount }) => {
   const [mostrarLinks, setMostrarLinks] = useState(false);
 
   const toggleUserLinks = () => {
@@ -68,12 +68,14 @@ const Navbar = ({ onCartToggle }) => {
           aria-label="Carrito"
           onClick={onCartToggle}
         >
-          {/* Ícono del carrito (sólido) */}
           <FontAwesomeIcon 
             icon={faCartShopping} 
             className="icon-img" 
             style={{ color: "#fff", background: "transparent" }} 
           />
+          {cartItemCount > 0 && (
+            <span className="cart__badge">{cartItemCount}</span>
+          )}
         </button>
       </div>
     </header>

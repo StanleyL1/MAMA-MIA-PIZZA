@@ -24,11 +24,10 @@ const ID_TO_CATEGORY = {
   '5': 'Bebidas'
 };
 
-const Menu = () => {
+const Menu = ({ onAddToCart }) => {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPizza, setSelectedPizza] = useState(null);
-  const [cartItems, setCartItems] = useState([]);
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,7 +35,7 @@ const Menu = () => {
     const fetchMenu = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/getMenu');
+        const response = await fetch('https://server.tiznadodev.com/api/content/getMenu');
         const data = await response.json();
         setMenu(data.productos);
         console.log("Productos obtenidos:", data.productos);
@@ -74,6 +73,7 @@ const Menu = () => {
   }, [menu, activeCategory, searchTerm]);
 
   const handleOpenPizza = (pizza) => {
+    console.log("Abriendo modal para pizza:", pizza);
     setSelectedPizza(pizza);
   };
 
@@ -89,30 +89,11 @@ const Menu = () => {
     setSearchTerm(e.target.value);
   };
 
-  const handleAddToCart = (pizza, masa, tamano) => {
-    const exists = cartItems.find(
-      (item) => item.title === pizza.title && item.masa === masa && item.tamano === tamano
-    );
-    if (exists) {
-      setCartItems(
-        cartItems.map((item) =>
-          item === exists ? { ...item, cantidad: item.cantidad + 1 } : item
-        )
-      );
-    } else {
-      const newItem = {
-        id: Date.now(),
-        title: pizza.title,
-        Descripcion: pizza.Descripcion,
-        img: pizza.img,
-        price: pizza.price,
-        cantidad: 1,
-        masa,
-        tamano,
-        disponible: true,
-      };
-      setCartItems([...cartItems, newItem]);
-    }
+  const handleAddToCart = (pizza, masa, tamano, instrucciones, ingredientes) => {
+    // Simplemente usamos la función onAddToCart que nos pasaron como prop
+    console.log("Menu: Añadiendo al carrito", pizza);
+    onAddToCart(pizza, masa, tamano, instrucciones, ingredientes);
+    handleCloseModal();
   };
 
   return (
