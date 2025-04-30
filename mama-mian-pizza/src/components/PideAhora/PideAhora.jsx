@@ -1,24 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './PideAhora.css';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 /* IMPORTA TUS ASSETS: íconos, imágenes, etc. Ajusta las rutas según tu proyecto */
-import pizzaIcon from '../../assets/PizzaR.png';
-import userIcon from '../../assets/Usuario1.png';
-import userIcon5 from '../../assets/usuario3.png';  // Icono para "Con una cuenta" activo
-import userIcon4 from '../../assets/usuario4.png';  // Icono para "Como invitado" activo
-import userIcon2 from '../../assets/Usuario2.png';
-import deleteIcon from '../../assets/Basurero.png';
-import pizzaCardImg from '../../assets/PizzaCard.png';
 import mapIcon from '../../assets/Map.png';  
-import Ubicacion from '../../assets/Ubicacion.png';         // Imagen estática para el mapa
-import warningIcon from '../../assets/Warning.png';         // Icono de advertencia
-import redLock from '../../assets/redLock.png';
-import activoIcon from '../../assets/Activo.png';             // Mostrar contraseña
-import ocultoIcon from '../../assets/Oculto.png';             // Ocultar contraseña
-import { FaFilePdf, FaCheck } from 'react-icons/fa';
+import { 
+  FaCheck, 
+  FaFilePdf, 
+  FaEye, 
+  FaEyeSlash, 
+  FaMapMarkerAlt, 
+  FaSpinner, 
+  FaUser, 
+  FaUserTie,
+  FaTrash,
+  FaLock,
+  FaCreditCard,
+  FaMoneyBillWave,
+  FaMapMarked,
+  FaExclamationTriangle,
+  FaPizzaSlice
+} from 'react-icons/fa'; // Importamos todos los iconos que vamos a usar
 
+// Google Maps API key
+const GOOGLE_MAPS_API_KEY = 'AIzaSyDAiO05_RG1ycHFVfvcUyCEG6g4pfWQ8VY';
 
-const PideAhora = () => {
+// Estilos para el mapa de Google
+const mapContainerStyle = {
+  width: '100%',
+  height: '350px',
+  borderRadius: '8px',
+  boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+};
+
+const PideAhora = ({ cartItems = [] }) => {
   const [step, setStep] = useState('Cuenta');
   const [modo, setModo] = useState('invitado');
   const [showPassword, setShowPassword] = useState(false);
@@ -28,6 +43,14 @@ const PideAhora = () => {
   const [numeroTarjeta, setNumeroTarjeta] = useState('');
   const [fechaExp, setFechaExp] = useState('');
   const [cvv, setCvv] = useState('');
+  
+  // Estados para la geolocalización
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState('');
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationShared, setLocationShared] = useState(false);
+  const [addressInfo, setAddressInfo] = useState(null);
+  const [loadingAddress, setLoadingAddress] = useState(false);
   
   const [invitadoData, setInvitadoData] = useState({
     nombre: '',
@@ -77,6 +100,151 @@ const PideAhora = () => {
     });
   };
 
+  // Función para obtener la ubicación del usuario
+  const getLocation = () => {
+    // Restablecer estados
+    setIsLocating(true);
+    setLocationError('');
+    setUserLocation(null);
+    setLocationShared(false);
+    setAddressInfo(null);
+    
+    // Verificar si el navegador soporta geolocalización
+    if (!navigator.geolocation) {
+      setLocationError('Tu navegador no soporta geolocalización.');
+      setIsLocating(false);
+      return;
+    }
+    
+    // Opciones de geolocalización - alta precisión, timeout de 10 segundos
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    };
+    
+    // Obtener ubicación
+    navigator.geolocation.getCurrentPosition(
+      // Success callback
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({
+          lat: latitude,
+          lng: longitude,
+          accuracy: position.coords.accuracy
+        });
+        setLocationShared(true);
+        setIsLocating(false);
+        
+        // Obtener dirección aproximada basada en coordenadas
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`)
+          .then(response => response.json())
+          .then(data => {
+            setAddressInfo({
+              formattedAddress: data.display_name,
+              locality: data.address.city || data.address.town || data.address.village || '',
+              administrativeArea: data.address.state || '',
+              country: data.address.country || ''
+            });
+            setLoadingAddress(false);
+          })
+          .catch(error => {
+            console.error('Error al obtener la dirección:', error);
+            setAddressInfo({
+              formattedAddress: 'No se pudo obtener la dirección'
+            });
+            setLoadingAddress(false);
+          });
+      },
+      // Error callback
+      (error) => {
+        let errorMsg;
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMsg = 'Permiso denegado para obtener ubicación.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMsg = 'Información de ubicación no disponible.';
+            break;
+          case error.TIMEOUT:
+            errorMsg = 'La solicitud de ubicación expiró.';
+            break;
+          case error.UNKNOWN_ERROR:
+          default:
+            errorMsg = 'Ocurrió un error desconocido.';
+        }
+        setLocationError(errorMsg);
+        setIsLocating(false);
+      },
+      // Options
+      options
+    );
+  };
+
+  // Función para obtener la dirección a partir de las coordenadas (reverse geocoding)
+  const getAddressFromCoordinates = useCallback(async (lat, lng) => {
+    setLoadingAddress(true);
+    try {
+      // Usamos la API de Geocoding de Google Maps
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API_KEY}`
+      );
+      const data = await response.json();
+      
+      if (data.status === 'OK' && data.results.length > 0) {
+        const addressComponents = data.results[0].address_components;
+        const formattedAddress = data.results[0].formatted_address;
+        
+        // Extraer componentes de la dirección
+        let locality = '';
+        let subLocality = '';
+        let administrativeArea = '';
+        let country = '';
+        
+        addressComponents.forEach(component => {
+          const types = component.types;
+          if (types.includes('locality')) {
+            locality = component.long_name;
+          } else if (types.includes('sublocality')) {
+            subLocality = component.long_name;
+          } else if (types.includes('administrative_area_level_1')) {
+            administrativeArea = component.long_name;
+          } else if (types.includes('country')) {
+            country = component.long_name;
+          }
+        });
+        
+        setAddressInfo({
+          formattedAddress,
+          locality,
+          subLocality,
+          administrativeArea,
+          country
+        });
+      } else {
+        // Si hay un error en la respuesta de la API
+        console.error('Error en geocodificación inversa:', data.status);
+        setAddressInfo({
+          formattedAddress: 'Ubicación sin dirección disponible'
+        });
+      }
+    } catch (error) {
+      console.error('Error al obtener la dirección:', error);
+      setAddressInfo({
+        formattedAddress: 'Error al obtener la dirección'
+      });
+    } finally {
+      setLoadingAddress(false);
+    }
+  }, []);
+
+  // Efecto para obtener la dirección una vez que tenemos la ubicación
+  useEffect(() => {
+    if (userLocation && userLocation.lat && userLocation.lng) {
+      getAddressFromCoordinates(userLocation.lat, userLocation.lng);
+    }
+  }, [userLocation, getAddressFromCoordinates]);
+
   // Función para avanzar al siguiente paso
   const handleContinuar = () => {
     if (step === 'Cuenta') {
@@ -115,7 +283,7 @@ const PideAhora = () => {
       <div className="layout">
         {/* Columna izquierda: Barra de progreso y Card según el paso */}
         <div className="col-izquierda">
-          <div className="barra-progreso">
+          <div className="barra-progreso" data-step={step}>
             {pasos.map((p, idx) => {
               const isActive = idx <= currentIndex;
               return (
@@ -131,7 +299,7 @@ const PideAhora = () => {
             <div className="card-cuenta">
               <h3 className="titulo-compra">
                 ¿Cómo quieres continuar con tu compra?
-                <img src={pizzaIcon} alt="Pizza Icon" className="icono-pizza" />
+                <FaPizzaSlice className="icono-pizza" />
               </h3>
               <p className="descripcion-compra">
                 Elige cómo quieres continuar
@@ -143,10 +311,8 @@ const PideAhora = () => {
                   className={`toggle-btn ${modo === 'invitado' ? 'activo' : ''}`}
                   onClick={() => setModo('invitado')}
                 >
-                  <img
-                    src={modo === 'invitado' ? userIcon : userIcon4}
-                    alt="Invitado"
-                    className="icono-usuario"
+                  <FaUser 
+                    className={`icono-usuario ${modo === 'invitado' ? 'active-icon' : ''}`}
                   />
                   <span className="toggle-titulo">Como invitado</span>
                   <span className="toggle-desc">
@@ -157,10 +323,8 @@ const PideAhora = () => {
                   className={`toggle-btn ${modo === 'cuenta' ? 'activo' : ''}`}
                   onClick={() => setModo('cuenta')}
                 >
-                  <img
-                    src={modo === 'cuenta' ? userIcon5 : userIcon2}
-                    alt="Cuenta"
-                    className="icono-usuario"
+                  <FaUserTie 
+                    className={`icono-usuario ${modo === 'cuenta' ? 'active-icon' : ''}`}
                   />
                   <span className="toggle-titulo">Con una cuenta</span>
                   <span className="toggle-desc">
@@ -240,12 +404,12 @@ const PideAhora = () => {
                         value={cuentaData.password}
                         onChange={handleInputCuenta}
                       />
-                      <img
-                        src={showPassword ? activoIcon : ocultoIcon}
-                        alt={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                      <span 
                         className="toggle-password"
                         onClick={() => setShowPassword(!showPassword)}
-                      />
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -337,30 +501,97 @@ const PideAhora = () => {
 
               {modoDireccion === 'tiempoReal' && (
                 <div className="contenido-tiempo-real">
-                  <p className="instruccion">
-                    Haz clic en el botón para compartir tu ubicación actual
-                  </p>
-                  <button className="btn-ubicacion">
-                    <img
-                      src={Ubicacion}
-                      alt="Ubicación"
-                      className="icono-ubicacion"
-                    />
-                    Compartir mi ubicación
-                  </button>
-                  <div className="map-container">
-                    <img
-                      src={mapIcon}
-                      alt="Mapa"
-                      className="map-image"
-                    />
-                  </div>
+                  {!locationShared && !isLocating && !locationError && (
+                    <>
+                      <p className="instruccion">
+                        Haz clic en el botón para compartir tu ubicación actual
+                      </p>
+                      <button className="btn-ubicacion" onClick={getLocation}>
+                        <FaMapMarkerAlt className="icono-ubicacion" />
+                        Compartir mi ubicación
+                      </button>
+                    </>
+                  )}
+                  
+
+                  {isLocating && (
+                    <div className="ubicacion-cargando">
+                      <FaSpinner className="icono-spinner" />
+                      <p>Obteniendo tu ubicación actual...</p>
+                    </div>
+                  )}
+                  
+                  {locationError && (
+                    <div className="ubicacion-error">
+                      <p className="error-mensaje">{locationError}</p>
+                      <button className="btn-reintentar" onClick={getLocation}>
+                        Reintentar
+                      </button>
+                    </div>
+                  )}
+                  
+                  {locationShared && userLocation && (
+                    <div className="ubicacion-compartida">
+                      <div className="ubicacion-header">
+                        <FaMapMarkerAlt className="icono-pin" />
+                        <span>¡Ubicación compartida con éxito!</span>
+                      </div>
+                      
+                      <div className="map-container">
+                        {/* Google Maps integration */}
+                        <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+                          <GoogleMap
+                            mapContainerStyle={mapContainerStyle}
+                            center={userLocation}
+                            zoom={16}
+                          >
+                            <Marker position={userLocation} />
+                          </GoogleMap>
+                        </LoadScript>
+                        
+                        {/* Información de dirección mejorada */}
+                        <div className="direccion-info">
+                          {loadingAddress ? (
+                            <div className="loading-address">
+                              <FaSpinner className="icono-spinner-small" />
+                              <span>Obteniendo dirección exacta...</span>
+                            </div>
+                          ) : addressInfo ? (
+                            <div className="address-details">
+                              <h4>Tu ubicación exacta:</h4>
+                              <p className="direccion-completa">{addressInfo.formattedAddress || "Dirección no disponible"}</p>
+                              {addressInfo.locality && (
+                                <p className="locality-info">
+                                  <FaMapMarkerAlt className="location-icon-small" />
+                                  {addressInfo.locality}
+                                  {addressInfo.administrativeArea && `, ${addressInfo.administrativeArea}`}
+                                  {addressInfo.country && `, ${addressInfo.country}`}
+                                </p>
+                              )}
+                              <div className="coordinates-box">
+                                <p className="coordinates-text">
+                                  <span className="coordinates-label">Latitud:</span> {userLocation.lat.toFixed(6)}
+                                </p>
+                                <p className="coordinates-text">
+                                  <span className="coordinates-label">Longitud:</span> {userLocation.lng.toFixed(6)}
+                                </p>
+                                <p className="precision-text">
+                                  <span className="coordinates-label">Precisión:</span> ±{Math.round(userLocation.accuracy)} metros
+                                </p>
+                              </div>
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                      
+                      <button className="btn-actualizar" onClick={getLocation}>
+                        <FaMapMarkerAlt /> Actualizar ubicación
+                      </button>
+                    </div>
+                  )}
+
                   <div className="alerta-cobertura">
-                    <img
-                      src={warningIcon}
-                      alt="Advertencia"
-                      className="warning-icon"
-                    />
+                    <FaExclamationTriangle className="warning-icon" />
                     <p>
                       Cobertura de entrega en Puerto Parada y en Jiquilisco, Usulután, El Salvador
                     </p>
@@ -389,14 +620,8 @@ const PideAhora = () => {
         className={`toggle-btn ${pagoMetodo === 'tarjeta' ? 'activo' : ''}`}
         onClick={() => setPagoMetodo('tarjeta')}
       >
-        <img
-          src={
-            pagoMetodo === 'tarjeta'
-              ? require('../../assets/TarjetaB.png')
-              : require('../../assets/TarjetaR.png')
-          }
-          alt="Tarjeta"
-          className="icono-metodo"
+        <FaCreditCard 
+          className={`icono-metodo ${pagoMetodo === 'tarjeta' ? 'active-icon' : ''}`}
         />
         <span>Tarjeta</span>
       </button>
@@ -405,14 +630,8 @@ const PideAhora = () => {
         className={`toggle-btn ${pagoMetodo === 'efectivo' ? 'activo' : ''}`}
         onClick={() => setPagoMetodo('efectivo')}
       >
-        <img
-          src={
-            pagoMetodo === 'efectivo'
-              ? require('../../assets/EfectivoB.png')
-              : require('../../assets/EfectivoR.png')
-          }
-          alt="Efectivo"
-          className="icono-metodo"
+        <FaMoneyBillWave 
+          className={`icono-metodo ${pagoMetodo === 'efectivo' ? 'active-icon' : ''}`}
         />
         <span>Efectivo</span>
       </button>
@@ -475,11 +694,7 @@ const PideAhora = () => {
             </div>
           </div>
           <div className="seguridad-info">
-            <img
-              src={redLock}
-              alt="Candado"
-              className="icono-seguridadd"
-            />
+            <FaLock className="icono-seguridadd" />
             <span>Tus datos están Protegidos con encriptación de alta seguridad</span>
           </div>
         </div>
@@ -624,33 +839,36 @@ const PideAhora = () => {
         <div className="col-derecha">
           <div className="card-resumen wider right-align">
             <h3 className="resumen-titulo">Resumen de la orden</h3>
-            {[1, 2].map((item, idx) => (
-              <div className="resumen-item" key={item}>
-                <img src={pizzaCardImg} alt="Pizza" className="resumen-img" />
-                <div className="resumen-detalle">
-                  <h4>Burrata</h4>
-                  <p>
-                    Mozzarella, cebolla caramelizada, queso burrata, jamón, rúgula y vinagre balsámico
-                  </p>
-                  <div className="cantidad">
-                    <button>-</button>
-                    <span>1</span>
-                    <button>+</button>
+            {cartItems.length > 0 ? (
+              <>
+                {cartItems.map((item) => (
+                  <div className="resumen-item" key={item.id}>
+                    <img src={item.imagen} alt={item.nombre} className="resumen-img" />
+                    <div className="resumen-detalle">
+                      <h4>{item.nombre}</h4>
+                      <p>{item.descripcion}</p>
+                      {item.masa && <p><small>Masa: {item.masa}</small></p>}
+                      {item.tamano && <p><small>Tamaño: {item.tamano}</small></p>}
+                      {item.ingredientes && item.ingredientes.length > 0 && (
+                        <p><small>Ingredientes: {item.ingredientes.join(', ')}</small></p>
+                      )}
+                      <div className="cantidad">
+                        <span>Cantidad: {item.cantidad}</span>
+                      </div>
+                      <div className="resumen-footer">
+                        <span className="precio">${(item.precio * item.cantidad).toFixed(2)}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="resumen-footer">
-                    <button className="eliminar">
-                      <img src={deleteIcon} alt="Eliminar" />
-                      Eliminar
-                    </button>
-                    <span className="precio">${idx === 0 ? '5.00' : '8.00'}</span>
-                  </div>
+                ))}
+                <div className="resumen-total">
+                  <span>Total:</span>
+                  <span>${cartItems.reduce((total, item) => total + (item.precio * item.cantidad), 0).toFixed(2)}</span>
                 </div>
-              </div>
-            ))}
-            <div className="resumen-total">
-              <span>Total:</span>
-              <span>$16.00</span>
-            </div>
+              </>
+            ) : (
+              <p>No hay productos en el carrito</p>
+            )}
           </div>
         </div>
       </div>      

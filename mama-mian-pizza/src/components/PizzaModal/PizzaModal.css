@@ -26,6 +26,35 @@
   flex-direction: row;
 }
 
+/* Notificación de éxito */
+.modal__notification {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4CAF50;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 10001;
+  animation: fadeInOut 2s ease;
+  text-align: center;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+  20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+}
+
+.modal__notification p {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
 /* Botón "X" para cerrar */
 .modal__close-button {
   position: absolute;
@@ -204,6 +233,111 @@ input:checked + .modal__slider:before {
   color: #666;
 }
 
+/* Sección de ingredientes */
+.modal__ingredientes-section {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.modal__ingredientes-hint {
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: #991B1B;
+  font-weight: 500;
+  text-align: center;
+  padding: 0.25rem;
+  background-color: #fff3e0;
+  border-radius: 4px;
+}
+
+/* Contenedor de ingredientes */
+.modal__ingredientes-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+}
+
+.modal__ingrediente-item {
+  padding: 0.25rem;
+}
+
+/* Estilo personalizado para los checkboxes */
+.modal__checkbox-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 28px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  user-select: none;
+}
+
+.modal__checkbox-container.modal__disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal__checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.modal__checkbox-custom {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 18px;
+  width: 18px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.modal__checkbox-container:hover input ~ .modal__checkbox-custom {
+  border-color: #991B1B;
+}
+
+.modal__checkbox-container input:checked ~ .modal__checkbox-custom {
+  background-color: #991B1B;
+  border-color: #991B1B;
+}
+
+.modal__checkbox-container input:disabled ~ .modal__checkbox-custom {
+  background-color: #e0e0e0;
+  border-color: #ccc;
+  cursor: not-allowed;
+}
+
+.modal__checkbox-custom:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.modal__checkbox-container input:checked ~ .modal__checkbox-custom:after {
+  display: block;
+}
+
+.modal__checkbox-container .modal__checkbox-custom:after {
+  left: 6px;
+  top: 2px;
+  width: 4px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
 /* Estilo para el campo de instrucciones especiales */
 .modal__instrucciones-input {
   width: 100%;
@@ -317,6 +451,10 @@ input:checked + .modal__slider:before {
   .modal__add-button {
     padding: 0.5rem 0.8rem;
     font-size: 0.9rem;
+  }
+  
+  .modal__ingredientes-container {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

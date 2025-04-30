@@ -37,7 +37,7 @@ const datosTestimonios = [
   },
 ];
 
-const Home = () => {
+const Home = ({ onAddToCart }) => {
   const [popular, setPopular] = useState([]);
   const [recomendacion, setRecomendaciones] = useState([]);
 
@@ -73,14 +73,10 @@ const Home = () => {
   console.log(popular[0]);
 
   // Estado para el modal de pizza
-
   const [selectedPizza, setSelectedPizza] = useState(null);
-  const [cartItems, setCartItems] = useState([]);
-
-  // Estado para controlar la visibilidad del carrito (ahora se usa)
-
 
   const handleOpenPizza = (pizza) => {
+    console.log("Abriendo modal para pizza:", pizza);
     setSelectedPizza(pizza);
   };
 
@@ -89,30 +85,11 @@ const Home = () => {
   };
 
   // Función para agregar la pizza al carrito (incluye opciones)
-  const handleAddToCart = (pizza, masa, tamano) => {
-    const exists = cartItems.find(
-      (item) => item.title === pizza.title && item.masa === masa && item.tamano === tamano
-    );
-    if (exists) {
-      setCartItems(
-        cartItems.map((item) =>
-          item === exists ? { ...item, cantidad: item.cantidad + 1 } : item
-        )
-      );
-    } else {
-      const newItem = {
-        id: Date.now(),
-        title: pizza.title,
-        Descripcion: pizza.Descripcion,
-        img: pizza.img,
-        price: pizza.price,
-        cantidad: 1,
-        masa,
-        tamano,
-        disponible: true,
-      };
-      setCartItems([...cartItems, newItem]);
-    }
+  const handleAddToCart = (pizza, masa, tamano, instrucciones, ingredientes) => {
+    console.log("Home: Añadiendo al carrito", pizza);
+    // Pasamos la llamada a la función onAddToCart proporcionada por el componente padre (App)
+    onAddToCart(pizza, masa, tamano, instrucciones, ingredientes);
+    handleCloseModal();
   };
 
   return (
@@ -207,6 +184,7 @@ const Home = () => {
       <div className="chat-floating-button">
         <SocialMediaButton/>
       </div>
+      
       {/* Sección de Testimonios */}
       <section className="review__section">
         <h2 className="review__header">Lo que dicen nuestros clientes</h2>
