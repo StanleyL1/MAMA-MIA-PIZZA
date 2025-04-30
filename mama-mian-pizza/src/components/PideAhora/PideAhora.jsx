@@ -53,6 +53,12 @@ const PideAhora = ({ cartItems = [] }) => {
   const [addressInfo, setAddressInfo] = useState(null);
   const [loadingAddress, setLoadingAddress] = useState(false);
   
+  // Estados adicionales para manejo del pedido
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderError, setOrderError] = useState('');
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderCode, setOrderCode] = useState('');
+  
   const [invitadoData, setInvitadoData] = useState({
     nombre: '',
     apellido: '',
@@ -261,14 +267,146 @@ const PideAhora = ({ cartItems = [] }) => {
     }
   };
 
+  // Función para enviar el pedido al servidor - añadido más logs
+  const enviarPedido = async () => {
+    console.log('Función enviarPedido ejecutada');
+    
+    if (!pagoMetodo) {
+      console.log('No se seleccionó método de pago');
+      alert('Por favor selecciona un método de pago.');
+      return;
+    }
+    
+    console.log('Preparando datos para enviar a la API...');
+    setIsSubmitting(true);
+    setOrderError('');
+    
+    try {
+      // 1. Preparar los datos del pedido
+      const pedidoData = {
+        // Datos del cliente según el modo seleccionado
+        tipo_cliente: modo === 'invitado' ? 'invitado' : 'registrado',
+        cliente: modo === 'invitado' 
+          ? { 
+              nombre: invitadoData.nombre,
+              apellido: invitadoData.apellido,
+              telefono: invitadoData.telefono,
+              email: null // Los invitados no proporcionan email en esta UI
+            }
+          : {
+              email: cuentaData.email,
+              password: cuentaData.password // Para autenticación del usuario
+            },
+              
+        // Datos de la dirección según el modo seleccionado
+        direccion: {
+          tipo_direccion: modoDireccion,
+          // Si es dirección por formulario
+          ...(modoDireccion === 'formulario' && {
+            direccion: direccionData.direccionExacta,
+            pais: direccionData.pais,
+            departamento: direccionData.departamento,
+            municipio: direccionData.municipio
+          }),
+          // Si es ubicación en tiempo real
+          ...(modoDireccion === 'tiempoReal' && userLocation && {
+            latitud: userLocation.lat,
+            longitud: userLocation.lng,
+            precision_ubicacion: Math.round(userLocation.accuracy),
+            direccion_formateada: addressInfo?.formattedAddress
+          })
+        },
+              
+        // Datos de pago
+        metodo_pago: pagoMetodo,
+        ...(pagoMetodo === 'tarjeta' && {
+          nombre_tarjeta: nombreTarjeta,
+          num_tarjeta_masked: numeroTarjeta.slice(-4).padStart(16, '*'),
+        }),
+              
+        // Detalles del pedido
+        productos: cartItems.map(item => ({
+          id_producto: item.id,
+          nombre_producto: item.nombre,
+          precio_unitario: item.precio,
+          cantidad: item.cantidad,
+          subtotal: item.precio * item.cantidad,
+          masa: item.masa || null,
+          tamano: item.tamano || null,
+          instrucciones_especiales: item.instrucciones || null,
+          ingredientes: item.ingredientes || []
+        })),
+              
+        // Datos financieros
+        subtotal: cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0),
+        costo_envio: 0.00, // O el valor que determines
+        impuestos: 0.00,   // O el valor que determines
+        total: cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0),
+              
+        // Datos adicionales
+        aceptado_terminos: true,
+        tiempo_estimado_entrega: 45 // En minutos
+      };
+      
+      console.log('Datos del pedido preparados:', pedidoData);
+      console.log('Intentando hacer fetch a https://server.tiznadodev.com/api/orders/neworder');
+      
+      // 2. Enviar los datos al servidor
+      const response = await fetch('https://server.tiznadodev.com/api/orders/neworder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Añadiendo headers CORS adicionales que podrían ser necesarios
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type'
+        },
+        body: JSON.stringify(pedidoData)
+      });
+      
+      console.log('Respuesta recibida del servidor:', response);
+      
+      const result = await response.json();
+      console.log('Resultado del servidor parseado:', result);
+      
+      if (response.ok) {
+        console.log('Pedido creado exitosamente:', result);
+        setOrderSuccess(true);
+        setOrderCode(result.codigo_pedido || '#78657'); // Usar el código devuelto o uno por defecto
+        setShowTerms(false);
+        setShowSuccess(true);
+      } else {
+        console.error('Error al procesar el pedido:', result);
+        setOrderError(result.message || 'Error al procesar el pedido');
+        setShowTerms(false);
+        alert(`Error al procesar el pedido: ${result.message || 'Intenta nuevamente'}`);
+      }
+    } catch (error) {
+      console.error('Error al enviar el pedido:', error);
+      setOrderError('Error de conexión al procesar el pedido');
+      alert('Hubo un problema al procesar el pedido. Intenta nuevamente más tarde.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Modificar la función handleAceptarTerminos para añadir más logs de depuración
+  const handleAceptarTerminos = () => {
+    console.log('Función handleAceptarTerminos ejecutada');
+    console.log('Estado aceptoTerminos:', aceptoTerminos);
+    
+    if (aceptoTerminos) {
+      console.log('Términos aceptados, intentando enviar pedido...');
+      enviarPedido();
+    } else {
+      console.log('Términos no aceptados');
+      alert('Debes aceptar los términos y condiciones para continuar');
+    }
+  };
+
   // Funciones para el flujo de modales
   const handleRealizarPedido = () => {
     setShowTerms(true);
-  };
-
-  const handleAceptarTerminos = () => {
-    setShowTerms(false);
-    setShowSuccess(true);
   };
 
   const handleCerrarExito = () => {
@@ -800,8 +938,12 @@ const PideAhora = ({ cartItems = [] }) => {
               className="btn-aceptar"
               onClick={handleAceptarTerminos}
               disabled={!aceptoTerminos}
+              style={{
+                opacity: aceptoTerminos ? 1 : 0.5,
+                cursor: aceptoTerminos ? 'pointer' : 'not-allowed'
+              }}
             >
-              Aceptar
+              Aceptar y Realizar Pedido
             </button>
           </div>
         </div>
