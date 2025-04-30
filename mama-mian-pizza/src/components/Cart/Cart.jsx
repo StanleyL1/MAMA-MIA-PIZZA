@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Cart.css';
 import PizzaIcon from '../../assets/PizzaR.png';
 import trashIcon from '../../assets/Basurero.png';
@@ -6,15 +6,15 @@ import { useNavigate } from 'react-router-dom';
 
 const Cart = ({ isOpen, onClose, cartItems, setCartItems }) => {
   // Evitar scroll de fondo cuando el carrito está abierto
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = 'auto';
     return () => { document.body.style.overflow = 'auto'; };
   }, [isOpen]);
 
   const navigate = useNavigate();
-  const [animateTotal, setAnimateTotal] = React.useState(false);
-  const [newItemId, setNewItemId] = React.useState(null);
+  const [animateTotal, setAnimateTotal] = useState(false);
+  const [newItemId, setNewItemId] = useState(null);
 
   // Calcula el total solo de los productos disponibles
   const total = cartItems.reduce((acc, item) => {
@@ -24,14 +24,14 @@ const Cart = ({ isOpen, onClose, cartItems, setCartItems }) => {
   }, 0);
 
   // Cada vez que cambie el total, activa la animación
-  React.useEffect(() => {
+  useEffect(() => {
     setAnimateTotal(true);
     const timer = setTimeout(() => setAnimateTotal(false), 300);
     return () => clearTimeout(timer);
   }, [total]);
 
   // Detectar cuando se añade un nuevo producto al carrito
-  React.useEffect(() => {
+  useEffect(() => {
     if (cartItems.length > 0) {
       const lastItem = cartItems[cartItems.length - 1];
       setNewItemId(lastItem.id);
@@ -43,7 +43,7 @@ const Cart = ({ isOpen, onClose, cartItems, setCartItems }) => {
       
       return () => clearTimeout(timer);
     }
-  }, [cartItems.length]);
+  }, [cartItems]);
 
   // Manejo de cantidad
   const handleRemove = (id) => {

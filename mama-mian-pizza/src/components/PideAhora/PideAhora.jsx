@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './PideAhora.css';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 /* IMPORTA TUS ASSETS: íconos, imágenes, etc. Ajusta las rutas según tu proyecto */
-import mapIcon from '../../assets/Map.png';  
+// Removing unused mapIcon import
+// import mapIcon from '../../assets/Map.png';  
 import { 
   FaCheck, 
   FaFilePdf, 
@@ -13,11 +14,11 @@ import {
   FaSpinner, 
   FaUser, 
   FaUserTie,
-  FaTrash,
+  
   FaLock,
   FaCreditCard,
   FaMoneyBillWave,
-  FaMapMarked,
+
   FaExclamationTriangle,
   FaPizzaSlice
 } from 'react-icons/fa'; // Importamos todos los iconos que vamos a usar
