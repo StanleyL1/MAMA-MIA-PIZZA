@@ -35,7 +35,7 @@ const Menu = ({ onAddToCart }) => {
     const fetchMenu = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/getMenu');
+        const response = await fetch('https://server.tiznadodev.com/api/content/getMenu');
         const data = await response.json();
         setMenu(data.productos);
         console.log("Productos obtenidos:", data.productos);

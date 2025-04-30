@@ -45,7 +45,7 @@ const Home = ({ onAddToCart }) => {
     
     const fetchRecomendations = async () => {
       try{
-        const response = await fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/recomendacion');
+        const response = await fetch('https://server.tiznadodev.com/api/content/recomendacion');
         const data = await response.json();
         setRecomendaciones(data.productos);
       }catch (error) {
@@ -57,7 +57,7 @@ const Home = ({ onAddToCart }) => {
 
     const fetchPopular = async () => {
       try{
-        const response = await fetch('http://bkcww48c8swokk0s4wo4gkk8.82.29.198.111.sslip.io/api/content/MostPopular');
+        const response = await fetch('https://server.tiznadodev.com/api/content/MostPopular');
         const data = await response.json();
         setPopular(data.productos);
       }catch (error) {
