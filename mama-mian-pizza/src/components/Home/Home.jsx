@@ -107,7 +107,7 @@ const Home = ({ onAddToCart }) => {
                 backgroundImage: `url(${img})`
               }}
             >
-              <div className="hero__overlay"></div> {/* <-- este es el fondo oscuro */}
+              <div className="hero__overlay"></div> 
               
               <div className="hero__text__container">
                 <h1 className="hero__title">Las mejores pizzas</h1>
