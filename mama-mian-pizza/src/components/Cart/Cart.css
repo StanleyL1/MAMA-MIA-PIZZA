@@ -34,7 +34,6 @@
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
-  transition: right 0.5s ease;
   z-index: 9999;
   font-family: sans-serif;
   visibility: hidden; /* Oculto por defecto */
@@ -43,6 +42,7 @@
 .cart__panel.cart__open {
   background-color: var(--secondary-color);
   right: 0;
+  transform: translateX(0);        /* entra a la vista */
   visibility: visible; /* Visible cuando está abierto */
 }
 

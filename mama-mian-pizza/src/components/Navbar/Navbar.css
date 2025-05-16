@@ -99,7 +99,9 @@ margin-bottom: 0px;}
   position: relative;
 
 }
-
+.navbar__links li:nth-child(2) {
+  margin-left: 5rem; /* ajusta el valor según lo que desees */
+}
 .navbar-title a {
   color: var(--text-color);
   font-weight: 500;

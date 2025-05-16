@@ -29,7 +29,7 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
       alt="Logo de pizza" 
       className="brand-logo" 
     />
-    <h1 style={{ margin: 0, lineHeight: '1.2' }}>
+    <h1 style={{ margin: 15, lineHeight: '1.2' }}>
       Mama Mian Pizza
     </h1>
   </div>
@@ -45,8 +45,7 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
       <nav className="navbar__links">
         <ul>
           <li><a href="/services">Servicios</a></li>
-          <li><a href="/sobrenosotros">Sobre Nosotros</a></li>
-        </ul>
+          <li className="extra-space"><a href="/sobrenosotros">Sobre Nosotros</a></li>        </ul>
       </nav>
 
       <div className="navbar__icons">
