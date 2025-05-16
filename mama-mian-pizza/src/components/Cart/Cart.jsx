@@ -71,6 +71,7 @@ const Cart = ({ isOpen, onClose, cartItems, setCartItems }) => {
 
   const handleContinuarPago = () => {
     if (cartItems.length === 0) return;
+    if (onClose) onClose();
     navigate('/pideahora');
   };
 
