@@ -90,40 +90,39 @@ const Home = ({ onAddToCart }) => {
   return (
     <div className="main__content">
       
-      {/* Carrusel HERO */}
-      <section className="hero__carousel__container">
-        <Swiper
-          modules={[Navigation, Autoplay]}
-          navigation
-          autoplay={{ delay: 6000 }}
-          loop
-          className="hero__carousel"
+   {/* Carrusel HERO */}
+<section className="hero__carousel__container">
+  <Swiper
+    modules={[Autoplay]}
+    autoplay={{ delay: 9000 }}
+    loop
+    className="hero__carousel"
+  >
+    {carouselImages.map((img, idx) => (
+      <SwiperSlide key={idx}>
+        <div
+          className="hero__slide"
+          style={{
+            backgroundImage: `url(${img})`
+          }}
         >
-          {carouselImages.map((img, idx) => (
-            <SwiperSlide key={idx}>
-            <div
-              className="hero__slide"
-              style={{
-                backgroundImage: `url(${img})`
-              }}
-            >
-              <div className="hero__overlay"></div> 
-              
-              <div className="hero__text__container">
-                <h1 className="hero__title">Las mejores pizzas</h1>
-                <p className="hero__text">
-                  Ingredientes frescos, masa artesanal y sabores únicos que te harán volver por más.
-                </p>
-                <button className="hero__button">
-                  <Link to="/menu" className="link">Ver Menú</Link>
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
+          <div className="hero__overlay"></div> 
           
-          ))}
-        </Swiper>
-      </section>
+          <div className="hero__text__container">
+            <h1 className="hero__title">Las mejores pizzas</h1>
+            <p className="hero__text">
+              Ingredientes frescos, masa artesanal y sabores únicos que te harán volver por más.
+            </p>
+            <button className="hero__button">
+              <Link to="/menu" className="link">Ver Menú</Link>
+            </button>
+          </div>
+        </div>
+      </SwiperSlide>
+    ))}
+  </Swiper>
+</section>
+
 
       {/* Recomendación de la Casa */}
       <section className="house__choice__section">
