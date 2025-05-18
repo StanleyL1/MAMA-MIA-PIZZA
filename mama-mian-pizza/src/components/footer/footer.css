@@ -27,7 +27,7 @@
   
   .final-footer-text-left {
     color: var(--accent-color);
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     padding: 1rem;
     font-weight: bold;
     font-family:'Bold';
@@ -35,7 +35,7 @@
     white-space: nowrap;      /* <-- Hace que el texto no se divida en líneas */
     overflow: visible;        /* <-- Asegura que no se recorte */
     max-width: none;  
-    margin-left: 20rem; /* Ajusta este valor según lo que necesites */
+    margin-left: 18rem; /* Ajusta este valor según lo que necesites */
   }
   
   .final-footer-bottom {
