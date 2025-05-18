@@ -15,9 +15,7 @@ const Footer = ({ noImage }) => {
             <div className="final-footer-text-box final-footer-text-left">
               Del horno a tu paladar, Mamá Mian te invita a disfrutar
             </div>
-            <div className="final-footer-text-box final-footer-text-right">
-              Ven y adquiere la tuyaa ya!!!
-            </div>
+            
           </div>
         </div>
       )}

@@ -193,8 +193,8 @@ margin-bottom: 0px;}
 /* Badge de notificación en el carrito */
 .cart__badge {
   position: absolute;
-  top: 0.2rem;
-  right: 0.2rem;
+  top: -0.6rem;
+  right: -0.7rem;
   background-color: #ff3b3f;
   color: #fff;
   font-size: 0.7rem;
