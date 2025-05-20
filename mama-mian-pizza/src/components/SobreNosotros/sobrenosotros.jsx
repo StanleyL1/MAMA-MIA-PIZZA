@@ -1,6 +1,8 @@
 import React from 'react';
 import quesoR from '../../assets/quesoR.png';
 import './sobrenosotros.css';
+import Footer from '../footer/footer';
+
 //import Footer from '../footer/footer';
 
 function SobreNosotros() {
@@ -49,6 +51,8 @@ Bienvenidos a Mamá Mian Pizza. Bienvenidos a nuestro hogar.
           <img src={quesoR} alt="Nuestra Filosofía" className="sobrenos-image" />
         </div>
       </div>
+      <Footer noImage={true} />
+
     </div>
   );
 }

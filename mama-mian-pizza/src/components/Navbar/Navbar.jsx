@@ -4,8 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 // Nota: faUser en free-regular para que se vea como outline
 import { faUser } from '@fortawesome/free-regular-svg-icons';
 // Los siguientes íconos se usan en versión sólida (porque no tienen variante outline gratuita)
-import { faPizzaSlice, faCartShopping } from '@fortawesome/free-solid-svg-icons';
-
+import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
+import Logo from '../../assets/Logo1.png';
 import './Navbar.css';
 
 const Navbar = ({ onCartToggle, cartItemCount }) => {
@@ -22,15 +22,20 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
           <ul>
             <li>
               <a href="/" className="brand-link">
-                <h1>
-                  Mama Mian <br /> Pizza
-                  {/* Ícono de Pizza (sólido, ya que no hay versión outline gratuita) */}
-                  <FontAwesomeIcon 
-                    icon={faPizzaSlice} 
-                    className="brand-logo" 
-                    style={{ color: "#fff", background: "transparent" }} 
-                  />
-                </h1>
+              <a href="/" className="brand-link">
+  <div style={{ display: 'flex', alignItems: 'center' }}>
+    <img 
+      src={Logo} 
+      alt="Logo de pizza" 
+      className="brand-logo" 
+    />
+    <h1 style={{ margin: 15, lineHeight: '1.2' }}>
+      Mama Mian Pizza
+    </h1>
+  </div>
+
+
+</a>
               </a>
             </li>
           </ul>
@@ -40,9 +45,7 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
       <nav className="navbar__links">
         <ul>
           <li><a href="/services">Servicios</a></li>
-          <li><a href="#pideahora">Pide Ahora!!</a></li>
-          <li><a href="/sobrenosotros">Sobre Nosotros</a></li>
-        </ul>
+          <li className="extra-space"><a href="/sobrenosotros">Sobre Nosotros</a></li>        </ul>
       </nav>
 
       <div className="navbar__icons">
