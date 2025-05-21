@@ -1,29 +1,29 @@
 import React from 'react';
 import './Services.css';
+import Footer from '../footer/footer';
 
 import pizzaMovilImg from '../../assets/domicilio.jpeg';
 import cateringImg from '../../assets/Retiro.jpeg';
 import bigPizzaImg from '../../assets/Consumo.jpeg';
 
-// Iconos
+
 import iconoCamion from '../../assets/iconoCamion.png';
 import iconoGrupo from '../../assets/iconoGrupo.png';
 import iconoGrupo1 from '../../assets/iconoGrupo1.png';
 import menuBookIcon from '../../assets/menuBook.png'
 
 function Services() {
+  
   return (
     <div className="services-container">
-      {/* Título principal */}
-      <h1 className="services-title">Pizza para llevar
 
+      <h1 className="services-title">Pizza para llevar
         <img 
                     src={menuBookIcon} 
                     alt="Ícono Libro Menú" 
                     className="menu-title-icon" 
                   />
       </h1>
-
       {/* Cards superiores */}
       <div className="services-top-row">
         {/* Tarjeta 1: Pizza Móvil */}
@@ -86,6 +86,7 @@ function Services() {
           <img src={bigPizzaImg} alt="Pizza Grande" className="services-bottom-image" />
         </div>
       </div>
+      <Footer noImage={true} />
 
     </div>
     

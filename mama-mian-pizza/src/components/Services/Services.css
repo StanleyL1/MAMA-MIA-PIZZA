@@ -1,11 +1,20 @@
 /* Contenedor principal */
 .services-container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
   background-color: #FFF8EE; /* Fondo crema claro */
   font-family: sans-serif;
+  box-sizing: border-box;
+  width: 100%;
+
+
 }
+.services-container {
+  margin: 0;
+  padding: 0;
+}
+
+
 
 /* Título principal */
 .services-title {
@@ -96,15 +105,18 @@
   color: #BF6D0A; /* Texto destacado */
 }
 
-/* Card inferior: rojo a la izquierda, foto a la derecha */
 .services-bottom-card {
   display: flex;
   flex-wrap: wrap;
-  /* Card con borde redondeado y sombra, si deseas */
+  width: 70%;
+  margin-left: 15%; /* mueve ligeramente a la izquierda */
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   border-radius: 8px;
-  overflow: hidden; /* para que no se salga la imagen */
+  overflow: hidden;
+  margin-top: 80px; /* Ajusta este valor según lo que necesites */
+
 }
+
 
 /* Bloque rojo a la izquierda */
 .services-bottom-text {
