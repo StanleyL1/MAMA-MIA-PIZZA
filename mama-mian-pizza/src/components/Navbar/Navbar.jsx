@@ -31,7 +31,10 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
       </div>
 
       <div className="navbar__links">
-      
+        <ul>
+          <li><a href="/services">Servicios</a></li>
+          <li><a href="/sobrenosotros">Sobre Nosotros</a></li>
+        </ul>
       </div>
 
       <div className="navbar__icons">
@@ -57,14 +60,7 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
       {/* Menú hamburguesa desplegable */}
       {isMenuOpen && (
         <div className="navbar__menu">
-          <ul>
-            <li>
-              <Link to="/services" onClick={() => setIsMenuOpen(false)}>Servicios</Link>
-            </li>
-            <li>
-              <Link to="/sobrenosotros" onClick={() => setIsMenuOpen(false)}>Sobre Nosotros</Link>
-            </li>
-          </ul>
+        
         </div>
       )}
     </header>
