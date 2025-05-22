@@ -16,7 +16,9 @@ import {
   FaCreditCard,
   FaMoneyBillWave,
   FaExclamationTriangle,
-  FaPizzaSlice
+  FaPizzaSlice,
+  FaMotorcycle,
+  FaStore
 } from 'react-icons/fa';
 
 // Google Maps API key
@@ -40,6 +42,7 @@ const PideAhora = ({ cartItems = [] }) => {
   const [numeroTarjeta, setNumeroTarjeta] = useState('');
   const [fechaExp, setFechaExp] = useState('');
   const [cvv, setCvv] = useState('');
+  const [metodoEntrega, setMetodoEntrega] = useState('');
   
   // Estados para la geolocalización
   const [isLocating, setIsLocating] = useState(false);
@@ -297,25 +300,37 @@ const PideAhora = ({ cartItems = [] }) => {
               email: cuentaData.email,
               password: cuentaData.password 
             },
+        
+        // Tipo de entrega: 1 para recoger en local, 0 para entrega a domicilio
+        tipo_entrega: metodoEntrega === 'recoger' ? 1 : 0,
               
-        // Datos de la dirección según el modo seleccionado
-        direccion: {
-          tipo_direccion: modoDireccion === 'tiempoReal' ? 'tiempo_real' : 'formulario',
-          // Si es dirección por formulario
-          ...(modoDireccion === 'formulario' && {
-            direccion: direccionData.direccionExacta,
-            pais: direccionData.pais,
-            departamento: direccionData.departamento,
-            municipio: direccionData.municipio
-          }),
-          // Si es ubicación en tiempo real
-          ...(modoDireccion === 'tiempoReal' && userLocation && {
-            latitud: userLocation.lat,
-            longitud: userLocation.lng,
-            precision_ubicacion: Math.round(userLocation.accuracy),
-            direccion_formateada: addressInfo?.formattedAddress
-          })
-        },
+        // Datos de la dirección - siempre incluimos información para evitar errores
+        direccion: metodoEntrega === 'domicilio'
+          ? {
+              tipo_direccion: modoDireccion === 'tiempoReal' ? 'tiempo_real' : 'formulario',
+              // Si es dirección por formulario
+              ...(modoDireccion === 'formulario' && {
+                direccion: direccionData.direccionExacta,
+                pais: direccionData.pais,
+                departamento: direccionData.departamento,
+                municipio: direccionData.municipio
+              }),
+              // Si es ubicación en tiempo real
+              ...(modoDireccion === 'tiempoReal' && userLocation && {
+                latitud: userLocation.lat,
+                longitud: userLocation.lng,
+                precision_ubicacion: Math.round(userLocation.accuracy),
+                direccion_formateada: addressInfo?.formattedAddress || "Ubicación compartida en tiempo real"
+              })
+            }
+          : {
+              // Información de dirección mínima cuando se recoge en local
+              tipo_direccion: 'local',
+              direccion: "Av. Principal #123, Puerto Parada, Jiquilisco",
+              pais: "El Salvador",
+              departamento: "Usulután",
+              municipio: "Jiquilisco"
+            },
               
         // Datos de pago
         metodo_pago: pagoMetodo,
@@ -338,13 +353,17 @@ const PideAhora = ({ cartItems = [] }) => {
               
         // Datos financieros
         subtotal: parseFloat(cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0).toFixed(2)),
-        costo_envio: 0.00,
-        impuestos: 0.00,
-        total: parseFloat(cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0).toFixed(2)),
+        costo_envio: metodoEntrega === 'domicilio' ? 2.50 : 0.00,
+        impuestos: parseFloat((cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) * 0.13).toFixed(2)),
+        total: parseFloat((
+          cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) + 
+          (metodoEntrega === 'domicilio' ? 2.50 : 0.00) + 
+          (cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) * 0.13)
+        ).toFixed(2)),
               
         // Datos adicionales
         aceptado_terminos: true,
-        tiempo_estimado_entrega: 45 // En minutos
+        tiempo_estimado_entrega: metodoEntrega === 'domicilio' ? 45 : 25 // En minutos
       };
       
       console.log('Datos del pedido preparados:', pedidoData);
@@ -365,8 +384,49 @@ const PideAhora = ({ cartItems = [] }) => {
       if (response.ok) {
         const result = await response.json();
         console.log('Pedido creado exitosamente:', result);
+        
+        // Calcular el total para mostrar en la notificación
+        const total = parseFloat((
+          cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) + 
+          (metodoEntrega === 'domicilio' ? 2.50 : 0.00) + 
+          (cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) * 0.13)
+        ).toFixed(2));
+        
+        // Obtener código de pedido de la respuesta o usar un valor por defecto
+        const codigoPedido = result.codigo_pedido || '#78657';
+        
+        // Crear notificación
+        const notificacionData = {
+          titulo: "Nuevo Pedido",
+          mensaje: `Pedido ${codigoPedido} por $${total.toFixed(2)}`,
+          tipo: "pedido",
+          estado: "no leida"  // Corresponde a 'no leida' en el enum de la BD
+        };
+        
+        try {
+          // Enviar notificación al servidor
+          console.log('Enviando notificación:', notificacionData);
+          const notificationResponse = await fetch('https://server.tiznadodev.com/api/notifications/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(notificacionData)
+          });
+          
+          if (notificationResponse.ok) {
+            console.log('Notificación creada exitosamente');
+          } else {
+            console.error('Error al crear notificación:', await notificationResponse.json());
+          }
+        } catch (notificationError) {
+          console.error('Error al enviar notificación:', notificationError);
+          // No interrumpimos el flujo principal por un error en la notificación
+        }
+        
+        // Continuar con el flujo normal después de un pedido exitoso
         setOrderSuccess(true);
-        setOrderCode(result.codigo_pedido || '#78657');
+        setOrderCode(codigoPedido);
         setShowTerms(false);
         setShowSuccess(true);
       } else {
@@ -561,177 +621,216 @@ const PideAhora = ({ cartItems = [] }) => {
 
           {step === 'Dirección' && (
             <div className="card-direccion">
-              <h3 className="titulo-compra">Dirección de entrega</h3>
-
-              <div className="toggle-direccion">
+              <h3 className="titulo-compra">Método de entrega</h3>
+              
+              {/* Selección de método de entrega */}
+              <div className="toggle-metodo-entrega">
                 <button
-                  className={`toggle-dir-btn ${modoDireccion === 'formulario' ? 'activo' : ''}`}
-                  onClick={() => setModoDireccion('formulario')}
+                  className={`toggle-metodo-btn ${metodoEntrega === 'domicilio' ? 'activo' : ''}`}
+                  onClick={() => setMetodoEntrega('domicilio')}
                 >
-                  Llenar Formulario
+                  <FaMotorcycle className={`icono-metodo ${metodoEntrega === 'domicilio' ? 'active-icon' : ''}`} />
+                  <span>Entrega a domicilio</span>
                 </button>
                 <button
-                  className={`toggle-dir-btn ${modoDireccion === 'tiempoReal' ? 'activo' : ''}`}
-                  onClick={() => setModoDireccion('tiempoReal')}
+                  className={`toggle-metodo-btn ${metodoEntrega === 'recoger' ? 'activo' : ''}`}
+                  onClick={() => setMetodoEntrega('recoger')}
                 >
-                  Ubicación de tiempo real
+                  <FaStore className={`icono-metodo ${metodoEntrega === 'recoger' ? 'active-icon' : ''}`} />
+                  <span>Recoger en local</span>
                 </button>
               </div>
 
-              {modoDireccion === 'formulario' && (
-                <div className="contenido-direccion">
-                  {/* Dirección exacta */}
-                  <div className="campo">
-                    <label htmlFor="direccionExacta">Dirección exacta</label>
-                    <input
-                      type="text"
-                      name="direccionExacta"
-                      id="direccionExacta"
-                      value={direccionData.direccionExacta}
-                      onChange={handleInputDireccion}
-                      className="input-full"
-                    />
+              {/* Muestra la sección de dirección solo si eligió entrega a domicilio */}
+              {metodoEntrega === 'domicilio' && (
+                <>
+                  <h4 className="subtitulo-direccion">Dirección de entrega</h4>
+                  <div className="toggle-direccion">
+                    <button
+                      className={`toggle-dir-btn ${modoDireccion === 'formulario' ? 'activo' : ''}`}
+                      onClick={() => setModoDireccion('formulario')}
+                    >
+                      Llenar Formulario
+                    </button>
+                    <button
+                      className={`toggle-dir-btn ${modoDireccion === 'tiempoReal' ? 'activo' : ''}`}
+                      onClick={() => setModoDireccion('tiempoReal')}
+                    >
+                      Ubicación de tiempo real
+                    </button>
                   </div>
-                  <div className="campos-tres">
-  <div className="campo">
-    <label htmlFor="pais">País</label>
-    <input
-      type="text"
-      name="pais"
-      id="pais"
-      value={direccionData.pais}
-      onChange={handleInputDireccion}
-      className="input-pais"
-    />
-  </div>
-  <div className="campo">
-    <label htmlFor="departamento">Departamento</label>
-    <select
-      name="departamento"
-      id="departamento"
-      value={direccionData.departamento}
-      onChange={handleInputDireccion}
-      className="select-departamento"
-    >
-      <option value="">Seleccionar...</option>
-      <option value="Usulután">Jiquilisco</option>
-      <option value="San Salvador">Usulutan</option>
-      <option value="La Libertad">La Libertad</option>
-    </select>
-  </div>
-  <div className="campo">
-    <label htmlFor="municipio">Municipio</label>
-    <input
-      type="text"
-      name="municipio"
-      id="municipio"
-      value={direccionData.municipio}
-      onChange={handleInputDireccion}
-      className="input-municipio"
-    />
-  </div>
-</div>
-                </div>
-              )}
 
-              {modoDireccion === 'tiempoReal' && (
-                <div className="contenido-tiempo-real">
-                  {!locationShared && !isLocating && !locationError && (
-                    <>
-                      <p className="instruccion">
-                        Haz clic en el botón para compartir tu ubicación actual
-                      </p>
-                      <button className="btn-ubicacion" onClick={getLocation}>
-                        <FaMapMarkerAlt className="icono-ubicacion" />
-                        Compartir mi ubicación
-                      </button>
-                    </>
-                  )}
-                  
-
-                  {isLocating && (
-                    <div className="ubicacion-cargando">
-                      <FaSpinner className="icono-spinner" />
-                      <p>Obteniendo tu ubicación actual...</p>
-                    </div>
-                  )}
-                  
-
-                  {locationError && (
-                    <div className="ubicacion-error">
-                      <p className="error-mensaje">{locationError}</p>
-                      <button className="btn-reintentar" onClick={getLocation}>
-                        Reintentar
-                      </button>
-                    </div>
-                  )}
-                  
-
-                  {locationShared && userLocation && (
-                    <div className="ubicacion-compartida">
-                      <div className="ubicacion-header">
-                        <FaMapMarkerAlt className="icono-pin" />
-                        <span>¡Ubicación compartida con éxito!</span>
+                  {modoDireccion === 'formulario' && (
+                    <div className="contenido-direccion">
+                      {/* Dirección exacta */}
+                      <div className="campo">
+                        <label htmlFor="direccionExacta">Dirección exacta</label>
+                        <input
+                          type="text"
+                          name="direccionExacta"
+                          id="direccionExacta"
+                          value={direccionData.direccionExacta}
+                          onChange={handleInputDireccion}
+                          className="input-full"
+                        />
                       </div>
-                      
-                      <div className="map-container">
-                        {/* Google Maps integration */}
-                        <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
-                          <GoogleMap
-                            mapContainerStyle={mapContainerStyle}
-                            center={userLocation}
-                            zoom={16}
+                      <div className="campos-tres">
+                        <div className="campo">
+                          <label htmlFor="pais">País</label>
+                          <input
+                            type="text"
+                            name="pais"
+                            id="pais"
+                            value={direccionData.pais}
+                            onChange={handleInputDireccion}
+                            className="input-pais"
+                          />
+                        </div>
+                        <div className="campo">
+                          <label htmlFor="departamento">Departamento</label>
+                          <select
+                            name="departamento"
+                            id="departamento"
+                            value={direccionData.departamento}
+                            onChange={handleInputDireccion}
+                            className="select-departamento"
                           >
-                            <Marker position={userLocation} />
-                          </GoogleMap>
-                        </LoadScript>
-                        
-                        {/* Información de dirección mejorada */}
-                        <div className="direccion-info">
-                          {loadingAddress ? (
-                            <div className="loading-address">
-                              <FaSpinner className="icono-spinner-small" />
-                              <span>Obteniendo dirección exacta...</span>
-                            </div>
-                          ) : addressInfo ? (
-                            <div className="address-details">
-                              <h4>Tu ubicación exacta:</h4>
-                              <p className="direccion-completa">{addressInfo.formattedAddress || "Dirección no disponible"}</p>
-                              {addressInfo.locality && (
-                                <p className="locality-info">
-                                  <FaMapMarkerAlt className="location-icon-small" />
-                                  {addressInfo.locality}
-                                  {addressInfo.administrativeArea && `, ${addressInfo.administrativeArea}`}
-                                  {addressInfo.country && `, ${addressInfo.country}`}
-                                </p>
-                              )}
-                              <div className="coordinates-box">
-                                <p className="coordinates-text">
-                                  <span className="coordinates-label">Latitud:</span> {userLocation.lat.toFixed(6)}
-                                </p>
-                                <p className="coordinates-text">
-                                  <span className="coordinates-label">Longitud:</span> {userLocation.lng.toFixed(6)}
-                                </p>
-                                <p className="precision-text">
-                                  <span className="coordinates-label">Precisión:</span> ±{Math.round(userLocation.accuracy)} metros
-                                </p>
-                              </div>
-                            </div>
-                          ) : null}
+                            <option value="">Seleccionar...</option>
+                            <option value="Usulután">Jiquilisco</option>
+                            <option value="San Salvador">Usulutan</option>
+                            <option value="La Libertad">La Libertad</option>
+                          </select>
+                        </div>
+                        <div className="campo">
+                          <label htmlFor="municipio">Municipio</label>
+                          <input
+                            type="text"
+                            name="municipio"
+                            id="municipio"
+                            value={direccionData.municipio}
+                            onChange={handleInputDireccion}
+                            className="input-municipio"
+                          />
                         </div>
                       </div>
-                      
-                      <button className="btn-actualizar" onClick={getLocation}>
-                        <FaMapMarkerAlt /> Actualizar ubicación
-                      </button>
                     </div>
                   )}
 
-                  <div className="alerta-cobertura">
-                    <FaExclamationTriangle className="warning-icon" />
-                    <p>
-                      Cobertura de entrega en Puerto Parada y en Jiquilisco, Usulután, El Salvador
-                    </p>
+                  {modoDireccion === 'tiempoReal' && (
+                    <div className="contenido-tiempo-real">
+                      {!locationShared && !isLocating && !locationError && (
+                        <>
+                          <p className="instruccion">
+                            Haz clic en el botón para compartir tu ubicación actual
+                          </p>
+                          <button className="btn-ubicacion" onClick={getLocation}>
+                            <FaMapMarkerAlt className="icono-ubicacion" />
+                            Compartir mi ubicación
+                          </button>
+                        </>
+                      )}
+                      
+
+                      {isLocating && (
+                        <div className="ubicacion-cargando">
+                          <FaSpinner className="icono-spinner" />
+                          <p>Obteniendo tu ubicación actual...</p>
+                        </div>
+                      )}
+                      
+
+                      {locationError && (
+                        <div className="ubicacion-error">
+                          <p className="error-mensaje">{locationError}</p>
+                          <button className="btn-reintentar" onClick={getLocation}>
+                            Reintentar
+                          </button>
+                        </div>
+                      )}
+                      
+
+                      {locationShared && userLocation && (
+                        <div className="ubicacion-compartida">
+                          <div className="ubicacion-header">
+                            <FaMapMarkerAlt className="icono-pin" />
+                            <span>¡Ubicación compartida con éxito!</span>
+                          </div>
+                          
+                          <div className="map-container">
+                            {/* Google Maps integration */}
+                            <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+                              <GoogleMap
+                                mapContainerStyle={mapContainerStyle}
+                                center={userLocation}
+                                zoom={16}
+                              >
+                                <Marker position={userLocation} />
+                              </GoogleMap>
+                            </LoadScript>
+                            
+                            {/* Información de dirección mejorada */}
+                            <div className="direccion-info">
+                              {loadingAddress ? (
+                                <div className="loading-address">
+                                  <FaSpinner className="icono-spinner-small" />
+                                  <span>Obteniendo dirección exacta...</span>
+                                </div>
+                              ) : addressInfo ? (
+                                <div className="address-details">
+                                  <h4>Tu ubicación exacta:</h4>
+                                  <p className="direccion-completa">{addressInfo.formattedAddress || "Dirección no disponible"}</p>
+                                  {addressInfo.locality && (
+                                    <p className="locality-info">
+                                      <FaMapMarkerAlt className="location-icon-small" />
+                                      {addressInfo.locality}
+                                      {addressInfo.administrativeArea && `, ${addressInfo.administrativeArea}`}
+                                      {addressInfo.country && `, ${addressInfo.country}`}
+                                    </p>
+                                  )}
+                                  <div className="coordinates-box">
+                                    <p className="coordinates-text">
+                                      <span className="coordinates-label">Latitud:</span> {userLocation.lat.toFixed(6)}
+                                    </p>
+                                    <p className="coordinates-text">
+                                      <span className="coordinates-label">Longitud:</span> {userLocation.lng.toFixed(6)}
+                                    </p>
+                                    <p className="precision-text">
+                                      <span className="coordinates-label">Precisión:</span> ±{Math.round(userLocation.accuracy)} metros
+                                    </p>
+                                  </div>
+                                </div>
+                              ) : null}
+                            </div>
+                          </div>
+                          
+                          <button className="btn-actualizar" onClick={getLocation}>
+                            <FaMapMarkerAlt /> Actualizar ubicación
+                          </button>
+                        </div>
+                      )}
+
+                      <div className="alerta-cobertura">
+                        <FaExclamationTriangle className="warning-icon" />
+                        <p>
+                          Cobertura de entrega en Puerto Parada y en Jiquilisco, Usulután, El Salvador
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {metodoEntrega === 'recoger' && (
+                <div className="contenido-recoger-local">
+                  <div className="info-local">
+                    <h4>Información del local</h4>
+                    <p><strong>Dirección:</strong> Av. Principal #123, Puerto Parada, Jiquilisco</p>
+                    <p><strong>Horario:</strong> Lunes a Domingo de 11:00 AM a 10:00 PM</p>
+                    <p><strong>Teléfono:</strong> +503 2222-3333</p>
+                    <div className="nota-importante">
+                      <FaExclamationTriangle className="warning-icon" />
+                      <p>Tu pedido estará listo para recoger en aproximadamente 25-30 minutos</p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -740,7 +839,11 @@ const PideAhora = ({ cartItems = [] }) => {
                 <button className="btn-volver-Direccion" onClick={() => setStep('Cuenta')}>
                   Atrás
                 </button>
-                <button className="btn-continuar-Direccion" onClick={handleContinuar}>
+                <button 
+                  className="btn-continuar-Direccion" 
+                  onClick={handleContinuar}
+                  disabled={!metodoEntrega || (metodoEntrega === 'domicilio' && modoDireccion === 'tiempoReal' && !locationShared)}
+                >
                   Continuar
                 </button>
               </div>
@@ -884,21 +987,48 @@ const PideAhora = ({ cartItems = [] }) => {
       )}
     </div>
 
-    {/* Sección de Dirección de entrega */}
+    {/* Sección de Método de entrega y dirección */}
     <div className="seccion-linea">
-      <h4 className="subtitulo-seccion">Dirección de entrega</h4>
-      {modoDireccion === 'formulario' ? (
-        <>
-          <p>{direccionData.direccionExacta}</p>
-          <p>{direccionData.pais} – {direccionData.departamento} – {direccionData.municipio}</p>
-        </>
+      <h4 className="subtitulo-seccion">
+        {metodoEntrega === 'recoger' ? 'Método de entrega' : 'Dirección de entrega'}
+      </h4>
+      
+      {metodoEntrega === 'recoger' ? (
+        <div className="metodo-entrega-info">
+          <div className="metodo-icon-container">
+            <FaStore className="metodo-icon" />
+          </div>
+          <div className="metodo-details">
+            <p className="metodo-tipo">Recoger en local</p>
+            <p>Av. Principal #123, Puerto Parada, Jiquilisco</p>
+            <p className="metodo-tiempo">Tiempo estimado para recoger: 25-30 minutos</p>
+          </div>
+        </div>
       ) : (
         <>
-          {addressInfo?.formattedAddress ? (
-            <p>{addressInfo.formattedAddress}</p>
-          ) : (
-            <p>Ubicación compartida en tiempo real</p>
-          )}
+          <div className="metodo-entrega-info">
+            <div className="metodo-icon-container">
+              <FaMotorcycle className="metodo-icon" />
+            </div>
+            <div className="metodo-details">
+              <p className="metodo-tipo">Entrega a domicilio</p>
+              {modoDireccion === 'formulario' ? (
+                <>
+                  <p>{direccionData.direccionExacta}</p>
+                  <p>{direccionData.pais} – {direccionData.departamento} – {direccionData.municipio}</p>
+                </>
+              ) : (
+                <>
+                  {addressInfo?.formattedAddress ? (
+                    <p>{addressInfo.formattedAddress}</p>
+                  ) : (
+                    <p>Ubicación compartida en tiempo real</p>
+                  )}
+                </>
+              )}
+              <p className="metodo-tiempo">Tiempo estimado de entrega: 45-60 minutos</p>
+            </div>
+          </div>
         </>
       )}
     </div>
@@ -906,12 +1036,29 @@ const PideAhora = ({ cartItems = [] }) => {
     {/* Sección de Método de pago */}
     <div className="seccion-linea">
       <h4 className="subtitulo-seccion">Método de pago</h4>
-      {pagoMetodo === 'efectivo' && (
-        <p>Efectivo al momento de la entrega</p>
-      )}
-      {pagoMetodo === 'tarjeta' && (
-        <p>Tarjeta de crédito o débito</p>
-      )}
+      <div className="metodo-pago-info">
+        {pagoMetodo === 'efectivo' ? (
+          <div className="metodo-entrega-info">
+            <div className="metodo-icon-container">
+              <FaMoneyBillWave className="metodo-icon pago-icon" />
+            </div>
+            <div className="metodo-details">
+              <p className="metodo-tipo">Efectivo al momento de {metodoEntrega === 'recoger' ? 'recoger' : 'la entrega'}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="metodo-entrega-info">
+            <div className="metodo-icon-container">
+              <FaCreditCard className="metodo-icon pago-icon" />
+            </div>
+            <div className="metodo-details">
+              <p className="metodo-tipo">Tarjeta de crédito o débito</p>
+              <p>**** **** **** {numeroTarjeta.slice(-4)}</p>
+              <p>Titular: {nombreTarjeta}</p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
 
     <div className="botones-confirmar">
