@@ -267,7 +267,7 @@ const PideAhora = ({ cartItems = [] }) => {
     }
   };
 
-  // Función para enviar el pedido al servidor - añadido más logs
+  // Función para enviar el pedido al servidor adaptada para el nuevo backend
   const enviarPedido = async () => {
     console.log('Función enviarPedido ejecutada');
     
@@ -282,7 +282,7 @@ const PideAhora = ({ cartItems = [] }) => {
     setOrderError('');
     
     try {
-      // 1. Preparar los datos del pedido
+      // Construir objeto con la estructura esperada por el backend
       const pedidoData = {
         // Datos del cliente según el modo seleccionado
         tipo_cliente: modo === 'invitado' ? 'invitado' : 'registrado',
@@ -291,17 +291,16 @@ const PideAhora = ({ cartItems = [] }) => {
               nombre: invitadoData.nombre,
               apellido: invitadoData.apellido,
               telefono: invitadoData.telefono,
-              email: null // Los invitados no proporcionan email en esta UI
+              email: null 
             }
           : {
               email: cuentaData.email,
-              password: cuentaData.password // Para autenticación del usuario
+              password: cuentaData.password 
             },
               
-
         // Datos de la dirección según el modo seleccionado
         direccion: {
-          tipo_direccion: modoDireccion,
+          tipo_direccion: modoDireccion === 'tiempoReal' ? 'tiempo_real' : 'formulario',
           // Si es dirección por formulario
           ...(modoDireccion === 'formulario' && {
             direccion: direccionData.direccionExacta,
@@ -318,7 +317,6 @@ const PideAhora = ({ cartItems = [] }) => {
           })
         },
               
-
         // Datos de pago
         metodo_pago: pagoMetodo,
         ...(pagoMetodo === 'tarjeta' && {
@@ -326,70 +324,63 @@ const PideAhora = ({ cartItems = [] }) => {
           num_tarjeta_masked: numeroTarjeta.slice(-4).padStart(16, '*'),
         }),
               
-
-        // Detalles del pedido
+        // Detalles del pedido - adaptado para la estructura esperada por el backend
         productos: cartItems.map(item => ({
           id_producto: item.id,
           nombre_producto: item.nombre,
-          precio_unitario: item.precio,
-          cantidad: item.cantidad,
-          subtotal: item.precio * item.cantidad,
+          precio_unitario: parseFloat(item.precio),
+          cantidad: parseInt(item.cantidad),
+          subtotal: parseFloat(item.precio * item.cantidad),
           masa: item.masa || null,
           tamano: item.tamano || null,
-          instrucciones_especiales: item.instrucciones || null,
-          ingredientes: item.ingredientes || []
+          instrucciones_especiales: item.instrucciones || null
         })),
               
-
         // Datos financieros
-        subtotal: cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0),
-        costo_envio: 0.00, // O el valor que determines
-        impuestos: 0.00,   // O el valor que determines
-        total: cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0),
+        subtotal: parseFloat(cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0).toFixed(2)),
+        costo_envio: 0.00,
+        impuestos: 0.00,
+        total: parseFloat(cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0).toFixed(2)),
               
-
         // Datos adicionales
         aceptado_terminos: true,
         tiempo_estimado_entrega: 45 // En minutos
       };
       
       console.log('Datos del pedido preparados:', pedidoData);
-      console.log('Intentando hacer fetch a https://server.tiznadodev.com/api/orders/neworder');
+      console.log('Enviando pedido a https://server.tiznadodev.com/api/orders/neworder');
       
-      // 2. Enviar los datos al servidor
+      // Enviar los datos al servidor
       const response = await fetch('https://server.tiznadodev.com/api/orders/neworder', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          // Añadiendo headers CORS adicionales que podrían ser necesarios
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(pedidoData)
       });
       
-      console.log('Respuesta recibida del servidor:', response);
+      console.log('Respuesta recibida:', response);
       
-      const result = await response.json();
-      console.log('Resultado del servidor parseado:', result);
-      
+      // Analizar el resultado
       if (response.ok) {
+        const result = await response.json();
         console.log('Pedido creado exitosamente:', result);
         setOrderSuccess(true);
-        setOrderCode(result.codigo_pedido || '#78657'); // Usar el código devuelto o uno por defecto
+        setOrderCode(result.codigo_pedido || '#78657');
         setShowTerms(false);
         setShowSuccess(true);
       } else {
-        console.error('Error al procesar el pedido:', result);
-        setOrderError(result.message || 'Error al procesar el pedido');
+        const errorResult = await response.json();
+        console.error('Error al procesar el pedido:', errorResult);
+        setOrderError(errorResult.message || 'Error al procesar el pedido');
         setShowTerms(false);
-        alert(`Error al procesar el pedido: ${result.message || 'Intenta nuevamente'}`);
+        alert(`Error al procesar el pedido: ${errorResult.message || 'Intenta nuevamente'}`);
       }
     } catch (error) {
-      console.error('Error al enviar el pedido:', error);
+      console.error('Error en la solicitud:', error);
       setOrderError('Error de conexión al procesar el pedido');
-      alert('Hubo un problema al procesar el pedido. Intenta nuevamente más tarde.');
+      setShowTerms(false);
+      alert('Hubo un problema al procesar el pedido. Por favor intenta nuevamente más tarde.');
     } finally {
       setIsSubmitting(false);
     }
