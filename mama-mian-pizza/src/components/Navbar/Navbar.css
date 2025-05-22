@@ -173,8 +173,14 @@ margin-bottom: 0px;}
   cursor: pointer;
   font-size: 1.8rem;
   color: var(--text-color);
+  padding: 0.4rem;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
-
+/* Estilo en hover del botón hamburguesa */
+.navbar__toggle:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
 
 @media (max-width: 768px) {
   .navbar {

@@ -3,23 +3,20 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 // Nota: faUser en free-regular para que se vea como outline
 import { faUser } from '@fortawesome/free-regular-svg-icons';
-// Los siguientes íconos se usan en versión sólida (porque no tienen variante outline gratuita)
+import {faBars } from '@fortawesome/free-solid-svg-icons';
 import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
 import Logo from '../../assets/Logo1.png';
 import './Navbar.css';
+import { Link } from 'react-router-dom';
+
 
 const Navbar = ({ onCartToggle, cartItemCount }) => {
-  const [mostrarLinks, setMostrarLinks] = useState(false); // Para el usuario
-  const [menuOpen, setMenuOpen] = useState(false);         // Para el menú hamburguesa
-  
-  
-  const toggleUserLinks = () => {
-    setMostrarLinks(!mostrarLinks);
-  };
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
   
     const toggleMenu = () => {
-      setMenuOpen(prev => !prev);
+      setIsMenuOpen(prev => !prev);
     };
+  
   return (
     <header className="navbar">
       <div className="navbar__brand">
@@ -51,55 +48,44 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
         <li><a href="/sobrenosotros">Sobre Nosotros</a></li>
       </ul>
     </div>
+    <div className="navbar__icons">
+  {/* Usuario */}
+  <div className="navbar__user-section">
+    <Link to="/login" className="icon-button" aria-label="Usuario">
+      <FontAwesomeIcon
+        icon={faUser}
+        className="icon-img"
+        style={{ color: "#fff", background: "transparent" }}
+      />
+    </Link>
+  </div>
 
-    <button className="navbar__toggle" onClick={toggleMenu}>☰</button>
+  {/* Menú hamburguesa */}
+  <button
+    className="navbar__toggle icon-button"
+    onClick={toggleMenu}
+    aria-label="Menú"
+  >
+    <FontAwesomeIcon icon={faBars} className="icon-img" />
+  </button>
 
-    {menuOpen && (
-      <div className="navbar__menu">
-        <ul>
-          <li><a href="/services">Servicios</a></li>
-          <li><a href="/sobrenosotros">Sobre Nosotros</a></li>
-        </ul>
-      </div>
+  {/* Carrito */}
+  <button
+    className="icon-button cart-button"
+    aria-label="Carrito"
+    onClick={onCartToggle}
+  >
+    <FontAwesomeIcon
+      icon={faCartShopping}
+      className="icon-img"
+      style={{ color: "#fff", background: "transparent" }}
+    />
+    {cartItemCount > 0 && (
+      <span className="cart__badge">{cartItemCount}</span>
     )}
-      <div className="navbar__icons">
-        {/* Sección de usuario */}
-        <div className="navbar__user-section">
-      <button
-        className="icon-button"
-        aria-label="Usuario"
-        onClick={toggleUserLinks}
-      >
-        <FontAwesomeIcon
-          icon={faUser}
-          className="icon-img"
-          style={{ color: "#fff", background: "transparent" }}
-        />
-      </button>
+  </button>
+</div>
 
-      <div className={`navbar__user-links ${mostrarLinks ? "" : "hidden"}`}>
-        <a href="/login">Iniciar Sesión</a>
-        <a href="/registro">Registrarse</a>
-      </div>
-    </div>
-
-      
-        {/* Botón del carrito */}
-        <button
-          className="icon-button cart-button"
-          aria-label="Carrito"
-          onClick={onCartToggle}
-        >
-          <FontAwesomeIcon 
-            icon={faCartShopping} 
-            className="icon-img" 
-            style={{ color: "#fff", background: "transparent" }} 
-          />
-          {cartItemCount > 0 && (
-            <span className="cart__badge">{cartItemCount}</span>
-          )}
-        </button>
-      </div>
     </header>
   );
 };
