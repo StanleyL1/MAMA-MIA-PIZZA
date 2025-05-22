@@ -10,6 +10,7 @@ import Recover from './components/auth/recover/recover';
 import Navbar from './components/Navbar';
 import PideAhora from './components/PideAhora/PideAhora';
 import Cart from './components/Cart/Cart';
+import Services from './components/Services/Services';
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -69,6 +70,7 @@ function App() {
         <Route path="/" element={<Home onAddToCart={handleAddToCart} />} />
         <Route path="/menu" element={<Menu onAddToCart={handleAddToCart} />} />
         <Route path="/sobrenosotros" element={<SobreNosotros />} />
+        <Route path="/Services" element={<Services />} />
         <Route path="/pideahora" element={<PideAhora cartItems={cartItems} />} />
       </Routes>
 

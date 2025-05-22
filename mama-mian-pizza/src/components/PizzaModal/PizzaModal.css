@@ -17,11 +17,11 @@
   position: relative;
   width: 45%;
   height: auto;
-  max-height: 85vh;
+  max-height: 90vh;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-  overflow: hidden;
+  overflow: auto;
   display: flex;
   flex-direction: row;
 }

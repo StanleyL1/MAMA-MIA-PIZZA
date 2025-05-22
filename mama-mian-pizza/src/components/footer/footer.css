@@ -7,7 +7,7 @@
   
   .final-footer-background {
     background-position: center;
-    background-color: var(--primary-color);
+    background-color: var(--accent-color);
     background-size: cover;
     background-repeat: no-repeat;
     min-height: 400px;      
@@ -23,26 +23,19 @@
     padding: 2rem;
   }
   
-  .final-footer-text-right {
-    background:var(--text); 
-    color: var(--primary-color);
-    font-size: 1.4rem;
-    padding: 0.7rem;
-    font-weight: bold;
-    border-radius: 8px;
-    width: 19%;
-    max-width: 400px;
-    text-align: left; 
-  }
+ 
+  
   .final-footer-text-left {
     color: var(--accent-color);
-    font-size: 2.1rem;
-    padding: 2rem;
-    display: table-column;
+    font-size: 2.5rem;
+    padding: 1rem;
     font-weight: bold;
-    font-family:'Arial Narrow', Arial, sans-serif;
+    font-family:'Bold';
     border-radius: 8px;
-    max-width: 400px;
+    white-space: nowrap;      /* <-- Hace que el texto no se divida en líneas */
+    overflow: visible;        /* <-- Asegura que no se recorte */
+    max-width: none;  
+    margin-left: 18rem; /* Ajusta este valor según lo que necesites */
   }
   
   .final-footer-bottom {

@@ -1,11 +1,20 @@
 /* Contenedor principal */
 .services-container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
   background-color: #FFF8EE; /* Fondo crema claro */
   font-family: sans-serif;
+  box-sizing: border-box;
+  width: 100%;
+
+
 }
+.services-container {
+  margin: 0;
+  padding: 0;
+}
+
+
 
 /* Título principal */
 .services-title {
@@ -19,35 +28,35 @@
 .services-top-row {
   display: flex;
   flex-wrap: wrap; /* Para ser responsive en pantallas pequeñas */
-  gap: 2rem;
-  margin-bottom: 4.5rem;
+  gap: 20px;
+  justify-content: center;
 }
 
 /* Card general */
 .services-card {
-  background-color: #d3cdcd;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(255, 117, 117, 0.1);
+  width: 100%;
+  max-width: 400px;
+  background-color: #fff;
+  border-radius: 10px;
   overflow: hidden;
-  flex: 1 1 ; /* Cada card mínimo 400px ancho */
-  width: 517px;
-  height: 457px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
 }
 
 /* Contenedor de la imagen (con overlay del título) */
 .services-card-image-container {
-  position: relative;
   width: 100%;
-  height: 100%; /* Ajusta la altura de la imagen */
-  overflow: hidden;
+  height: 400px; /* Altura equilibrada para las imágenes */
+  position: relative;
+  overflow: hidden
 }
 
 .services-card-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 /* Título centrado en el medio de la imagen */
@@ -96,15 +105,18 @@
   color: #BF6D0A; /* Texto destacado */
 }
 
-/* Card inferior: rojo a la izquierda, foto a la derecha */
 .services-bottom-card {
   display: flex;
   flex-wrap: wrap;
-  /* Card con borde redondeado y sombra, si deseas */
+  width: 70%;
+  margin-left: 15%; /* mueve ligeramente a la izquierda */
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   border-radius: 8px;
-  overflow: hidden; /* para que no se salga la imagen */
+  overflow: hidden;
+  margin-top: 80px; /* Ajusta este valor según lo que necesites */
+
 }
+
 
 /* Bloque rojo a la izquierda */
 .services-bottom-text {

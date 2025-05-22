@@ -863,52 +863,68 @@ const PideAhora = ({ cartItems = [] }) => {
 
           {/* Aquí se podría implementar la Card de Confirmación para el paso 4 */}
           {step === 'Confirmar' && (
-        <div className="card-confirmar">
-          <h3 className="titulo-confirmar">Revisar y confirmar</h3>
-          <p className="descripcion-confirmar">
-            Revisa los detalles de tu pedido antes de confirmar
-          </p>
-          
-          {/* Sección de Información Personal */}
-          <div className="seccion-linea">
-            <h4 className="subtitulo-seccion">Información personal</h4>
-           
-          </div>
-
-          {/* Sección de Dirección de entrega */}
-          <div className="seccion-linea">
-            <h4 className="subtitulo-seccion">Dirección de entrega</h4>
-            {modoDireccion === 'formulario' ? (
-              <>
-                <p>{direccionData.direccionExacta}</p>
-                <p>{direccionData.pais} – {direccionData.departamento} – {direccionData.municipio}</p>
-              </>
-            ) : (
-              <p>Ubicación compartida en tiempo real (Puerto Parada o Jiquilisco)</p>
-            )}
-          </div>
-
-          {/* Sección de Método de pago */}
-          <div className="seccion-linea">
-            <h4 className="subtitulo-seccion">Método de pago</h4>
-            {pagoMetodo === 'efectivo' && (
-              <p>Efectivo al momento de la entrega</p>
-            )}
-            {pagoMetodo === 'tarjeta' && (
-              <p>Tarjeta de crédito o débito</p>
-            )}
-          </div>
-
-          <div className="botones-confirmar">
-            <button className="btn-volver-pedido" onClick={() => setStep('Pago')}>
-              Atrás
-            </button>
-            <button className="btn-continuar-pedido" onClick={handleRealizarPedido}>
-              Realizar pedido
-            </button>
-          </div>
-        </div>
+  <div className="card-confirmar">
+    <h3 className="titulo-confirmar">Revisar y confirmar</h3>
+    <p className="descripcion-confirmar">
+      Revisa los detalles de tu pedido antes de confirmar
+    </p>
+    
+    {/* Sección de Información Personal */}
+    <div className="seccion-linea">
+      <h4 className="subtitulo-seccion">Información personal</h4>
+      {modo === 'invitado' ? (
+        <>
+          <p>{invitadoData.nombre} {invitadoData.apellido}</p>
+          <p>Teléfono: +503 {invitadoData.telefono}</p>
+        </>
+      ) : (
+        <>
+          <p>Email: {cuentaData.email}</p>
+        </>
       )}
+    </div>
+
+    {/* Sección de Dirección de entrega */}
+    <div className="seccion-linea">
+      <h4 className="subtitulo-seccion">Dirección de entrega</h4>
+      {modoDireccion === 'formulario' ? (
+        <>
+          <p>{direccionData.direccionExacta}</p>
+          <p>{direccionData.pais} – {direccionData.departamento} – {direccionData.municipio}</p>
+        </>
+      ) : (
+        <>
+          {addressInfo?.formattedAddress ? (
+            <p>{addressInfo.formattedAddress}</p>
+          ) : (
+            <p>Ubicación compartida en tiempo real</p>
+          )}
+        </>
+      )}
+    </div>
+
+    {/* Sección de Método de pago */}
+    <div className="seccion-linea">
+      <h4 className="subtitulo-seccion">Método de pago</h4>
+      {pagoMetodo === 'efectivo' && (
+        <p>Efectivo al momento de la entrega</p>
+      )}
+      {pagoMetodo === 'tarjeta' && (
+        <p>Tarjeta de crédito o débito</p>
+      )}
+    </div>
+
+    <div className="botones-confirmar">
+      <button className="btn-volver-pedido" onClick={() => setStep('Pago')}>
+        Atrás
+      </button>
+      <button className="btn-continuar-pedido" onClick={handleRealizarPedido}>
+        Realizar pedido
+      </button>
+    </div>
+  </div>
+)}
+
 
       {/* Modal Términos y Condiciones */}
       {showTerms && (
