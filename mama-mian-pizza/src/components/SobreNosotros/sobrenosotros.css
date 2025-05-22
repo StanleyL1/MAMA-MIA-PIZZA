@@ -51,3 +51,53 @@
   padding: 40px 20px;
 }
 
+/* Media queries para pantallas pequeñas */
+@media (max-width: 768px) {
+  .sobrenos-content {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .sobrenos-image-container,
+  .sobrenos-text {
+    flex: unset;
+    width: 100%;
+    padding: 0;
+  }
+
+  /* Ocultar segunda imagen */
+  .sobrenos-image1 {
+    display: none;
+  }
+
+  /* Ajustar primera imagen */
+  .sobrenos-image {
+    width: 80%;
+    margin-bottom: 1.5rem;
+  }
+
+  .sobrenos-text h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .sobrenos-text p {
+    font-size: 1rem;
+    padding: 0 0.25rem;
+  }
+}
+
+/* Media queries para pantallas muy pequeñas (celulares) */
+@media (max-width: 400px) {
+  .sobrenos-image {
+    width: 100%;
+  }
+
+  .sobrenos-text h2 {
+    font-size: 1.3rem;
+  }
+
+  .sobrenos-text p {
+    font-size: 0.95rem;
+  }
+}

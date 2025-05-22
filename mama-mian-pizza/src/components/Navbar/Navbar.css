@@ -3,23 +3,23 @@
 .navbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   background-color: var(--primary-color);
-  padding: 1rem 1rem;
+  padding: 1rem 2rem;
   color: var(--text-color);
-  position: block;
-  top: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar__brand {
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 /* Contenedor de íconos en la Navbar */
 
 .brand-logo {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   margin-left: 1px;
 }
 
@@ -92,6 +92,7 @@ margin-bottom: 0px;}
 .navbar__links{
   margin-left: 3%; /* Esto empuja el bloque hacia la derecha */
   font-size: 21px;
+  gap: 2rem;
   color: var(--secondary-color);
 }
 
@@ -145,10 +146,23 @@ margin-bottom: 0px;}
 .icon-img {
   width: 24px;
   height: 24px;
-  object-fit: contain;
-  font-weight: bold;
-  color: "#fff";
-  background: "transparent" ; 
+  color: #fff;
+  background: transparent;
+}
+
+.navbar__menu {
+  animation: slideDown 0.3s ease-in-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Botón de menú hamburguesa (oculto en escritorio) */
