@@ -1,22 +1,18 @@
 import React, { useState } from 'react';
-// Importa el componente de Font Awesome y los íconos necesarios
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// Nota: faUser en free-regular para que se vea como outline
 import { faUser } from '@fortawesome/free-regular-svg-icons';
-import {faBars } from '@fortawesome/free-solid-svg-icons';
-import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faCartShopping } from '@fortawesome/free-solid-svg-icons';
 import Logo from '../../assets/Logo1.png';
 import './Navbar.css';
 import { Link } from 'react-router-dom';
 
-
 const Navbar = ({ onCartToggle, cartItemCount }) => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-    const toggleMenu = () => {
-      setIsMenuOpen(prev => !prev);
-    };
-  
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(prev => !prev);
+  };
+
   return (
     <header className="navbar">
       <div className="navbar__brand">
@@ -24,68 +20,53 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
           <ul>
             <li>
               <a href="/" className="brand-link">
-  <div style={{ display: 'flex', alignItems: 'center' }}>
-    <img 
-      src={Logo} 
-      alt="Logo de pizza" 
-      className="brand-logo" 
-    />
-    <h1 style={{ margin: 15, lineHeight: '1.2' }}>
-      Mama Mian Pizza
-    </h1>
-  </div>
-
-
-</a>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <img src={Logo} alt="Logo de pizza" className="brand-logo" />
+                  <h1 style={{ margin: 15, lineHeight: '1.2' }}>Mama Mian Pizza</h1>
+                </div>
+              </a>
             </li>
           </ul>
         </nav>
       </div>
 
       <div className="navbar__links">
-      <ul>
-        <li><a href="/services">Servicios</a></li>
-        <li><a href="/sobrenosotros">Sobre Nosotros</a></li>
-      </ul>
-    </div>
-    <div className="navbar__icons">
-  {/* Usuario */}
-  <div className="navbar__user-section">
-    <Link to="/login" className="icon-button" aria-label="Usuario">
-      <FontAwesomeIcon
-        icon={faUser}
-        className="icon-img"
-        style={{ color: "#fff", background: "transparent" }}
-      />
-    </Link>
-  </div>
+      
+      </div>
 
-  {/* Menú hamburguesa */}
-  <button
-    className="navbar__toggle icon-button"
-    onClick={toggleMenu}
-    aria-label="Menú"
-  >
-    <FontAwesomeIcon icon={faBars} className="icon-img" />
-  </button>
+      <div className="navbar__icons">
+        {/* Usuario */}
+        <div className="navbar__user-section">
+          <Link to="/login" className="icon-button" aria-label="Usuario">
+            <FontAwesomeIcon icon={faUser} className="icon-img" style={{ color: "#fff", background: "transparent" }} />
+          </Link>
+        </div>
 
-  {/* Carrito */}
-  <button
-    className="icon-button cart-button"
-    aria-label="Carrito"
-    onClick={onCartToggle}
-  >
-    <FontAwesomeIcon
-      icon={faCartShopping}
-      className="icon-img"
-      style={{ color: "#fff", background: "transparent" }}
-    />
-    {cartItemCount > 0 && (
-      <span className="cart__badge">{cartItemCount}</span>
-    )}
-  </button>
-</div>
+        {/* Menú hamburguesa */}
+        <button className="navbar__toggle icon-button" onClick={toggleMenu} aria-label="Menú">
+          <FontAwesomeIcon icon={faBars} className="icon-img" />
+        </button>
 
+        {/* Carrito */}
+        <button className="icon-button cart-button" aria-label="Carrito" onClick={onCartToggle}>
+          <FontAwesomeIcon icon={faCartShopping} className="icon-img" style={{ color: "#fff", background: "transparent" }} />
+          {cartItemCount > 0 && <span className="cart__badge">{cartItemCount}</span>}
+        </button>
+      </div>
+
+      {/* Menú hamburguesa desplegable */}
+      {isMenuOpen && (
+        <div className="navbar__menu">
+          <ul>
+            <li>
+              <Link to="/services" onClick={() => setIsMenuOpen(false)}>Servicios</Link>
+            </li>
+            <li>
+              <Link to="/sobrenosotros" onClick={() => setIsMenuOpen(false)}>Sobre Nosotros</Link>
+            </li>
+          </ul>
+        </div>
+      )}
     </header>
   );
 };
