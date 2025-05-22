@@ -9,19 +9,23 @@ import Logo from '../../assets/Logo1.png';
 import './Navbar.css';
 
 const Navbar = ({ onCartToggle, cartItemCount }) => {
-  const [mostrarLinks, setMostrarLinks] = useState(false);
-
+  const [mostrarLinks, setMostrarLinks] = useState(false); // Para el usuario
+  const [menuOpen, setMenuOpen] = useState(false);         // Para el menú hamburguesa
+  
+  
   const toggleUserLinks = () => {
     setMostrarLinks(!mostrarLinks);
   };
-
+  
+    const toggleMenu = () => {
+      setMenuOpen(prev => !prev);
+    };
   return (
     <header className="navbar">
       <div className="navbar__brand">
         <nav className="navbar-title">
           <ul>
             <li>
-              <a href="/" className="brand-link">
               <a href="/" className="brand-link">
   <div style={{ display: 'flex', alignItems: 'center' }}>
     <img 
@@ -36,35 +40,50 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
 
 
 </a>
-              </a>
             </li>
           </ul>
         </nav>
       </div>
 
-      <nav className="navbar__links">
+      <div className="navbar__links">
+      <ul>
+        <li><a href="/services">Servicios</a></li>
+        <li><a href="/sobrenosotros">Sobre Nosotros</a></li>
+      </ul>
+    </div>
+
+    <button className="navbar__toggle" onClick={toggleMenu}>☰</button>
+
+    {menuOpen && (
+      <div className="navbar__menu">
         <ul>
           <li><a href="/services">Servicios</a></li>
-          <li className="extra-space"><a href="/sobrenosotros">Sobre Nosotros</a></li>        </ul>
-      </nav>
-
+          <li><a href="/sobrenosotros">Sobre Nosotros</a></li>
+        </ul>
+      </div>
+    )}
       <div className="navbar__icons">
         {/* Sección de usuario */}
         <div className="navbar__user-section">
-          <button
-            className="icon-button"
-            aria-label="Usuario"
-            onClick={toggleUserLinks}
-          >
-            {/* Ícono de usuario outline */}
-            <FontAwesomeIcon 
-              icon={faUser} 
-              className="icon-img" 
-              style={{ color: "#fff", background: "transparent" }} 
-            />
-          </button>
-        </div>
+      <button
+        className="icon-button"
+        aria-label="Usuario"
+        onClick={toggleUserLinks}
+      >
+        <FontAwesomeIcon
+          icon={faUser}
+          className="icon-img"
+          style={{ color: "#fff", background: "transparent" }}
+        />
+      </button>
 
+      <div className={`navbar__user-links ${mostrarLinks ? "" : "hidden"}`}>
+        <a href="/login">Iniciar Sesión</a>
+        <a href="/registro">Registrarse</a>
+      </div>
+    </div>
+
+      
         {/* Botón del carrito */}
         <button
           className="icon-button cart-button"

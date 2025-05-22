@@ -48,7 +48,7 @@ Bienvenidos a Mamá Mian Pizza. Bienvenidos a nuestro hogar.
           </p>
         </div>
         <div className="sobrenos-image-container">
-          <img src={quesoR} alt="Nuestra Filosofía" className="sobrenos-image" />
+          <img src={quesoR} alt="Nuestra Filosofía" className="sobrenos-image1" />
         </div>
       </div>
       <Footer noImage={true} />

@@ -1,116 +1,157 @@
 /* Contenedor principal: ocupa toda la pantalla y centra el contenido */
 .recover {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-  }
-  
-  /* Contenedor del formulario */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem; /* espacio para que no quede pegado en móviles */
+  box-sizing: border-box;
+}
+
+/* Contenedor del formulario */
+.recover__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #991B1B;
+  border-radius: 10px;
+  padding: 2rem;
+  width: clamp(300px, 45%, 600px);
+  background-color: #FFFFFF;
+  gap: 1.25rem;
+  box-sizing: border-box;
+}
+
+/* Cabecera */
+.recover__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.recover__header h3 {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  color: #991B1B;
+  margin: 0;
+}
+
+/* Contenido principal */
+.recover__main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.recover__text {
+  text-align: center;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #991B1B;
+  margin: 0;
+  width: 90%;
+}
+
+/* Formulario */
+.recover__form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Input de correo */
+.recover__input {
+  width: 90%;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid #991B1B;
+  padding: 0 0.75rem;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #991B1B;
+  box-sizing: border-box;
+}
+
+/* Botón para restablecer contraseña */
+.recover__btn {
+  border-radius: 10px;
+  padding: 0.75rem;
+  background-color: #feb248;
+  border: none;
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  width: 50%;
+  color: #991B1B;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.recover__btn:hover {
+  background-color: #991B1B;
+  color: #FFFFFF;
+}
+
+/* Pie de página */
+.recover__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.recover__link {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #991B1B;
+  text-decoration: none;
+}
+
+.recover__link:hover {
+  text-decoration: underline;
+}
+
+.recover__link:visited {
+  color: #991B1B;
+}
+
+/* MEDIA QUERIES para pantallas pequeñas (móviles y tabletas) */
+@media (max-width: 768px) {
   .recover__container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #991B1B;
-    border-radius: 10px;
-    padding: 2rem;
-    /* clamp(min, preferred, max) para ser responsive */
-    width: clamp(300px, 45%, 600px);
-    background-color: #FFFFFF;
-    gap: 1.25rem;
-  }
-  
-  /* Cabecera */
-  .recover__header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
-  
-  .recover__header h3 {
-    font-size: clamp(1.5rem, 2.5vw, 2rem);
-    color: #991B1B;
-    margin: 0;
-  }
-  
-  /* Contenido principal */
-  .recover__main {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .recover__text {
-    text-align: center;
-    font-size: clamp(1rem, 2vw, 1.2rem);
-    color: #991B1B;
-    margin: 0;
     width: 90%;
+    padding: 1.5rem;
   }
   
-  /* Formulario */
-  .recover__form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
-  
-  /* Input de correo */
-  .recover__input {
-    width: 90%;
-    height: 40px;
-    border-radius: 10px;
-    border: 1px solid #991B1B;
-    padding: 0 0.75rem;
-    font-size: clamp(1rem, 2vw, 1.2rem);
-    color: #991B1B;
-  }
-  
-  /* Botón para restablecer contraseña */
   .recover__btn {
-    border-radius: 10px;
-    padding: 0.75rem;
-    background-color: #feb248;
-    border: none;
-    font-size: clamp(1rem, 2vw, 1.1rem);
-    width: 50%;
-    color: #991B1B;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+    width: 70%;
   }
-  
-  .recover__btn:hover {
-    background-color: #991B1B;
-    color: #FFFFFF;
-  }
-  
-  /* Pie de página */
-  .recover__footer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
+
+  .recover__input {
     width: 100%;
   }
-  
-  .recover__link {
-    font-size: clamp(1rem, 2vw, 1.2rem);
-    color: #991B1B;
-    text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .recover__container {
+    width: 95%;
+    padding: 1rem;
   }
-  
-  .recover__link:hover {
-    text-decoration: underline;
+
+  .recover__btn {
+    width: 90%;
+    padding: 1rem;
+    font-size: 1rem;
   }
-  
-  .recover__link:visited {
-    color: #991B1B;
+
+  .recover__input {
+    width: 100%;
+    font-size: 1rem;
   }
-  
+
+  .recover__text {
+    width: 100%;
+    font-size: 1rem;
+  }
+}

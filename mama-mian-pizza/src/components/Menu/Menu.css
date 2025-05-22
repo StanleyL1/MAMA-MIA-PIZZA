@@ -257,3 +257,39 @@
     font-size: 0.9rem;
   }
 }
+@media (max-width: 480px) {
+  .menu-section-title {
+    font-size: 1.5rem;
+  }
+
+  .menu-category-button {
+    width: 100%;
+    padding: 0.8rem;
+  }
+
+  .menu-categories {
+    flex-direction: column;
+  }
+
+  .recommendation-title {
+    font-size: 1.2rem;
+  }
+
+  .menu-pizza-icon,
+  .menu-title-icon {
+    width: 24px;
+  }
+
+  .menu-recommendation-section {
+    padding: 2rem 1rem;
+  }
+
+  .loading-container p {
+    font-size: 1rem;
+  }
+
+  .no-products-message {
+    width: 95%;
+    padding: 1.5rem;
+  }
+}

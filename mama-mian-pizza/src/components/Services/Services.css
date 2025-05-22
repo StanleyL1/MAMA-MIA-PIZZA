@@ -184,3 +184,85 @@
   object-fit: cover;
   border-radius: 0 0 0 0; /* Ajusta si deseas borde redondeado */
 }
+@media (max-width: 1024px) {
+  .services-top-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .services-card {
+    max-width: 90%;
+    margin-bottom: 2rem;
+  }
+
+  .services-bottom-card {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    flex-direction: column;
+    margin-top: 40px;
+  }
+
+  .services-bottom-text {
+    padding: 1.5rem;
+    flex: unset;
+    width: 100%;
+  }
+
+  .services-bottom-image-container {
+    width: 100%;
+    height: auto;
+  }
+
+  .services-bottom-image {
+    width: 100%;
+    height: auto;
+    border-radius: 0;
+  }
+}
+
+/* Media queries para pantallas pequeñas (móviles) */
+@media (max-width: 480px) {
+  .services-title {
+    font-size: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .services-card-body {
+    gap: 2rem;
+  }
+
+  .services-card-image-container {
+    height: 250px; /* Imagen más pequeña en móviles */
+  }
+
+  .services-card-title-overlay {
+    font-size: 1rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .services-card {
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .services-bottom-text h2 {
+    font-size: 1.2rem;
+  }
+
+  .services-bottom-text p,
+  .services-bottom-text ul {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .services-reserve-button {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .services-bottom-image-container {
+    height: 200px;
+  }
+}
