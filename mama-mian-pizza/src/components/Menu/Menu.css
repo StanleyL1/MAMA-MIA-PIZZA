@@ -14,6 +14,11 @@
   margin-bottom: 3rem;
 }
 
+.menu-title-text {
+  margin-top: 3rem; /* ajusta según lo que necesites */
+  display: inline-block;
+}
+
 .menu-title-icon {
   width: 32px;
   height: auto;

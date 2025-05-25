@@ -101,14 +101,15 @@ const Menu = ({ onAddToCart }) => {
       
       {/* SECCIÓN: CATEGORÍAS Y BÚSQUEDA */}
       <section className="menu-categories-section">
-        <h2 className="menu-section-title">
-          Nuestro Menú
-          <img 
-            src={menuBookIcon} 
-            alt="Ícono Libro Menú" 
-            className="menu-title-icon" 
-          />
-        </h2>
+      <h2 className="menu-section-title">
+  <span className="menu-title-text">Nuestro Menú</span>
+  <img 
+    src={menuBookIcon} 
+    alt="Ícono Libro Menú" 
+    className="menu-title-icon" 
+  />
+</h2>
+
         <div className="menu-categories">
           <button
             className={`menu-category-button ${activeCategory === "Todos" ? "active" : ""}`}
