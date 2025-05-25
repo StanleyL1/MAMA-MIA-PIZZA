@@ -3,7 +3,8 @@
     position: fixed;
     bottom: 34px;
     right: 69px;
-    z-index: 1000;
+    z-index: 9999;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
   }
   
   .social-media-button {

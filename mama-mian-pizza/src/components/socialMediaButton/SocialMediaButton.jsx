@@ -1,6 +1,5 @@
-// SocialMediaButton.jsx
-import React, { useState } from 'react';
-import { MessageSquareMore , X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MessageSquareMore, X } from 'lucide-react';
 import SocialIcon from './SocialIcon';
 import './SocialMediaButton.css';
 
@@ -20,15 +19,42 @@ const socialPlatforms = [
     color: '#E1306C',
     url: 'https://instagram.com/',
   },
-
 ];
 
 export default function SocialMediaButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const fullHeight = document.body.scrollHeight;
+
+      const scrollPercentage = (scrollTop + windowHeight) / fullHeight;
+
+      if (scrollPercentage >= 0.9) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Ejecutar una vez al montar
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  if (!isVisible) return null;
 
   return (
     <div className="social-media-container">
