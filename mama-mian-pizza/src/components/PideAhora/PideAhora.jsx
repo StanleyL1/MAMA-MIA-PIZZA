@@ -326,7 +326,7 @@ const PideAhora = ({ cartItems = [] }) => {
           : {
               // Información de dirección mínima cuando se recoge en local
               tipo_direccion: 'local',
-              direccion: "Av. Principal #123, Puerto Parada, Jiquilisco",
+              direccion: "CP #3417, Puerto El Triunfo, EL salvador",
               pais: "El Salvador",
               departamento: "Usulután",
               municipio: "Jiquilisco"
@@ -696,9 +696,7 @@ const PideAhora = ({ cartItems = [] }) => {
                             className="select-departamento"
                           >
                             <option value="">Seleccionar...</option>
-                            <option value="Usulután">Jiquilisco</option>
                             <option value="San Salvador">Usulutan</option>
-                            <option value="La Libertad">La Libertad</option>
                           </select>
                         </div>
                         <div className="campo">
@@ -812,7 +810,7 @@ const PideAhora = ({ cartItems = [] }) => {
                       <div className="alerta-cobertura">
                         <FaExclamationTriangle className="warning-icon" />
                         <p>
-                          Cobertura de entrega en Puerto Parada y en Jiquilisco, Usulután, El Salvador
+                          Cobertura de entrega en Puerto el triunfo y Jiquilisco, Usulután, El Salvador
                         </p>
                       </div>
                     </div>
@@ -824,9 +822,10 @@ const PideAhora = ({ cartItems = [] }) => {
                 <div className="contenido-recoger-local">
                   <div className="info-local">
                     <h4>Información del local</h4>
-                    <p><strong>Dirección:</strong> Av. Principal #123, Puerto Parada, Jiquilisco</p>
-                    <p><strong>Horario:</strong> Lunes a Domingo de 11:00 AM a 10:00 PM</p>
-                    <p><strong>Teléfono:</strong> +503 2222-3333</p>
+                    <p><strong>Dirección:</strong>CP #3417, Puerto El Triunfo, EL salvador</p>
+                    <p><strong>Horario:</strong> Lunes a Viernes de 10:00 AM a 07:00 PM, Sabado y Domingo de 10:00
+                    a 08:00 PM</p>
+                    <p><strong>Teléfono:</strong> +503 7515-5863</p>
                     <div className="nota-importante">
                       <FaExclamationTriangle className="warning-icon" />
                       <p>Tu pedido estará listo para recoger en aproximadamente 25-30 minutos</p>
@@ -863,7 +862,7 @@ const PideAhora = ({ cartItems = [] }) => {
         <FaCreditCard 
           className={`icono-metodo ${pagoMetodo === 'tarjeta' ? 'active-icon' : ''}`}
         />
-        <span>Tarjeta</span>
+        <span>Transferencia bancaria</span>
       </button>
       {/* Segundo botón: Efectivo */}
       <button
@@ -1000,7 +999,7 @@ const PideAhora = ({ cartItems = [] }) => {
           </div>
           <div className="metodo-details">
             <p className="metodo-tipo">Recoger en local</p>
-            <p>Av. Principal #123, Puerto Parada, Jiquilisco</p>
+            <p>CP #3417, Puerto El Triunfo, EL salvador</p>
             <p className="metodo-tiempo">Tiempo estimado para recoger: 25-30 minutos</p>
           </div>
         </div>
@@ -1104,7 +1103,7 @@ const PideAhora = ({ cartItems = [] }) => {
                 cursor: aceptoTerminos ? 'pointer' : 'not-allowed'
               }}
             >
-              Aceptar y Realizar Pedido
+              Aceptar y realizar pedido
             </button>
           </div>
         </div>

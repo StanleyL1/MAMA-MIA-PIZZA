@@ -22,7 +22,7 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
               <a href="/" className="brand-link">
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <img src={Logo} alt="Logo de pizza" className="brand-logo" />
-                  <h1 style={{ margin: 15, lineHeight: '1.2' }}>Mama Mian Pizza</h1>
+                  <h1 style={{ margin: 15, lineHeight: '1.2' }}>Mamá Mian Pizza</h1>
                 </div>
               </a>
             </li>

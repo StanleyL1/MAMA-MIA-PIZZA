@@ -130,12 +130,6 @@ const Menu = ({ onAddToCart }) => {
             Bebidas
           </button>
           <button
-            className={`menu-category-button ${activeCategory === "Postres" ? "active" : ""}`}
-            onClick={() => handleCategoryChange("Postres")}
-          >
-            Postres
-          </button>
-          <button
             className={`menu-category-button ${activeCategory === "Complementos" ? "active" : ""}`}
             onClick={() => handleCategoryChange("Complementos")}
           >

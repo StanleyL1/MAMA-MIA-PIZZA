@@ -82,7 +82,7 @@
 }
 
 .modal__left {
-  flex: 1.3;
+  flex: 1.2;
   overflow: hidden;
 }
 
@@ -98,7 +98,7 @@
   display: flex;
   flex-direction: column;
   width: auto;
-  padding:0.1rem;
+  padding:1.3rem;
   gap: 1rem;
   text-align: left;
   justify-content: space-between;
