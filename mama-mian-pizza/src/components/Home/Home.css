@@ -19,19 +19,6 @@ body{
   gap: 40px;
 }
 
-.hero__container{
-  background-image: url(../../assets/PizzaPrin.png);
-  background-size: 100%;
-  background-repeat: no-repeat;
-  height: 600px;
-  display: flex;
-  align-items: flex-start;
-  flex-direction: column;
-  padding: 40px;
-  color: #FFFFFF;
-  margin: 1px 0;
-  justify-content: center;
-}
 
 .hero__text__container{
   width: 400px;
