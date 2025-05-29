@@ -1,4 +1,7 @@
 @import '../../styles/variables.css';
+body {
+  overflow-x: hidden;
+}
 
 *{
   margin: 0;
