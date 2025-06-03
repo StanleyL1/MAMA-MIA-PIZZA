@@ -11,10 +11,6 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
 const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-const toggleUserMenu = () => {
-  setIsUserMenuOpen(prev => !prev);
-  setIsMobileMenuOpen(false);
-};
 
 const toggleMobileMenu = () => {
   setIsMobileMenuOpen(prev => !prev);
