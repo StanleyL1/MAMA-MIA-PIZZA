@@ -6,9 +6,23 @@ import Logo from '../../assets/Logo1.png';
 import './Navbar.css';
 import { Link } from 'react-router-dom';
 
+
 const Navbar = ({ onCartToggle, cartItemCount }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+const toggleUserMenu = () => {
+  setIsUserMenuOpen(prev => !prev);
+  setIsMobileMenuOpen(false);
+};
+
+const toggleMobileMenu = () => {
+  setIsMobileMenuOpen(prev => !prev);
+  setIsUserMenuOpen(false);
+};
+
+
+
 
 
   return (
@@ -42,13 +56,21 @@ const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
       <div className="navbar__icons">
         {/* Usuario */}
       <div className="navbar__user-section">
-  <button
-    className="icon-button"
-    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-    aria-label="Usuario"
-  >
-    <FontAwesomeIcon icon={faUser} className="icon-img" style={{ color: "#fff", background: "transparent" }} />
-  </button>
+<button
+  className="icon-button"
+  onClick={() => {
+    if (window.innerWidth > 768) {
+      window.location.href = "/login";
+    } else {
+      setIsUserMenuOpen(prev => !prev);
+      setIsMobileMenuOpen(false);
+    }
+  }}
+  aria-label="Usuario"
+>
+  <FontAwesomeIcon icon={faUser} className="icon-img" />
+</button>
+
 
   {isUserMenuOpen && (
     <ul className="user-dropdown">
@@ -65,13 +87,13 @@ const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
         </button>
 
         {/* Menú Hamburguesa - visible solo en mobile */}
-        <button
-          className="hamburger-button"
-          aria-label="Menú"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          <FontAwesomeIcon icon={faBars} style={{ color: "#fff" }} />
-        </button>
+       <button
+  className="hamburger-button"
+  aria-label="Menú"
+  onClick={toggleMobileMenu}
+>
+  <FontAwesomeIcon icon={faBars} />
+</button>
       </div>
 
       {/* Menú desplegable en modo móvil */}
