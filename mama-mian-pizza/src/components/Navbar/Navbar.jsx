@@ -7,11 +7,9 @@ import './Navbar.css';
 import { Link } from 'react-router-dom';
 
 const Navbar = ({ onCartToggle, cartItemCount }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(prev => !prev);
-  };
 
   return (
     <header className="navbar">
@@ -30,38 +28,58 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
         </nav>
       </div>
 
-      <div className="navbar__links">
+  
+
+   <div className="navbar__links">
         <ul>
           <li><a href="/services">Servicios</a></li>
           <li><a href="/sobrenosotros">Sobre Nosotros</a></li>
         </ul>
       </div>
 
+
+
       <div className="navbar__icons">
         {/* Usuario */}
-        <div className="navbar__user-section">
-          <Link to="/login" className="icon-button" aria-label="Usuario">
-            <FontAwesomeIcon icon={faUser} className="icon-img" style={{ color: "#fff", background: "transparent" }} />
-          </Link>
-        </div>
+      <div className="navbar__user-section">
+  <button
+    className="icon-button"
+    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+    aria-label="Usuario"
+  >
+    <FontAwesomeIcon icon={faUser} className="icon-img" style={{ color: "#fff", background: "transparent" }} />
+  </button>
 
-        {/* Menú hamburguesa */}
-        <button className="navbar__toggle icon-button" onClick={toggleMenu} aria-label="Menú">
-          <FontAwesomeIcon icon={faBars} className="icon-img" />
-        </button>
+  {isUserMenuOpen && (
+    <ul className="user-dropdown">
+      <li><Link to="/login" onClick={() => setIsUserMenuOpen(false)}>Iniciar Sesión</Link></li>
+      <li><Link to="/register" onClick={() => setIsUserMenuOpen(false)}>Registrarse</Link></li>
+    </ul>
+  )}
+</div>
 
         {/* Carrito */}
         <button className="icon-button cart-button" aria-label="Carrito" onClick={onCartToggle}>
           <FontAwesomeIcon icon={faCartShopping} className="icon-img" style={{ color: "#fff", background: "transparent" }} />
           {cartItemCount > 0 && <span className="cart__badge">{cartItemCount}</span>}
         </button>
+
+        {/* Menú Hamburguesa - visible solo en mobile */}
+        <button
+          className="hamburger-button"
+          aria-label="Menú"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          <FontAwesomeIcon icon={faBars} style={{ color: "#fff" }} />
+        </button>
       </div>
 
-      {/* Menú hamburguesa desplegable */}
-      {isMenuOpen && (
-        <div className="navbar__menu">
-        
-        </div>
+      {/* Menú desplegable en modo móvil */}
+      {isMobileMenuOpen && (
+        <ul className="mobile-menu">
+          <li><Link to="/Services" onClick={() => setIsMobileMenuOpen(false)}>Servicio</Link></li>
+          <li><Link to="/SobreNosotros" onClick={() => setIsMobileMenuOpen(false)}>Sobre Nosotros</Link></li>
+        </ul>
       )}
     </header>
   );
