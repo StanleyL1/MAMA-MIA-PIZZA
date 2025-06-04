@@ -158,7 +158,7 @@ const Home = ({ onAddToCart }) => {
 
       {/* Por qué elegir Mama Mian */}
       <section className="whyus__section">
-        <h2 className="whyus__header">¿Por qué elegir Mama Mian Pizza?</h2>
+        <h2 className="whyus__header">¿Por qué elegir Mamá Mian Pizza?</h2>
         <div className="whyus__contentt">
           <div className="whyus__cards">
             <i><FontAwesomeIcon icon={faClock} /></i>
@@ -171,14 +171,14 @@ const Home = ({ onAddToCart }) => {
             <i><FontAwesomeIcon icon={faMedal} /></i>
             <h3 className="whyus__card__title">Recetas premiadas</h3>
             <p className="whyus__card__description">
-              Nuestras pizzas han ganado múltiples premios por su sabor único.
+              Nuestros clientes tienen la opcion de personalizar sus pizzas a su gusto
             </p>
           </div>
           <div className="whyus__cards">
             <i><FontAwesomeIcon icon={faTruck} /></i>
             <h3 className="whyus__card__title">Envío gratuito</h3>
             <p className="whyus__card__description">
-              Disfruta de envío gratis en todos los pedidos superiores a $25.
+              Disfruta de envío gratis solamente en el area de Puerto el triunfo, en todos los pedidos superiores a $25.
             </p>
           </div>
           <div className="whyus__cards">

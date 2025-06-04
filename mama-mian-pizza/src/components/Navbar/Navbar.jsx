@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
-// Importa el componente de Font Awesome y los íconos necesarios
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// Nota: faUser en free-regular para que se vea como outline
 import { faUser } from '@fortawesome/free-regular-svg-icons';
-// Los siguientes íconos se usan en versión sólida (porque no tienen variante outline gratuita)
-import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faCartShopping } from '@fortawesome/free-solid-svg-icons';
 import Logo from '../../assets/Logo1.png';
 import './Navbar.css';
+import { Link } from 'react-router-dom';
+
 
 const Navbar = ({ onCartToggle, cartItemCount }) => {
-  const [mostrarLinks, setMostrarLinks] = useState(false); // Para el usuario
-  const [menuOpen, setMenuOpen] = useState(false);         // Para el menú hamburguesa
-  
-  
-  const toggleUserLinks = () => {
-    setMostrarLinks(!mostrarLinks);
-  };
-  
-    const toggleMenu = () => {
-      setMenuOpen(prev => !prev);
-    };
+const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+
+const toggleMobileMenu = () => {
+  setIsMobileMenuOpen(prev => !prev);
+  setIsUserMenuOpen(false);
+};
+
+
+
+
+
   return (
     <header className="navbar">
       <div className="navbar__brand">
@@ -27,79 +28,77 @@ const Navbar = ({ onCartToggle, cartItemCount }) => {
           <ul>
             <li>
               <a href="/" className="brand-link">
-  <div style={{ display: 'flex', alignItems: 'center' }}>
-    <img 
-      src={Logo} 
-      alt="Logo de pizza" 
-      className="brand-logo" 
-    />
-    <h1 style={{ margin: 15, lineHeight: '1.2' }}>
-      Mama Mian Pizza
-    </h1>
-  </div>
-
-
-</a>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <img src={Logo} alt="Logo de pizza" className="brand-logo" />
+                  <h1 style={{ margin: 15, lineHeight: '1.2' }}>Mamá Mian Pizza</h1>
+                </div>
+              </a>
             </li>
           </ul>
         </nav>
       </div>
 
-      <div className="navbar__links">
-      <ul>
-        <li><a href="/services">Servicios</a></li>
-        <li><a href="/sobrenosotros">Sobre Nosotros</a></li>
-      </ul>
-    </div>
+  
 
-    <button className="navbar__toggle" onClick={toggleMenu}>☰</button>
-
-    {menuOpen && (
-      <div className="navbar__menu">
+   <div className="navbar__links">
         <ul>
           <li><a href="/services">Servicios</a></li>
           <li><a href="/sobrenosotros">Sobre Nosotros</a></li>
         </ul>
       </div>
-    )}
+
+
+
       <div className="navbar__icons">
-        {/* Sección de usuario */}
-        <div className="navbar__user-section">
-      <button
-        className="icon-button"
-        aria-label="Usuario"
-        onClick={toggleUserLinks}
-      >
-        <FontAwesomeIcon
-          icon={faUser}
-          className="icon-img"
-          style={{ color: "#fff", background: "transparent" }}
-        />
-      </button>
+        {/* Usuario */}
+      <div className="navbar__user-section">
+<button
+  className="icon-button"
+  onClick={() => {
+    if (window.innerWidth > 768) {
+      window.location.href = "/login";
+    } else {
+      setIsUserMenuOpen(prev => !prev);
+      setIsMobileMenuOpen(false);
+    }
+  }}
+  aria-label="Usuario"
+>
+  <FontAwesomeIcon icon={faUser} className="icon-img" />
+</button>
 
-      <div className={`navbar__user-links ${mostrarLinks ? "" : "hidden"}`}>
-        <a href="/login">Iniciar Sesión</a>
-        <a href="/registro">Registrarse</a>
-      </div>
-    </div>
 
-      
-        {/* Botón del carrito */}
-        <button
-          className="icon-button cart-button"
-          aria-label="Carrito"
-          onClick={onCartToggle}
-        >
-          <FontAwesomeIcon 
-            icon={faCartShopping} 
-            className="icon-img" 
-            style={{ color: "#fff", background: "transparent" }} 
-          />
-          {cartItemCount > 0 && (
-            <span className="cart__badge">{cartItemCount}</span>
-          )}
+  {isUserMenuOpen && (
+    <ul className="user-dropdown">
+      <li><Link to="/login" onClick={() => setIsUserMenuOpen(false)}>Iniciar Sesión</Link></li>
+      <li><Link to="/register" onClick={() => setIsUserMenuOpen(false)}>Registrarse</Link></li>
+    </ul>
+  )}
+</div>
+
+        {/* Carrito */}
+        <button className="icon-button cart-button" aria-label="Carrito" onClick={onCartToggle}>
+          <FontAwesomeIcon icon={faCartShopping} className="icon-img" style={{ color: "#fff", background: "transparent" }} />
+          {cartItemCount > 0 && <span className="cart__badge">{cartItemCount}</span>}
         </button>
+
+        {/* Menú Hamburguesa - visible solo en mobile */}
+       <button
+  className="hamburger-button"
+  aria-label="Menú"
+  onClick={toggleMobileMenu}
+>
+  <FontAwesomeIcon icon={faBars} />
+</button>
       </div>
+
+      {/* Menú desplegable en modo móvil */}
+      {isMobileMenuOpen && (
+        <ul className="mobile-menu">
+          <li><Link to="/Services" onClick={() => setIsMobileMenuOpen(false)}>Servicio</Link></li>
+          <li><Link to="/SobreNosotros" onClick={() => setIsMobileMenuOpen(false)}>Sobre Nosotros</Link></li>
+        </ul>
+      )}
     </header>
   );
 };

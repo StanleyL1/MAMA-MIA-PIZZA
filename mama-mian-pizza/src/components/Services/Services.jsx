@@ -36,13 +36,12 @@ function Services() {
           </div>
           <div className="services-card-body">
             <p>
-              Haz que tu evento sea inolvidable con nuestro servicio de catering de pizzas.
-              Desde eventos corporativos hasta bodas, ofrecemos una experiencia gastronómica 
-              única que encantará a sus invitados.
+            Lleva el sabor de nuestra pizzería directo a tu hogar.
+Disfruta de nuestras pizzas artesanales con servicio a domicilio para tus celebraciones, reuniones o momentos especiales.
             </p>
             <div className="services-card-icon-label">
               <img src={iconoCamion} alt="Disponible" />
-              <span><strong>Disponible en todo el país</strong></span>
+              <span><strong>Disponible en Jiquilisco y Puerto el Triunfo</strong></span>
             </div>
           </div>
         </div>
@@ -57,10 +56,9 @@ function Services() {
           </div>
           <div className="services-card-body">
             <p>
-              Haz que tu evento sea inolvidable con nuestro servicio de catering de pizzas.
-              Desde eventos corporativos hasta bodas, ofrecemos una experiencia gastronómica 
-              única que encantará a sus invitados.
-            </p>
+            ¡Pide, pasa y disfruta! 
+Tus pizzas favoritas y personalizadas listas llevar, recién horneadas y llenas de sabor.
+Haz tu pedido y recógelo en nuestro local sin esperas.</p>
             <div className="services-card-icon-label">
               <img src={iconoGrupo} alt="Grupo" />
               <span><strong>Perfecto para grupos de cualquier tamaño</strong></span>

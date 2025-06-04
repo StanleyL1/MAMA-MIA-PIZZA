@@ -36,7 +36,8 @@
   font-family: 'Bold', sans-serif;
   border-radius: 8px;
   max-width: 100%;
-  text-align: left;
+  text-align: center;
+  margin-left: 12%;
   flex: 1;
 }
 

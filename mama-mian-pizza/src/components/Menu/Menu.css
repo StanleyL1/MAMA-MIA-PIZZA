@@ -11,7 +11,12 @@
 .menu-section-title {
   font-size: 2rem;
   color: var(--primary-color);
-  margin-bottom: 1rem;
+  margin-bottom: 3rem;
+}
+
+.menu-title-text {
+  margin-top: 3rem; /* ajusta según lo que necesites */
+  display: inline-block;
 }
 
 .menu-title-icon {
@@ -55,6 +60,7 @@
 .menu-search-container {
   position: relative;
   width: 250px;
+  left: 43%;
 }
 
 .menu-search-input {
@@ -190,16 +196,27 @@
     align-items: stretch;
     gap: 0.75rem;
   }
-
+/* Responsive: para pantallas pequeñas */
+@media screen and (max-width: 768px) {
   .menu-category-button {
-    width: 100%;
-    padding: 0.75rem;
     font-size: 1rem;
+    padding: 0.3rem 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
   }
 
+}
+
   .menu-search-container {
-    width: 100%;
+  
     margin-top: 1rem;
+    left:20%;
   }
 
   .menu-search-input {
@@ -231,11 +248,7 @@
     font-size: 1.25rem;
   }
 
-  .menu-category-button {
-    font-size: 0.95rem;
-    padding: 0.6rem 1rem;
-  }
-
+ 
   .menu-search-input {
     font-size: 0.9rem;
   }
@@ -262,10 +275,7 @@
     font-size: 1.5rem;
   }
 
-  .menu-category-button {
-    width: 100%;
-    padding: 0.8rem;
-  }
+
 
   .menu-categories {
     flex-direction: column;

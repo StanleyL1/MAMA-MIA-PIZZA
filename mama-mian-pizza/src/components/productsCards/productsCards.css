@@ -5,8 +5,8 @@
   border-radius: 10px;
   background-color: #fff;
   width: 100%;
-  max-width: 450px;
-  height: 550px; /* Altura fija para mantener consistencia */
+  max-width: 550px;
+  height: 650px; /* Altura fija para mantener consistencia */
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
   margin: 15px 0;
   overflow: hidden; /* Evita que el contenido sobresalga */
@@ -19,7 +19,7 @@
 
 .prodcard-image-container {
   width: 100%;
-  height: 250px; /* Altura fija para todas las imágenes */
+  height: 370px; /* Altura fija para todas las imágenes */
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -28,7 +28,7 @@
 
 .prodcard-image {
   width: 100%;
-  height: 100%;
+  height: 400px;
   object-fit: cover; /* Cambiado a cover para llenar el espacio uniformemente */
   object-position: center; /* Centra la imagen */
   transition: transform 0.3s ease;

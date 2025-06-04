@@ -128,7 +128,7 @@ const Register = () => {
               <div className="register__select-arrow"></div>
             </div>
             <p className="register__instructions">
-              Debe contener al menos 8 caracteres, 1 número y 1 caracter especial.
+            Debe contener al menos 8 caracteres, 1 número y 1 carácter especial.
             </p>
           </form>
         </main>

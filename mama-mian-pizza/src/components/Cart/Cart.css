@@ -252,3 +252,89 @@
   text-align: center;
   margin-top: 1rem;
 }
+@keyframes hideInstant {
+  to {
+    transform: translateX(100%);
+    visibility: hidden;
+  }
+}
+.cart__panel {
+  transition: transform 0s ease;
+  transform: translateX(100%);
+  visibility: hidden;
+}
+
+.cart__panel.cart__open {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+/* Para ocultar sin transición, usamos una animación */
+.cart__panel.closing {
+  animation: hideInstant 0.00s forwards;
+}
+
+@media screen and (max-width: 768px) {
+  /* Ocultar la imagen */
+  .cart__item-image {
+    display: none;
+  }
+  
+  /* Ajustes en cada item: fila para nombre + precio */
+  .cart__item {
+    gap: 0.8rem;
+    padding-bottom: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+     /* Borde lateral izquierdo */
+    border-left: 3px solid var(--primary-color);
+    padding-left: 0.5rem; /* para que el contenido no quede pegado al borde */
+    margin-bottom: 1rem;
+  }
+  
+  /* Contenedor de detalles ocupa todo el ancho */
+  .cart__item-details {
+    width: 100%;
+  }
+  
+  /* Ocultar icono de basurero */
+  .cart__trash-icon {
+    display: none;
+  }
+
+  /* Ocultar descripción */
+  .cart__item-desc {
+    display: none;
+  }
+  
+  /* Nombre y precio en la misma línea */
+  .cart__item-line1 {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Nombre más grande */
+  .cart-item-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+
+  /* Precio al lado del nombre, tamaño medio */
+  .cart-item-price {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    white-space: nowrap;
+  }
+  
+  /* Ajuste ancho panel carrito */
+  .cart__panel {
+    width: 90vw;
+    max-width: 260px;
+    right: 0;
+  }
+}
+

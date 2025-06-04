@@ -126,7 +126,7 @@
   padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: auto;
 }
 
 /* Título en la sección inferior */

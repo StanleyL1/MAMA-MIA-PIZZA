@@ -95,18 +95,23 @@
     font-size: 1.2rem;
     color: #991B1B;
     margin: 0;
+    text-decoration: underline; /* Subrayado */
 }
 .login__footer a{
     font-size: 1.2rem;
     color: #991B1B;
     text-decoration: none;
+    font-weight: 600;    
+
 }
 
 .login__footer a:hover{
     text-decoration: underline;
 }
 .login__footer a:visited{
-    color: #991B1B;
+    font-weight: 900;    
+    color: #000000;
+
 }
 
 /* Para pantallas grandes */

@@ -1,4 +1,7 @@
 @import '../../styles/variables.css';
+body {
+  overflow-x: hidden;
+}
 
 *{
   margin: 0;
@@ -19,19 +22,6 @@ body{
   gap: 40px;
 }
 
-.hero__container{
-  background-image: url(../../assets/PizzaPrin.png);
-  background-size: 100%;
-  background-repeat: no-repeat;
-  height: 600px;
-  display: flex;
-  align-items: flex-start;
-  flex-direction: column;
-  padding: 40px;
-  color: #FFFFFF;
-  margin: 1px 0;
-  justify-content: center;
-}
 
 .hero__text__container{
   width: 400px;
@@ -62,11 +52,6 @@ body{
   height: 18%;
   font-weight: bold;
   border-radius: 10px;
-}
-
-.hero__button a{
-  text-decoration: none;
-  color: #991B1B;
 }
 
 .house__choice__section{
@@ -400,7 +385,7 @@ body{
     font-size: 1.2rem;
   }
   .hero__button {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     padding: 8px 16px;
   }
   .house__choice__section,
@@ -468,10 +453,7 @@ body{
   .hero__text {
     font-size: 1.3rem;
   }
-  .hero__button {
-    font-size: 1.3rem;
-    padding: 9px 18px;
-  }
+  
   .house__choice__section,
   .trending__section,
   .whyus__section,
@@ -560,18 +542,6 @@ body{
   text-align: justify;
 }
 
-.hero__button {
-  background-color: #FEB248;
-  color: #821717;
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  font-size: 1.4rem;
-  width: 38%;
-  height: 18%;
-  font-weight: bold;
-  border-radius: 10px;
-}
 
 .hero__button .link {
   text-decoration: none;

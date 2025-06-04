@@ -101,14 +101,15 @@ const Menu = ({ onAddToCart }) => {
       
       {/* SECCIÓN: CATEGORÍAS Y BÚSQUEDA */}
       <section className="menu-categories-section">
-        <h2 className="menu-section-title">
-          Nuestro Menú
-          <img 
-            src={menuBookIcon} 
-            alt="Ícono Libro Menú" 
-            className="menu-title-icon" 
-          />
-        </h2>
+      <h2 className="menu-section-title">
+  <span className="menu-title-text">Nuestro Menú</span>
+  <img 
+    src={menuBookIcon} 
+    alt="Ícono Libro Menú" 
+    className="menu-title-icon" 
+  />
+</h2>
+
         <div className="menu-categories">
           <button
             className={`menu-category-button ${activeCategory === "Todos" ? "active" : ""}`}
@@ -129,18 +130,14 @@ const Menu = ({ onAddToCart }) => {
             Bebidas
           </button>
           <button
-            className={`menu-category-button ${activeCategory === "Postres" ? "active" : ""}`}
-            onClick={() => handleCategoryChange("Postres")}
-          >
-            Postres
-          </button>
-          <button
             className={`menu-category-button ${activeCategory === "Complementos" ? "active" : ""}`}
             onClick={() => handleCategoryChange("Complementos")}
           >
             Complementos
           </button>
-          <div className="menu-search-container">
+          
+        </div>
+        <div className="menu-search-container">
             <input
               type="text"
               placeholder="Buscar..."
@@ -154,7 +151,6 @@ const Menu = ({ onAddToCart }) => {
               className="menu-search-icon" 
             />
           </div>
-        </div>
       </section>
 
       {/* SECCIÓN: PRODUCTOS FILTRADOS */}
