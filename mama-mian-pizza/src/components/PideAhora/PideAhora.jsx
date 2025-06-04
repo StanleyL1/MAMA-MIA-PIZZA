@@ -110,6 +110,13 @@ const PideAhora = ({ cartItems = [] }) => {
     });
   };
 
+const redirigirAWompi = () => {
+  window.open("https://u.wompi.sv/398524Auq", "_blank");
+};
+
+
+
+
   // Función para obtener la ubicación del usuario
   const getLocation = () => {
     // Restablecer estados
@@ -123,6 +130,10 @@ const PideAhora = ({ cartItems = [] }) => {
     if (!navigator.geolocation) {
       setLocationError('Tu navegador no soporta geolocalización.');
       setIsLocating(false);
+
+ 
+
+
       return;
     }
     
@@ -854,91 +865,28 @@ const PideAhora = ({ cartItems = [] }) => {
     <h3 className="titulo-compra">Método de Pago</h3>
     <p className="descripcion-pago">Elige cómo quieres pagar tu pedido</p>
     <div className="toggle-pago">
-      {/* Primer botón: Tarjeta */}
-      <button
-        className={`toggle-btn ${pagoMetodo === 'tarjeta' ? 'activo' : ''}`}
-        onClick={() => setPagoMetodo('tarjeta')}
-      >
-        <FaCreditCard 
-          className={`icono-metodo ${pagoMetodo === 'tarjeta' ? 'active-icon' : ''}`}
-        />
-        <span>Transferencia bancaria</span>
-      </button>
-      {/* Segundo botón: Efectivo */}
-      <button
-        className={`toggle-btn ${pagoMetodo === 'efectivo' ? 'activo' : ''}`}
-        onClick={() => setPagoMetodo('efectivo')}
-      >
-        <FaMoneyBillWave 
-          className={`icono-metodo ${pagoMetodo === 'efectivo' ? 'active-icon' : ''}`}
-        />
-        <span>Efectivo</span>
-      </button>
-    </div>
+  <button
+    className={`toggle-btn ${pagoMetodo === 'transferencia' ? 'activo' : ''}`}
+    onClick={() => {
+      setPagoMetodo('transferencia');
+      redirigirAWompi();
+    }}
+  >
+    <FaCreditCard className={`icono-metodo ${pagoMetodo === 'transferencia' ? 'active-icon' : ''}`} />
+    <span>Transferencia bancaria</span>
+  </button>
 
-    {pagoMetodo === 'tarjeta' && (
-      <div className="detalle-pago">
-        <h4>Detalles de Tarjeta</h4>
-        <div className="form-tarjeta">
-          <div className="campo">
-            <label htmlFor="nombreTarjeta">Nombre en la tarjeta</label>
-            <input
-              type="text"
-              id="nombreTarjeta"
-              name="nombreTarjeta"
-              value={nombreTarjeta}
-              onChange={(e) => setNombreTarjeta(e.target.value)}
-              placeholder="Como aparece en la tarjeta"
-              className="input-full"
-            />
-          </div>
-          <div className="campo">
-            <label htmlFor="numeroTarjeta">Número de tarjeta</label>
-            <input
-              type="text"
-              id="numeroTarjeta"
-              name="numeroTarjeta"
-              value={numeroTarjeta}
-              onChange={(e) => setNumeroTarjeta(e.target.value)}
-              placeholder="1234 5678 9012 3456"
-              maxLength={16}
-              className="input-full"
-            />
-          </div>
-          <div className="fila-tarjeta">
-            <div className="campo">
-              <label htmlFor="fechaExp">Fecha de expiración</label>
-              <input
-                type="month"
-                id="fechaExp"
-                name="fechaExp"
-                value={fechaExp}
-                placeholder='MM/AA'
-                onChange={(e) => setFechaExp(e.target.value)}
-                className="input-full"
-              />
-            </div>
-            <div className="campo">
-              <label htmlFor="cvv">CVV</label>
-              <input
-                type="text"
-                id="cvv"
-                name="cvv"
-                value={cvv}
-                onChange={(e) => setCvv(e.target.value)}
-                placeholder="123"
-                maxLength={3}
-                className="input-full"
-              />
-            </div>
-          </div>
-          <div className="seguridad-info">
-            <FaLock className="icono-seguridadd" />
-            <span>Tus datos están Protegidos con encriptación de alta seguridad</span>
-          </div>
-        </div>
-      </div>
-    )}
+  <button
+    className={`toggle-btn ${pagoMetodo === 'efectivo' ? 'activo' : ''}`}
+    onClick={() => setPagoMetodo('efectivo')}
+  >
+    <FaMoneyBillWave className={`icono-metodo ${pagoMetodo === 'efectivo' ? 'active-icon' : ''}`} />
+    <span>Efectivo</span>
+  </button>
+</div>
+
+
+
 
     {pagoMetodo === 'efectivo' && (
       <div className="detalle-pagos">
@@ -1051,9 +999,7 @@ const PideAhora = ({ cartItems = [] }) => {
               <FaCreditCard className="metodo-icon pago-icon" />
             </div>
             <div className="metodo-details">
-              <p className="metodo-tipo">Tarjeta de crédito o débito</p>
-              <p>**** **** **** {numeroTarjeta.slice(-4)}</p>
-              <p>Titular: {nombreTarjeta}</p>
+            
             </div>
           </div>
         )}
