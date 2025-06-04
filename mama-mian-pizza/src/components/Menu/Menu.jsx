@@ -135,7 +135,9 @@ const Menu = ({ onAddToCart }) => {
           >
             Complementos
           </button>
-          <div className="menu-search-container">
+          
+        </div>
+        <div className="menu-search-container">
             <input
               type="text"
               placeholder="Buscar..."
@@ -149,7 +151,6 @@ const Menu = ({ onAddToCart }) => {
               className="menu-search-icon" 
             />
           </div>
-        </div>
       </section>
 
       {/* SECCIÓN: PRODUCTOS FILTRADOS */}
