@@ -367,10 +367,10 @@ const PideAhora = ({ cartItems = [] }) => {
       };
       
       console.log('Datos del pedido preparados:', pedidoData);
-      console.log('Enviando pedido a https://server.tiznadodev.com/api/orders/neworder');
+      console.log('Enviando pedido a https://api.mamamianpizza.com/api/orders/neworder');
       
       // Enviar los datos al servidor
-      const response = await fetch('https://server.tiznadodev.com/api/orders/neworder', {
+      const response = await fetch('https://api.mamamianpizza.com/api/orders/neworder', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -406,7 +406,7 @@ const PideAhora = ({ cartItems = [] }) => {
         try {
           // Enviar notificación al servidor
           console.log('Enviando notificación:', notificacionData);
-          const notificationResponse = await fetch('https://server.tiznadodev.com/api/notifications/', {
+          const notificationResponse = await fetch('https://api.mamamianpizza.com/api/notifications/', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
