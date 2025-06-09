@@ -340,11 +340,7 @@ const redirigirAWompi = () => {
             },
               
         // Datos de pago
-        metodo_pago: pagoMetodo,
-        ...(pagoMetodo === 'tarjeta' && {
-          nombre_tarjeta: nombreTarjeta,
-          num_tarjeta_masked: numeroTarjeta.slice(-4).padStart(16, '*'),
-        }),
+
               
         // Detalles del pedido - adaptado para la estructura esperada por el backend
         productos: cartItems.map(item => ({
