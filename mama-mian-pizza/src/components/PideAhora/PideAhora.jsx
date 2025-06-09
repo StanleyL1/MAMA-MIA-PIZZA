@@ -12,7 +12,6 @@ import {
   FaSpinner, 
   FaUser, 
   FaUserTie,
-  FaLock,
   FaCreditCard,
   FaMoneyBillWave,
   FaExclamationTriangle,
@@ -38,10 +37,7 @@ const PideAhora = ({ cartItems = [] }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [modoDireccion, setModoDireccion] = useState('formulario');
   const [pagoMetodo, setPagoMetodo] = useState('');
-  const [nombreTarjeta, setNombreTarjeta] = useState('');
-  const [numeroTarjeta, setNumeroTarjeta] = useState('');
-  const [fechaExp, setFechaExp] = useState('');
-  const [cvv, setCvv] = useState('');
+
   const [metodoEntrega, setMetodoEntrega] = useState('');
   
   // Estados para la geolocalización
