@@ -1,0 +1,202 @@
+.team-container {
+  padding: 60px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.team-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #e74c3c;
+  font-size: 2.5rem;
+}
+
+.team-description {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 50px;
+  color: #666;
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+/* Primera fila - las 3 chicas */
+.team-card:nth-child(1) {
+  grid-column: 1 / 2;
+}
+
+.team-card:nth-child(2) {
+  grid-column: 2 / 3;
+}
+
+.team-card:nth-child(3) {
+  grid-column: 3 / 4;
+}
+
+/* Segunda fila - los 3 chicos */
+.team-card:nth-child(4) {
+  grid-column: 1 / 2;
+}
+
+.team-card:nth-child(5) {
+  grid-column: 2 / 3;
+}
+
+.team-card:nth-child(6) {
+  grid-column: 3 / 4;
+}
+
+.team-card {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(231, 76, 60, 0.15);
+}
+
+.member-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 0 auto 20px;
+  text-transform: uppercase;
+}
+
+.team-card h3 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.role {
+  color: #e74c3c;
+  margin-bottom: 25px;
+  font-style: italic;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.portfolio-link {
+  display: inline-block;
+  background: #e74c3c;
+  color: white;
+  padding: 12px 25px;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.portfolio-link:hover {
+  background: #c0392b;
+  transform: scale(1.05);
+}
+
+.contact-section {
+  text-align: center;
+  background: #f8f9fa;
+  padding: 40px 30px;
+  border-radius: 15px;
+  border: 2px solid #e9ecef;
+}
+
+.contact-section h2 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-size: 1.8rem;
+}
+
+.contact-section p {
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+.contact-team-btn {
+  background: #27ae60;
+  color: white;
+  padding: 18px 40px;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.contact-team-btn:hover {
+  background: #229954;
+  transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .team-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  
+  .team-card:nth-child(1),
+  .team-card:nth-child(2),
+  .team-card:nth-child(3),
+  .team-card:nth-child(4),
+  .team-card:nth-child(5),
+  .team-card:nth-child(6) {
+    grid-column: 1;
+    justify-self: center;
+  }
+}
+
+.member-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  overflow: hidden;
+  border: 3px solid #e74c3c;
+}
+
+.member-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.member-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 0 auto 20px;
+  text-transform: uppercase;
+}

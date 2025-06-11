@@ -18,12 +18,11 @@ const Footer = ({ noImage }) => {
             
           </div>
         </div>
-      )}
-
-      <div className="final-footer-bottom">
+      )}      <div className="final-footer-bottom">
         <p className="final-footer-rights">© todos los derechos reservados 2025</p>
         <div className="final-footer-social">
-       </div>
+          <a href="/equipo-desarrollo" className="footer-team-link">Equipo de desarrollo</a>
+        </div>
       </div>
     </footer>
   );
