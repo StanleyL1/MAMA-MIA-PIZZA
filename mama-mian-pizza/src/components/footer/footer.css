@@ -26,12 +26,12 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 2rem;
 }
 
 .final-footer-text-left {
   font-size: 2.2rem;
-  color: var(--accent-color);
+  color: white; /* Cambiado a blanco */
   font-weight: bold;
   font-family: 'Bold', sans-serif;
   border-radius: 8px;
@@ -39,6 +39,48 @@
   text-align: center;
   margin-left: 12%;
   flex: 1;
+}
+
+/* Enlace del equipo de desarrollo */
+.footer-team-link {
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.footer-team-link:hover {
+  color: #f0f0f0;
+  text-decoration: underline;
+}
+
+/* Sección UX/UI */
+.footer-uxui-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  flex: 0 0 auto;
+}
+
+.footer-uxui-title {
+  color: white;
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.footer-uxui-team {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  text-align: center;
+}
+
+.footer-uxui-member {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
 .final-footer-social {
@@ -81,15 +123,25 @@
     flex-direction: column;
     text-align: center;
     align-items: center;
+    gap: 1.5rem;
   }
 
   .final-footer-text-left {
     font-size: 2rem;
+    margin-left: 0;
   }
 
   .final-footer-icon {
     width: 28px;
     height: 28px;
+  }
+
+  .footer-uxui-title {
+    font-size: 1.2rem;
+  }
+
+  .footer-uxui-member {
+    font-size: 0.9rem;
   }
 }
 
@@ -101,5 +153,13 @@
   .final-footer-icon {
     width: 24px;
     height: 24px;
+  }
+
+  .footer-uxui-title {
+    font-size: 1.1rem;
+  }
+
+  .footer-uxui-member {
+    font-size: 0.85rem;
   }
 }

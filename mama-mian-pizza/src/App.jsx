@@ -11,7 +11,7 @@ import Navbar from './components/Navbar';
 import PideAhora from './components/PideAhora/PideAhora';
 import Cart from './components/Cart/Cart';
 import Services from './components/Services/Services';
-
+import Team from './components/Team/Team';
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
@@ -72,6 +72,7 @@ function App() {
         <Route path="/sobrenosotros" element={<SobreNosotros />} />
         <Route path="/Services" element={<Services />} />
         <Route path="/pideahora" element={<PideAhora cartItems={cartItems} />} />
+        <Route path="/equipo-desarrollo" element={<Team />} />
       </Routes>
 
       {/* Overlay de notificación tipo toast */}
