@@ -406,6 +406,30 @@ input:checked + .modal__slider:before {
   background-color: #fcd6a0;
 }
 
+/* Precio del tamaño seleccionado */
+.modal__precio-tamano {
+  margin-top: 10px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal__precio-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.modal__precio-valor {
+  font-size: 18px;
+  color: #dc3545;
+  font-weight: bold;
+}
+
 /* Estilos responsivos */
 @media (max-width: 1024px) {
   .modal__content {
