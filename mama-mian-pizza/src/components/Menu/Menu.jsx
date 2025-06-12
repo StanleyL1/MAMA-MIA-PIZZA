@@ -84,18 +84,18 @@ const Menu = ({ onAddToCart }) => {
         return true;
       }
       
+      if (activeCategory === 'Complementos' && 
+          (titulo.includes('sticks') || titulo.includes('complemento') || 
+           titulo.includes('pan') || titulo.includes('papas') || 
+           descripcion.includes('complemento'))) {
+        return true;
+      }
+      
       if (activeCategory === 'Bebidas' && 
           (titulo.includes('bebida') || titulo.includes('refresco') || 
            titulo.includes('agua') || titulo.includes('soda') || 
            titulo.includes('cerveza') || titulo.includes('jugo') || 
            descripcion.includes('bebida'))) {
-        return true;
-      }
-
-      if (activeCategory === 'Postres' && 
-          (titulo.includes('postre') || titulo.includes('helado') || 
-           titulo.includes('pastel') || titulo.includes('torta') || 
-           titulo.includes('dulce') || descripcion.includes('postre'))) {
         return true;
       }
       
@@ -194,10 +194,10 @@ const Menu = ({ onAddToCart }) => {
             Bebidas
           </button>
           <button
-            className={`menu-category-button ${activeCategory === "Postres" ? "active" : ""}`}
-            onClick={() => handleCategoryChange("Postres")}
+            className={`menu-category-button ${activeCategory === "Complementos" ? "active" : ""}`}
+            onClick={() => handleCategoryChange("Complementos")}
           >
-            Postres
+            Complementos
           </button>
         </div>
         <div className="menu-search-container">
