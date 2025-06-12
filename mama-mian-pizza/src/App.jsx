@@ -13,6 +13,8 @@ import Cart from './components/Cart/Cart';
 import Services from './components/Services/Services';
 import Team from './components/Team/Team';
 import InformacionLegal from './components/InformacionLegal/InformacionLegal';
+import perfilFoto from '../src/assets/perfilfoto.png';
+import Perfil from './components/Perfil/Perfil';
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -61,10 +63,24 @@ function App() {
     setToast({ show: true, message: `Agregaste ${title} al carrito` });
     setTimeout(() => setToast({ show: false, message: '' }), 2000);
   };
+const [user, setUser] = useState({
+  nombre: "Juan Pérez",
+  foto: perfilFoto
+});
+
+const handleLogout = () => {
+  setUser(null);
+  // Si quieres también: window.location.href = "/login";
+};
 
   return (
     <BrowserRouter>
-      <Navbar onCartToggle={handleCartToggle} cartItemCount={cartItems.length} />
+      <Navbar
+        onCartToggle={handleCartToggle}
+        cartItemCount={cartItems.length}
+        user={user}
+        onLogout={handleLogout}
+     />
       <Routes>
         <Route path="/forgot-password" element={<Recover />} />
         <Route path="/register" element={<Register />} />
@@ -72,6 +88,7 @@ function App() {
         <Route path="/" element={<Home onAddToCart={handleAddToCart} />} />
         <Route path="/menu" element={<Menu onAddToCart={handleAddToCart} />} />
         <Route path="/sobrenosotros" element={<SobreNosotros />} />
+        <Route path="/Perfil" element={<Perfil onAddToCart={handleAddToCart}/>} />
         <Route path="/Services" element={<Services />} />
         <Route path="/pideahora" element={<PideAhora cartItems={cartItems} />} />
         <Route path="/equipo-desarrollo" element={<Team />} />

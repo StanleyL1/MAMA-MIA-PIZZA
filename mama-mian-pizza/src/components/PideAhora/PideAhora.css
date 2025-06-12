@@ -427,7 +427,13 @@
   margin-bottom: 25px;
   padding: 0 15px;
 }
-
+.toggle-password {
+  position: absolute;
+  right: 2%;
+  top: 58%; /* AJUSTA este valor para subir o bajar el ícono */
+  cursor: pointer;
+  color: #555;
+}
 .btn-ubicacion {
   display: flex;
   align-items: center;

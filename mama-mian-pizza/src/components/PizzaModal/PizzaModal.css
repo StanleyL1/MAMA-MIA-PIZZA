@@ -12,7 +12,7 @@
   justify-content: center;
 }
 
-/* Contenedor del modal con alto ajustado */
+/* Contenedor del modal */
 .modal__content {
   position: relative;
   width: 60%;
@@ -23,7 +23,38 @@
   box-shadow: 0 8px 16px rgba(0,0,0,0.3);
   overflow: auto;
   display: flex;
-  flex-direction: row;
+  flex-direction: column; /* Cambiado para que la barra esté arriba */
+}
+
+/* BARRA SUPERIOR */
+.modal__topbar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  padding: 0 24px;
+  gap: 18px;
+  min-height: 52px;
+}
+
+.modal__topbar-item {
+  font-size: 1.13rem;
+  font-weight: 500;
+  color: #ab1319;
+  background: transparent;
+  border: none;
+  padding: 16px 16px 12px 0;
+  cursor: pointer;
+  outline: none;
+  transition: color .2s;
+  display: flex;
+  align-items: center;
+}
+
+.modal__topbar-item.active {
+  color: #a81818;
+  border-bottom: 2.5px solid #a81818;
 }
 
 /* Notificación de éxito */
@@ -74,13 +105,14 @@
   transform: scale(1.1);
 }
 
-/* Layout interno: 2 columnas */
+/* Layout interno: 2 columnas bajo la barra */
 .modal__layout {
   display: flex;
   width: 100%;
   height: 100%;
 }
 
+/* Imagen de la pizza */
 .modal__left {
   flex: 1.2;
   overflow: hidden;
@@ -168,7 +200,7 @@
   font-size: 0.9rem;
 }
 
-/* Estilo para la sección de personalizar ingredientes */
+/* Personalizar ingredientes */
 .modal__personalizar-wrapper {
   display: flex;
   flex-direction: column;
@@ -181,7 +213,7 @@
   justify-content: space-between;
 }
 
-/* Estilo para el toggle switch */
+/* Toggle switch */
 .modal__toggle-slider {
   position: relative;
   display: inline-block;
@@ -227,7 +259,6 @@ input:checked + .modal__slider:before {
   transform: translateX(26px);
 }
 
-/* Estilo para el contador de cambios */
 .modal__cambios-counter {
   font-size: 0.8rem;
   color: #666;
@@ -267,7 +298,6 @@ input:checked + .modal__slider:before {
   padding: 0.25rem;
 }
 
-/* Estilo personalizado para los checkboxes */
 .modal__checkbox-container {
   display: flex;
   align-items: center;
@@ -338,7 +368,7 @@ input:checked + .modal__slider:before {
   transform: rotate(45deg);
 }
 
-/* Estilo para el campo de instrucciones especiales */
+/* Campo de instrucciones especiales */
 .modal__instrucciones-input {
   width: 100%;
   padding: 0.75rem;
@@ -378,7 +408,6 @@ input:checked + .modal__slider:before {
   padding-top: 1rem;
 }
 
-/* price */
 .modal__pizza-price {
   font-size: 1.3rem;
   font-weight: 700;
@@ -406,79 +435,297 @@ input:checked + .modal__slider:before {
   background-color: #fcd6a0;
 }
 
-/* Precio del tamaño seleccionado */
-.modal__precio-tamano {
-  margin-top: 10px;
-  padding: 12px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border: 2px solid #e9ecef;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* Modal de reseñas pantalla completa */
+.modal__content.modal__full-white {
+  background: #fff !important;
+  min-height: 100vh !important;
+  width: 100vw !important;
+  left: 0 !important;
+  top: 0 !important;
+  max-width: 100vw !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  z-index: 9999;
+  position: fixed !important;
+  overflow-y: auto;
+  animation: fadeIn .2s;
 }
 
-.modal__precio-label {
-  font-size: 14px;
-  color: #666;
-  font-weight: 500;
+/* Animación de modal */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.modal__precio-valor {
-  font-size: 18px;
-  color: #dc3545;
-  font-weight: bold;
-}
-
-/* Estilos responsivos */
+/* RESPONSIVE */
 @media (max-width: 1024px) {
   .modal__content {
-    width: 70%;
+    width: 80%;
   }
 }
-
 @media (max-width: 768px) {
   .modal__content {
-    width: 90%;
-    flex-direction: column;
+    width: 98%;
+    min-width: unset;
+    max-width: 99vw;
   }
-  
   .modal__layout {
     flex-direction: column;
   }
-  
   .modal__left {
-    height: 200px;
+    height: 160px;
   }
-  
   .modal__right {
     padding: 1rem;
     gap: 0.75rem;
   }
-  
-  .modal__pizza-title {
-    font-size: 1.5rem;
-  }
-  
-  .modal__desc-title {
-    font-size: 1rem;
-  }
-  
-  .modal__pizza-description {
-    font-size: 0.9rem;
-  }
-  
-  .modal__pizza-price {
-    font-size: 1.2rem;
-  }
-  
-  .modal__add-button {
-    padding: 0.5rem 0.8rem;
-    font-size: 0.9rem;
-  }
-  
-  .modal__ingredientes-container {
-    grid-template-columns: repeat(2, 1fr);
+  .modal__topbar {
+    padding: 0 8px;
   }
 }
 
+
+/* ============ RESEÑAS (modal blanco) ============ */
+.reseñas__container {
+  padding: 32px 18vw 32px 18vw;
+  min-height: 80vh;
+  background: #fafbfc;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.reseñas__header {
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #f3f3f3;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  min-height: 68px;
+  padding: 20px 20px 20px 16px;
+  gap: 16px;
+}
+
+.reseñas__header-stars {
+  display: flex;
+  gap: 4px;
+}
+
+.reseñas__header-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.reseñas__average {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #222;
+}
+.reseñas__count {
+  font-size: 0.95rem;
+  color: #8d8d8d;
+}
+
+.reseñas__header-extra {
+  flex: 1;
+  text-align: right;
+}
+
+.reseñas__clientes-titulo {
+  margin-bottom: 14px;
+  font-weight: bold;
+  font-size: 1.08rem;
+  color: #161616;
+}
+
+.reseñas__empty {
+  background: transparent;
+  border: none;
+  margin: 32px auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 410px;
+  width: 100%;
+}
+
+.reseñas__empty-icon {
+  margin-bottom: 16px;
+}
+
+.reseñas__empty-titulo {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  color: #292929;
+}
+
+.reseñas__empty-text {
+  font-size: 1rem;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.reseñas__empty-btn {
+  padding: 8px 20px;
+  font-size: 1rem;
+  background: #a81818;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background .2s;
+}
+.reseñas__empty-btn:hover {
+  background: #bf2323;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .reseñas__container {
+    padding: 32px 2vw 32px 2vw;
+  }
+}
+
+@media (max-width: 600px) {
+  .reseñas__container {
+    padding: 18px 0 18px 0;
+  }
+  .reseñas__header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px;
+    min-height: 48px;
+    gap: 10px;
+  }
+}
+.reseñas__form-card {
+  background: #fff;
+  border: 1px solid #edcfcf;
+  border-radius: 8px;
+  padding: 32px 24px 24px 24px;
+  margin-bottom: 32px;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.reseñas__form-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 18px;
+  color: #222;
+}
+
+.reseñas__form-field {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.reseñas__form-label {
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #333;
+  font-size: 1rem;
+}
+
+.reseñas__form-stars {
+  display: flex;
+  gap: 3px;
+}
+
+.reseñas__form-star {
+  color: #d1d5db;
+  font-size: 24px;
+  transition: color 0.15s;
+}
+.reseñas__form-star:hover,
+.reseñas__form-star.selected {
+  color: #eab308;
+}
+
+.reseñas__form-textarea {
+  width: 100%;
+  border: 1px solid #d6d6d6;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+.reseñas__form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.reseñas__form-btn {
+  padding: 8px 20px;
+  font-size: 1rem;
+  background: #fff;
+  color: #991b1b;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .18s, color .18s;
+}
+
+.reseñas__form-btn--red {
+  background: #a81818;
+  color: #fff;
+  border: 1px solid #a81818;
+}
+.reseñas__form-btn--red:hover {
+  background: #c62626;
+}
+
+.reseñas__form-btn:hover:not(.reseñas__form-btn--red) {
+  background: #f5f5f5;
+}
+
+.reseñas__lista {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.reseñas__review {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  padding: 18px 20px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+.reseñas__review-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 1rem;
+  margin-bottom: 7px;
+}
+.reseñas__review-author {
+  color: #b1b1b1;
+  margin-left: 8px;
+  font-size: 0.92rem;
+}
+.reseñas__review-comment {
+  color: #222;
+  font-size: 1.02rem;
+  line-height: 1.4;
+  margin-top: 2px;
+}

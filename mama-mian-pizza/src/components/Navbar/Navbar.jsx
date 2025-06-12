@@ -7,7 +7,7 @@ import './Navbar.css';
 import { Link } from 'react-router-dom';
 
 
-const Navbar = ({ onCartToggle, cartItemCount }) => {
+const Navbar = ({ onCartToggle, cartItemCount, user, onLogout }) => {
 const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -51,24 +51,46 @@ const toggleMobileMenu = () => {
 
       <div className="navbar__icons">
         {/* Usuario */}
-      <div className="navbar__user-section">
-<button
-  className="icon-button"
-  onClick={() => {
-    if (window.innerWidth > 768) {
-      window.location.href = "/login";
-    } else {
-      setIsUserMenuOpen(prev => !prev);
-      setIsMobileMenuOpen(false);
-    }
-  }}
-  aria-label="Usuario"
->
-  <FontAwesomeIcon icon={faUser} className="icon-img" />
-</button>
+     <div className="navbar__user-section">
+  {/* Si hay usuario logueado, muestra perfil y cerrar sesión */}
+  {user ? (
+    <div className="navbar__profile-logged">
+      <button
+        className="navbar__profile-btn"
+        onClick={() => window.location.href = "/Perfil"}
+        aria-label="Perfil"
+      >
+       <img alt='PERFIL'
+  src={user.foto}
+  className="navbar__profile-photo"
+/>
 
+        <span className="navbar__profile-name">{user.nombre}</span>
+      </button>
+      <button className="navbar__logout-btn" onClick={onLogout}>
+        Cerrar Sesión
+      </button>
+    </div>
+  ) : (
+    // Si no está logueado, icono user como antes
+    <button
+      className="icon-button"
+      onClick={() => {
+        if (window.innerWidth > 768) {
+          window.location.href = "/login";
+        } else {
+          setIsUserMenuOpen(prev => !prev);
+          setIsMobileMenuOpen(false);
+        }
+      }}
+      aria-label="Usuario"
+    >
+      <FontAwesomeIcon icon={faUser} className="icon-img" />
+    </button>
+  )}
 
-  {isUserMenuOpen && (
+  {/* Dropdown solo si no hay usuario */}
+  {!user && isUserMenuOpen && (
     <ul className="user-dropdown">
       <li><Link to="/login" onClick={() => setIsUserMenuOpen(false)}>Iniciar Sesión</Link></li>
       <li><Link to="/register" onClick={() => setIsUserMenuOpen(false)}>Registrarse</Link></li>
