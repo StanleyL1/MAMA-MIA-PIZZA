@@ -14,7 +14,8 @@ const Menu = ({ onAddToCart }) => {
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-    const fetchMenu = async () => {
+
+  const fetchMenu = async () => {
     setLoading(true);
     setError(null);
     
@@ -40,7 +41,8 @@ const Menu = ({ onAddToCart }) => {
         }
         
         // Ya no necesitamos visualizar las categorías como antes porque la estructura ha cambiado
-        console.log("Número de productos cargados:", data.menu.length);      } else {
+        console.log("Número de productos cargados:", data.menu.length);
+      } else {
         console.error("Error: Datos recibidos incorrectos o vacíos", data);
         setError("No se pudieron cargar los productos. La API devolvió datos incorrectos.");
         setMenu([]);
@@ -56,7 +58,9 @@ const Menu = ({ onAddToCart }) => {
   
   useEffect(() => {
     fetchMenu();
-  }, []);  // Filtrar productos según la categoría activa y término de búsqueda
+  }, []);
+
+  // Filtrar productos según la categoría activa y término de búsqueda
   const filteredMenu = useMemo(() => {
     if (!menu || menu.length === 0) return [];
     
@@ -94,24 +98,15 @@ const Menu = ({ onAddToCart }) => {
            descripcion.includes('bebida'))) {
         return true;
       }
-        if (activeCategory === 'Postres' && 
+
+      if (activeCategory === 'Postres' && 
           (titulo.includes('postre') || titulo.includes('helado') || 
            titulo.includes('pastel') || titulo.includes('torta') || 
            titulo.includes('dulce') || descripcion.includes('postre'))) {
         return true;
       }
       
-      // Si llegamos aquí, el producto no coincide con ninguna categoría específica
-      // Solo aplicar filtro de búsqueda
-      const itemTitle = item.titulo || '';
-      const itemDesc = item.descripcion || '';
-      
-      const matchesSearch = 
-        !searchTerm || 
-        itemTitle.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        itemDesc.toLowerCase().includes(searchTerm.toLowerCase());
-        // Para categorías específicas que no coincidieron, no mostrar el producto
-      // Solo para búsqueda o categoría "Todos"
+      // Para categorías específicas que no coincidieron, no mostrar el producto
       return false;
     }).filter(item => {
       // Aplicar filtro de búsqueda a todos los productos ya filtrados por categoría
@@ -124,7 +119,7 @@ const Menu = ({ onAddToCart }) => {
              itemDesc.toLowerCase().includes(searchTerm.toLowerCase());
     });
   }, [menu, activeCategory, searchTerm]);
-  // Resto del código igual...
+
   const handleOpenModal = (product) => {
     console.log("Abriendo modal para producto:", product);
     setSelectedProduct(product);
@@ -140,7 +135,9 @@ const Menu = ({ onAddToCart }) => {
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-  };  const handleAddToCart = (producto, masa, tamano, instrucciones, ingredientes) => {
+  };
+
+  const handleAddToCart = (producto, masa, tamano, instrucciones, ingredientes) => {
     console.log("Menu: Añadiendo al carrito", producto);
     
     // Determinar si es una pizza basado en el nombre o categoría
@@ -239,16 +236,18 @@ const Menu = ({ onAddToCart }) => {
             {activeCategory === 'Todos' ? 'Todos los Productos' : activeCategory}{" "}
             <img src={pizzaIcon} alt="Pizza Icon" className="menu-pizza-icon" />
           </h3>
-            {loading ? (
+          {loading ? (
             <div className="loading-container">
               <p>Cargando productos...</p>
-            </div>          ) : error ? (
+            </div>
+          ) : error ? (
             <div className="error-container">
               <p>{error}</p>
               <button onClick={fetchMenu} className="retry-button">
                 Reintentar
               </button>
-            </div>          ) : filteredMenu.length > 0 ? (
+            </div>
+          ) : filteredMenu.length > 0 ? (
             <div className="menu-card-container">
               {filteredMenu.map((item, index) => (
                 <ProductsCards 
@@ -275,8 +274,12 @@ const Menu = ({ onAddToCart }) => {
                 - Búsqueda: {searchTerm || "(vacía)"}
                 - Total productos: {menu.length}
               </pre>
-            </div>          )}        </div>
-      </section>      <Footer noImage={true} />
+            </div>
+          )}
+        </div>
+      </section>
+
+      <Footer noImage={true} />
 
       {/* Modal del Producto */}
       {selectedProduct && (
