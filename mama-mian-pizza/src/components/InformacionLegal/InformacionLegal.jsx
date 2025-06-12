@@ -1,6 +1,19 @@
 import React, { useEffect } from 'react';
 import './InformacionLegal.css';
 import Footer from '../footer/footer';
+import { 
+  FaInfoCircle, 
+  FaQuestionCircle, 
+  FaBoxOpen, 
+  FaShippingFast, 
+  FaShieldAlt, 
+  FaFileContract, 
+  FaTimes, 
+  FaCreditCard, 
+  FaCookie, 
+  FaUndo, 
+  FaArrowLeft 
+} from 'react-icons/fa';
 
 const InformacionLegal = () => {
   // Función para hacer scroll automático al anchor
@@ -26,7 +39,7 @@ const InformacionLegal = () => {
         <div className="legal-sections">
           {/* 1. Acerca de Nosotros */}
           <section id="acerca-de-nosotros" className="legal-section">
-            <h2>🔹 1. Acerca de Nosotros</h2>
+            <h2><FaInfoCircle className="section-icon" /> 1. Acerca de Nosotros</h2>
             <p>
               Bienvenido a Mamá Mian Pizza. Esta sección contiene información importante sobre tus derechos como cliente, 
               así como nuestras políticas operativas. Te recomendamos leer cada apartado antes de hacer tu pedido.
@@ -35,7 +48,7 @@ const InformacionLegal = () => {
 
           {/* 2. Preguntas Frecuentes */}
           <section id="preguntas-frecuentes" className="legal-section">
-            <h2>❓ 2. Preguntas Frecuentes</h2>
+            <h2><FaQuestionCircle className="section-icon" /> 2. Preguntas Frecuentes</h2>
             
             <div className="faq-item">
               <h3>¿Qué tipos de pizza ofrecen?</h3>
@@ -75,7 +88,7 @@ const InformacionLegal = () => {
 
           {/* 3. Garantías y Retornos */}
           <section id="garantias-retornos" className="legal-section">
-            <h2>📦 3. Garantías y Retornos (Política de Devoluciones)</h2>
+            <h2><FaBoxOpen className="section-icon" /> 3. Garantías y Retornos (Política de Devoluciones)</h2>
             <ul>
               <li>Puedes reportar problemas dentro de los primeros 30 minutos tras recibir el pedido.</li>
               <li>Debes enviar evidencia (foto, número de orden).</li>
@@ -86,7 +99,7 @@ const InformacionLegal = () => {
 
           {/* 4. Política de Envíos */}
           <section id="politica-envios" className="legal-section">
-            <h2>🚚 4. Política de Envíos</h2>
+            <h2><FaShippingFast className="section-icon" /> 4. Política de Envíos</h2>
             <p><strong>Zonas:</strong> Puerto El Triunfo (gratis) y Jiquilisco ($1.50).</p>
             <p><strong>Tiempo estimado:</strong> 25–30 minutos.</p>
             <p><strong>Seguimiento:</strong> Se notificará por WhatsApp o correo electrónico.</p>
@@ -94,7 +107,7 @@ const InformacionLegal = () => {
 
           {/* 5. Políticas de Privacidad */}
           <section id="politicas-privacidad" className="legal-section">
-            <h2>🔐 5. Políticas de Privacidad</h2>
+            <h2><FaShieldAlt className="section-icon" /> 5. Políticas de Privacidad</h2>
             
             <div className="privacy-subsection">
               <h3>Datos que recopilamos:</h3>
@@ -127,7 +140,7 @@ const InformacionLegal = () => {
 
           {/* 6. Términos y Condiciones */}
           <section id="terminos-condiciones" className="legal-section">
-            <h2>📄 6. Términos y Condiciones</h2>
+            <h2><FaFileContract className="section-icon" /> 6. Términos y Condiciones</h2>
             <ul>
               <li>Al usar el sitio confirmas que sos mayor de edad y que los datos proporcionados son verídicos.</li>
               <li>La disponibilidad de productos está sujeta a cambios.</li>
@@ -138,7 +151,7 @@ const InformacionLegal = () => {
 
           {/* 7. Cancelación de Compra */}
           <section id="cancelacion-compra" className="legal-section">
-            <h2>❌ 7. Cancelación de Compra</h2>
+            <h2><FaTimes className="section-icon" /> 7. Cancelación de Compra</h2>
             <ul>
               <li>Podés cancelar tu pedido en los primeros 5 minutos.</li>
               <li>Si ya se inició la preparación, no se podrá cancelar.</li>
@@ -148,7 +161,7 @@ const InformacionLegal = () => {
 
           {/* 8. Formas de Pago */}
           <section id="formas-pago" className="legal-section">
-            <h2>💳 8. Formas de Pago</h2>
+            <h2><FaCreditCard className="section-icon" /> 8. Formas de Pago</h2>
             <ul>
               <li>Tarjetas de crédito y débito (Wompi)</li>
               <li>Transferencia bancaria (Banco Agrícola)</li>
@@ -158,20 +171,20 @@ const InformacionLegal = () => {
 
           {/* 9. Política de Cookies */}
           <section id="politica-cookies" className="legal-section">
-            <h2>🍪 9. Política de Cookies</h2>
+            <h2><FaCookie className="section-icon" /> 9. Política de Cookies</h2>
             <p>Se usan para recordar sesión, carrito, estadísticas, y personalización.</p>
             <p>Puedes desactivarlas desde tu navegador (afectará algunas funciones).</p>
           </section>
 
           {/* 10. Reversión de Pago */}
           <section id="reversion-pago" className="legal-section">
-            <h2>🔁 10. Reversión de Pago</h2>
+            <h2><FaUndo className="section-icon" /> 10. Reversión de Pago</h2>
             <p>Las devoluciones de dinero por errores se procesan en un plazo máximo de 72 horas, en casos justificados.</p>
           </section>
 
           {/* 11. Derecho a Retracto */}
           <section id="derecho-retracto" className="legal-section">
-            <h2>🔙 11. Derecho a Retracto</h2>
+            <h2><FaArrowLeft className="section-icon" /> 11. Derecho a Retracto</h2>
             <p>
               Podés ejercer tu derecho a retracto si el pedido aún no ha sido preparado. 
               Una vez iniciado el despacho o cocción, no aplica.
