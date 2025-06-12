@@ -12,6 +12,8 @@ import PideAhora from './components/PideAhora/PideAhora';
 import Cart from './components/Cart/Cart';
 import Services from './components/Services/Services';
 import Team from './components/Team/Team';
+import InformacionLegal from './components/InformacionLegal/InformacionLegal';
+
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
@@ -73,6 +75,7 @@ function App() {
         <Route path="/Services" element={<Services />} />
         <Route path="/pideahora" element={<PideAhora cartItems={cartItems} />} />
         <Route path="/equipo-desarrollo" element={<Team />} />
+        <Route path="/informacion-legal" element={<InformacionLegal />} />
       </Routes>
 
       {/* Overlay de notificación tipo toast */}
