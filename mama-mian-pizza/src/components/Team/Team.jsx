@@ -7,8 +7,8 @@ const Team = () => {
     {
       name: "Katterin Yeferin Campos Rodriguez",
       role: "Project Manager",
-      portfolio: "https://katterin-campos.github.io/portfolio", // Pendiente
-      image: "https://media.licdn.com/dms/image/v2/D4D35AQFCbjhlH7qEog/profile-framedphoto-shrink_800_800/profile-framedphoto-shrink_800_800/0/1714412876031?e=1750204800&v=beta&t=QIWMCCjfJXuerwU7mkZMUWQyPZJuG70H6eF_VkV-R8o"
+      portfolio: "https://yeferinrodriguez.netlify.app", // Pendiente
+      image: "https://yeferinrodriguez.netlify.app/contenido/perfil.png"
     },
     {
       name: "Nathaly Milena Zelaya Caballero",
@@ -26,7 +26,7 @@ const Team = () => {
     {
       name: "Franklin Stanley Larin Saravia",
       role: "Desarrollador Frontend",
-      portfolio: "https://franklin-larin.netlify.app", // Pendiente
+      portfolio: "https://stanleyfront.netlify.app/", // Pendiente
       image: "https://media.licdn.com/dms/image/v2/D5603AQHtOVdXamSeGg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1709504026689?e=1755129600&v=beta&t=plPL7tdFJ0WXPzWJaNA15GPZN1MCh3Bpq9eJ5hR1_B4"
     },
     {
@@ -39,7 +39,7 @@ const Team = () => {
       name: "Erick Mauricio Tiznado Rodriguez",
       role: "Desarrollador Backend",
       portfolio: "https://www.tiznadodev.com/",
-      image: "https://media.licdn.com/dms/image/v2/D4D35AQFaMFDtsNIhrA/profile-framedphoto-shrink_800_800/profile-framedphoto-shrink_800_800/0/1709515078111?e=1750204800&v=beta&t=JFUHQaf9U9Xo88T1UHI8uUPSgaACNLjQDqTavEoyyO0"
+      image: "https://www.tiznadodev.com/static/media/20240304_011522000_iOS.52d39143920209f5681e.jpg"
     }
   ];
 

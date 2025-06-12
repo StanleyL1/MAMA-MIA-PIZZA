@@ -56,46 +56,82 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
   useEffect(() => {
     const count = ingredientes.filter(ing => ing.seleccionado).length;
     setIngredientesSeleccionados(count);
-  }, [ingredientes]);  // Cargar tamaños y precios desde la API
+  }, [ingredientes]);  // Cargar tamaños y precios desde la API o del objeto del producto
   useEffect(() => {
     const fetchTamanos = async () => {
       if (!pizza) return;
       
-      setCargandoTamanos(true);      try {
-        const response = await fetch('https://api.mamamianpizza.com/api/tamanos/tamanosandprices');
-        const data = await response.json();
-        console.log('Datos recibidos de la API:', data);
-        
-        // Procesar los datos para obtener tamaños únicos
-        const tamanosUnicos = procesarTamanos(data);
-        console.log('Tamaños procesados:', tamanosUnicos);
-        setTamanos(tamanosUnicos);
-        
-        // Establecer el precio inicial para el primer tamaño
-        if (tamanosUnicos.length > 0) {
-          const primerTamano = tamanosUnicos[0];
-          setTamano(primerTamano.nombre);
-          setPrecioActual(calcularPrecio(primerTamano));
+      // Determinar si es una pizza o un producto con tamaños configurables
+      const isPizzaProduct = pizza.id_categoria === 1 || 
+                         (pizza.titulo && pizza.titulo.toLowerCase().includes('pizza'));
+      
+      // Solo cargamos tamaños de la API para pizzas
+      if (isPizzaProduct) {
+        setCargandoTamanos(true);
+        try {
+          const response = await fetch('https://api.mamamianpizza.com/api/tamanos/tamanosandprices');
+          const data = await response.json();
+          console.log('Datos recibidos de la API:', data);
+          
+          // Procesar los datos para obtener tamaños únicos
+          const tamanosUnicos = procesarTamanos(data);
+          console.log('Tamaños procesados:', tamanosUnicos);
+          setTamanos(tamanosUnicos);
+          
+          // Establecer el precio inicial para el primer tamaño
+          if (tamanosUnicos.length > 0) {
+            const primerTamano = tamanosUnicos[0];
+            setTamano(primerTamano.nombre);
+            setPrecioActual(calcularPrecio(primerTamano));
+          }
+        } catch (error) {
+          console.error('Error al cargar tamaños:', error);
+          // Si falla la API, usar valores por defecto
+          const defaultTamanos = [
+            { id: 1, nombre: 'Personal', indice: 1, precio: '6.00' },
+            { id: 2, nombre: 'Mediana', indice: 2, precio: '8.00' },
+            { id: 3, nombre: 'Grande', indice: 3, precio: '10.00' },
+            { id: 4, nombre: 'Gigante', indice: 4, precio: '12.00' }
+          ];
+          setTamanos(defaultTamanos);
+          setTamano(defaultTamanos[0].nombre);
+          setPrecioActual(calcularPrecio(defaultTamanos[0]));
+        } finally {
+          setCargandoTamanos(false);
         }
-      } catch (error) {
-        console.error('Error al cargar tamaños:', error);
-        // Si falla la API, usar valores por defecto
-        const defaultTamanos = [
-          { id: 1, nombre: 'Personal', indice: 1, precio: '6.00' },
-          { id: 2, nombre: 'Mediana', indice: 2, precio: '8.00' },
-          { id: 3, nombre: 'Grande', indice: 3, precio: '10.00' },
-          { id: 4, nombre: 'Gigante', indice: 4, precio: '12.00' }
-        ];
-        setTamanos(defaultTamanos);
-        setTamano(defaultTamanos[0].nombre);
-        setPrecioActual(calcularPrecio(defaultTamanos[0]));
-      } finally {
+      } else {
+        // Para productos que no son pizzas, si tienen opciones, las utilizamos directamente
+        if (pizza.opciones && pizza.opciones.length > 0) {
+          // Convertir las opciones del producto a formato de tamaños
+          const opcionesTamanos = pizza.opciones.map((opcion, index) => ({
+            id: opcion.tamanoId || index + 1,
+            nombre: opcion.nombre,
+            indice: index + 1,
+            precio: opcion.precio
+          }));
+          
+          setTamanos(opcionesTamanos);
+          
+          if (opcionesTamanos.length > 0) {
+            setTamano(opcionesTamanos[0].nombre);
+            setPrecioActual(calcularPrecio(opcionesTamanos[0]));
+          }
+        } else {
+          // Si no tiene opciones, dejamos el array de tamaños vacío
+          setTamanos([]);
+          // Y ponemos el precio directo si existe
+          if (pizza.precio) {
+            setPrecioActual(`$${parseFloat(pizza.precio).toFixed(0)}`);
+          } else {
+            setPrecioActual('$0');
+          }
+        }
         setCargandoTamanos(false);
       }
     };
 
-    fetchTamanos();  }, [pizza]);
-
+    fetchTamanos();
+  }, [pizza]);
   // Actualizar precio cuando cambia el tamaño
   useEffect(() => {
     if (tamanos.length > 0) {
@@ -103,13 +139,32 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
       if (tamanosSeleccionado) {
         setPrecioActual(calcularPrecio(tamanosSeleccionado));
       }
+    } else if (pizza && pizza.opciones && pizza.opciones.length > 0) {
+      // Si no hay tamaños pero hay opciones disponibles, usar el precio de la primera opción
+      setPrecioActual(`$${parseFloat(pizza.opciones[0].precio).toFixed(0)}`);
+    } else if (pizza && pizza.precio) {
+      // Si hay precio directo en el producto
+      setPrecioActual(`$${parseFloat(pizza.precio).toFixed(0)}`);
     }
-  }, [tamano, tamanos]);
+  }, [tamano, tamanos, pizza]);
+
+  // Establecer precio inicial basado en opciones cuando no hay tamaños disponibles
+  useEffect(() => {
+    if (pizza && (!tamanos || tamanos.length === 0)) {
+      if (pizza.opciones && pizza.opciones.length > 0) {
+        setPrecioActual(`$${parseFloat(pizza.opciones[0].precio).toFixed(0)}`);
+      } else if (pizza.precio) {
+        setPrecioActual(`$${parseFloat(pizza.precio).toFixed(0)}`);
+      }
+    }
+  }, [pizza, tamanos]);
 
   if (!pizza) return null;
 
-  const isPizza = pizza.id_categoria === 1;
-  const handleAddToOrder = () => {
+  // Determinar si es una pizza basado en el nombre o categoría
+  const isPizza = pizza.id_categoria === 1 || 
+                 (pizza.titulo && pizza.titulo.toLowerCase().includes('pizza'));
+    const handleAddToOrder = () => {
     // Si es una pizza, incluir masa, tamaño e instrucciones, de lo contrario, enviar solo el producto
     if (isPizza) {
       const ingredientesSeleccionadosArray = personalizarIngredientes 
@@ -118,7 +173,8 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
       
       // Encontrar el precio actual del tamaño seleccionado
       const tamanosSeleccionado = tamanos.find(t => t.nombre === tamano);
-      const precioFinal = tamanosSeleccionado ? tamanosSeleccionado.precio : pizza.precio;
+      const precioFinal = tamanosSeleccionado ? tamanosSeleccionado.precio : 
+                         (pizza.opciones && pizza.opciones.length > 0 ? pizza.opciones[0].precio : pizza.precio);
         
       onAddToCart(
         {...pizza, precio: precioFinal}, 
@@ -128,7 +184,12 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
         personalizarIngredientes ? ingredientesSeleccionadosArray : []
       );
     } else {
-      onAddToCart(pizza, null, null, instrucciones);
+      // Para productos que no son pizzas pero tienen opciones de tamaño
+      const tamanosSeleccionado = tamanos.find(t => t.nombre === tamano);
+      const precioFinal = tamanosSeleccionado ? tamanosSeleccionado.precio : 
+                         (pizza.opciones && pizza.opciones.length > 0 ? pizza.opciones[0].precio : pizza.precio);
+      
+      onAddToCart({...pizza, precio: precioFinal}, null, tamanosSeleccionado, instrucciones);
     }
     
     // Mostrar la notificación de éxito
@@ -185,10 +246,9 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
         <div className="modal__layout">
           <div className="modal__left">
             <img src={pizza.imagen} alt={pizza.titulo} className="modal__pizza-image" />
-          </div>
-          <div className="modal__right">
+          </div>          <div className="modal__right">
             <h2 className="modal__pizza-title">{pizza.titulo}</h2>
-            
+              {/* Opciones específicas para pizzas */}
             {isPizza && (
               <>
                 <div className="modal__option-section">
@@ -207,28 +267,8 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
                       Tradicional
                     </button>
                   </div>
-                </div>                <div className="modal__option-section">
-                  <span className="modal__option-label">Tamaño</span>
-                  <div className="modal__dropdown">
-                    <select 
-                      value={tamano} 
-                      onChange={(e) => setTamano(e.target.value)}
-                      className="modal__custom-select"
-                    >
-                      {tamanos.map(t => (
-                        <option key={t.id} value={t.nombre}>{t.nombre}</option>
-                      ))}
-                    </select>
-                  </div>
-                  {/* Mostrar precio del tamaño seleccionado */}
-                  <div className="modal__precio-tamano">
-                    <span className="modal__precio-label">Precio para {tamano}:</span>
-                    <span className="modal__precio-valor">
-                      {cargandoTamanos ? 'Calculando...' : precioActual}
-                    </span>
-                  </div>
                 </div>
-
+                
                 <div className="modal__option-section">
                   <div className="modal__personalizar-wrapper">
                     <span className="modal__option-label">Personalizar ingredientes</span>
@@ -273,6 +313,31 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
                 </div>
               </>
             )}
+            
+            {/* Sección de tamaños - mostrar para todos los productos con opciones/tamaños */}
+            {tamanos && tamanos.length > 0 && (
+              <div className="modal__option-section">
+                <span className="modal__option-label">Tamaño</span>
+                <div className="modal__dropdown">
+                  <select 
+                    value={tamano} 
+                    onChange={(e) => setTamano(e.target.value)}
+                    className="modal__custom-select"
+                  >
+                    {tamanos.map(t => (
+                      <option key={t.id} value={t.nombre}>{t.nombre}</option>
+                    ))}
+                  </select>
+                </div>
+                {/* Mostrar precio del tamaño seleccionado */}
+                <div className="modal__precio-tamano">
+                  <span className="modal__precio-label">Precio para {tamano}:</span>
+                  <span className="modal__precio-valor">
+                    {cargandoTamanos ? 'Calculando...' : precioActual}
+                  </span>
+                </div>
+              </div>
+            )}
 
             <div className="modal__option-section">
               <span className="modal__option-label">Instrucciones especiales</span>
@@ -287,7 +352,7 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
             <h3 className="modal__desc-title">Descripción</h3>
             <p className="modal__pizza-description">{pizza.descripcion}</p>            <div className="modal__bottom-row">
               <span className="modal__pizza-price">
-                {isPizza ? (cargandoTamanos ? 'Cargando...' : precioActual) : pizza.precio}
+                {cargandoTamanos ? 'Cargando...' : precioActual}
               </span>
               <button className="modal__add-button" onClick={handleAddToOrder}>
                 Añadir a mi orden <FontAwesomeIcon icon={faCartShopping} />
