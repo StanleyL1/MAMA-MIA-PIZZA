@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './InformacionLegal.css';
 import Footer from '../footer/footer';
 
 const InformacionLegal = () => {
+  // Función para hacer scroll automático al anchor
+  useEffect(() => {
+    if (window.location.hash) {
+      const element = document.getElementById(window.location.hash.slice(1));
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+    }
+  }, []);
+
   return (
     <div className="informacion-legal-container">
-      {/* No necesitas Header aquí porque ya tienes Navbar en App.jsx */}
-      
       <main className="informacion-legal-content">
         <div className="legal-header">
           <h1>Información y Políticas</h1>
@@ -15,7 +25,7 @@ const InformacionLegal = () => {
 
         <div className="legal-sections">
           {/* 1. Acerca de Nosotros */}
-          <section className="legal-section">
+          <section id="acerca-de-nosotros" className="legal-section">
             <h2>🔹 1. Acerca de Nosotros</h2>
             <p>
               Bienvenido a Mamá Mian Pizza. Esta sección contiene información importante sobre tus derechos como cliente, 
@@ -24,7 +34,7 @@ const InformacionLegal = () => {
           </section>
 
           {/* 2. Preguntas Frecuentes */}
-          <section className="legal-section">
+          <section id="preguntas-frecuentes" className="legal-section">
             <h2>❓ 2. Preguntas Frecuentes</h2>
             
             <div className="faq-item">
@@ -64,7 +74,7 @@ const InformacionLegal = () => {
           </section>
 
           {/* 3. Garantías y Retornos */}
-          <section className="legal-section">
+          <section id="garantias-retornos" className="legal-section">
             <h2>📦 3. Garantías y Retornos (Política de Devoluciones)</h2>
             <ul>
               <li>Puedes reportar problemas dentro de los primeros 30 minutos tras recibir el pedido.</li>
@@ -75,7 +85,7 @@ const InformacionLegal = () => {
           </section>
 
           {/* 4. Política de Envíos */}
-          <section className="legal-section">
+          <section id="politica-envios" className="legal-section">
             <h2>🚚 4. Política de Envíos</h2>
             <p><strong>Zonas:</strong> Puerto El Triunfo (gratis) y Jiquilisco ($1.50).</p>
             <p><strong>Tiempo estimado:</strong> 25–30 minutos.</p>
@@ -83,7 +93,7 @@ const InformacionLegal = () => {
           </section>
 
           {/* 5. Políticas de Privacidad */}
-          <section className="legal-section">
+          <section id="politicas-privacidad" className="legal-section">
             <h2>🔐 5. Políticas de Privacidad</h2>
             
             <div className="privacy-subsection">
@@ -116,7 +126,7 @@ const InformacionLegal = () => {
           </section>
 
           {/* 6. Términos y Condiciones */}
-          <section className="legal-section">
+          <section id="terminos-condiciones" className="legal-section">
             <h2>📄 6. Términos y Condiciones</h2>
             <ul>
               <li>Al usar el sitio confirmas que sos mayor de edad y que los datos proporcionados son verídicos.</li>
@@ -127,7 +137,7 @@ const InformacionLegal = () => {
           </section>
 
           {/* 7. Cancelación de Compra */}
-          <section className="legal-section">
+          <section id="cancelacion-compra" className="legal-section">
             <h2>❌ 7. Cancelación de Compra</h2>
             <ul>
               <li>Podés cancelar tu pedido en los primeros 5 minutos.</li>
@@ -137,7 +147,7 @@ const InformacionLegal = () => {
           </section>
 
           {/* 8. Formas de Pago */}
-          <section className="legal-section">
+          <section id="formas-pago" className="legal-section">
             <h2>💳 8. Formas de Pago</h2>
             <ul>
               <li>Tarjetas de crédito y débito (Wompi)</li>
@@ -147,20 +157,20 @@ const InformacionLegal = () => {
           </section>
 
           {/* 9. Política de Cookies */}
-          <section className="legal-section">
+          <section id="politica-cookies" className="legal-section">
             <h2>🍪 9. Política de Cookies</h2>
             <p>Se usan para recordar sesión, carrito, estadísticas, y personalización.</p>
             <p>Puedes desactivarlas desde tu navegador (afectará algunas funciones).</p>
           </section>
 
           {/* 10. Reversión de Pago */}
-          <section className="legal-section">
+          <section id="reversion-pago" className="legal-section">
             <h2>🔁 10. Reversión de Pago</h2>
             <p>Las devoluciones de dinero por errores se procesan en un plazo máximo de 72 horas, en casos justificados.</p>
           </section>
 
           {/* 11. Derecho a Retracto */}
-          <section className="legal-section">
+          <section id="derecho-retracto" className="legal-section">
             <h2>🔙 11. Derecho a Retracto</h2>
             <p>
               Podés ejercer tu derecho a retracto si el pedido aún no ha sido preparado. 

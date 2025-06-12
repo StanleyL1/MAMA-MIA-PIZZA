@@ -153,3 +153,15 @@
     font-size: 1.2rem;
   }
 }
+
+/* Añade a InformacionLegal.css */
+.legal-section:target {
+  background-color: #fff3e0;
+  border: 2px solid #ff6b35;
+  animation: highlight 2s ease-in-out;
+}
+
+@keyframes highlight {
+  0% { background-color: #ffe0b3; }
+  100% { background-color: #fff3e0; }
+}

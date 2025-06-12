@@ -23,29 +23,29 @@ const Footer = ({ noImage }) => {
         <div className="footer-links-grid">
           <div className="footer-links-column">
             <h4>Información</h4>
-            <a href="/informacion-legal">Acerca de Nosotros</a>
-            <a href="/informacion-legal">Preguntas Frecuentes</a>
-            <a href="/informacion-legal">Garantías y Retornos</a>
+            <a href="/informacion-legal#acerca-de-nosotros">Acerca de Nosotros</a>
+            <a href="/informacion-legal#preguntas-frecuentes">Preguntas Frecuentes</a>
+            <a href="/informacion-legal#garantias-retornos">Garantías y Retornos</a>
           </div>
           
           <div className="footer-links-column">
             <h4>Políticas</h4>
-            <a href="/informacion-legal">Política de Envíos</a>
-            <a href="/informacion-legal">Políticas de Privacidad</a>
-            <a href="/informacion-legal">Términos y Condiciones</a>
+            <a href="/informacion-legal#politica-envios">Política de Envíos</a>
+            <a href="/informacion-legal#politicas-privacidad">Políticas de Privacidad</a>
+            <a href="/informacion-legal#terminos-condiciones">Términos y Condiciones</a>
           </div>
           
           <div className="footer-links-column">
             <h4>Compras</h4>
-            <a href="/informacion-legal">Cancelación de Compra</a>
-            <a href="/informacion-legal">Formas de Pago</a>
-            <a href="/informacion-legal">Derecho a Retracto</a>
+            <a href="/informacion-legal#cancelacion-compra">Cancelación de Compra</a>
+            <a href="/informacion-legal#formas-pago">Formas de Pago</a>
+            <a href="/informacion-legal#derecho-retracto">Derecho a Retracto</a>
           </div>
           
           <div className="footer-links-column">
             <h4>Legal</h4>
-            <a href="/informacion-legal">Política de Cookies</a>
-            <a href="/informacion-legal">Reversión de Pago</a>
+            <a href="/informacion-legal#politica-cookies">Política de Cookies</a>
+            <a href="/informacion-legal#reversion-pago">Reversión de Pago</a>
           </div>
         </div>
       </div>
