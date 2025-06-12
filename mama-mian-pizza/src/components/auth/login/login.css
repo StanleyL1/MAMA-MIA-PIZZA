@@ -3,8 +3,8 @@
     flex-direction: column;
     align-items:center;
     justify-content: center;
-    height: 100%;
-    padding: 20px; /* un poco de padding para móviles */
+    height: 100vh; /* Cambiar a 100vh para altura completa */
+    padding: 20px;
 }
 
 .login__container{
@@ -14,17 +14,18 @@
     justify-content: center;
     border: 1px solid #991B1B;
     border-radius: 10px;
-    padding: 20px;
+    padding: 30px; /* Aumentar padding */
     width: 45%;
-    height: 50%;
+    height: auto; /* Cambiar a auto para mejor responsividad */
+    min-height: 500px; /* Altura mínima */
     background-color: #FFFFFF;
-    gap: 20px;
-    box-sizing: border-box; /* para incluir padding dentro del ancho */
+    gap: 30px; /* Aumentar gap entre elementos */
+    box-sizing: border-box;
 }
 
 .login__header{
     display: flex;
-    padding: 10px;
+    padding: 15px; /* Aumentar padding */
     flex-direction:column;
     align-items: center;
     width: 100%; 
@@ -38,42 +39,44 @@
 
 .login__main{
     width: 100%;
-    height: 40%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-items: center;
+    justify-content: center;
+    margin: 20px 0; /* Agregar margen vertical */
 }
 
 .login__form{
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-around;
+    justify-content: center;
     width: 100%;
-    height: 100%;
+    gap: 20px; /* Agregar gap entre inputs */
 }
 
 .login__form input{
     width: 70%;
-    height: 40px;
+    height: 45px; /* Aumentar altura */
     border-radius: 10px;
     border: 1px solid #991B1B;
-    padding: 10px;
+    padding: 12px; /* Aumentar padding */
     font-size: 1.2rem;
     color: #991B1B;
+    margin: 5px 0; /* Agregar margen */
 }
 
 .login__btn{
     border-radius: 10px;
-    padding: 10px;
+    padding: 12px 20px; /* Aumentar padding */
     background-color: #feb248;
     border: none;
     font-size: 1.1rem;
-    width: 20%;
+    width: 30%; /* Aumentar ancho */
     color: #991B1B;
     font-weight: bold;
     cursor: pointer;
+    margin: 15px 0; /* Agregar margen */
 }
 
 .login__btn:hover{
@@ -85,75 +88,137 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 20%;
-    gap: 10px;
+    gap: 20px; /* Aumentar espacio entre párrafos */
+    margin-top: 20px; /* Agregar margen superior */
 }
 
 .login__footer p{
     font-size: 1.2rem;
     color: #991B1B;
     margin: 0;
-    text-decoration: underline; /* Subrayado */
+    text-decoration: none;
 }
+
 .login__footer a{
     font-size: 1.2rem;
     color: #991B1B;
     text-decoration: none;
     font-weight: 600;    
+}
 
+/* Estilo específico para "Registrate" - negrita */
+.login__footer a.register-link{
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* Estilo específico para "Recuperar" - subrayado */
+.login__footer a.recover-link{
+    text-decoration: underline;
+    font-weight: 600;
 }
 
 .login__footer a:hover{
     text-decoration: underline;
 }
-.login__footer a:visited{
-    font-weight: 900;    
-    color: #000000;
-
-}
 
 /* Para pantallas grandes */
 @media (min-width: 1025px) {
     .login__container {
-        width: 45%;
-        height: 50%;
+        width: 40%;
+        min-height: 550px;
+        gap: 35px;
+    }
+    
+    .login__btn {
+        width: 25%;
     }
 }
 
 /* Tablets (entre 769px y 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
     .login__container {
-        width: 70%;
-        height: auto;
+        width: 60%;
+        padding: 25px;
+        gap: 25px;
+        min-height: 480px;
+    }
+    
+    .login__btn {
+        width: 40%;
+    }
+    
+    .login__footer {
+        gap: 18px;
     }
 }
 
 /* Móviles (hasta 768px) */
 @media (max-width: 768px) {
     .login__container {
-        width: 95%;
-        height: auto;
-        padding: 15px;
+        width: 90%;
+        padding: 20px;
+        gap: 20px;
+        min-height: 450px;
+    }
+    
+    .login__form {
         gap: 15px;
     }
     
     .login__form input {
         width: 100%;
+        height: 40px;
+        padding: 10px;
     }
 
     .login__btn {
-        width: 50%;
+        width: 60%;
         font-size: 1rem;
-        padding: 8px;
+        padding: 10px;
+        margin: 10px 0;
     }
 
     .login__header h3 {
         font-size: 1.5rem;
     }
+    
+    .login__header {
+        padding: 10px;
+    }
+
+    .login__footer {
+        gap: 15px;
+        margin-top: 15px;
+    }
 
     .login__footer p, .login__footer a {
         font-size: 1rem;
+    }
+}
+
+/* Móviles pequeños (hasta 480px) */
+@media (max-width: 480px) {
+    .login {
+        padding: 15px;
+    }
+    
+    .login__container {
+        width: 95%;
+        padding: 15px;
+        gap: 15px;
+        min-height: 400px;
+    }
+    
+    .login__btn {
+        width: 70%;
+    }
+    
+    .login__footer {
+        gap: 12px;
+    }
+    
+    .login__footer p, .login__footer a {
+        font-size: 0.9rem;
     }
 }
