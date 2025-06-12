@@ -84,13 +84,6 @@ const Menu = ({ onAddToCart }) => {
         return true;
       }
       
-      if (activeCategory === 'Complementos' && 
-          (titulo.includes('sticks') || titulo.includes('complemento') || 
-           titulo.includes('pan') || titulo.includes('papas') || 
-           descripcion.includes('complemento'))) {
-        return true;
-      }
-      
       if (activeCategory === 'Bebidas' && 
           (titulo.includes('bebida') || titulo.includes('refresco') || 
            titulo.includes('agua') || titulo.includes('soda') || 
@@ -201,12 +194,6 @@ const Menu = ({ onAddToCart }) => {
             Bebidas
           </button>
           <button
-            className={`menu-category-button ${activeCategory === "Complementos" ? "active" : ""}`}
-            onClick={() => handleCategoryChange("Complementos")}
-          >
-            Complementos
-          </button>
-          <button
             className={`menu-category-button ${activeCategory === "Postres" ? "active" : ""}`}
             onClick={() => handleCategoryChange("Postres")}
           >
@@ -268,12 +255,6 @@ const Menu = ({ onAddToCart }) => {
               <p>No se encontraron productos {searchTerm ? `que coincidan con "${searchTerm}"` : ''} 
                  {activeCategory !== 'Todos' ? ` en la categoría "${activeCategory}"` : ''}</p>
               <p>Intenta con otra búsqueda o categoría</p>
-              <pre style={{ textAlign: 'left', margin: '20px auto', maxWidth: '500px' }}>
-                Estado actual:
-                - Categoría: {activeCategory}
-                - Búsqueda: {searchTerm || "(vacía)"}
-                - Total productos: {menu.length}
-              </pre>
             </div>
           )}
         </div>
