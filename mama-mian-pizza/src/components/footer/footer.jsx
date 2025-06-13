@@ -26,6 +26,7 @@ const Footer = ({ noImage }) => {
             <a href="/informacion-legal#acerca-de-nosotros">Acerca de Nosotros</a>
             <a href="/informacion-legal#preguntas-frecuentes">Preguntas Frecuentes</a>
             <a href="/informacion-legal#garantias-retornos">Garantías y Retornos</a>
+            <a href="/equipo-desarrollo">Equipo de desarrollo</a>
           </div>
           
           <div className="footer-links-column">
@@ -55,9 +56,6 @@ const Footer = ({ noImage }) => {
 
       <div className="final-footer-bottom">
         <p className="final-footer-rights">© todos los derechos reservados 2025</p>
-        <div className="final-footer-social">
-          <a href="/equipo-desarrollo" className="footer-team-link">Equipo de desarrollo</a>
-        </div>
       </div>
     </footer>
   );
