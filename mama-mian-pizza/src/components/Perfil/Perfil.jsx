@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
    faHeart, faUser, faEdit, faShieldAlt, faCamera,
@@ -42,21 +43,25 @@ const favoritos = [
   },
 ];
 
-export default function Perfil({ onAddToCart }) {
+export default function Perfil({ onAddToCart, user }) {
+  const navigate = useNavigate();
+  
   // Tabs: pedidos | favoritos | editar | seguridad
   const [activeTab, setActiveTab] = useState('pedidos');
   const [showCambiarContra, setShowCambiarContra] = useState(false);
-
-  // Estado de perfil del usuario
+  // Estado de perfil del usuario - usar datos reales si están disponibles
   const [userPerfil, setUserPerfil] = useState({
-    nombre: 'Juan Pérez',
-    email: 'juan.perez@email.com',
-    telefono: '+503 7123-4567',
-    foto: perfilFoto,
-    pedidos: 12,
-    favoritos: 2,
-    miembroDesde: 2023,
+    nombre: user?.nombre || 'Usuario',
+    email: user?.correo || user?.email || 'usuario@email.com',
+    telefono: user?.telefono || user?.celular || '+503 0000-0000',
+    foto: user?.foto_perfil || user?.foto || perfilFoto,
+    pedidos: 12, // Esto podría venir de la API
+    favoritos: 2, // Esto podría venir de la API
+    miembroDesde: 2023, // Esto podría calcularse desde la fecha de registro
   });
+
+  console.log('👤 PERFIL - Usuario recibido:', user);
+  console.log('👤 PERFIL - Estado userPerfil:', userPerfil);
 
   // Formulario de edición
   const [formData, setFormData] = useState({
@@ -65,6 +70,19 @@ export default function Perfil({ onAddToCart }) {
     telefono: userPerfil.telefono,
   });
   const [editSuccess, setEditSuccess] = useState(false);
+  // Actualizar userPerfil cuando cambie el prop user
+  useEffect(() => {
+    if (user) {
+      console.log('👤 PERFIL - Actualizando perfil con datos de usuario:', user);
+      setUserPerfil(prev => ({
+        ...prev,
+        nombre: user.nombre || prev.nombre,
+        email: user.correo || user.email || prev.email,
+        telefono: user.telefono || user.celular || prev.telefono,
+        foto: user.foto_perfil || user.foto || prev.foto,
+      }));
+    }
+  }, [user]);
 
   // Sincroniza los datos del formulario cuando el tab o usuario cambian
   useEffect(() => {
@@ -76,6 +94,18 @@ export default function Perfil({ onAddToCart }) {
       });
     }
   }, [activeTab, userPerfil]);
+
+  // Redirigir al login si no hay usuario logueado
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  // Si no hay usuario, no renderizar nada (se está redirigiendo)
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="perfil__main">

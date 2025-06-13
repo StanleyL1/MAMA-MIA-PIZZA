@@ -171,30 +171,53 @@ textarea {
 /* Notificación tipo toast */
 .toast-notification {
   position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #4CAF50;
+  top: 20px;
+  right: 20px;
+  background-color: #22c55e;
   color: white;
-  padding: 15px 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 10002;
-  animation: fadeInOut 2s ease;
+  animation: slideIn 0.3s ease-out;
+  max-width: 150px;
   text-align: center;
 }
 
 .toast-notification p {
   margin: 0;
-  font-size: 1.1rem;
+  white-space: nowrap;
+  font-size: 13px;
   font-weight: 500;
+  padding: 0;
 }
 
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-  20% { opacity: 1; transform: translateX(-50%) translateY(0); }
-  80% { opacity: 1; transform: translateX(-50%) translateY(0); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive para notificación */
+@media (max-width: 768px) {
+  .toast-notification {
+    top: 10px;
+    right: 10px;
+    padding: 6px 12px;
+    font-size: 12px;
+    max-width: 120px;
+  }
+  
+  .toast-notification p {
+    font-size: 12px;
+  }
 }
 
 .navbar__profile-logged {
