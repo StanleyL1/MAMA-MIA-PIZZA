@@ -44,7 +44,7 @@ const datosTestimonios = [
   },
 ];
 
-const Home = ({ onAddToCart }) => {
+const Home = ({ onAddToCart, user }) => {
   const [popular, setPopular] = useState([]);
   const [recomendacion, setRecomendaciones] = useState([]);
   const [selectedPizza, setSelectedPizza] = useState(null);
@@ -205,14 +205,13 @@ const Home = ({ onAddToCart }) => {
         </div>
       </section>
 
-      <Footer />
-
-      {/* Modal */}
+      <Footer />      {/* Modal */}
       {selectedPizza && (
         <PizzaModal 
           pizza={selectedPizza}
           onClose={handleCloseModal}
           onAddToCart={handleAddToCart}
+          user={user}
         />
       )}
     </div>

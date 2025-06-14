@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './PizzaModal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping, faCommentDots, faStar } from '@fortawesome/free-solid-svg-icons';
 
-function PizzaModal({ pizza, onClose, onAddToCart }) {
+function PizzaModal({ pizza, onClose, onAddToCart, user }) {
   const [masa, setMasa] = useState('Tradicional');
   const [tamano, setTamano] = useState('Personal');
   const [instrucciones, setInstrucciones] = useState('');
   const [personalizarIngredientes, setPersonalizarIngredientes] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-  const [activeTab, setActiveTab] = useState('pedido');
-  const [reseñas, setReseñas] = useState([]);
+  const [activeTab, setActiveTab] = useState('pedido');  const [reseñas, setReseñas] = useState([]);
   const [mostrarFormularioResena, setMostrarFormularioResena] = useState(false);
   const [nuevaResena, setNuevaResena] = useState({ rating: 0, comentario: '' });
   const [tamanos, setTamanos] = useState([]);
   const [precioActual, setPrecioActual] = useState(pizza?.precio || '0');
   const [cargandoTamanos, setCargandoTamanos] = useState(false);
+  const [cargandoReseñas, setCargandoReseñas] = useState(false);
+  const [enviandoResena, setEnviandoResena] = useState(false);
 
   const maxIngredientes = 4;
   const [ingredientes, setIngredientes] = useState([
@@ -28,14 +29,47 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
     { id: 7, nombre: 'Aceitunas', seleccionado: false },
     { id: 8, nombre: 'Cebolla', seleccionado: false }
   ]);
-
   const [ingredientesSeleccionados, setIngredientesSeleccionados] = useState(0);
+  // Función para cargar reseñas desde la API
+  const cargarReseñas = useCallback(async () => {
+    // Determinar el ID del producto de manera robusta
+    const productId = pizza?.id || pizza?.id_producto || pizza?.product_id || pizza?.ID;
+    
+    if (!productId) {
+      console.warn('⚠️ No se encontró ID de producto para cargar reseñas');
+      return;
+    }
+    
+    setCargandoReseñas(true);
+    try {
+      const response = await fetch(`https://api.mamamianpizza.com/api/resenas/${productId}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Reseñas cargadas:', data);
+        
+        // Transformar las reseñas para que coincidan con el formato esperado
+        const reseñasFormateadas = data.resenas ? data.resenas.map(resena => ({
+          rating: resena.valoracion,
+          comentario: resena.comentario,
+          nombre: resena.nombre_usuario,
+          fecha: new Date(resena.fecha_creacion).toISOString().slice(0, 10),
+          foto: require('../../assets/perfilfoto.png') // Usar foto por defecto
+        })) : [];
+        
+        setReseñas(reseñasFormateadas);
+      } else {
+        console.log('No se pudieron cargar las reseñas:', response.status);
+        setReseñas([]);
+      }
+    } catch (error) {
+      console.error('Error al cargar reseñas:', error);
+      setReseñas([]);
+    } finally {
+      setCargandoReseñas(false);
+    }
+  }, [pizza]);
   
-  const user = {
-    nombre: "Juan Pérez",
-    foto: require('../../assets/perfilfoto.png'),
-  };
-
   // Función para calcular el precio basado en el multiplicador del tamaño
   const calcularPrecio = (tamanoData) => {
     if (!tamanoData || !tamanoData.precio) return '$0';
@@ -61,7 +95,21 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
     console.log('Tamaños únicos procesados:', tamanosUnicos);
     return tamanosUnicos.sort((a, b) => a.indice - b.indice);
   };
-
+  // Cargar reseñas cuando se monta el componente o cambia la pizza
+  useEffect(() => {
+    if (pizza && activeTab === 'resenas') {
+      cargarReseñas();
+    }
+  }, [pizza, activeTab, cargarReseñas]);
+  
+  // Reiniciar formulario de reseñas cuando cambia la pizza
+  useEffect(() => {
+    if (pizza) {
+      setNuevaResena({ rating: 0, comentario: '' });
+      setMostrarFormularioResena(false);
+    }
+  }, [pizza]);
+  
   // Actualiza el contador cuando cambian las selecciones
   useEffect(() => {
     const count = ingredientes.filter(ing => ing.seleccionado).length;
@@ -172,6 +220,18 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
     }
   }, [pizza, tamanos]);
 
+  // Log cuando se recibe una nueva pizza
+  useEffect(() => {
+    if (pizza) {
+      console.log('🍕 PizzaModal recibió nueva pizza:', pizza);
+      console.log('🆔 Todas las propiedades de la pizza:', Object.keys(pizza));
+      console.log('🆔 pizza.id:', pizza.id);
+      console.log('🆔 pizza.id_producto:', pizza.id_producto);
+      console.log('🆔 pizza.product_id:', pizza.product_id);
+      console.log('🆔 pizza.ID:', pizza.ID);
+    }
+  }, [pizza]);
+
   if (!pizza) return null;
 
   // Determinar si es una pizza basado en el nombre o categoría
@@ -236,24 +296,159 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
         ing.id === id ? { ...ing, seleccionado: true } : ing
       ));
     }
-  };
+  };  const handlePublicarResena = async () => {
+    // Validar que la calificación esté en el rango correcto (1-5)
+    if (nuevaResena.rating < 1 || nuevaResena.rating > 5) {
+      alert('Por favor, selecciona una calificación válida (1-5 estrellas)');
+      return;
+    }
+    
+    if (nuevaResena.rating > 0 && nuevaResena.comentario.trim()) {      // Verificar que el usuario esté autenticado
+      if (!user || !user.id) {
+        alert('Debes estar autenticado para escribir una reseña');
+        return;
+      }      // Verificar que la pizza tenga un ID válido usando búsqueda robusta
+      const productId = pizza?.id || pizza?.id_producto || pizza?.product_id || pizza?.ID;
+      
+      if (!pizza || !productId) {
+        console.error('❌ Pizza sin ID válido:', pizza);
+        console.error('❌ Propiedades disponibles:', pizza ? Object.keys(pizza) : 'No hay objeto pizza');
+        alert('Error: No se puede identificar el producto. Por favor, recarga la página.');
+        return;
+      }
 
-  const handlePublicarResena = () => {
-    if (nuevaResena.rating > 0 && nuevaResena.comentario.trim()) {
-      const hoy = new Date();
-      setReseñas([
-        ...reseñas,
-        {
-          ...nuevaResena,
-          nombre: user.nombre,
-          foto: user.foto,
-          fecha: hoy.toISOString().slice(0, 10), // YYYY-MM-DD
+      setEnviandoResena(true);
+        try {        // Log para verificar los datos de la pizza
+        console.log('🍕 Objeto pizza completo:', pizza);
+        console.log('🆔 pizza.id:', pizza.id);
+        console.log('🆔 productId encontrado:', productId);
+        console.log('👤 user.id:', user.id);
+        console.log('👤 Tipo de user.id:', typeof user.id);
+        console.log('🆔 Tipo de productId:', typeof productId);
+        
+        // Asegurar que los IDs sean enteros
+        const userId = parseInt(user.id, 10);
+        const productIdInt = parseInt(productId, 10);
+        const valoracionInt = parseInt(nuevaResena.rating, 10);
+        
+        // Validar que la conversión fue exitosa
+        if (isNaN(userId) || isNaN(productIdInt) || isNaN(valoracionInt)) {
+          console.error('❌ Error en conversión de tipos:');
+          console.error('userId:', userId, 'isNaN:', isNaN(userId));
+          console.error('productIdInt:', productIdInt, 'isNaN:', isNaN(productIdInt));
+          console.error('valoracionInt:', valoracionInt, 'isNaN:', isNaN(valoracionInt));
+          alert('Error: Datos de usuario o producto inválidos');
+          setEnviandoResena(false);
+          return;
         }
-      ]);
-      setNuevaResena({ rating: 0, comentario: '' });
-      setMostrarFormularioResena(false);
+          const resenaData = {
+          id_usuario: userId,
+          id_producto: productIdInt,
+          comentario: nuevaResena.comentario.trim(),
+          valoracion: valoracionInt
+        };
+
+        // Validación final antes del envío (similar al backend)
+        const missingFields = [];
+        if (!resenaData.id_usuario) missingFields.push('id_usuario');
+        if (!resenaData.id_producto) missingFields.push('id_producto');
+        if (!resenaData.comentario) missingFields.push('comentario');
+        if (resenaData.valoracion === undefined || resenaData.valoracion === null || resenaData.valoracion === '') missingFields.push('valoracion');
+        
+        if (missingFields.length > 0) {
+          console.error('❌ Campos faltantes detectados:', missingFields);
+          console.error('❌ Datos actuales:', resenaData);
+          alert(`Error: Faltan campos requeridos: ${missingFields.join(', ')}`);
+          setEnviandoResena(false);
+          return;
+        }
+        
+        // Validar rango de valoración
+        if (resenaData.valoracion < 1 || resenaData.valoracion > 5) {
+          console.error('❌ Valoración fuera de rango:', resenaData.valoracion);
+          alert('Error: La valoración debe estar entre 1 y 5 estrellas');
+          setEnviandoResena(false);
+          return;
+        }
+
+        console.log('📝 Enviando reseña con tipos correctos:', resenaData);
+        console.log('📝 Tipos de datos:', {
+          id_usuario: typeof resenaData.id_usuario,
+          id_producto: typeof resenaData.id_producto,
+          comentario: typeof resenaData.comentario,
+          valoracion: typeof resenaData.valoracion
+        });
+        console.log('⭐ Rating seleccionado por el usuario:', nuevaResena.rating, 'estrellas');
+
+        const response = await fetch('https://api.mamamianpizza.com/api/resenas/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(resenaData)
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ Reseña creada exitosamente:', data);
+          
+          // Agregar la nueva reseña localmente
+          const nuevaResenaLocal = {
+            rating: nuevaResena.rating,
+            comentario: nuevaResena.comentario,
+            nombre: user.nombre || 'Usuario',
+            fecha: new Date().toISOString().slice(0, 10),
+            foto: user.foto_perfil || user.foto || require('../../assets/perfilfoto.png')
+          };
+          
+          setReseñas(prev => [nuevaResenaLocal, ...prev]);
+          setNuevaResena({ rating: 0, comentario: '' });
+          setMostrarFormularioResena(false);
+          
+          // Mostrar mensaje de éxito
+          alert('¡Reseña publicada exitosamente!');        } else {
+          const errorData = await response.json();
+          console.error('❌ Error al crear reseña:', errorData);
+          console.error('❌ Status:', response.status);
+          console.error('❌ Response completa:', response);
+          
+          // Mostrar mensaje de error específico basado en el backend
+          if (response.status === 400) {
+            if (errorData.campos_faltantes) {
+              alert(`Error: Faltan campos requeridos: ${errorData.campos_faltantes.join(', ')}\n\nDatos enviados: ${JSON.stringify(errorData.datos_recibidos, null, 2)}`);
+            } else {
+              alert(errorData.message || 'Datos inválidos enviados al servidor');
+            }
+          } else if (response.status === 409) {
+            alert('Ya has escrito una reseña para este producto');
+          } else if (response.status === 404) {
+            alert('Usuario o producto no encontrado');
+          } else {
+            alert(`Error ${response.status}: ${errorData.message || 'Error al publicar la reseña'}`);
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error de conexión:', error);
+        alert('Error de conexión. Por favor, intenta nuevamente.');
+      } finally {
+        setEnviandoResena(false);
+      }
+    } else {
+      alert('Por favor, selecciona una calificación y escribe un comentario');
     }
   };
+
+  // Función para manejar la selección de estrellas de manera robusta
+  const handleStarClick = (rating) => {
+    // Asegurar que el rating esté en el rango válido
+    if (rating >= 1 && rating <= 5) {
+      console.log(`⭐ Usuario seleccionó ${rating} estrellas`);
+      setNuevaResena(prev => ({ ...prev, rating: rating }));
+    } else {
+      console.warn('⚠️ Rating inválido seleccionado:', rating);
+    }
+  };
+
   return (
     <div className="modal__overlay" onClick={onClose}>
       <div
@@ -430,8 +625,7 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
                 </button>
               </div>
             </div>
-            
-            <div className="reseñas__container">
+              <div className="reseñas__container">
               {/* Encabezado: estrellas y promedio */}
               <div className="reseñas__header">
                 <div className="reseñas__header-stars">
@@ -462,26 +656,36 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
                 </div>
               </div>
 
+              {/* Estado de carga */}
+              {cargandoReseñas && (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  <p>Cargando reseñas...</p>
+                </div>
+              )}
+
               {/* Formulario o botón */}
               {mostrarFormularioResena ? (
                 <>
                   <div className="reseñas__form-card">
                     <div className="reseñas__form-title">
                       Escribe tu reseña
-                    </div>
-                    <div className="reseñas__form-field">
+                    </div>                    <div className="reseñas__form-field">
                       <label className="reseñas__form-label">Calificación</label>
-                      <div className="reseñas__form-stars">
-                        {[1,2,3,4,5].map((star) => (
+                      <div className="reseñas__form-stars">                        {[1,2,3,4,5].map((star) => (
                           <FontAwesomeIcon
                             key={star}
                             icon={faStar}
                             className={`reseñas__form-star${nuevaResena.rating >= star ? " selected" : ""}`}
-                            onClick={() => setNuevaResena({ ...nuevaResena, rating: star })}
+                            onClick={() => handleStarClick(star)}
                             style={{ cursor: "pointer" }}
                           />
                         ))}
                       </div>
+                      {nuevaResena.rating > 0 && (
+                        <div style={{ marginTop: '8px', fontSize: '14px', color: '#666' }}>
+                          Calificación seleccionada: {nuevaResena.rating} {nuevaResena.rating === 1 ? 'estrella' : 'estrellas'}
+                        </div>
+                      )}
                     </div>
                     <div className="reseñas__form-field">
                       <label className="reseñas__form-label">Comentario</label>
@@ -492,26 +696,27 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
                         onChange={e => setNuevaResena({ ...nuevaResena, comentario: e.target.value })}
                         rows={3}
                       />
-                    </div>
-                    <div className="reseñas__form-actions">
+                    </div>                    <div className="reseñas__form-actions">
                       <button
                         className="reseñas__form-btn reseñas__form-btn--red"
                         type="button"
                         onClick={handlePublicarResena}
+                        disabled={enviandoResena}
                       >
-                        Publicar reseña
+                        {enviandoResena ? 'Publicando...' : 'Publicar reseña'}
                       </button>
                       <button
                         className="reseñas__form-btn"
                         type="button"
                         onClick={() => setMostrarFormularioResena(false)}
+                        disabled={enviandoResena}
                       >
                         Cancelar
                       </button>
                     </div>
                   </div>
                 </>
-              ) : reseñas.length === 0 ? (
+              ) : reseñas.length === 0 && !cargandoReseñas ? (
                 <>
                   {/* Estado vacío de reseñas */}
                   <div className="reseñas__clientes-titulo">
@@ -525,24 +730,37 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
                       </svg>
                     </div>
                     <div className="reseñas__empty-titulo">
-                      ¡Sé el primero en reseñar!
-                    </div>
+                      ¡Sé el primero en reseñar!                    </div>
                     <div className="reseñas__empty-text">
                       Comparte tu experiencia con esta deliciosa pizza
                     </div>
-                    <button className="reseñas__empty-btn" onClick={() => setMostrarFormularioResena(true)}>
-                      <FontAwesomeIcon icon={faCommentDots} style={{marginRight: 8}} />
-                      Escribir primera reseña
-                    </button>
+                    {user && user.id ? (
+                      <button className="reseñas__empty-btn" onClick={() => setMostrarFormularioResena(true)}>
+                        <FontAwesomeIcon icon={faCommentDots} style={{marginRight: 8}} />
+                        Escribir primera reseña
+                      </button>
+                    ) : (
+                      <p style={{ textAlign: 'center', color: '#666', fontSize: '14px', marginTop: '10px' }}>
+                        Inicia sesión para escribir una reseña
+                      </p>
+                    )}
                   </div>
                 </>
-              ) : null}
-
-              {/* Mostrar reseñas ya publicadas */}
-              {reseñas.length > 0 && (
+              ) : null}              {/* Mostrar reseñas ya publicadas */}
+              {!cargandoReseñas && reseñas.length > 0 && (
                 <div className="reseñas__lista">
-                  <div className="reseñas__clientes-titulo">
-                    Reseñas de clientes
+                  <div className="reseñas__clientes-titulo" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Reseñas de clientes</span>
+                    {user && user.id && !mostrarFormularioResena && (
+                      <button 
+                        className="reseñas__empty-btn" 
+                        style={{ fontSize: '14px', padding: '8px 16px' }}
+                        onClick={() => setMostrarFormularioResena(true)}
+                      >
+                        <FontAwesomeIcon icon={faCommentDots} style={{marginRight: 6}} />
+                        Escribir reseña
+                      </button>
+                    )}
                   </div>
                   {reseñas.map((resena, i) => (
                     <div key={i} className="reseñas__review">

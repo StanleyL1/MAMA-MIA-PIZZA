@@ -1278,3 +1278,130 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* === ESTILOS PARA RESEÑAS === */
+.perfil__reviews-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 100%;
+}
+
+.perfil__review-card {
+  background: #fff;
+  border: 1px solid #e1e5e9;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.perfil__review-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.perfil__review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.perfil__review-product h4 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.perfil__review-stars {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.perfil__star {
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+
+.perfil__star.filled {
+  color: #fbbf24;
+}
+
+.perfil__star.empty {
+  color: #d1d5db;
+}
+
+.perfil__rating-text {
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.perfil__review-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.perfil__review-content {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid #ab1319;
+}
+
+.perfil__review-content p {
+  margin: 0;
+  color: #374151;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.perfil__refresh-btn {
+  background: none;
+  border: none;
+  color: #ab1319;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  margin-left: 1rem;
+}
+
+.perfil__refresh-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.perfil__refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive para reseñas */
+@media (max-width: 768px) {
+  .perfil__review-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .perfil__review-date {
+    align-self: flex-end;
+  }
+  
+  .perfil__reviews-container {
+    gap: 1rem;
+  }
+  
+  .perfil__review-card {
+    padding: 1rem;
+  }
+}
+

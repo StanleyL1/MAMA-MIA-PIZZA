@@ -5,7 +5,7 @@ import {
    faHeart, faUser, faEdit, faShieldAlt, faCamera,
   faArrowLeft, faPhone, faEnvelope, faEye, faEyeSlash,
   faRefresh, faSpinner, faExclamationTriangle, faShoppingBag,
-  faClock, faCreditCard, faTruck
+  faClock, faCreditCard, faTruck, faStar, faCommentDots
 } from "@fortawesome/free-solid-svg-icons";
 
 import perfilFoto from '../../assets/perfilfoto.png';
@@ -31,6 +31,11 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [errorOrders, setErrorOrders] = useState(null);
   const [updateMessage, setUpdateMessage] = useState('');
+  
+  // Estados para reseñas del usuario
+  const [userReviews, setUserReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [errorReviews, setErrorReviews] = useState(null);
   
   // Estado de perfil del usuario - usar datos reales si están disponibles
   const [userPerfil, setUserPerfil] = useState({
@@ -167,13 +172,73 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
       return false;
     }
   };
+  // Función para obtener reseñas del usuario desde la API
+  const fetchUserReviews = useCallback(async () => {
+    if (!user?.id) {
+      console.log('❌ No hay ID de usuario para obtener reseñas');
+      return;
+    }
+
+    setLoadingReviews(true);
+    setErrorReviews(null);
+
+    try {
+      const userId = user.id;
+      console.log('🔍 Obteniendo reseñas para usuario ID:', userId);
+      
+      const response = await fetch(`${API_BASE_URL}/resenas/usuario/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al obtener reseñas: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('⭐ Respuesta completa de reseñas:', data);
+
+      // Extraer reseñas de la respuesta
+      const reseñas = data.resenas || [];
+      
+      // Procesar los datos de reseñas
+      const processedReviews = reseñas.map(review => ({
+        id: review.id_resena,
+        producto: {
+          id: review.id_producto,
+          nombre: review.nombre_producto
+        },
+        comentario: review.comentario,
+        valoracion: review.valoracion,
+        fecha: review.fecha_creacion,
+        fechaFormateada: new Date(review.fecha_creacion).toLocaleDateString('es-ES', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      }));
+
+      setUserReviews(processedReviews);
+      console.log('✅ Reseñas procesadas:', processedReviews);
+
+    } catch (error) {
+      console.error('❌ Error al obtener reseñas:', error);
+      setErrorReviews(error.message);
+    } finally {
+      setLoadingReviews(false);
+    }
+  }, [user?.id]);
+
   // Efecto para cargar datos cuando se monta el componente o cambia el usuario
   useEffect(() => {
     if (user?.id) {
       console.log('🔄 Cargando datos del perfil para usuario ID:', user.id);
       fetchUserOrders();
+      fetchUserReviews();
     }
-  }, [user?.id, fetchUserOrders]);
+  }, [user?.id, fetchUserOrders, fetchUserReviews]);
 
   // Escuchar actualizaciones de pedidos desde el componente padre
   useEffect(() => {
@@ -227,6 +292,13 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
       navigate('/login');
     }
   }, [user, navigate]);
+
+  // Cargar reseñas cuando se activa la pestaña de reseñas
+  useEffect(() => {
+    if (activeTab === 'reseñas' && user?.id) {
+      fetchUserReviews();
+    }
+  }, [activeTab, fetchUserReviews, user?.id]);
 
   // Función para manejar la actualización manual de pedidos
   const handleRefreshOrders = async () => {
@@ -530,18 +602,80 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
         )}        {/* --- MIS RESEÑAS --- */}
         {activeTab === 'reseñas' && (
           <div>
-            <div className="perfil__titulo-favoritos">Mis reseñas</div>
-            <div className="perfil__empty">
-              <FontAwesomeIcon icon={faHeart} />
-              <h3>Función en desarrollo</h3>
-              <p>Próximamente podrás ver y gestionar tus reseñas de productos aquí</p>
+            <div className="perfil__titulo-favoritos">
+              Mis reseñas
               <button 
-                className="perfil__empty-btn"
-                onClick={() => navigate('/menu')}
+                className="perfil__refresh-btn"
+                onClick={fetchUserReviews}
+                disabled={loadingReviews}
+                title="Actualizar reseñas"
               >
-                Explorar Menú
+                <FontAwesomeIcon 
+                  icon={faRefresh} 
+                  className={loadingReviews ? 'spinning' : ''} 
+                />
               </button>
             </div>
+
+            {loadingReviews ? (
+              <div className="perfil__loading">
+                <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                <p>Cargando tus reseñas...</p>
+              </div>
+            ) : errorReviews ? (
+              <div className="perfil__error">
+                <FontAwesomeIcon icon={faExclamationTriangle} />
+                <h3>Error al cargar reseñas</h3>
+                <p>{errorReviews}</p>
+                <button 
+                  className="perfil__retry-btn"
+                  onClick={fetchUserReviews}
+                >
+                  <FontAwesomeIcon icon={faRefresh} /> Reintentar
+                </button>
+              </div>
+            ) : userReviews.length === 0 ? (
+              <div className="perfil__empty">
+                <FontAwesomeIcon icon={faCommentDots} />
+                <h3>No tienes reseñas aún</h3>
+                <p>Compra algunos productos y comparte tu experiencia escribiendo reseñas</p>
+                <button 
+                  className="perfil__empty-btn"
+                  onClick={() => navigate('/menu')}
+                >
+                  Explorar Menú
+                </button>
+              </div>
+            ) : (
+              <div className="perfil__reviews-container">
+                {userReviews.map((review) => (
+                  <div key={review.id} className="perfil__review-card">
+                    <div className="perfil__review-header">
+                      <div className="perfil__review-product">
+                        <h4>{review.producto.nombre}</h4>
+                        <div className="perfil__review-stars">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <FontAwesomeIcon
+                              key={star}
+                              icon={faStar}
+                              className={`perfil__star ${review.valoracion >= star ? 'filled' : 'empty'}`}
+                            />
+                          ))}
+                          <span className="perfil__rating-text">({review.valoracion}/5)</span>
+                        </div>
+                      </div>
+                      <div className="perfil__review-date">
+                        <FontAwesomeIcon icon={faClock} />
+                        <span>{review.fechaFormateada}</span>
+                      </div>
+                    </div>
+                    <div className="perfil__review-content">
+                      <p>"{review.comentario}"</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}{/* --- EDITAR PERFIL --- */}
         {activeTab === 'editar' && (

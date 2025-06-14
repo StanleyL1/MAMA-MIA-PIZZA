@@ -3,7 +3,8 @@ import './productsCards.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faStarHalf, faCartShopping } from '@fortawesome/free-solid-svg-icons';
 
-function ProductsCards({ data: { titulo, descripcion, imagen, precio, id_categoria }, onCardClick }) {
+function ProductsCards({ data, onCardClick }) {
+  const { titulo, descripcion, imagen, precio, id_categoria } = data;
   const [precioMediana, setPrecioMediana] = useState(precio);
   const [cargandoPrecio, setCargandoPrecio] = useState(false);
 
@@ -44,9 +45,8 @@ function ProductsCards({ data: { titulo, descripcion, imagen, precio, id_categor
 
     fetchPrecioMediana();
   }, [titulo, precio, id_categoria]);
-
   return (
-    <div className="prodcard-container" onClick={onCardClick}>
+    <div className="prodcard-container" onClick={() => onCardClick(data)}>
       <div className="prodcard-image-container">
         <img src={imagen} alt={titulo} className="prodcard-image" />
       </div>
