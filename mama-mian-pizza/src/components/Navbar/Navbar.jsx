@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-regular-svg-icons';
-import { faBars, faCartShopping } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faCartShopping, faUserCircle, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import Logo from '../../assets/Logo1.png';
 import './Navbar.css';
 import { Link } from 'react-router-dom';
@@ -143,8 +143,7 @@ useEffect(() => {
                     {/* Menú desplegable del perfil */}
               {isProfileMenuOpen && (
                 <ul 
-                  className="profile-dropdown" 
-                  style={{
+                  className="profile-dropdown"                  style={{
                     position: 'absolute',
                     top: 'calc(100% + 8px)',
                     right: '0',
@@ -168,8 +167,7 @@ useEffect(() => {
                     }}>
                       {user.nombre || user.name || 'Usuario'}
                     </div>
-                  </li>
-                  <li>
+                  </li>                  <li>
                     <Link 
                       to="/Perfil" 
                       onClick={() => {
@@ -189,10 +187,17 @@ useEffect(() => {
                       onMouseEnter={(e) => e.target.style.backgroundColor = '#f8f9fa'}
                       onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                     >
-                      👤 Ver Perfil
+                      <FontAwesomeIcon 
+                        icon={faUserCircle} 
+                        style={{ 
+                          marginRight: '8px', 
+                          color: '#007bff',
+                          fontSize: '16px' 
+                        }} 
+                      />
+                      Ver Perfil
                     </Link>
-                  </li>
-                  <li style={{ borderTop: '1px solid #f0f0f0', margin: '8px 0 0 0' }}>
+                  </li><li style={{ borderTop: '1px solid #f0f0f0', margin: '8px 0 0 0' }}>
                     <button 
                       onClick={() => {
                         console.log('🚪 Cerrando sesión');
@@ -216,7 +221,15 @@ useEffect(() => {
                       onMouseEnter={(e) => e.target.style.backgroundColor = '#ffebee'}
                       onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                     >
-                      🚪 Cerrar Sesión
+                      <FontAwesomeIcon 
+                        icon={faSignOutAlt} 
+                        style={{ 
+                          marginRight: '8px', 
+                          color: '#dc3545',
+                          fontSize: '16px' 
+                        }} 
+                      />
+                      Cerrar Sesión
                     </button>
                   </li>
                 </ul>

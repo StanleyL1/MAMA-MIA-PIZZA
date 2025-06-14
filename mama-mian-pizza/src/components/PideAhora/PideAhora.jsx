@@ -63,8 +63,9 @@ const PideAhora = ({ cartItems = [] }) => {
     apellido: '',
     telefono: '',
   });
-  
-  const [cuentaData, setCuentaData] = useState({
+    const [cuentaData, setCuentaData] = useState({
+    nombre: '',
+    telefono: '',
     email: '',
     password: '',
   });
@@ -290,13 +291,12 @@ const redirigirAWompi = () => {
     console.log('Preparando datos para enviar a la API...');
     setIsSubmitting(true);
     setOrderError('');
-    
-    try {
+      try {
       // Construir objeto con la estructura esperada por el backend
       const pedidoData = {
         // Datos del cliente según el modo seleccionado
         tipo_cliente: modo === 'invitado' ? 'invitado' : 'registrado',
-        cliente: modo === 'invitado' 
+        cliente: modo === 'invitado'
           ? { 
               nombre: invitadoData.nombre,
               apellido: invitadoData.apellido,
@@ -304,6 +304,8 @@ const redirigirAWompi = () => {
               email: null 
             }
           : {
+              nombre: cuentaData.nombre,
+              telefono: cuentaData.telefono,
               email: cuentaData.email,
               password: cuentaData.password 
             },
@@ -329,18 +331,16 @@ const redirigirAWompi = () => {
                 precision_ubicacion: Math.round(userLocation.accuracy),
                 direccion_formateada: addressInfo?.formattedAddress || "Ubicación compartida en tiempo real"
               })
-            }
-          : {
-              // Información de dirección mínima cuando se recoge en local
-              tipo_direccion: 'local',
+            }          : {
+              // Información de dirección del local cuando se recoge en local
+              tipo_direccion: 'formulario',
               direccion: "CP #3417, Puerto El Triunfo, EL salvador",
               pais: "El Salvador",
               departamento: "Usulután",
-              municipio: "Jiquilisco"
-            },
-              
+              municipio: "Jiquilisco"            },
+        
         // Datos de pago
-
+        metodo_pago: pagoMetodo,
               
         // Detalles del pedido - adaptado para la estructura esperada por el backend
         productos: cartItems.map(item => ({
@@ -575,11 +575,38 @@ const redirigirAWompi = () => {
                     </div>
                   </div>
                 </div>
-              )}
-
-              {/* Formulario de Cuenta */}
+              )}              {/* Formulario de Cuenta */}
               {modo === 'cuenta' && (
                 <div className="formulario-cuenta">
+                  <div className="campos-dobles">
+                    <div className="campo">
+                      <label htmlFor="nombreCuenta">Nombre</label>
+                      <input
+                        name="nombre"
+                        id="nombreCuenta"
+                        type="text"
+                        className="input-small"
+                        value={cuentaData.nombre}
+                        onChange={handleInputCuenta}
+                      />
+                    </div>
+                    <div className="campo">
+                      <label htmlFor="telefonoCuenta">Teléfono</label>
+                      <div className="telefono-container">
+                        <span className="telefono-prefix">+503</span>
+                        <span className="separador"></span>
+                        <input
+                          name="telefono"
+                          id="telefonoCuenta"
+                          type="tel"
+                          className="input-telefono"
+                          placeholder="000-0000"
+                          value={cuentaData.telefono}
+                          onChange={handleInputCuenta}
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <div className="campo">
                     <label htmlFor="email">Correo electrónico</label>
                     <input
@@ -913,15 +940,16 @@ const redirigirAWompi = () => {
     
     {/* Sección de Información Personal */}
     <div className="seccion-linea">
-      <h4 className="subtitulo-seccion">Información personal</h4>
-      {modo === 'invitado' ? (
+      <h4 className="subtitulo-seccion">Información personal</h4>      {modo === 'invitado' ? (
         <>
           <p>{invitadoData.nombre} {invitadoData.apellido}</p>
           <p>Teléfono: +503 {invitadoData.telefono}</p>
         </>
       ) : (
         <>
+          <p>{cuentaData.nombre}</p>
           <p>Email: {cuentaData.email}</p>
+          <p>Teléfono: +503 {cuentaData.telefono}</p>
         </>
       )}
     </div>

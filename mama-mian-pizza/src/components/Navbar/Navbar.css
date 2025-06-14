@@ -498,3 +498,39 @@ margin-bottom: 0px;}
   position: relative !important;
   z-index: 1000 !important;
 }
+
+/* Estilos para iconos del menú de perfil */
+.profile-dropdown .svg-inline--fa {
+  transition: all 0.2s ease;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.profile-dropdown li a:hover .svg-inline--fa,
+.profile-dropdown li button:hover .svg-inline--fa {
+  transform: scale(1.1);
+}
+
+.profile-dropdown li a .svg-inline--fa {
+  color: #007bff !important;
+}
+
+.profile-dropdown li button .svg-inline--fa {
+  color: #dc3545 !important;
+}
+
+/* Efectos adicionales para el menú desplegable */
+.profile-dropdown {
+  animation: fadeInDown 0.3s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

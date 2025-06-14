@@ -254,7 +254,6 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
       setMostrarFormularioResena(false);
     }
   };
-
   return (
     <div className="modal__overlay" onClick={onClose}>
       <div
@@ -263,55 +262,67 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
       >
         <button className="modal__close-button" onClick={onClose}>×</button>
 
-        {/* Barra superior */}
-        <div className="modal__topbar">
-          <span
-            className={`modal__topbar-item ${activeTab === 'pedido' ? 'active' : ''}`}
-            onClick={() => setActiveTab('pedido')}
-          >
-            <FontAwesomeIcon icon={faCartShopping} style={{ marginRight: 8 }} />
-            Realizar Pedido
-          </span>
-          <span
-            className={`modal__topbar-item ${activeTab === 'resenas' ? 'active' : ''}`}
-            onClick={() => setActiveTab('resenas')}
-          >
-            <FontAwesomeIcon icon={faStar} style={{ marginRight: 8 }} />
-            Reseñas
-          </span>
-        </div>
-
         {/* Notificación */}
-{showNotification && (
-  <div className="modal__notification">
-    <p>✓ Agregado al carrito</p>
-  </div>
-)}
+        {showNotification && (
+          <div className="modal__notification">
+            <p>✓ Agregado al carrito</p>
+          </div>
+        )}
 
-        {/* Layout principal */}
-        <div className="modal__layout">
-          {activeTab === 'pedido' && (
-            <div className="modal__left">
+        {activeTab === 'pedido' ? (
+          // Vista de pedido
+          <div className="modal__pedido-container">
+            {/* Imagen de la pizza */}
+            <div className="modal__image-section">
               <img src={pizza.imagen} alt={pizza.titulo} className="modal__pizza-image" />
             </div>
-          )}
-          <div className={`modal__right ${activeTab === 'resenas' ? 'full-width' : ''}`}>
-            <h2 className="modal__pizza-title">{pizza.titulo}</h2>
-            {activeTab === 'pedido' && (
-              <>
+
+            {/* Contenido del pedido */}
+            <div className="modal__content-section">
+              {/* Header con título y tabs */}
+              <div className="modal__header">
+                <h2 className="modal__pizza-title">{pizza.titulo}</h2>
+                <div className="modal__tabs">
+                  <button
+                    className={`modal__tab ${activeTab === 'pedido' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('pedido')}
+                  >
+                    <FontAwesomeIcon icon={faCartShopping} />
+                    Realizar Pedido
+                  </button>
+                  <button
+                    className={`modal__tab ${activeTab === 'resenas' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('resenas')}
+                  >
+                    <FontAwesomeIcon icon={faStar} />
+                    Reseñas
+                  </button>
+                </div>
+              </div>              {/* Formulario de opciones */}
+              <div className="modal__form-section">
                 {isPizza && (
                   <>
-                    <div className="modal__option-section">
-                      <span className="modal__option-label">Tipo de masa</span>
+                    <div className="modal__option-group">
+                      <label className="modal__option-label">Tipo de masa</label>
                       <div className="modal__option-toggle">
-                        <button className={`modal__toggle-button ${masa === 'Delgada' ? 'modal__active' : ''}`} onClick={() => handleToggleMasa('Delgada')}>Delgada</button>
-                        <button className={`modal__toggle-button ${masa === 'Tradicional' ? 'modal__active' : ''}`} onClick={() => handleToggleMasa('Tradicional')}>Tradicional</button>
+                        <button 
+                          className={`modal__toggle-button ${masa === 'Delgada' ? 'modal__active' : ''}`} 
+                          onClick={() => handleToggleMasa('Delgada')}
+                        >
+                          Delgada
+                        </button>
+                        <button 
+                          className={`modal__toggle-button ${masa === 'Tradicional' ? 'modal__active' : ''}`} 
+                          onClick={() => handleToggleMasa('Tradicional')}
+                        >
+                          Tradicional
+                        </button>
                       </div>
                     </div>
                     
-                    <div className="modal__option-section">
+                    <div className="modal__option-group">
                       <div className="modal__personalizar-wrapper">
-                        <span className="modal__option-label">Personalizar ingredientes</span>
+                        <label className="modal__option-label">Personalizar ingredientes</label>
                         <div className="modal__toggle-slider-wrapper">
                           <label className="modal__toggle-slider">
                             <input type="checkbox" checked={personalizarIngredientes} onChange={handleTogglePersonalizar} />
@@ -349,10 +360,10 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
                   </>
                 )}
                 
-                {/* Sección de tamaños - mostrar para todos los productos con opciones/tamaños */}
+                {/* Sección de tamaños */}
                 {tamanos && tamanos.length > 0 && (
-                  <div className="modal__option-section">
-                    <span className="modal__option-label">Tamaño</span>
+                  <div className="modal__option-group">
+                    <label className="modal__option-label">Tamaño</label>
                     <select 
                       value={tamano} 
                       onChange={(e) => setTamano(e.target.value)}
@@ -365,177 +376,209 @@ function PizzaModal({ pizza, onClose, onAddToCart }) {
                   </div>
                 )}
 
-                <div className="modal__option-section">
-                  <span className="modal__option-label">Instrucciones especiales</span>
+                <div className="modal__option-group">
+                  <label className="modal__option-label">Instrucciones especiales</label>
                   <textarea
                     className="modal__instrucciones-input"
-                    placeholder="Ej: Poco queso, bien cocida, etc"
+                    placeholder="Ej: Poco queso, bien cocida, sin cebolla..."
                     value={instrucciones}
                     onChange={(e) => setInstrucciones(e.target.value)}
                   />
                 </div>
+              </div>
+
+              {/* Descripción */}
+              <div className="modal__description-section">
                 <h3 className="modal__desc-title">Descripción</h3>
                 <p className="modal__pizza-description">{pizza.descripcion}</p>
-                <div className="modal__bottom-row">
+              </div>
+
+              {/* Footer con precio y botón */}
+              <div className="modal__footer">
+                <div className="modal__price-section">
+                  <span className="modal__price-label">Precio total</span>
                   <span className="modal__pizza-price">
                     {cargandoTamanos ? 'Cargando...' : precioActual}
                   </span>
-                  <button className="modal__add-button" onClick={handleAddToOrder}>
-                    Añadir a mi orden <FontAwesomeIcon icon={faCartShopping} />
-                  </button>
                 </div>
-              </>
-            )}
-            {activeTab === 'resenas' && (
-              <div className="reseñas__container">
-                {/* Encabezado: estrellas y promedio */}
-                <div className="reseñas__header">
-                  <div className="reseñas__header-stars">
-                    {(() => {
-                      // Calcular promedio
-                      const avg = reseñas.length
-                        ? reseñas.reduce((s, r) => s + r.rating, 0) / reseñas.length
-                        : 0;
-                      // Mostrar estrellas promedio
-                      return [1,2,3,4,5].map(star => (
-                        <FontAwesomeIcon
-                          key={star}
-                          icon={faStar}
-                          className="reseñas__star"
-                          style={{
-                            color: avg >= star - 0.5 ? "#eab308" : "#d1d5db",
-                            fontSize: 22
-                          }}
-                        />
-                      ));
-                    })()}
-                  </div>
-                  <div className="reseñas__header-rating">
-                    <span className="reseñas__average">
-                      {reseñas.length ? (reseñas.reduce((s, r) => s + r.rating, 0) / reseñas.length).toFixed(1) : "0.0"} de 5
-                    </span>
-                    <span className="reseñas__count">{reseñas.length} reseñas</span>
-                  </div>
+                <button className="modal__add-button" onClick={handleAddToOrder}>
+                  <FontAwesomeIcon icon={faCartShopping} />
+                  Añadir a mi orden
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          // Vista de reseñas
+          <div className="modal__resenas-container">
+            <div className="modal__resenas-header">
+              <h2 className="modal__pizza-title">{pizza.titulo}</h2>
+              <div className="modal__tabs">
+                <button
+                  className={`modal__tab ${activeTab === 'pedido' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('pedido')}
+                >
+                  <FontAwesomeIcon icon={faCartShopping} />
+                  Realizar Pedido
+                </button>
+                <button
+                  className={`modal__tab ${activeTab === 'resenas' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('resenas')}
+                >
+                  <FontAwesomeIcon icon={faStar} />
+                  Reseñas
+                </button>
+              </div>
+            </div>
+            
+            <div className="reseñas__container">
+              {/* Encabezado: estrellas y promedio */}
+              <div className="reseñas__header">
+                <div className="reseñas__header-stars">
+                  {(() => {
+                    // Calcular promedio
+                    const avg = reseñas.length
+                      ? reseñas.reduce((s, r) => s + r.rating, 0) / reseñas.length
+                      : 0;
+                    // Mostrar estrellas promedio
+                    return [1,2,3,4,5].map(star => (
+                      <FontAwesomeIcon
+                        key={star}
+                        icon={faStar}
+                        className="reseñas__star"
+                        style={{
+                          color: avg >= star - 0.5 ? "#eab308" : "#d1d5db",
+                          fontSize: 22
+                        }}
+                      />
+                    ));
+                  })()}
                 </div>
+                <div className="reseñas__header-rating">
+                  <span className="reseñas__average">
+                    {reseñas.length ? (reseñas.reduce((s, r) => s + r.rating, 0) / reseñas.length).toFixed(1) : "0.0"} de 5
+                  </span>
+                  <span className="reseñas__count">{reseñas.length} reseñas</span>
+                </div>
+              </div>
 
-                {/* Formulario o botón */}
-                {mostrarFormularioResena ? (
-                  <>
-                    <div className="reseñas__form-card">
-                      <div className="reseñas__form-title">
-                        Escribe tu reseña
+              {/* Formulario o botón */}
+              {mostrarFormularioResena ? (
+                <>
+                  <div className="reseñas__form-card">
+                    <div className="reseñas__form-title">
+                      Escribe tu reseña
+                    </div>
+                    <div className="reseñas__form-field">
+                      <label className="reseñas__form-label">Calificación</label>
+                      <div className="reseñas__form-stars">
+                        {[1,2,3,4,5].map((star) => (
+                          <FontAwesomeIcon
+                            key={star}
+                            icon={faStar}
+                            className={`reseñas__form-star${nuevaResena.rating >= star ? " selected" : ""}`}
+                            onClick={() => setNuevaResena({ ...nuevaResena, rating: star })}
+                            style={{ cursor: "pointer" }}
+                          />
+                        ))}
                       </div>
-                      <div className="reseñas__form-field">
-                        <label className="reseñas__form-label">Calificación</label>
-                        <div className="reseñas__form-stars">
-                          {[1,2,3,4,5].map((star) => (
+                    </div>
+                    <div className="reseñas__form-field">
+                      <label className="reseñas__form-label">Comentario</label>
+                      <textarea
+                        className="reseñas__form-textarea"
+                        placeholder="Comparte tu experiencia con esta pizza..."
+                        value={nuevaResena.comentario}
+                        onChange={e => setNuevaResena({ ...nuevaResena, comentario: e.target.value })}
+                        rows={3}
+                      />
+                    </div>
+                    <div className="reseñas__form-actions">
+                      <button
+                        className="reseñas__form-btn reseñas__form-btn--red"
+                        type="button"
+                        onClick={handlePublicarResena}
+                      >
+                        Publicar reseña
+                      </button>
+                      <button
+                        className="reseñas__form-btn"
+                        type="button"
+                        onClick={() => setMostrarFormularioResena(false)}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : reseñas.length === 0 ? (
+                <>
+                  {/* Estado vacío de reseñas */}
+                  <div className="reseñas__clientes-titulo">
+                    Reseñas de clientes
+                  </div>
+                  <div className="reseñas__empty">
+                    <div className="reseñas__empty-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="58" height="58" fill="none" viewBox="0 0 58 58" style={{opacity:0.18}}>
+                        <circle cx="29" cy="29" r="28" stroke="#414141" strokeWidth="2" fill="none"/>
+                        <path d="M19 34c0 1.657 3.134 3 7 3s7-1.343 7-3M23 26a2 2 0 104 0 2 2 0 00-4 0zM31 26a2 2 0 104 0 2 2 0 00-4 0z" stroke="#414141" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                      </svg>
+                    </div>
+                    <div className="reseñas__empty-titulo">
+                      ¡Sé el primero en reseñar!
+                    </div>
+                    <div className="reseñas__empty-text">
+                      Comparte tu experiencia con esta deliciosa pizza
+                    </div>
+                    <button className="reseñas__empty-btn" onClick={() => setMostrarFormularioResena(true)}>
+                      <FontAwesomeIcon icon={faCommentDots} style={{marginRight: 8}} />
+                      Escribir primera reseña
+                    </button>
+                  </div>
+                </>
+              ) : null}
+
+              {/* Mostrar reseñas ya publicadas */}
+              {reseñas.length > 0 && (
+                <div className="reseñas__lista">
+                  <div className="reseñas__clientes-titulo">
+                    Reseñas de clientes
+                  </div>
+                  {reseñas.map((resena, i) => (
+                    <div key={i} className="reseñas__review">
+                      <img
+                        src={resena.foto || require('../../assets/perfilfoto.png')}
+                        alt={resena.nombre || "Usuario"}
+                        className="reseñas__review-foto"
+                        style={{
+                          width: 55, height: 55, borderRadius: "50%", objectFit: "cover", marginRight: 24, float: "left"
+                        }}
+                      />
+                      <div style={{ marginLeft: 80 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 2 }}>
+                          {[1,2,3,4,5].map(star => (
                             <FontAwesomeIcon
                               key={star}
                               icon={faStar}
-                              className={`reseñas__form-star${nuevaResena.rating >= star ? " selected" : ""}`}
-                              onClick={() => setNuevaResena({ ...nuevaResena, rating: star })}
-                              style={{ cursor: "pointer" }}
+                              className="reseñas__review-star"
+                              style={{ color: resena.rating >= star ? "#eab308" : "#d1d5db", fontSize: 24 }}
                             />
                           ))}
                         </div>
-                      </div>
-                      <div className="reseñas__form-field">
-                        <label className="reseñas__form-label">Comentario</label>
-                        <textarea
-                          className="reseñas__form-textarea"
-                          placeholder="Comparte tu experiencia con esta pizza..."
-                          value={nuevaResena.comentario}
-                          onChange={e => setNuevaResena({ ...nuevaResena, comentario: e.target.value })}
-                          rows={3}
-                        />
-                      </div>
-                      <div className="reseñas__form-actions">
-                        <button
-                          className="reseñas__form-btn reseñas__form-btn--red"
-                          type="button"
-                          onClick={handlePublicarResena}
-                        >
-                          Publicar reseña
-                        </button>
-                        <button
-                          className="reseñas__form-btn"
-                          type="button"
-                          onClick={() => setMostrarFormularioResena(false)}
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    </div>
-                  </>
-                ) : reseñas.length === 0 ? (
-                  <>
-                    {/* Estado vacío de reseñas */}
-                    <div className="reseñas__clientes-titulo">
-                      Reseñas de clientes
-                    </div>
-                    <div className="reseñas__empty">
-                      <div className="reseñas__empty-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="58" height="58" fill="none" viewBox="0 0 58 58" style={{opacity:0.18}}>
-                          <circle cx="29" cy="29" r="28" stroke="#414141" strokeWidth="2" fill="none"/>
-                          <path d="M19 34c0 1.657 3.134 3 7 3s7-1.343 7-3M23 26a2 2 0 104 0 2 2 0 00-4 0zM31 26a2 2 0 104 0 2 2 0 00-4 0z" stroke="#414141" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                        </svg>
-                      </div>
-                      <div className="reseñas__empty-titulo">
-                        ¡Sé el primero en reseñar!
-                      </div>
-                      <div className="reseñas__empty-text">
-                        Comparte tu experiencia con esta deliciosa pizza
-                      </div>
-                      <button className="reseñas__empty-btn" onClick={() => setMostrarFormularioResena(true)}>
-                        <FontAwesomeIcon icon={faCommentDots} style={{marginRight: 8}} />
-                        Escribir reseña
-                      </button>
-                    </div>
-                  </>
-                ) : null}
-
-                {/* Mostrar reseñas ya publicadas */}
-                {reseñas.length > 0 && (
-                  <div className="reseñas__lista">
-                    <div className="reseñas__clientes-titulo">
-                      Reseñas de clientes
-                    </div>
-                    {reseñas.map((resena, i) => (
-                      <div key={i} className="reseñas__review">
-                        <img
-                          src={resena.foto || require('../../assets/perfilfoto.png')}
-                          alt={resena.nombre || "Usuario"}
-                          className="reseñas__review-foto"
-                          style={{
-                            width: 55, height: 55, borderRadius: "50%", objectFit: "cover", marginRight: 24, float: "left"
-                          }}
-                        />
-                        <div style={{ marginLeft: 80 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 2 }}>
-                            {[1,2,3,4,5].map(star => (
-                              <FontAwesomeIcon
-                                key={star}
-                                icon={faStar}
-                                className="reseñas__review-star"
-                                style={{ color: resena.rating >= star ? "#eab308" : "#d1d5db", fontSize: 24 }}
-                              />
-                            ))}
-                          </div>
-                          <div className="reseñas__review-comment" style={{ fontSize: 17, marginBottom: 5 }}>
-                            {resena.comentario}
-                          </div>
-                          <div style={{ fontWeight: 600, fontSize: 16, marginTop: 7 }}>{resena.nombre}</div>
-                          <div style={{ fontSize: 14, color: "#7c7c7c" }}>{resena.fecha}</div>
+                        <div className="reseñas__review-comment" style={{ fontSize: 17, marginBottom: 5 }}>
+                          {resena.comentario}
                         </div>
-                        <div style={{ clear: "both" }} />
+                        <div style={{ fontWeight: 600, fontSize: 16, marginTop: 7 }}>{resena.nombre}</div>
+                        <div style={{ fontSize: 14, color: "#7c7c7c" }}>{resena.fecha}</div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+                      <div style={{ clear: "both" }} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

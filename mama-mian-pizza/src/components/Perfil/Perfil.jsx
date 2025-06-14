@@ -1,63 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
    faHeart, faUser, faEdit, faShieldAlt, faCamera,
-  faArrowLeft, faPhone, faEnvelope, faEye, faEyeSlash
+  faArrowLeft, faPhone, faEnvelope, faEye, faEyeSlash,
+  faRefresh, faSpinner, faExclamationTriangle, faShoppingBag,
+  faClock, faCreditCard, faTruck
 } from "@fortawesome/free-solid-svg-icons";
 
-import perfilFoto from '../../assets/perfilfoto.png'; // Ajusta la ruta si tu foto está en otro lado
+import perfilFoto from '../../assets/perfilfoto.png';
 import './Perfil.css';
 
-// Mock de pedidos
-const pedidosMock = [
-  {
-    id: 1,
-    fecha: '2024-01-15',
-    productos: ['Pizza Suprema', 'Pizza Margherita'],
-    total: 15,
-    estado: 'Entregado',
-  },
-  {
-    id: 2,
-    fecha: '2024-01-10',
-    productos: ['Pizza Pepperoni'],
-    total: 9,
-    estado: 'Entregado',
-  },
-];
+const API_BASE_URL = 'https://api.mamamianpizza.com/api';
 
-// Mock de favoritos
-const favoritos = [
-  {
-    id: 1,
-    nombre: "Pizza Suprema",
-    precio: 8.00,
-    imagen: require('../../assets/PizzaCard.png'),
-  },
-  {
-    id: 2,
-    nombre: "Pizza Margherita",
-    precio: 7.00,
-    imagen: require('../../assets/PizzaCard.png'),
-  },
-];
-
-export default function Perfil({ onAddToCart, user }) {
+export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
   const navigate = useNavigate();
   
-  // Tabs: pedidos | favoritos | editar | seguridad
+  // Tabs: pedidos | reseñas | editar | seguridad
   const [activeTab, setActiveTab] = useState('pedidos');
   const [showCambiarContra, setShowCambiarContra] = useState(false);
+  
+  // Estados para datos de la API
+  const [userOrders, setUserOrders] = useState([]);
+  const [userStats, setUserStats] = useState({
+    totalOrders: 0,
+    totalSpent: 0,
+    averageOrderValue: 0,
+    favoriteProducts: 0
+  });
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [errorOrders, setErrorOrders] = useState(null);
+  const [updateMessage, setUpdateMessage] = useState('');
+  
   // Estado de perfil del usuario - usar datos reales si están disponibles
   const [userPerfil, setUserPerfil] = useState({
     nombre: user?.nombre || 'Usuario',
     email: user?.correo || user?.email || 'usuario@email.com',
     telefono: user?.telefono || user?.celular || '+503 0000-0000',
     foto: user?.foto_perfil || user?.foto || perfilFoto,
-    pedidos: 12, // Esto podría venir de la API
-    favoritos: 2, // Esto podría venir de la API
-    miembroDesde: 2023, // Esto podría calcularse desde la fecha de registro
+    miembroDesde: user?.fecha_registro ? new Date(user.fecha_registro).getFullYear() : 2023,
   });
 
   console.log('👤 PERFIL - Usuario recibido:', user);
@@ -69,7 +50,152 @@ export default function Perfil({ onAddToCart, user }) {
     email: userPerfil.email,
     telefono: userPerfil.telefono,
   });
-  const [editSuccess, setEditSuccess] = useState(false);
+  const [editSuccess, setEditSuccess] = useState(false);  // Función para obtener pedidos del usuario desde la API
+  const fetchUserOrders = useCallback(async () => {
+    if (!user?.id) {
+      console.log('❌ No hay ID de usuario para obtener pedidos');
+      return;
+    }
+
+    setLoadingOrders(true);
+    setErrorOrders(null);
+
+    try {
+      const userId = user.id;
+      console.log('🔍 Obteniendo pedidos para usuario ID:', userId);
+      
+      const response = await fetch(`${API_BASE_URL}/customers/${userId}/orders`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al obtener pedidos: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('📦 Respuesta completa de la API:', data);
+
+      // Extraer pedidos y estadísticas de la respuesta
+      const pedidos = data.pedidos || [];
+      const estadisticas = data.estadisticas || {};
+
+      // Procesar los datos de pedidos
+      const processedOrders = pedidos.map(order => ({
+        id: order.id || order.order_id,
+        fecha: order.fecha_pedido || order.created_at || order.fecha,
+        productos: order.productos || order.items || order.detalles || [],
+        total: parseFloat(order.total) || 0,
+        estado: order.estado || order.status || 'Pendiente',
+        metodo_pago: order.metodo_pago || order.payment_method || 'No especificado',
+        tipo_entrega: order.tipo_entrega || order.delivery_type || 'No especificado',
+        tiempo_entrega: order.tiempo_entrega || order.delivery_time || null,
+        direccion: order.direccion || order.address || null,
+        telefono: order.telefono || order.phone || null,
+        observaciones: order.observaciones || order.notes || null,
+      }));
+
+      setUserOrders(processedOrders);
+
+      // Usar estadísticas de la API si están disponibles, sino calcular
+      const stats = {
+        totalOrders: parseInt(estadisticas.totalPedidos) || processedOrders.length,
+        totalSpent: parseFloat(estadisticas.totalGastado) || processedOrders.reduce((sum, order) => sum + order.total, 0),
+        averageOrderValue: parseFloat(estadisticas.promedioPedido) || (
+          processedOrders.length > 0 
+            ? processedOrders.reduce((sum, order) => sum + order.total, 0) / processedOrders.length 
+            : 0
+        ),
+        favoriteProducts: processedOrders.reduce((count, order) => 
+          count + (Array.isArray(order.productos) ? order.productos.length : 0), 0
+        ),
+        primerPedido: estadisticas.primerPedido,
+        ultimoPedido: estadisticas.ultimoPedido,
+        pedidoMinimo: parseFloat(estadisticas.pedidoMinimo) || 0,
+        pedidoMaximo: parseFloat(estadisticas.pedidoMaximo) || 0,
+      };
+
+      setUserStats(stats);
+
+      console.log('✅ Pedidos procesados:', processedOrders);
+      console.log('📊 Estadísticas calculadas:', stats);
+
+    } catch (error) {
+      console.error('❌ Error al obtener pedidos:', error);
+      setErrorOrders('Error al cargar los pedidos. Por favor, intenta de nuevo.');
+    } finally {
+      setLoadingOrders(false);
+    }
+  }, [user?.id]);
+  // Función para actualizar perfil en la API
+  const updateUserProfile = async (updatedData) => {
+    if (!user?.id) {
+      console.log('❌ No hay ID de usuario para actualizar perfil');
+      return false;
+    }
+
+    try {
+      console.log('🔄 Actualizando perfil para usuario ID:', user.id);
+      console.log('📝 Datos a actualizar:', updatedData);
+      
+      const response = await fetch(`${API_BASE_URL}/users/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre: updatedData.nombre,
+          correo: updatedData.email,
+          telefono: updatedData.telefono,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('❌ Error del servidor:', errorData);
+        throw new Error(`Error al actualizar perfil: ${response.status} - ${errorData.message || 'Error desconocido'}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Perfil actualizado:', result);
+      return true;
+
+    } catch (error) {
+      console.error('❌ Error al actualizar perfil:', error);
+      return false;
+    }
+  };
+  // Efecto para cargar datos cuando se monta el componente o cambia el usuario
+  useEffect(() => {
+    if (user?.id) {
+      console.log('🔄 Cargando datos del perfil para usuario ID:', user.id);
+      fetchUserOrders();
+    }
+  }, [user?.id, fetchUserOrders]);
+
+  // Escuchar actualizaciones de pedidos desde el componente padre
+  useEffect(() => {
+    if (onOrderUpdate) {
+      const handleOrderUpdate = () => {
+        console.log('🔄 Actualizando pedidos después de nueva orden...');
+        setUpdateMessage('Actualizando historial de pedidos...');
+        
+        setTimeout(() => {
+          fetchUserOrders();
+          setUpdateMessage('');
+          if (setToast) {
+            setToast('¡Historial de pedidos actualizado!');
+          }
+        }, 1000);
+      };
+
+      window.addEventListener('orderCompleted', handleOrderUpdate);
+      return () => window.removeEventListener('orderCompleted', handleOrderUpdate);
+    }
+  }, [onOrderUpdate, fetchUserOrders, setToast]);
+
   // Actualizar userPerfil cuando cambie el prop user
   useEffect(() => {
     if (user) {
@@ -80,10 +206,10 @@ export default function Perfil({ onAddToCart, user }) {
         email: user.correo || user.email || prev.email,
         telefono: user.telefono || user.celular || prev.telefono,
         foto: user.foto_perfil || user.foto || prev.foto,
+        miembroDesde: user.fecha_registro ? new Date(user.fecha_registro).getFullYear() : prev.miembroDesde,
       }));
     }
   }, [user]);
-
   // Sincroniza los datos del formulario cuando el tab o usuario cambian
   useEffect(() => {
     if (activeTab === 'editar') {
@@ -102,6 +228,47 @@ export default function Perfil({ onAddToCart, user }) {
     }
   }, [user, navigate]);
 
+  // Función para manejar la actualización manual de pedidos
+  const handleRefreshOrders = async () => {
+    await fetchUserOrders();
+  };
+
+  // Función para formatear fecha
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return 'Fecha no disponible';
+    }
+  };
+
+  // Función para obtener el color del estado
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'entregado':
+      case 'completed':
+        return '#4caf50';
+      case 'en preparacion':
+      case 'preparing':
+        return '#ff9800';
+      case 'enviado':
+      case 'shipped':
+        return '#2196f3';
+      case 'cancelado':
+      case 'cancelled':
+        return '#f44336';
+      default:
+        return '#9e9e9e';
+    }
+  };
+
   // Si no hay usuario, no renderizar nada (se está redirigiendo)
   if (!user) {
     return null;
@@ -116,16 +283,15 @@ export default function Perfil({ onAddToCart, user }) {
           <div className="perfil__foto-edit">
             <FontAwesomeIcon icon={faCamera} />
           </div>
-        </div>
-        <div className="perfil__info">
+        </div>        <div className="perfil__info">
           <div className="perfil__nombre">{userPerfil.nombre}</div>
           <div className="perfil__email">{userPerfil.email}</div>
           <div className="perfil__datos">
             <span>
-              <FontAwesomeIcon icon={faUser} /> {userPerfil.pedidos} pedidos realizados
+              <FontAwesomeIcon icon={faShoppingBag} /> {userStats.totalOrders} pedidos realizados
             </span>
             <span>
-              <FontAwesomeIcon icon={faHeart} style={{ color: '#ab1319' }} /> {userPerfil.favoritos} pizzas favoritas
+              <FontAwesomeIcon icon={faHeart} style={{ color: '#ab1319' }} /> ${userStats.totalSpent.toFixed(2)} gastado total
             </span>
             <span>
               <FontAwesomeIcon icon={faUser} /> Miembro desde {userPerfil.miembroDesde}
@@ -138,9 +304,8 @@ export default function Perfil({ onAddToCart, user }) {
       <div className="perfil__tabs">
         <button className={`perfil__tab-btn${activeTab === 'pedidos' ? ' active' : ''}`} onClick={() => setActiveTab('pedidos')}>
           <FontAwesomeIcon icon={faUser} /> Mis Pedidos
-        </button>
-        <button className={`perfil__tab-btn${activeTab === 'favoritos' ? ' active' : ''}`} onClick={() => setActiveTab('favoritos')}>
-          <FontAwesomeIcon icon={faHeart} /> Favoritos
+        </button>        <button className={`perfil__tab-btn${activeTab === 'reseñas' ? ' active' : ''}`} onClick={() => setActiveTab('reseñas')}>
+          <FontAwesomeIcon icon={faHeart} /> Mis reseñas
         </button>
         <button className={`perfil__tab-btn${activeTab === 'editar' ? ' active' : ''}`} onClick={() => setActiveTab('editar')}>
           <FontAwesomeIcon icon={faEdit} /> Editar Perfil
@@ -148,69 +313,263 @@ export default function Perfil({ onAddToCart, user }) {
         <button className={`perfil__tab-btn${activeTab === 'seguridad' ? ' active' : ''}`} onClick={() => setActiveTab('seguridad')}>
           <FontAwesomeIcon icon={faShieldAlt} /> Seguridad
         </button>
-      </div>
-
-      {/* CONTENIDO SEGÚN TAB */}
+      </div>      {/* CONTENIDO SEGÚN TAB */}
       <div className="perfil__contenido">
         {/* --- HISTORIAL DE PEDIDOS --- */}
         {activeTab === 'pedidos' && (
           <>
-            <div className="perfil__titulo-historial">Historial de Pedidos</div>
-            {pedidosMock.map(p => (
-              <div className="perfil__pedido-card" key={p.id}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <span className="perfil__pedido-id">Pedido #{p.id}</span>
-                    <span className="perfil__estado-entregado">Entregado</span>
-                  </div>
-                  <div className="perfil__pedido-total">${p.total.toFixed(2)}</div>
-                </div>
-                <div className="perfil__pedido-fecha">{p.fecha}</div>
-                <div>{p.productos.join(', ')}</div>
-                <button className="perfil__pedido-detalles-btn">Ver detalles</button>
-              </div>
-            ))}
-          </>
-        )}
+            <div className="perfil__titulo-historial">
+              Mis Pedidos
+              <button 
+                className="perfil__refresh-btn" 
+                onClick={handleRefreshOrders}
+                disabled={loadingOrders}
+              >
+                <FontAwesomeIcon 
+                  icon={faRefresh} 
+                  className={loadingOrders ? 'spinning' : ''} 
+                />
+                {loadingOrders ? 'Actualizando...' : 'Actualizar'}
+              </button>
+            </div>
 
-        {/* --- FAVORITOS --- */}
-        {activeTab === 'favoritos' && (
-          <div>
-            <div className="perfil__titulo-favoritos">Pizzas Favoritas</div>
-            <div className="perfil__favoritos-grid">
-              {favoritos.map(pizza => (
-                <div className="perfil__favorito-card" key={pizza.id}>
-                  <img src={pizza.imagen} alt={pizza.nombre} className="perfil__favorito-img" />
-                  <div className="perfil__favorito-nombre">{pizza.nombre}</div>
-                  <div className="perfil__favorito-precio">${pizza.precio.toFixed(2)}</div>
-                  <button
-                    className="perfil__favorito-btn"
-                    onClick={() => onAddToCart(pizza)}
-                  >
-                    Ordenar
+            {/* Mensaje de actualización */}
+            {updateMessage && (
+              <div className="perfil__update-message">
+                <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                {updateMessage}
+              </div>
+            )}            {/* Estadísticas */}
+            <div className="perfil__estadisticas">
+              <div className="perfil__estadistica-card">
+                <div className="perfil__estadistica-numero">{userStats.totalOrders}</div>
+                <div className="perfil__estadistica-label">Pedidos Totales</div>
+              </div>
+              <div className="perfil__estadistica-card">
+                <div className="perfil__estadistica-numero">${userStats.totalSpent.toFixed(2)}</div>
+                <div className="perfil__estadistica-label">Total Gastado</div>
+              </div>
+              <div className="perfil__estadistica-card">
+                <div className="perfil__estadistica-numero">${userStats.averageOrderValue.toFixed(2)}</div>
+                <div className="perfil__estadistica-label">Promedio por Pedido</div>
+              </div>
+              {userStats.pedidoMaximo > 0 && (
+                <div className="perfil__estadistica-card">
+                  <div className="perfil__estadistica-numero">${userStats.pedidoMaximo.toFixed(2)}</div>
+                  <div className="perfil__estadistica-label">Pedido Más Alto</div>
+                </div>
+              )}
+            </div>
+
+            {/* Estados de carga, error y contenido */}
+            {loadingOrders && (
+              <div className="perfil__loading">
+                <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                Cargando tus pedidos...
+              </div>
+            )}
+
+            {errorOrders && (
+              <div className="perfil__error">
+                <FontAwesomeIcon icon={faExclamationTriangle} />
+                {errorOrders}
+                <button className="perfil__retry-btn" onClick={handleRefreshOrders}>
+                  Reintentar
+                </button>
+              </div>
+            )}
+
+            {!loadingOrders && !errorOrders && userOrders.length === 0 && (
+              <div className="perfil__empty">
+                <FontAwesomeIcon icon={faShoppingBag} />
+                <h3>No tienes pedidos aún</h3>
+                <p>¡Explora nuestro menú y realiza tu primer pedido!</p>
+                <button 
+                  className="perfil__empty-btn"
+                  onClick={() => navigate('/menu')}
+                >
+                  Ver Menú
+                </button>
+              </div>
+            )}
+
+            {!loadingOrders && !errorOrders && userOrders.length > 0 && 
+              userOrders.map(pedido => (
+                <div className="perfil__pedido-card" key={pedido.id}>
+                  <div className="perfil__pedido-header">
+                    <div>
+                      <span className="perfil__pedido-id">Pedido #{pedido.id}</span>
+                      <span 
+                        className="perfil__estado-badge"
+                        style={{ backgroundColor: getStatusColor(pedido.estado) }}
+                      >
+                        {pedido.estado}
+                      </span>
+                    </div>
+                    <div className="perfil__pedido-total">${pedido.total.toFixed(2)}</div>
+                  </div>
+
+                  <div className="perfil__pedido-fecha">
+                    {formatDate(pedido.fecha)}
+                  </div>
+
+                  <div className="perfil__pedido-info">
+                    <div className="perfil__pedido-metodo">
+                      <FontAwesomeIcon icon={faCreditCard} />
+                      {pedido.metodo_pago}
+                    </div>
+                    <div className="perfil__pedido-entrega">
+                      <FontAwesomeIcon icon={faTruck} />
+                      {pedido.tipo_entrega}
+                    </div>
+                    {pedido.tiempo_entrega && (
+                      <div className="perfil__pedido-tiempo">
+                        <FontAwesomeIcon icon={faClock} />
+                        {pedido.tiempo_entrega} min
+                      </div>
+                    )}
+                  </div>                  {/* Productos del pedido */}
+                  {Array.isArray(pedido.productos) && pedido.productos.length > 0 && (
+                    <div className="perfil__pedido-productos">
+                      <div className="perfil__productos-titulo">
+                        Productos ({pedido.productos.length})
+                      </div>
+                      {pedido.productos.map((producto, index) => (
+                        <div className="perfil__producto-item" key={index}>
+                          {/* Imagen del producto */}
+                          {(producto.imagen || producto.image || producto.img) && (
+                            <div className="perfil__producto-imagen-wrapper">
+                              <img 
+                                src={producto.imagen || producto.image || producto.img} 
+                                alt={producto.titulo || producto.nombre || producto.name || 'Producto'}
+                                className="perfil__producto-imagen"
+                              /> {console.log(pedido.productos)}
+                            </div>
+                          )}
+                          
+                          <div className="perfil__producto-info">
+                            {/* Título del producto */}
+                            <div className="perfil__producto-nombre">
+                              { producto.nombre_producto}
+                            </div>
+                            
+                            {/* Descripción del producto */}
+                            {(producto.descripcion || producto.detalles || producto.description) && (
+                              <div className="perfil__producto-descripcion">
+                                {producto.descripcion || producto.detalles || producto.description}
+                              </div>
+                            )}
+                            
+                            {/* Cantidad */}
+                            {producto.cantidad && (
+                              <div className="perfil__producto-detalle">
+                                Cantidad: {producto.cantidad}
+                              </div>
+                            )}
+                            
+                            {/* Masa y Tamaño */}
+                            {(producto.masa || producto.tamano) && (
+                              <div className="perfil__producto-detalle">
+                                {producto.masa && `Masa: ${producto.masa}`}
+                                {producto.masa && producto.tamano && ' • '}
+                                {producto.tamano && `Tamaño: ${producto.tamano}`}
+                              </div>
+                            )}
+                            
+                            {/* Ingredientes */}
+                            {producto.ingredientes && Array.isArray(producto.ingredientes) && (
+                              <div className="perfil__producto-detalle">
+                                Ingredientes: {producto.ingredientes.join(', ')}
+                              </div>
+                            )}
+                            
+                            {/* Instrucciones */}
+                            {producto.instrucciones && (
+                              <div className="perfil__producto-detalle">
+                                Instrucciones: {producto.instrucciones}
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="perfil__producto-precio">
+                            ${producto.subtotal || 0}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Información adicional del pedido */}
+                  {(pedido.direccion || pedido.telefono || pedido.observaciones) && (
+                    <div className="perfil__pedido-extra">
+                      {pedido.direccion && (
+                        <div className="perfil__pedido-detalle">
+                          <strong>Dirección:</strong> {pedido.direccion}
+                        </div>
+                      )}
+                      {pedido.telefono && (
+                        <div className="perfil__pedido-detalle">
+                          <strong>Teléfono:</strong> {pedido.telefono}
+                        </div>
+                      )}
+                      {pedido.observaciones && (
+                        <div className="perfil__pedido-detalle">
+                          <strong>Observaciones:</strong> {pedido.observaciones}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <button className="perfil__pedido-detalles-btn">
+                    Ver Detalles Completos
                   </button>
                 </div>
-              ))}
+              ))
+            }
+          </>
+        )}        {/* --- MIS RESEÑAS --- */}
+        {activeTab === 'reseñas' && (
+          <div>
+            <div className="perfil__titulo-favoritos">Mis reseñas</div>
+            <div className="perfil__empty">
+              <FontAwesomeIcon icon={faHeart} />
+              <h3>Función en desarrollo</h3>
+              <p>Próximamente podrás ver y gestionar tus reseñas de productos aquí</p>
+              <button 
+                className="perfil__empty-btn"
+                onClick={() => navigate('/menu')}
+              >
+                Explorar Menú
+              </button>
             </div>
           </div>
-        )}
-
-        {/* --- EDITAR PERFIL --- */}
+        )}{/* --- EDITAR PERFIL --- */}
         {activeTab === 'editar' && (
           <div>
             <div className="perfil__titulo-editar">Editar Perfil</div>
             <form
               className="perfil__form-editar"
-              onSubmit={e => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                setUserPerfil(prev => ({
-                  ...prev,
-                  nombre: formData.nombre,
-                  email: formData.email,
-                  telefono: formData.telefono,
-                }));
-                setEditSuccess(true);
-                setTimeout(() => setEditSuccess(false), 2000);
+                const success = await updateUserProfile(formData);
+                
+                if (success) {
+                  setUserPerfil(prev => ({
+                    ...prev,
+                    nombre: formData.nombre,
+                    email: formData.email,
+                    telefono: formData.telefono,
+                  }));
+                  setEditSuccess(true);
+                  if (setToast) {
+                    setToast('¡Perfil actualizado correctamente!');
+                  }
+                  setTimeout(() => setEditSuccess(false), 3000);
+                } else {
+                  if (setToast) {
+                    setToast('Error al actualizar el perfil. Intenta de nuevo.');
+                  }
+                }
               }}
             >
               <div className="perfil__form-row">
