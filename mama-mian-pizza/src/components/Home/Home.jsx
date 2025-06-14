@@ -107,11 +107,10 @@ const Home = ({ onAddToCart }) => {
           }}
         >
           <div className="hero__overlay"></div> 
-          
-          <div className="hero__text__container">
-            <h1 className="hero__title">Las mejores pizzas</h1>
-            <p className="hero__text">
-              Ingredientes frescos, masa artesanal y sabores únicos que te harán volver por más.
+            <div className="hero__text__container">
+            <h1 className="hero__title">Las mejores <span>pizzas</span></h1>            <p className="hero__text">
+              Ingredientes frescos, masa artesanal y sabores únicos que<br/>
+              te harán volver por más.
             </p>
             <button className="hero__button">
               <Link to="/menu" className="link">Ver Menú</Link>

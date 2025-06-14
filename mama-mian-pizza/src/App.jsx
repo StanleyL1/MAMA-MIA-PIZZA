@@ -91,6 +91,18 @@ const handleLogout = () => {
   console.log('✅ APP - Usuario removido del estado y localStorage');
 };
 
+// Función para mostrar toast desde componentes hijos
+const showToast = (message) => {
+  setToast({ show: true, message });
+  setTimeout(() => setToast({ show: false, message: '' }), 3000);
+};
+
+// Trigger para actualizaciones de pedidos
+const triggerOrderUpdate = () => {
+  // Disparar evento para que el perfil se actualice
+  window.dispatchEvent(new CustomEvent('orderCompleted'));
+};
+
   return (
     <BrowserRouter>
       <Navbar
@@ -105,10 +117,23 @@ const handleLogout = () => {
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/" element={<Home onAddToCart={handleAddToCart} />} />
         <Route path="/menu" element={<Menu onAddToCart={handleAddToCart} />} />
-        <Route path="/sobrenosotros" element={<SobreNosotros />} />
-        <Route path="/Perfil" element={<Perfil onAddToCart={handleAddToCart} user={user} />} />
+        <Route path="/sobrenosotros" element={<SobreNosotros />} />        <Route path="/Perfil" element={
+          <Perfil 
+            onAddToCart={handleAddToCart} 
+            user={user} 
+            setToast={showToast}
+            onOrderUpdate={triggerOrderUpdate}
+          />
+        } />
         <Route path="/Services" element={<Services />} />
-        <Route path="/pideahora" element={<PideAhora cartItems={cartItems} />} />
+        <Route path="/pideahora" element={
+          <PideAhora 
+            cartItems={cartItems} 
+            user={user}
+            onOrderComplete={triggerOrderUpdate}
+            setToast={showToast}
+          />
+        } />
         <Route path="/equipo-desarrollo" element={<Team />} />
         <Route path="/informacion-legal" element={<InformacionLegal />} />
       </Routes>

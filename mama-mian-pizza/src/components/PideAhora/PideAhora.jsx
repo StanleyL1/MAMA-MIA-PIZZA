@@ -31,7 +31,7 @@ const mapContainerStyle = {
   boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
 };
 
-const PideAhora = ({ cartItems = [] }) => {
+const PideAhora = ({ cartItems = [], user, onOrderComplete, setToast }) => {
   const [step, setStep] = useState('Cuenta');
   const [modo, setModo] = useState('invitado');
   const [showPassword, setShowPassword] = useState(false);
@@ -426,12 +426,21 @@ const redirigirAWompi = () => {
           console.error('Error al enviar notificación:', notificationError);
           // No interrumpimos el flujo principal por un error en la notificación
         }
-        
-        // Continuar con el flujo normal después de un pedido exitoso
+          // Continuar con el flujo normal después de un pedido exitoso
         setOrderSuccess(true);
         setOrderCode(codigoPedido);
         setShowTerms(false);
         setShowSuccess(true);
+        
+        // Disparar actualización del perfil si hay usuario logueado
+        if (onOrderComplete) {
+          onOrderComplete();
+        }
+        
+        // Mostrar notificación de éxito
+        if (setToast) {
+          setToast(`¡Pedido ${codigoPedido} realizado con éxito!`);
+        }
       } else {
         const errorResult = await response.json();
         console.error('Error al procesar el pedido:', errorResult);

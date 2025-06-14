@@ -109,7 +109,7 @@
 
 .modal__pizza-image {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
@@ -316,8 +316,8 @@ input:checked + .modal__slider:before {
 
 .modal__ingredientes-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
   padding: 16px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -326,21 +326,28 @@ input:checked + .modal__slider:before {
 
 .modal__ingrediente-item {
   padding: 0;
+  width: 100%;
+  min-width: 0;
 }
 
 .modal__checkbox-container {
   display: flex;
   align-items: center;
   position: relative;
-  padding-left: 28px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
   color: #374151;
   user-select: none;
-  padding: 8px;
+  padding: 8px 8px 8px 32px;
   border-radius: 6px;
   transition: background 0.2s ease;
+  white-space: nowrap;
+  overflow: visible;
+  word-wrap: break-word;
+  min-height: 40px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .modal__checkbox-container:hover {
@@ -673,9 +680,9 @@ input:checked + .modal__slider:before {
     justify-content: center;
     padding: 16px 24px;
   }
-  
   .modal__ingredientes-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
   }
   
   .modal__close-button {
