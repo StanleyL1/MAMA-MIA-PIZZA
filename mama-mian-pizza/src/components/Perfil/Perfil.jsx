@@ -16,7 +16,7 @@ const API_BASE_URL = 'https://api.mamamianpizza.com/api';
 export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
   const navigate = useNavigate();
   
-  // Tabs: pedidos | favoritos | editar | seguridad
+  // Tabs: pedidos | reseñas | editar | seguridad
   const [activeTab, setActiveTab] = useState('pedidos');
   const [showCambiarContra, setShowCambiarContra] = useState(false);
   
@@ -304,9 +304,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
       <div className="perfil__tabs">
         <button className={`perfil__tab-btn${activeTab === 'pedidos' ? ' active' : ''}`} onClick={() => setActiveTab('pedidos')}>
           <FontAwesomeIcon icon={faUser} /> Mis Pedidos
-        </button>
-        <button className={`perfil__tab-btn${activeTab === 'favoritos' ? ' active' : ''}`} onClick={() => setActiveTab('favoritos')}>
-          <FontAwesomeIcon icon={faHeart} /> Favoritos
+        </button>        <button className={`perfil__tab-btn${activeTab === 'reseñas' ? ' active' : ''}`} onClick={() => setActiveTab('reseñas')}>
+          <FontAwesomeIcon icon={faHeart} /> Mis reseñas
         </button>
         <button className={`perfil__tab-btn${activeTab === 'editar' ? ' active' : ''}`} onClick={() => setActiveTab('editar')}>
           <FontAwesomeIcon icon={faEdit} /> Editar Perfil
@@ -437,20 +436,38 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
                       </div>
                       {pedido.productos.map((producto, index) => (
                         <div className="perfil__producto-item" key={index}>
-                          <div className="perfil__producto-info">
-                            <div className="perfil__producto-nombre">
-                              {producto.nombre || producto.name || producto.titulo || 'Producto'}
+                          {/* Imagen del producto */}
+                          {(producto.imagen || producto.image || producto.img) && (
+                            <div className="perfil__producto-imagen-wrapper">
+                              <img 
+                                src={producto.imagen || producto.image || producto.img} 
+                                alt={producto.titulo || producto.nombre || producto.name || 'Producto'}
+                                className="perfil__producto-imagen"
+                              /> {console.log(pedido.productos)}
                             </div>
-                            {(producto.detalles || producto.descripcion) && (
-                              <div className="perfil__producto-detalle">
-                                {producto.detalles || producto.descripcion}
+                          )}
+                          
+                          <div className="perfil__producto-info">
+                            {/* Título del producto */}
+                            <div className="perfil__producto-nombre">
+                              { producto.nombre_producto}
+                            </div>
+                            
+                            {/* Descripción del producto */}
+                            {(producto.descripcion || producto.detalles || producto.description) && (
+                              <div className="perfil__producto-descripcion">
+                                {producto.descripcion || producto.detalles || producto.description}
                               </div>
                             )}
+                            
+                            {/* Cantidad */}
                             {producto.cantidad && (
                               <div className="perfil__producto-detalle">
                                 Cantidad: {producto.cantidad}
                               </div>
                             )}
+                            
+                            {/* Masa y Tamaño */}
                             {(producto.masa || producto.tamano) && (
                               <div className="perfil__producto-detalle">
                                 {producto.masa && `Masa: ${producto.masa}`}
@@ -458,19 +475,24 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
                                 {producto.tamano && `Tamaño: ${producto.tamano}`}
                               </div>
                             )}
+                            
+                            {/* Ingredientes */}
                             {producto.ingredientes && Array.isArray(producto.ingredientes) && (
                               <div className="perfil__producto-detalle">
                                 Ingredientes: {producto.ingredientes.join(', ')}
                               </div>
                             )}
+                            
+                            {/* Instrucciones */}
                             {producto.instrucciones && (
                               <div className="perfil__producto-detalle">
                                 Instrucciones: {producto.instrucciones}
                               </div>
                             )}
                           </div>
+                          
                           <div className="perfil__producto-precio">
-                            ${(producto.precio || producto.price || 0).toFixed(2)}
+                            ${producto.subtotal || 0}
                           </div>
                         </div>
                       ))}
@@ -505,14 +527,14 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
               ))
             }
           </>
-        )}        {/* --- FAVORITOS --- */}
-        {activeTab === 'favoritos' && (
+        )}        {/* --- MIS RESEÑAS --- */}
+        {activeTab === 'reseñas' && (
           <div>
-            <div className="perfil__titulo-favoritos">Pizzas Favoritas</div>
+            <div className="perfil__titulo-favoritos">Mis reseñas</div>
             <div className="perfil__empty">
               <FontAwesomeIcon icon={faHeart} />
               <h3>Función en desarrollo</h3>
-              <p>Próximamente podrás guardar tus pizzas favoritas aquí</p>
+              <p>Próximamente podrás ver y gestionar tus reseñas de productos aquí</p>
               <button 
                 className="perfil__empty-btn"
                 onClick={() => navigate('/menu')}
@@ -521,7 +543,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
               </button>
             </div>
           </div>
-        )}        {/* --- EDITAR PERFIL --- */}
+        )}{/* --- EDITAR PERFIL --- */}
         {activeTab === 'editar' && (
           <div>
             <div className="perfil__titulo-editar">Editar Perfil</div>

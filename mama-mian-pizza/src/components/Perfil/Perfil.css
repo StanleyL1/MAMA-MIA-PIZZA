@@ -1077,9 +1077,10 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 12px 0;
+  padding: 16px 0;
   border-bottom: 1px solid #e9ecef;
   transition: all 0.2s ease;
+  gap: 16px;
 }
 
 .perfil__producto-item:last-child {
@@ -1089,8 +1090,35 @@
 .perfil__producto-item:hover {
   background: rgba(168, 24, 24, 0.02);
   margin: 0 -8px;
-  padding: 12px 8px;
+  padding: 16px 8px;
   border-radius: 6px;
+}
+
+/* Imagen del producto */
+.perfil__producto-imagen-wrapper {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.perfil__producto-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.perfil__producto-item:hover .perfil__producto-imagen-wrapper {
+  border-color: #a81818;
+  box-shadow: 0 4px 12px rgba(168, 24, 24, 0.2);
+}
+
+.perfil__producto-item:hover .perfil__producto-imagen {
+  transform: scale(1.05);
 }
 
 .perfil__producto-info {
@@ -1103,7 +1131,8 @@
 .perfil__producto-nombre {
   font-weight: 700;
   color: #333;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
   transition: color 0.2s ease;
 }
 
@@ -1111,10 +1140,19 @@
   color: #a81818;
 }
 
+.perfil__producto-descripcion {
+  font-size: 0.95rem;
+  color: #666;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+
 .perfil__producto-detalle {
   font-size: 0.9rem;
   color: #666;
   font-style: italic;
+  margin-bottom: 4px;
 }
 
 .perfil__producto-precio {
@@ -1170,16 +1208,24 @@
     flex-direction: column;
     gap: 8px;
   }
-
   .perfil__producto-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 12px;
+    padding: 16px 0;
+  }
+
+  .perfil__producto-imagen-wrapper {
+    width: 100%;
+    max-width: 120px;
+    height: 120px;
+    align-self: center;
   }
 
   .perfil__producto-precio {
     margin-left: 0;
     align-self: flex-end;
+    font-size: 1.1rem;
   }
 
   .perfil__titulo-historial {
