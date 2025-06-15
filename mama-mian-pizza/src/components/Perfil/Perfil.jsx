@@ -13,7 +13,7 @@ import './Perfil.css';
 
 const API_BASE_URL = 'https://api.mamamianpizza.com/api';
 
-export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
+export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, setUser }) {
   const navigate = useNavigate();
   
   // Tabs: pedidos | reseñas | editar | seguridad
@@ -27,27 +27,37 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
     totalSpent: 0,
     averageOrderValue: 0,
     favoriteProducts: 0
-  });
-  const [loadingOrders, setLoadingOrders] = useState(false);
-  const [errorOrders, setErrorOrders] = useState(null);
-  const [updateMessage, setUpdateMessage] = useState('');
+  });  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [errorOrders, setErrorOrders] = useState(null);  const [updateMessage, setUpdateMessage] = useState('');
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [profileUpdateError, setProfileUpdateError] = useState('');
+  
+  // Estados para manejo de foto de perfil
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState(null);
   
   // Estados para reseñas del usuario
   const [userReviews, setUserReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [errorReviews, setErrorReviews] = useState(null);
-  
-  // Estado de perfil del usuario - usar datos reales si están disponibles
+    // Estado de perfil del usuario - usar datos reales si están disponibles
   const [userPerfil, setUserPerfil] = useState({
     nombre: user?.nombre || 'Usuario',
     email: user?.correo || user?.email || 'usuario@email.com',
     telefono: user?.telefono || user?.celular || '+503 0000-0000',
-    foto: user?.foto_perfil || user?.foto || perfilFoto,
+    foto: user?.foto_perfil || user?.foto || user?.profilePhoto || perfilFoto,
     miembroDesde: user?.fecha_registro ? new Date(user.fecha_registro).getFullYear() : 2023,
+  });  console.log('👤 PERFIL - Usuario recibido:', user);
+  console.log('👤 PERFIL - Estado userPerfil:', userPerfil);
+  console.log('🖼️ PERFIL - Foto actual:', {
+    userFoto: user?.foto,
+    userFotoPerfil: user?.foto_perfil,
+    userProfilePhoto: user?.profilePhoto,
+    perfilFoto: userPerfil.foto
   });
 
-  console.log('👤 PERFIL - Usuario recibido:', user);
-  console.log('👤 PERFIL - Estado userPerfil:', userPerfil);
+  // Variable derivada para el ID del usuario (evita warnings de ESLint)
+  const userId = user?.id || user?.id_usuario;
 
   // Formulario de edición
   const [formData, setFormData] = useState({
@@ -57,7 +67,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
   });
   const [editSuccess, setEditSuccess] = useState(false);  // Función para obtener pedidos del usuario desde la API
   const fetchUserOrders = useCallback(async () => {
-    if (!user?.id) {
+    // Verificar que tenemos el ID del usuario
+    if (!userId) {
       console.log('❌ No hay ID de usuario para obtener pedidos');
       return;
     }
@@ -66,7 +77,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
     setErrorOrders(null);
 
     try {
-      const userId = user.id;
       console.log('🔍 Obteniendo pedidos para usuario ID:', userId);
       
       const response = await fetch(`${API_BASE_URL}/customers/${userId}/orders`, {
@@ -129,52 +139,203 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
 
     } catch (error) {
       console.error('❌ Error al obtener pedidos:', error);
-      setErrorOrders('Error al cargar los pedidos. Por favor, intenta de nuevo.');
-    } finally {
+      setErrorOrders('Error al cargar los pedidos. Por favor, intenta de nuevo.');    } finally {
       setLoadingOrders(false);
     }
-  }, [user?.id]);
+  }, [userId]);
   // Función para actualizar perfil en la API
   const updateUserProfile = async (updatedData) => {
-    if (!user?.id) {
+    // Verificar que tenemos el ID del usuario
+    if (!userId) {
       console.log('❌ No hay ID de usuario para actualizar perfil');
+      console.log('👤 Usuario disponible:', user);
+      setToast && setToast('Error: No se pudo identificar el usuario');
       return false;
     }
 
-    try {
-      console.log('🔄 Actualizando perfil para usuario ID:', user.id);
-      console.log('📝 Datos a actualizar:', updatedData);
+    setIsUpdatingProfile(true);
+    setProfileUpdateError(''); // Limpiar errores previos
+
+    try {      console.log('🔄 INICIANDO actualización de perfil...');
+      console.log('👤 Usuario actual:', user);
+      console.log('🆔 UserId disponible:', userId);
+      console.log('📝 Datos a actualizar:', updatedData);      // Preparar datos para enviar a la API - usando nombres de columnas exactos de la BD
+      const dataToSend = {
+        nombre: updatedData.nombre.trim(),
+        correo: updatedData.email.trim(),
+        celular: updatedData.telefono.trim(), // En la BD es 'celular', no 'telefono'
+      };
       
-      const response = await fetch(`${API_BASE_URL}/users/${user.id}`, {
+      // Incluir foto si está presente en los datos actualizados
+      if (updatedData.foto) {
+        dataToSend.foto_perfil = updatedData.foto;
+        console.log('📸 Incluyendo foto en la actualización:', updatedData.foto.substring(0, 50) + '...');
+      }
+      
+      console.log('📤 Datos preparados para envío (con nombres de columnas de BD):', {
+        ...dataToSend,
+        foto_perfil: dataToSend.foto_perfil ? '[BASE64_DATA_INCLUDED]' : 'NO_PHOTO'
+      });
+      console.log('📝 Tipos de datos:', {
+        nombre: typeof dataToSend.nombre,
+        correo: typeof dataToSend.correo,
+        celular: typeof dataToSend.celular,
+        foto_perfil: typeof dataToSend.foto_perfil
+      });// Usar el endpoint correcto: PUT /api/users/:id/profile
+      // Usar el ID de usuario ya disponible en el scope superior
+      const url = `${API_BASE_URL}/users/${userId}/profile`;
+      console.log('🌐 URL del endpoint:', url);
+      console.log('👤 ID de usuario usado:', userId);
+      
+      const requestConfig = {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          // Agregar token de autorización si existe en el usuario
+          ...(user.token && { 'Authorization': `Bearer ${user.token}` })
         },
-        body: JSON.stringify({
-          nombre: updatedData.nombre,
-          correo: updatedData.email,
-          telefono: updatedData.telefono,
-        }),
+        body: JSON.stringify(dataToSend),
+      };
+        console.log('⚙️ Configuración de la petición:', {
+        method: requestConfig.method,
+        headers: requestConfig.headers,
+        url: url,
+        bodySize: JSON.stringify(dataToSend).length + ' bytes',
+        includesPhoto: !!dataToSend.foto_perfil
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('❌ Error del servidor:', errorData);
-        throw new Error(`Error al actualizar perfil: ${response.status} - ${errorData.message || 'Error desconocido'}`);
+      
+      // Log específico para verificar el envío de la foto
+      if (dataToSend.foto_perfil) {
+        console.log('📸 ✅ FOTO INCLUIDA en la petición al endpoint PUT /api/users/:id/profile');
+        console.log('📏 Tamaño de la foto Base64:', dataToSend.foto_perfil.length + ' caracteres');
+      } else {
+        console.log('📸 ❌ NO hay foto en esta petición');
+      }
+      
+      console.log('🚀 Enviando petición a la API...');
+      const response = await fetch(url, requestConfig);
+      
+      console.log('📥 Respuesta recibida:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });      // Intentar leer la respuesta de manera segura
+      let responseData;
+      const responseClone = response.clone(); // Clonar para evitar "body stream already read"
+      
+      try {
+        responseData = await response.json();
+        console.log('📄 Datos de respuesta JSON:', responseData);
+      } catch (jsonError) {
+        console.log('⚠️ No se pudo parsear JSON, intentando como texto...', jsonError.message);
+        try {
+          responseData = await responseClone.text();
+          console.log('📄 Respuesta como texto:', responseData);
+        } catch (textError) {
+          console.error('❌ Error leyendo respuesta:', textError);
+          responseData = { error: 'No se pudo leer la respuesta del servidor' };
+        }
+      }if (!response.ok) {
+        console.error('❌ Error del servidor:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: responseData
+        });
+        
+        // Manejar diferentes tipos de errores
+        let errorMessage = 'Error desconocido al actualizar el perfil';
+          if (response.status === 500) {
+          if (responseData?.error?.includes('Unknown column')) {
+            errorMessage = 'Error interno del servidor: Problema con la estructura de la base de datos. Por favor, contacta al administrador.';
+            console.error('🚨 Error de base de datos:', responseData.error);
+          } else if (typeof responseData === 'string' && responseData.includes('Something broke!')) {
+            errorMessage = 'Error del servidor: La imagen es muy grande o el servidor no pudo procesarla. Inténtalo con una imagen más pequeña.';
+            console.error('🚨 Error de servidor (posiblemente por tamaño de imagen)');
+          } else {
+            errorMessage = 'Error interno del servidor. La imagen podría ser muy grande. Por favor, intenta con una imagen más pequeña.';
+          }
+        } else if (response.status === 404) {
+          errorMessage = 'Usuario no encontrado. Por favor, inicia sesión nuevamente.';
+        } else if (response.status === 400) {
+          errorMessage = responseData?.message || 'Datos inválidos. Verifica la información ingresada.';
+        } else if (response.status === 401) {
+          errorMessage = 'No autorizado. Por favor, inicia sesión nuevamente.';
+        } else {
+          errorMessage = responseData?.message || 
+                       responseData?.error || 
+                       `Error ${response.status}: No se pudo actualizar el perfil`;
+        }
+        
+        throw new Error(errorMessage);
+      }      console.log('✅ Perfil actualizado exitosamente en la API:', responseData);      // Actualizar el estado local del perfil inmediatamente
+      const updatedProfile = {
+        nombre: updatedData.nombre,
+        email: updatedData.email,
+        telefono: updatedData.telefono,
+      };
+      
+      // Si hay una nueva foto, incluirla
+      if (updatedData.foto) {
+        updatedProfile.foto = updatedData.foto;
       }
 
-      const result = await response.json();
-      console.log('✅ Perfil actualizado:', result);
+      setUserPerfil(prev => {
+        const newPerfil = {
+          ...prev,
+          ...updatedProfile
+        };
+        console.log('🔄 Actualizando userPerfil state:', newPerfil);
+        return newPerfil;
+      });
+
+      // Si se proporciona setUser, actualizar el contexto global del usuario
+      if (setUser) {        const updatedUser = {
+          ...user,
+          nombre: updatedData.nombre,
+          correo: updatedData.email,
+          email: updatedData.email, // mantener ambos formatos por compatibilidad
+          telefono: updatedData.telefono,
+          celular: updatedData.telefono, // mantener ambos formatos por compatibilidad
+        };
+          // Si hay nueva foto, incluirla
+        if (updatedData.foto) {
+          updatedUser.foto_perfil = updatedData.foto;
+          updatedUser.foto = updatedData.foto;
+          updatedUser.profilePhoto = updatedData.foto; // Campo adicional para compatibilidad
+        }
+        
+        console.log('🔄 Actualizando usuario en el contexto global:', updatedUser);
+        setUser(updatedUser);
+        
+        // Actualizar también en localStorage para persistencia
+        try {
+          localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+          console.log('✅ Usuario guardado en localStorage:', updatedUser);
+        } catch (error) {
+          console.error('❌ Error al guardar en localStorage:', error);
+        }
+      }      console.log('✅ Perfil actualizado completamente - Estado local y global actualizados');
+
+      // Forzar recarga inmediata del perfil desde el servidor para sincronización
+      await fetchUserProfile();
+
       return true;
 
-    } catch (error) {
-      console.error('❌ Error al actualizar perfil:', error);
+    } catch (error) {      console.error('❌ Error completo al actualizar perfil:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      setToast && setToast(`Error: ${error.message}`);
+      setProfileUpdateError(error.message);
       return false;
+    } finally {
+      setIsUpdatingProfile(false);
     }
-  };
-  // Función para obtener reseñas del usuario desde la API
+  };  // Función para obtener reseñas del usuario desde la API
   const fetchUserReviews = useCallback(async () => {
-    if (!user?.id) {
+    // Verificar que tenemos el ID del usuario
+    if (!userId) {
       console.log('❌ No hay ID de usuario para obtener reseñas');
       return;
     }
@@ -183,7 +344,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
     setErrorReviews(null);
 
     try {
-      const userId = user.id;
       console.log('🔍 Obteniendo reseñas para usuario ID:', userId);
       
       const response = await fetch(`${API_BASE_URL}/resenas/usuario/${userId}`, {
@@ -225,20 +385,67 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
 
     } catch (error) {
       console.error('❌ Error al obtener reseñas:', error);
-      setErrorReviews(error.message);
-    } finally {
+      setErrorReviews(error.message);    } finally {
       setLoadingReviews(false);
     }
-  }, [user?.id]);
+  }, [userId]);
+  // Función para obtener perfil actualizado desde el servidor
+  const fetchUserProfile = useCallback(async () => {
+    if (!userId) {
+      console.log('❌ No hay ID de usuario para obtener perfil');
+      return;
+    }
 
+    try {
+      console.log('🔄 Obteniendo perfil actualizado desde el servidor...');
+      const url = `${API_BASE_URL}/users/${userId}/profile`;
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(user.token && { 'Authorization': `Bearer ${user.token}` })
+        }
+      });
+
+      if (response.ok) {
+        const profileData = await response.json();
+        console.log('✅ Perfil obtenido desde servidor:', profileData);
+        
+        // Actualizar el contexto del usuario con los datos del servidor
+        if (setUser && profileData) {
+          const updatedUser = {
+            ...user,
+            nombre: profileData.nombre || user.nombre,
+            correo: profileData.correo || user.correo,
+            email: profileData.correo || user.email,
+            celular: profileData.celular || user.celular,
+            telefono: profileData.celular || user.telefono,
+            foto_perfil: profileData.foto_perfil || user.foto_perfil,
+            foto: profileData.foto_perfil || user.foto,
+            profilePhoto: profileData.foto_perfil || user.profilePhoto
+          };
+          
+          setUser(updatedUser);
+          localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+          console.log('✅ Usuario actualizado con datos del servidor');
+        }
+      } else {
+        console.log('⚠️ No se pudo obtener perfil del servidor:', response.status);
+      }
+    } catch (error) {
+      console.error('❌ Error al obtener perfil del servidor:', error);
+    }
+  }, [userId, user, setUser]);
   // Efecto para cargar datos cuando se monta el componente o cambia el usuario
   useEffect(() => {
-    if (user?.id) {
-      console.log('🔄 Cargando datos del perfil para usuario ID:', user.id);
+    if (userId) {
+      console.log('🔄 Cargando datos del perfil para usuario ID:', userId);
+      fetchUserProfile(); // Obtener perfil actualizado del servidor
       fetchUserOrders();
       fetchUserReviews();
     }
-  }, [user?.id, fetchUserOrders, fetchUserReviews]);
+  }, [userId, fetchUserProfile, fetchUserOrders, fetchUserReviews]);
 
   // Escuchar actualizaciones de pedidos desde el componente padre
   useEffect(() => {
@@ -259,30 +466,82 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
       window.addEventListener('orderCompleted', handleOrderUpdate);
       return () => window.removeEventListener('orderCompleted', handleOrderUpdate);
     }
-  }, [onOrderUpdate, fetchUserOrders, setToast]);
-
-  // Actualizar userPerfil cuando cambie el prop user
+  }, [onOrderUpdate, fetchUserOrders, setToast]);  // Actualizar userPerfil cuando cambie el prop user
   useEffect(() => {
-    if (user) {
-      console.log('👤 PERFIL - Actualizando perfil con datos de usuario:', user);
-      setUserPerfil(prev => ({
-        ...prev,
-        nombre: user.nombre || prev.nombre,
-        email: user.correo || user.email || prev.email,
-        telefono: user.telefono || user.celular || prev.telefono,
-        foto: user.foto_perfil || user.foto || prev.foto,
-        miembroDesde: user.fecha_registro ? new Date(user.fecha_registro).getFullYear() : prev.miembroDesde,
-      }));
+    if (user) {      console.log('👤 PERFIL - Actualizando perfil con datos de usuario:', user);
+        // Intentar obtener la foto de diferentes campos posibles
+      let userPhoto = user.foto_perfil || user.foto || user.profilePhoto || user.avatar;
+      
+      console.log('🖼️ DEBUGGING FOTO - Campos de foto disponibles:', {
+        foto_perfil: user.foto_perfil ? (user.foto_perfil.startsWith('data:') ? '[BASE64]' : user.foto_perfil) : 'null',
+        foto: user.foto ? (user.foto.startsWith('data:') ? '[BASE64]' : user.foto) : 'null',
+        profilePhoto: user.profilePhoto ? (user.profilePhoto.startsWith('data:') ? '[BASE64]' : user.profilePhoto) : 'null',
+        avatar: user.avatar ? (user.avatar.startsWith('data:') ? '[BASE64]' : user.avatar) : 'null',
+        selected: userPhoto ? (userPhoto.startsWith('data:') ? '[BASE64_SELECTED]' : userPhoto) : 'NO_PHOTO'
+      });
+      
+      // Si no hay foto o es la foto por defecto, usar la imagen por defecto
+      if (!userPhoto || userPhoto === perfilFoto) {
+        console.log('🖼️ No hay foto válida, usando imagen por defecto');
+        userPhoto = perfilFoto;
+      }
+      
+      // Validar URL o Base64
+      if (userPhoto && userPhoto !== perfilFoto) {
+        if (userPhoto.startsWith('data:image/')) {
+          // Es una imagen Base64, usarla directamente
+          console.log('✅ Usando foto Base64 del usuario');
+          setUserPerfil(prev => ({ ...prev, foto: userPhoto }));
+        } else if (userPhoto.startsWith('http')) {
+          // Es una URL, validar que sea accesible
+          console.log('🖼️ Validando URL de foto:', userPhoto);
+          
+          const img = new Image();
+          img.onload = () => {
+            console.log('✅ Foto URL cargada correctamente:', userPhoto);
+            setUserPerfil(prev => ({ ...prev, foto: userPhoto }));
+          };
+          img.onerror = () => {
+            console.log('❌ Error al cargar foto URL, usando imagen por defecto');
+            setUserPerfil(prev => ({ ...prev, foto: perfilFoto }));
+          };
+          img.src = userPhoto;
+        } else {
+          // Formato desconocido, usar por defecto
+          console.log('⚠️ Formato de foto desconocido, usando imagen por defecto');
+          userPhoto = perfilFoto;
+        }
+      }
+      
+      const newPerfil = {
+        nombre: user.nombre || '',
+        email: user.correo || user.email || '',
+        telefono: user.telefono || user.celular || '',
+        foto: userPhoto,
+        miembroDesde: user.fecha_registro ? new Date(user.fecha_registro).getFullYear() : 2023,
+      };
+      
+      setUserPerfil(newPerfil);
+      
+      // También actualizar el formulario si estamos en la pestaña de editar
+      if (activeTab === 'editar') {
+        setFormData({
+          nombre: newPerfil.nombre,
+          email: newPerfil.email,
+          telefono: newPerfil.telefono,
+        });
+        console.log('📝 Datos del formulario sincronizados con usuario actualizado');
+      }
     }
-  }, [user]);
-  // Sincroniza los datos del formulario cuando el tab o usuario cambian
+  }, [user, activeTab]);// Sincronizar datos del formulario cuando se cambia a la pestaña de editar
   useEffect(() => {
-    if (activeTab === 'editar') {
+    if (activeTab === 'editar' && userPerfil.nombre) {
       setFormData({
         nombre: userPerfil.nombre,
         email: userPerfil.email,
         telefono: userPerfil.telefono,
       });
+      console.log('📝 Formulario sincronizado al cambiar a pestaña editar');
     }
   }, [activeTab, userPerfil]);
 
@@ -291,14 +550,208 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
     if (!user) {
       navigate('/login');
     }
-  }, [user, navigate]);
-
-  // Cargar reseñas cuando se activa la pestaña de reseñas
+  }, [user, navigate]);  // Cargar reseñas cuando se activa la pestaña de reseñas
   useEffect(() => {
-    if (activeTab === 'reseñas' && user?.id) {
+    if (activeTab === 'reseñas' && userId) {
       fetchUserReviews();
+    }  }, [activeTab, fetchUserReviews, userId]);
+
+  // ============== FUNCIONES PARA MANEJO DE FOTOS ==============
+  
+  // Función para convertir imagen a Base64
+  const convertImageToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };  // Función para redimensionar imagen antes de enviarla
+  const resizeImageForUpload = (file, maxWidth = 400, maxHeight = 400, quality = 0.7) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calcular nuevas dimensiones manteniendo aspect ratio
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Dibujar imagen redimensionada
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convertir a base64 con calidad reducida
+        const base64 = canvas.toDataURL('image/jpeg', quality);
+        console.log(`📏 Imagen redimensionada: ${width}x${height}, tamaño: ${base64.length} caracteres`);
+        resolve(base64);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // Función optimizada para manejar cambio de foto de perfil
+  const handlePhotoChange = async (file) => {
+    if (!file) return;    // Validaciones básicas
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setToast && setToast('Formato no válido. Use JPG, PNG o WEBP');
+      return;
     }
-  }, [activeTab, fetchUserReviews, user?.id]);
+
+    if (file.size > 10 * 1024 * 1024) { // Aumentado a 10MB para archivo original
+      setToast && setToast('Archivo muy grande. Máximo 10MB');
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+    console.log('📸 Procesando nueva foto...');
+      try {
+      // Redimensionar imagen para evitar archivos muy grandes
+      console.log('🔧 Redimensionando imagen para optimizar envío...');
+      const resizedBase64 = await resizeImageForUpload(file);
+      
+      // Verificar que el tamaño sea razonable (máximo 500KB)
+      if (resizedBase64.length > 500000) {
+        console.log('⚠️ Imagen aún muy grande, aplicando más compresión...');
+        const extraCompressed = await resizeImageForUpload(file, 300, 300, 0.5);
+        console.log(`📉 Tamaño después de compresión extra: ${extraCompressed.length} caracteres`);
+        var base64 = extraCompressed;
+      } else {
+        var base64 = resizedBase64;
+      }
+        console.log('✅ Imagen procesada - Tamaño final:', base64.length, 'caracteres');
+      
+      // Validación final del tamaño antes de enviar
+      if (base64.length > 800000) { // Máximo ~800KB en Base64
+        setToast && setToast('La imagen procesada sigue siendo muy grande. Intenta con una imagen más pequeña.');
+        setIsUploadingPhoto(false);
+        setPhotoPreview(null);
+        return;
+      }
+      
+      // Actualizar inmediatamente en la UI para mejor UX
+      setUserPerfil(prev => ({ ...prev, foto: base64 }));
+      setPhotoPreview(base64);
+      console.log('👁️ Vista actualizada inmediatamente');// Preparar datos para sincronizar con el backend
+      const dataToUpdate = {
+        nombre: userPerfil.nombre || user?.nombre || '',
+        email: userPerfil.email || user?.correo || user?.email || '',
+        telefono: userPerfil.telefono || user?.celular || user?.telefono || '',
+        foto: base64
+      };
+
+      console.log('🔄 Datos preparados para sincronizar foto con backend:', {
+        nombre: dataToUpdate.nombre,
+        email: dataToUpdate.email,
+        telefono: dataToUpdate.telefono,
+        foto: '[BASE64_DATA_PRESENT]'
+      });
+      console.log('🌐 Enviando al endpoint: PUT /api/users/:id/profile');
+
+      console.log('🔄 Sincronizando foto con el backend...');
+      
+      // Llamar a updateUserProfile para guardar en el backend
+      const success = await updateUserProfile(dataToUpdate);
+      
+      if (success) {
+        // Guardar en localStorage solo si se guardó exitosamente en el backend
+        if (setUser && user) {
+          const updatedUser = {
+            ...user,
+            foto_perfil: base64,
+            foto: base64,
+            profilePhoto: base64
+          };
+          setUser(updatedUser);
+          localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+          console.log('💾 Guardado en localStorage tras éxito en backend');
+        }
+        
+        setToast && setToast('¡Foto actualizada y guardada!');
+      } else {
+        // Si falló el backend, revertir la UI
+        console.log('❌ Fallo en backend, revirtiendo UI...');
+        setUserPerfil(prev => ({ ...prev, foto: prev.foto || user?.foto_perfil || '' }));
+        setToast && setToast('Error al guardar la foto en el servidor');
+      }
+      
+      // Limpiar preview después de un momento
+      setTimeout(() => setPhotoPreview(null), 2000);
+
+    } catch (error) {
+      console.error('❌ Error procesando imagen:', error);
+      setToast && setToast('Error al procesar la imagen');
+      setPhotoPreview(null);
+      // Revertir cambios en la UI
+      setUserPerfil(prev => ({ ...prev, foto: prev.foto || user?.foto_perfil || '' }));
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
+  // Función para manejar el clic en el botón de cambiar foto
+  const handlePhotoClick = () => {
+    if (isUploadingPhoto) return; // No permitir clicks durante la subida
+    
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        handlePhotoChange(file); // Usar la función optimizada
+      }
+    };
+    input.click();
+  };
+
+  // ============== OTRAS FUNCIONES HELPER ==============
+  // Función para manejar errores de carga de imagen
+  const handleImageError = (e) => {
+    console.log('❌ Error al cargar imagen:', e.target.src);
+    console.log('🔄 Cambiando a imagen por defecto');
+    e.target.src = perfilFoto; // Cambiar a imagen por defecto
+    
+    // También actualizar el estado para que no vuelva a intentar cargar la imagen rota
+    setUserPerfil(prev => ({
+      ...prev,
+      foto: perfilFoto
+    }));
+    
+    // Actualizar en localStorage para evitar futuros errores
+    if (setUser && user) {
+      const updatedUser = {
+        ...user,
+        foto_perfil: perfilFoto,
+        foto: perfilFoto,
+        profilePhoto: perfilFoto
+      };
+      setUser(updatedUser);
+      
+      try {
+        localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+        console.log('🧹 Imagen rota limpiada de localStorage');
+      } catch (error) {
+        console.error('❌ Error al limpiar localStorage:', error);
+      }
+    }
+  };
 
   // Función para manejar la actualización manual de pedidos
   const handleRefreshOrders = async () => {
@@ -348,14 +801,47 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
 
   return (
     <div className="perfil__main">
-      {/* CARD DE PERFIL */}
-      <div className="perfil__card">
-        <div className="perfil__foto-wrapper">
-          <img src={userPerfil.foto} alt="Perfil" className="perfil__foto" />
-          <div className="perfil__foto-edit">
-            <FontAwesomeIcon icon={faCamera} />
+      {/* CARD DE PERFIL */}      <div className="perfil__card">        <div className="perfil__foto-wrapper">
+          <img 
+            src={photoPreview || userPerfil.foto} 
+            alt="Perfil" 
+            className="perfil__foto"
+            onError={handleImageError}
+            style={{ 
+              opacity: isUploadingPhoto ? 0.7 : 1,
+              transition: 'opacity 0.3s ease'
+            }}
+          />
+          <div 
+            className="perfil__foto-edit" 
+            onClick={!isUploadingPhoto ? handlePhotoClick : undefined}
+            style={{ 
+              cursor: isUploadingPhoto ? 'not-allowed' : 'pointer',
+              opacity: isUploadingPhoto ? 0.8 : 1
+            }}
+            title={isUploadingPhoto ? "Subiendo foto..." : "Cambiar foto de perfil"}
+          >
+            {isUploadingPhoto ? (
+              <FontAwesomeIcon icon={faSpinner} spin />
+            ) : (
+              <FontAwesomeIcon icon={faCamera} />
+            )}
           </div>
-        </div>        <div className="perfil__info">
+          {isUploadingPhoto && (
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              color: 'white',
+              fontSize: '12px',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.7)',
+              textAlign: 'center'
+            }}>
+              Subiendo...
+            </div>
+          )}
+        </div><div className="perfil__info">
           <div className="perfil__nombre">{userPerfil.nombre}</div>
           <div className="perfil__email">{userPerfil.email}</div>
           <div className="perfil__datos">
@@ -512,10 +998,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
                           {(producto.imagen || producto.image || producto.img) && (
                             <div className="perfil__producto-imagen-wrapper">
                               <img 
-                                src={producto.imagen || producto.image || producto.img} 
-                                alt={producto.titulo || producto.nombre || producto.name || 'Producto'}
+                                src={producto.imagen || producto.image || producto.img}                                alt={producto.titulo || producto.nombre || producto.name || 'Producto'}
                                 className="perfil__producto-imagen"
-                              /> {console.log(pedido.productos)}
+                              />
                             </div>
                           )}
                           
@@ -680,39 +1165,73 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
         )}{/* --- EDITAR PERFIL --- */}
         {activeTab === 'editar' && (
           <div>
-            <div className="perfil__titulo-editar">Editar Perfil</div>
-            <form
+            <div className="perfil__titulo-editar">Editar Perfil</div>            <form
               className="perfil__form-editar"
               onSubmit={async (e) => {
                 e.preventDefault();
-                const success = await updateUserProfile(formData);
                 
-                if (success) {
-                  setUserPerfil(prev => ({
-                    ...prev,
+                // Validaciones básicas
+                if (!formData.nombre.trim()) {
+                  setToast && setToast('El nombre es requerido');
+                  return;
+                }
+                
+                if (!formData.email.trim()) {
+                  setToast && setToast('El email es requerido');
+                  return;
+                }
+                
+                if (!formData.telefono.trim()) {
+                  setToast && setToast('El teléfono es requerido');
+                  return;
+                }
+
+                // Validar formato de email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(formData.email)) {
+                  setToast && setToast('Por favor ingresa un email válido');
+                  return;
+                }
+
+                // Validar formato de teléfono (opcional: puedes ajustar según tus necesidades)
+                const phoneRegex = /^(\+503\s?)?\d{4}-?\d{4}$/;
+                if (!phoneRegex.test(formData.telefono)) {
+                  setToast && setToast('Por favor ingresa un teléfono válido (formato: +503 7123-4567 o 7123-4567)');
+                  return;
+                }                console.log('💾 Guardando cambios del perfil...');
+                setProfileUpdateError(''); // Limpiar errores previos
+                const success = await updateUserProfile(formData);
+                  if (success) {
+                  setEditSuccess(true);
+                  setToast && setToast('¡Perfil actualizado correctamente!');
+                  
+                  // Actualizar los datos del formulario con los nuevos valores
+                  setFormData({
                     nombre: formData.nombre,
                     email: formData.email,
                     telefono: formData.telefono,
-                  }));
-                  setEditSuccess(true);
-                  if (setToast) {
-                    setToast('¡Perfil actualizado correctamente!');
-                  }
+                  });
+                  
+                  // Limpiar el mensaje de éxito después de 3 segundos
                   setTimeout(() => setEditSuccess(false), 3000);
+                  
+                  // Opcional: Mantener en la pestaña de editar para que el usuario vea los cambios aplicados
+                  console.log('✅ Perfil actualizado y formulario sincronizado');
                 } else {
-                  if (setToast) {
-                    setToast('Error al actualizar el perfil. Intenta de nuevo.');
-                  }
+                  // El error ya se maneja en updateUserProfile
+                  console.error('❌ Error al actualizar el perfil');
                 }
               }}
             >
               <div className="perfil__form-row">
                 <div className="perfil__form-group">
-                  <label>Nombre completo</label>
-                  <input
+                  <label>Nombre completo</label>                  <input
                     type="text"
                     value={formData.nombre}
-                    onChange={e => setFormData({ ...formData, nombre: e.target.value })}
+                    onChange={e => {
+                      setFormData({ ...formData, nombre: e.target.value });
+                      if (profileUpdateError) setProfileUpdateError('');
+                    }}
                     required
                   />
                 </div>
@@ -721,28 +1240,74 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
                   <input
                     type="email"
                     value={formData.email}
-                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    onChange={e => {
+                      setFormData({ ...formData, email: e.target.value });
+                      if (profileUpdateError) setProfileUpdateError('');
+                    }}
                     required
                   />
                 </div>
               </div>
               <div className="perfil__form-row">
                 <div className="perfil__form-group" style={{ width: '100%' }}>
-                  <label>Teléfono</label>
-                  <input
+                  <label>Teléfono</label>                  <input
                     type="text"
                     value={formData.telefono}
-                    onChange={e => setFormData({ ...formData, telefono: e.target.value })}
-                    placeholder="+503 7123-4567"
+                    onChange={e => {
+                      setFormData({ ...formData, telefono: e.target.value });
+                      if (profileUpdateError) setProfileUpdateError('');
+                    }}
+                    placeholder="Ej: +503 7123-4567 o 7123-4567"
                     required
                   />
                 </div>
-              </div>
-              <button type="submit" className="perfil__guardar-btn">
-                Guardar cambios
-              </button>
-              {editSuccess && (
+              </div>              <button 
+                type="submit" 
+                className="perfil__guardar-btn"
+                disabled={isUpdatingProfile}
+              >
+                {isUpdatingProfile ? (
+                  <>
+                    <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                    Guardando...
+                  </>
+                ) : (
+                  'Guardar cambios'
+                )}
+              </button>              {editSuccess && (
                 <div className="perfil__edit-success">¡Perfil actualizado correctamente!</div>
+              )}
+              {profileUpdateError && (
+                <div className="perfil__edit-error" style={{
+                  backgroundColor: '#ffebee',
+                  color: '#c62828',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  marginTop: '15px',
+                  border: '1px solid #ffcdd2'
+                }}>
+                  <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                    <FontAwesomeIcon icon={faExclamationTriangle} style={{ marginRight: '8px' }} />
+                    Error al actualizar perfil
+                  </div>
+                  <div style={{ fontSize: '14px' }}>{profileUpdateError}</div>
+                  {profileUpdateError.includes('base de datos') && (                    <div style={{ 
+                      fontSize: '13px', 
+                      marginTop: '8px', 
+                      padding: '8px',
+                      backgroundColor: '#fff3e0',
+                      border: '1px solid #ffcc02',
+                      borderRadius: '4px',
+                      color: '#e65100'
+                    }}>
+                      <strong>Información técnica para el desarrollador:</strong><br/>
+                      • La tabla 'usuarios' no tiene columna 'updated_at'<br/>
+                      • Columnas disponibles: id_usuario, nombre, correo, contrasena, celular, fecha_nacimiento, sexo, dui, foto_perfil<br/>
+                      • El endpoint debe actualizar solo: nombre, correo, celular<br/>
+                      • Remover referencias a 'updated_at' en el query SQL
+                    </div>
+                  )}
+                </div>
               )}
             </form>
           </div>
@@ -965,7 +1530,5 @@ function CambiarContraseñaModal({ telefono, email, onClose, onSuccess }) {
          
         </div>
       </div>
-    </div>
-  );
+    </div>  );
 }
-

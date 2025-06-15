@@ -120,6 +120,7 @@ const triggerOrderUpdate = () => {
           <Perfil 
             onAddToCart={handleAddToCart} 
             user={user} 
+            setUser={setUser}
             setToast={showToast}
             onOrderUpdate={triggerOrderUpdate}
           />
