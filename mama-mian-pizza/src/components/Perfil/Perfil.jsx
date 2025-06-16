@@ -43,14 +43,18 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
 
   console.log('👤 PERFIL - Usuario recibido:', user);
   console.log('👤 PERFIL - Estado userPerfil:', userPerfil);
-
   // Formulario de edición
   const [formData, setFormData] = useState({
     nombre: userPerfil.nombre,
     email: userPerfil.email,
     telefono: userPerfil.telefono,
   });
-  const [editSuccess, setEditSuccess] = useState(false);  // Función para obtener pedidos del usuario desde la API
+  const [editSuccess, setEditSuccess] = useState(false);
+  
+  // Estados para manejo de foto de perfil
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);// Función para obtener pedidos del usuario desde la API
   const fetchUserOrders = useCallback(async () => {
     if (!user?.id) {
       console.log('❌ No hay ID de usuario para obtener pedidos');
@@ -128,8 +132,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
     } finally {
       setLoadingOrders(false);
     }
-  }, [user?.id]);
-  // Función para actualizar perfil en la API
+  }, [user?.id]);  // Función para actualizar perfil en la API
   const updateUserProfile = async (updatedData) => {
     if (!user?.id) {
       console.log('❌ No hay ID de usuario para actualizar perfil');
@@ -140,7 +143,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
       console.log('🔄 Actualizando perfil para usuario ID:', user.id);
       console.log('📝 Datos a actualizar:', updatedData);
       
-      const response = await fetch(`${API_BASE_URL}/users/${user.id}`, {
+      const response = await fetch(`${API_BASE_URL}/users/${user.id}/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -165,6 +168,98 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
     } catch (error) {
       console.error('❌ Error al actualizar perfil:', error);
       return false;
+    }
+  };
+
+  // Función para manejar la selección de imagen
+  const handleImageSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Validar que sea una imagen
+      if (!file.type.startsWith('image/')) {
+        if (setToast) {
+          setToast('Por favor selecciona un archivo de imagen válido.');
+        }
+        return;
+      }
+
+      // Validar tamaño (máximo 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        if (setToast) {
+          setToast('La imagen debe ser menor a 5MB.');
+        }
+        return;
+      }
+
+      setSelectedImage(file);
+      
+      // Crear preview de la imagen
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Función para subir la foto de perfil
+  const uploadProfilePhoto = async () => {
+    if (!selectedImage || !user?.id) {
+      return false;
+    }
+
+    setUploadingImage(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('foto_perfil', selectedImage);
+
+      console.log('📸 Subiendo foto de perfil para usuario ID:', user.id);
+
+      const response = await fetch(`${API_BASE_URL}/users/${user.id}/profile`, {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('❌ Error del servidor al subir foto:', errorData);
+        throw new Error(`Error al subir foto: ${response.status} - ${errorData.message || 'Error desconocido'}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Foto de perfil actualizada:', result);
+
+      // Actualizar la foto en el estado local
+      setUserPerfil(prev => ({
+        ...prev,
+        foto: result.foto_perfil || result.foto || imagePreview
+      }));
+
+      // Limpiar estados de imagen
+      setSelectedImage(null);
+      setImagePreview(null);
+      
+      // Reset del input file
+      const fileInput = document.getElementById('profile-photo-input');
+      if (fileInput) {
+        fileInput.value = '';
+      }
+
+      if (setToast) {
+        setToast('¡Foto de perfil actualizada correctamente!');
+      }
+
+      return true;
+
+    } catch (error) {
+      console.error('❌ Error al subir foto de perfil:', error);
+      if (setToast) {
+        setToast('Error al subir la foto. Intenta de nuevo.');
+      }
+      return false;
+    } finally {
+      setUploadingImage(false);
     }
   };
   // Efecto para cargar datos cuando se monta el componente o cambia el usuario
@@ -209,8 +304,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
         miembroDesde: user.fecha_registro ? new Date(user.fecha_registro).getFullYear() : prev.miembroDesde,
       }));
     }
-  }, [user]);
-  // Sincroniza los datos del formulario cuando el tab o usuario cambian
+  }, [user]);  // Sincroniza los datos del formulario cuando el tab o usuario cambian
   useEffect(() => {
     if (activeTab === 'editar') {
       setFormData({
@@ -218,6 +312,14 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
         email: userPerfil.email,
         telefono: userPerfil.telefono,
       });
+    } else {
+      // Limpiar estados de imagen cuando se cambie de tab
+      setSelectedImage(null);
+      setImagePreview(null);
+      const fileInput = document.getElementById('profile-photo-input');
+      if (fileInput) {
+        fileInput.value = '';
+      }
     }
   }, [activeTab, userPerfil]);
 
@@ -543,10 +645,61 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
               </button>
             </div>
           </div>
-        )}{/* --- EDITAR PERFIL --- */}
+        )}        {/* --- EDITAR PERFIL --- */}
         {activeTab === 'editar' && (
           <div>
             <div className="perfil__titulo-editar">Editar Perfil</div>
+            
+            {/* Sección de foto de perfil */}
+            <div className="perfil__foto-section">
+              <div className="perfil__foto-title">Foto de perfil</div>
+              <div className="perfil__foto-container">
+                <div className="perfil__foto-preview">
+                  <img 
+                    src={imagePreview || userPerfil.foto} 
+                    alt="Vista previa" 
+                    className="perfil__foto-preview-img"
+                  />
+                </div>
+                <div className="perfil__foto-controls">
+                  <input
+                    type="file"
+                    id="profile-photo-input"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    style={{ display: 'none' }}
+                  />
+                  <label htmlFor="profile-photo-input" className="perfil__foto-select-btn">
+                    <FontAwesomeIcon icon={faCamera} />
+                    Seleccionar foto
+                  </label>
+                  {selectedImage && (
+                    <button
+                      type="button"
+                      onClick={uploadProfilePhoto}
+                      disabled={uploadingImage}
+                      className="perfil__foto-upload-btn"
+                    >
+                      {uploadingImage ? (
+                        <>
+                          <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                          Subiendo...
+                        </>
+                      ) : (
+                        <>
+                          <FontAwesomeIcon icon={faCamera} />
+                          Actualizar foto
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div className="perfil__foto-info">
+                Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 5MB
+              </div>
+            </div>
+
             <form
               className="perfil__form-editar"
               onSubmit={async (e) => {
