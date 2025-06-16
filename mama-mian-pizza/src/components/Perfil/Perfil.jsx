@@ -442,20 +442,22 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
             </span>
           </div>
         </div>
-      </div>      {/* TABS */}
+      </div>
+
+      {/* TABS */}
       <div className="perfil__tabs">
         <button className={`perfil__tab-btn${activeTab === 'pedidos' ? ' active' : ''}`} onClick={() => setActiveTab('pedidos')}>
-          <FontAwesomeIcon icon={faUser} /> <span className="perfil__tab-text">Mis Pedidos</span>
+          <FontAwesomeIcon icon={faUser} /> Mis Pedidos
         </button>        <button className={`perfil__tab-btn${activeTab === 'reseñas' ? ' active' : ''}`} onClick={() => setActiveTab('reseñas')}>
-          <FontAwesomeIcon icon={faHeart} /> <span className="perfil__tab-text">Mis reseñas</span>
+          <FontAwesomeIcon icon={faHeart} /> Mis reseñas
         </button>
         <button className={`perfil__tab-btn${activeTab === 'editar' ? ' active' : ''}`} onClick={() => setActiveTab('editar')}>
-          <FontAwesomeIcon icon={faEdit} /> <span className="perfil__tab-text">Editar Perfil</span>
+          <FontAwesomeIcon icon={faEdit} /> Editar Perfil
         </button>
         <button className={`perfil__tab-btn${activeTab === 'seguridad' ? ' active' : ''}`} onClick={() => setActiveTab('seguridad')}>
-          <FontAwesomeIcon icon={faShieldAlt} /> <span className="perfil__tab-text">Seguridad</span>
+          <FontAwesomeIcon icon={faShieldAlt} /> Seguridad
         </button>
-      </div>{/* CONTENIDO SEGÚN TAB */}
+      </div>      {/* CONTENIDO SEGÚN TAB */}
       <div className="perfil__contenido">
         {/* --- HISTORIAL DE PEDIDOS --- */}
         {activeTab === 'pedidos' && (
