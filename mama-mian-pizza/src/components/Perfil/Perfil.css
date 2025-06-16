@@ -1237,76 +1237,6 @@
   margin-right: 8px;
 }
 
-/* RESPONSIVE UPDATES */
-@media (max-width: 768px) {
-  .perfil__estadisticas {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-
-  .perfil__estadistica-card {
-    padding: 16px;
-  }
-
-  .perfil__estadistica-numero {
-    font-size: 1.5rem;
-  }
-
-  .perfil__pedido-info {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .perfil__producto-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 16px 0;
-  }
-
-  .perfil__producto-imagen-wrapper {
-    width: 100%;
-    max-width: 120px;
-    height: 120px;
-    align-self: center;
-  }
-
-  .perfil__producto-precio {
-    margin-left: 0;
-    align-self: flex-end;
-    font-size: 1.1rem;
-  }
-
-  .perfil__titulo-historial {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .perfil__refresh-btn {
-    align-self: flex-end;
-  }
-
-  .perfil__pedido-extra {
-    padding: 12px;
-    margin: 12px 0;
-  }
-
-  .perfil__pedido-detalle {
-    font-size: 0.85rem;
-    margin: 6px 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .perfil__estadisticas {
-    grid-template-columns: 1fr;
-  }
-
-  .perfil__empty {
-    padding: 40px 20px;
-  }
-}
-
 /* MENSAJE DE ACTUALIZACIÓN INTERNO */
 .perfil__update-message {
   background: #e3f2fd;
@@ -1446,11 +1376,699 @@
   line-height: 1.4;
 }
 
-.spinning {
-  animation: spin 1s linear infinite;
+/* ========================================= */
+/*          RESPONSIVE DESIGN COMPLETO      */
+/* ========================================= */
+
+/* Large desktops y pantallas muy grandes (1200px+) */
+@media (min-width: 1200px) {
+  .perfil__main {
+    padding: 3rem 2rem 4rem 2rem;
+  }
+  
+  .perfil__card {
+    max-width: 1000px;
+    padding: 40px 50px;
+    gap: 35px;
+  }
+  
+  .perfil__foto {
+    width: 140px;
+    height: 140px;
+  }
+  
+  .perfil__foto-wrapper {
+    min-width: 140px;
+    min-height: 140px;
+  }
+  
+  .perfil__nombre {
+    font-size: 2.5rem;
+  }
+  
+  .perfil__tabs {
+    max-width: 1000px;
+  }
+  
+  .perfil__contenido {
+    max-width: 1000px;
+  }
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* Tablets horizontales y escritorios pequeños (992px - 1199px) */
+@media (max-width: 1199px) and (min-width: 992px) {
+  .perfil__main {
+    padding: 2rem 1.5rem 3rem 1.5rem;
+  }
+  
+  .perfil__card {
+    max-width: 900px;
+    padding: 35px 45px;
+    gap: 30px;
+  }
+}
+
+/* Tablets (768px - 991px) */
+@media (max-width: 991px) and (min-width: 768px) {
+  .perfil__main {
+    padding: 1.5rem 1rem 2.5rem 1rem;
+  }
+  
+  .perfil__card {
+    max-width: 95%;
+    padding: 25px 30px;
+    gap: 25px;
+  }
+  
+  .perfil__foto {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .perfil__foto-wrapper {
+    min-width: 100px;
+    min-height: 100px;
+  }
+  
+  .perfil__nombre {
+    font-size: 1.9rem;
+  }
+  
+  .perfil__email {
+    font-size: 1.05rem;
+  }
+  
+  .perfil__datos {
+    gap: 20px;
+    font-size: 0.95rem;
+  }
+  
+  .perfil__tabs {
+    max-width: 95%;
+    gap: 12px;
+  }
+  
+  .perfil__tab-btn {
+    padding: 12px 25px 10px 22px;
+    font-size: 1rem;
+    gap: 8px;
+  }
+  
+  .perfil__contenido {
+    max-width: 95%;
+  }
+}
+
+/* Tablets verticales y móviles grandes (576px - 767px) */
+@media (max-width: 767px) {
+  .perfil__main {
+    padding: 1rem 0.8rem 2rem 0.8rem;
+  }
+  
+  .perfil__card {
+    flex-direction: column;
+    text-align: center;
+    max-width: 95%;
+    padding: 25px 20px;
+    gap: 20px;
+  }
+  
+  .perfil__foto-wrapper {
+    align-self: center;
+    min-width: 120px;
+    min-height: 120px;
+  }
+  
+  .perfil__foto {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .perfil__info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .perfil__nombre {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+  
+  .perfil__email {
+    font-size: 1rem;
+    text-align: center;
+  }
+  
+  .perfil__datos {
+    justify-content: center;
+    gap: 15px;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  
+  .perfil__tabs {
+    max-width: 95%;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .perfil__tab-btn {
+    padding: 10px 20px 8px 18px;
+    font-size: 0.95rem;
+    gap: 6px;
+    flex: 1;
+    min-width: 120px;
+  }
+  
+  .perfil__contenido {
+    max-width: 95%;
+  }
+  
+  .perfil__titulo-historial,
+  .perfil__titulo-favoritos,
+  .perfil__titulo-editar,
+  .perfil__titulo-seguridad {
+    font-size: 1.7rem;
+    text-align: center;
+    justify-content: center;
+  }
+  
+  .perfil__pedido-card {
+    padding: 20px 15px;
+    margin-bottom: 20px;
+  }
+  
+  .perfil__pedido-id {
+    font-size: 1.1rem;
+    padding: 6px 12px;
+  }
+  
+  .perfil__estado-entregado {
+    font-size: 0.8rem;
+    padding: 6px 14px;
+    margin-left: 8px;
+  }
+  
+  .perfil__pedido-total {
+    font-size: 1.2rem;
+  }
+  
+  .perfil__estadisticas {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .perfil__estadistica-card {
+    padding: 16px;
+  }
+  
+  .perfil__estadistica-numero {
+    font-size: 1.4rem;
+  }
+  
+  .perfil__estadistica-label {
+    font-size: 0.85rem;
+  }
+}
+
+/* Móviles medianos (480px - 575px) */
+@media (max-width: 575px) {
+  .perfil__main {
+    padding: 0.8rem 0.5rem 1.5rem 0.5rem;
+  }
+  
+  .perfil__card {
+    padding: 20px 15px;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  
+  .perfil__foto {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .perfil__foto-wrapper {
+    min-width: 100px;
+    min-height: 100px;
+  }
+  
+  .perfil__nombre {
+    font-size: 1.6rem;
+  }
+  
+  .perfil__email {
+    font-size: 0.95rem;
+  }
+  
+  .perfil__datos {
+    gap: 12px;
+    font-size: 0.85rem;
+    flex-direction: column;
+  }
+  
+  .perfil__tabs {
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  
+  .perfil__tab-btn {
+    padding: 8px 15px 6px 12px;
+    font-size: 0.9rem;
+    gap: 5px;
+    border-radius: 6px 6px 0 0;
+  }
+  
+  .perfil__titulo-historial,
+  .perfil__titulo-favoritos,
+  .perfil__titulo-editar,
+  .perfil__titulo-seguridad {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .perfil__pedido-card {
+    padding: 18px 12px;
+  }
+  
+  .perfil__pedido-info {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .perfil__estadisticas {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .perfil__estadistica-card {
+    padding: 14px;
+  }
+  
+  .perfil__estadistica-numero {
+    font-size: 1.3rem;
+  }
+}
+
+/* Móviles pequeños (360px - 479px) */
+@media (max-width: 479px) {
+  .perfil__main {
+    padding: 0.5rem 0.3rem 1rem 0.3rem;
+  }
+  
+  .perfil__card {
+    padding: 15px 10px;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .perfil__foto {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .perfil__foto-wrapper {
+    min-width: 80px;
+    min-height: 80px;
+  }
+  
+  .perfil__foto-edit {
+    width: 30px;
+    height: 30px;
+    bottom: 5px;
+    right: 5px;
+    font-size: 0.9rem;
+  }
+  
+  .perfil__nombre {
+    font-size: 1.4rem;
+  }
+  
+  .perfil__email {
+    font-size: 0.9rem;
+  }
+  
+  .perfil__datos {
+    font-size: 0.8rem;
+    gap: 8px;
+  }
+  
+  .perfil__tabs {
+    gap: 4px;
+    margin-bottom: 15px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .perfil__tab-btn {
+    padding: 10px 15px;
+    font-size: 0.85rem;
+    gap: 8px;
+    border-radius: 6px;
+    border-bottom: none;
+    border-left: 3px solid transparent;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .perfil__tab-btn.active,
+  .perfil__tab-btn:hover {
+    border-left: 3px solid #ab1319;
+    border-bottom: none;
+  }
+  
+  .perfil__titulo-historial,
+  .perfil__titulo-favoritos,
+  .perfil__titulo-editar,
+  .perfil__titulo-seguridad {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+  }
+  
+  .perfil__pedido-card {
+    padding: 15px 8px;
+    margin-bottom: 15px;
+  }
+  
+  .perfil__pedido-id {
+    font-size: 1rem;
+    padding: 5px 10px;
+  }
+  
+  .perfil__estado-entregado {
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    margin-left: 5px;
+  }
+  
+  .perfil__pedido-total {
+    font-size: 1.1rem;
+  }
+  
+  .perfil__pedido-fecha {
+    font-size: 0.8rem;
+  }
+}
+
+/* Móviles muy pequeños (hasta 359px) */
+@media (max-width: 359px) {
+  .perfil__main {
+    padding: 0.3rem 0.2rem 0.8rem 0.2rem;
+  }
+  
+  .perfil__card {
+    padding: 12px 8px;
+    gap: 10px;
+  }
+  
+  .perfil__foto {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .perfil__foto-wrapper {
+    min-width: 70px;
+    min-height: 70px;
+  }
+  
+  .perfil__foto-edit {
+    width: 25px;
+    height: 25px;
+    font-size: 0.8rem;
+  }
+  
+  .perfil__nombre {
+    font-size: 1.2rem;
+  }
+  
+  .perfil__email {
+    font-size: 0.8rem;
+  }
+  
+  .perfil__datos {
+    font-size: 0.75rem;
+  }
+  
+  .perfil__tab-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .perfil__titulo-historial,
+  .perfil__titulo-favoritos,
+  .perfil__titulo-editar,
+  .perfil__titulo-seguridad {
+    font-size: 1.1rem;
+  }
+  
+  .perfil__pedido-card {
+    padding: 12px 6px;
+  }
+  
+  .perfil__pedido-id {
+    font-size: 0.9rem;
+    padding: 4px 8px;
+  }
+}
+
+/* Orientación horizontal para móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+  .perfil__main {
+    padding: 0.5rem 1rem 1rem 1rem;
+  }
+  
+  .perfil__card {
+    flex-direction: row;
+    padding: 15px 20px;
+    gap: 20px;
+    text-align: left;
+  }
+  
+  .perfil__foto {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .perfil__foto-wrapper {
+    min-width: 80px;
+    min-height: 80px;
+  }
+  
+  .perfil__info {
+    align-items: flex-start;
+  }
+  
+  .perfil__nombre {
+    font-size: 1.4rem;
+    text-align: left;
+  }
+  
+  .perfil__email {
+    text-align: left;
+  }
+  
+  .perfil__datos {
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  
+  .perfil__tabs {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .perfil__tab-btn {
+    border-left: none;
+    border-bottom: 2.5px solid transparent;
+  }
+  
+  .perfil__tab-btn.active,
+  .perfil__tab-btn:hover {
+    border-bottom: 2.5px solid #ab1319;
+    border-left: none;
+  }
+}
+
+/* ========================================= */
+/*     RESPONSIVE - OCULTAR NOMBRE USUARIO  */
+/* ========================================= */
+
+/* En móviles grandes (576px), reducir nombre y centrarlo */
+@media (max-width: 576px) and (min-width: 361px) {
+  .perfil__nombre {
+    font-size: 1.3rem !important;
+    text-align: center;
+  }
+}
+
+/* En móviles pequeños (400px), ocultar nombre pero mantener email */
+@media (max-width: 400px) and (min-width: 361px) {
+  .perfil__nombre {
+    display: none !important;
+  }
+  
+  .perfil__info {
+    text-align: center;
+  }
+  
+  .perfil__email {
+    margin-top: 0;
+    font-size: 1rem !important;
+    font-weight: 600;
+    text-align: center;
+  }
+}
+
+/* En móviles muy pequeños (360px), solo mostrar la foto */
+@media (max-width: 360px) {
+  .perfil__nombre,
+  .perfil__email,
+  .perfil__datos {
+    display: none !important;
+  }
+  
+  .perfil__info {
+    display: none !important;
+  }
+  
+  .perfil__card {
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 20px !important;
+    text-align: center;
+  }
+  
+  .perfil__foto-wrapper {
+    margin: 0 auto;
+  }
+}
+
+/* Clase para controlar la visibilidad del texto en tabs */
+.perfil__tab-text {
+  display: inline;
+}
+
+/* ========================================= */
+/*      MEJORAS ADICIONALES RESPONSIVAS     */
+/* ========================================= */
+
+/* Optimización para productos en las secciones */
+@media (max-width: 767px) {
+  .perfil__producto-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 0;
+  }
+  
+  .perfil__producto-imagen-wrapper {
+    width: 100%;
+    max-width: 120px;
+    height: 120px;
+    align-self: center;
+  }
+  
+  .perfil__producto-precio {
+    margin-left: 0;
+    align-self: flex-end;
+    font-size: 1.1rem;
+  }
+  
+  .perfil__refresh-btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .perfil__pedido-extra {
+    padding: 12px;
+    margin: 12px 0;
+  }
+  
+  .perfil__pedido-detalle {
+    font-size: 0.85rem;
+    margin: 6px 0;
+  }
+  
+  .perfil__empty {
+    padding: 40px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Ocultar texto de tabs en pantallas muy pequeñas */
+@media (max-width: 400px) {
+  .perfil__tab-text {
+    display: none;
+  }
+  
+  .perfil__tab-btn {
+    min-width: auto;
+    padding: 10px;
+    justify-content: center;
+  }
+  
+  .perfil__tabs {
+    flex-direction: row;
+    justify-content: space-evenly;
+  }
+}
+
+/* Ajustes específicos para formularios en editar perfil */
+@media (max-width: 767px) {
+  .perfil__formulario {
+    padding: 20px 15px;
+  }
+  
+  .perfil__campo {
+    margin-bottom: 15px;
+  }
+  
+  .perfil__input,
+  .perfil__textarea {
+    font-size: 16px; /* Evita zoom en iOS */
+    padding: 12px;
+  }
+  
+  .perfil__botones {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .perfil__btn-guardar,
+  .perfil__btn-cancelar {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+  }
+}
+
+/* Mejoras para la sección de foto de perfil */
+@media (max-width: 767px) {
+  .perfil__foto-section {
+    padding: 20px 15px;
+  }
+  
+  .perfil__foto-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+  
+  .perfil__foto-preview {
+    align-self: center;
+  }
+  
+  .perfil__foto-controls {
+    align-items: center;
+  }
+  
+  .perfil__foto-select-btn,
+  .perfil__foto-upload-btn {
+    width: 100%;
+    max-width: 250px;
+    justify-content: center;
+  }
 }
