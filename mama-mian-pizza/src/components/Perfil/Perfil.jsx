@@ -31,14 +31,15 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [errorOrders, setErrorOrders] = useState(null);
   const [updateMessage, setUpdateMessage] = useState('');
-  
-  // Estado de perfil del usuario - usar datos reales si están disponibles
+    // Estado de perfil del usuario - usar datos reales si están disponibles
   const [userPerfil, setUserPerfil] = useState({
     nombre: user?.nombre || 'Usuario',
     email: user?.correo || user?.email || 'usuario@email.com',
     telefono: user?.telefono || user?.celular || '+503 0000-0000',
     foto: user?.foto_perfil || user?.foto || perfilFoto,
     miembroDesde: user?.fecha_registro ? new Date(user.fecha_registro).getFullYear() : 2023,
+    fecha_nacimiento: user?.fecha_nacimiento || 'No especificado',
+    dui: user?.dui || user?.numero_dui || 'No especificado',
   });
 
   console.log('👤 PERFIL - Usuario recibido:', user);
@@ -132,7 +133,54 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
     } finally {
       setLoadingOrders(false);
     }
-  }, [user?.id]);  // Función para actualizar perfil en la API
+  }, [user?.id]);
+  // Función para obtener datos completos del usuario desde la API
+  const fetchUserData = useCallback(async () => {
+    if (!user?.id) {
+      console.log('❌ No hay ID de usuario para obtener datos completos');
+      return;
+    }
+
+    try {
+      console.log('🔍 Obteniendo datos completos para usuario ID:', user.id);
+      
+      const response = await fetch(`${API_BASE_URL}/users/${user.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al obtener datos del usuario: ${response.status}`);
+      }      const userData = await response.json();
+      console.log('👤 PERFIL - Datos completos del usuario desde API:', userData);
+      console.log('📅 PERFIL - Fecha de nacimiento recibida:', userData.fecha_nacimiento);
+      console.log('📅 PERFIL - Tipo de fecha_nacimiento:', typeof userData.fecha_nacimiento);
+      console.log('🆔 PERFIL - DUI recibido:', userData.dui || userData.numero_dui);      // Actualizar el estado con los datos reales de la API
+      setUserPerfil(prev => {
+        const updatedPerfil = {
+          ...prev,
+          nombre: userData.nombre || prev.nombre,
+          email: userData.correo || userData.email || prev.email,
+          telefono: userData.telefono || userData.celular || prev.telefono,
+          foto: userData.foto_perfil || userData.foto || prev.foto,
+          fecha_nacimiento: userData.fecha_nacimiento || 'No especificado',
+          dui: userData.dui || userData.numero_dui || 'No especificado',
+        };
+
+        console.log('📝 PERFIL - Nuevo estado userPerfil que se va a establecer:', updatedPerfil);
+        return updatedPerfil;
+      });
+
+      console.log('✅ PERFIL - UserPerfil actualizado con datos de la API');
+
+    } catch (error) {
+      console.error('❌ PERFIL - Error al obtener datos del usuario:', error);
+    }
+  }, [user?.id]);
+
+  // Función para actualizar perfil en la API
   const updateUserProfile = async (updatedData) => {
     if (!user?.id) {
       console.log('❌ No hay ID de usuario para actualizar perfil');
@@ -286,14 +334,14 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
     } finally {
       setUploadingImage(false);
     }
-  };
-  // Efecto para cargar datos cuando se monta el componente o cambia el usuario
+  };  // Efecto para cargar datos cuando se monta el componente o cambia el usuario
   useEffect(() => {
     if (user?.id) {
       console.log('🔄 Cargando datos del perfil para usuario ID:', user.id);
       fetchUserOrders();
+      fetchUserData(); // Cargar datos completos del usuario
     }
-  }, [user?.id, fetchUserOrders]);
+  }, [user?.id, fetchUserOrders, fetchUserData]);
 
   // Escuchar actualizaciones de pedidos desde el componente padre
   useEffect(() => {
@@ -315,7 +363,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
       return () => window.removeEventListener('orderCompleted', handleOrderUpdate);
     }
   }, [onOrderUpdate, fetchUserOrders, setToast]);
-
   // Actualizar userPerfil cuando cambie el prop user
   useEffect(() => {
     if (user) {
@@ -327,9 +374,11 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
         telefono: user.telefono || user.celular || prev.telefono,
         foto: user.foto_perfil || user.foto || prev.foto,
         miembroDesde: user.fecha_registro ? new Date(user.fecha_registro).getFullYear() : prev.miembroDesde,
+        fecha_nacimiento: user.fecha_nacimiento || prev.fecha_nacimiento,
+        dui: user.dui || user.numero_dui || prev.dui,
       }));
     }
-  }, [user]);  // Sincroniza los datos del formulario cuando el tab o usuario cambian
+  }, [user]);// Sincroniza los datos del formulario cuando el tab o usuario cambian
   useEffect(() => {
     if (activeTab === 'editar') {
       setFormData({
@@ -358,7 +407,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
   const handleRefreshOrders = async () => {
     await fetchUserOrders();
   };
-
   // Función para formatear fecha
   const formatDate = (dateString) => {
     try {
@@ -372,6 +420,63 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
       });
     } catch (error) {
       return 'Fecha no disponible';
+    }
+  };  // Función para formatear fecha de nacimiento
+  const formatBirthDate = (dateString) => {
+    console.log('📅 formatBirthDate - Input:', dateString, 'Tipo:', typeof dateString);
+    
+    if (!dateString || dateString === 'No especificado') {
+      console.log('📅 formatBirthDate - Sin fecha o no especificado');
+      return 'No especificado';
+    }
+    
+    try {
+      let date;
+      
+      // Manejar formato ISO completo de la API (YYYY-MM-DDTHH:mm:ss.sssZ)
+      if (typeof dateString === 'string' && dateString.includes('T') && dateString.includes('Z')) {
+        console.log('📅 formatBirthDate - Procesando como fecha ISO completa con timestamp');
+        date = new Date(dateString);
+      }
+      // Si es una fecha ISO simple (YYYY-MM-DD)
+      else if (typeof dateString === 'string' && dateString.includes('-')) {
+        console.log('📅 formatBirthDate - Procesando como fecha ISO simple');
+        date = new Date(dateString);
+      }
+      // Si es un timestamp o número
+      else if (typeof dateString === 'number' || !isNaN(Number(dateString))) {
+        console.log('📅 formatBirthDate - Procesando como timestamp');
+        date = new Date(Number(dateString));
+      }
+      // Intentar como string directo
+      else {
+        console.log('📅 formatBirthDate - Procesando como string directo');
+        date = new Date(dateString);
+      }
+      
+      console.log('📅 formatBirthDate - Fecha parseada:', date);
+      console.log('📅 formatBirthDate - Fecha válida?:', !isNaN(date.getTime()));
+      
+      // Verificar que la fecha es válida
+      if (isNaN(date.getTime())) {
+        console.log('❌ formatBirthDate - Fecha inválida');
+        return 'Fecha inválida';
+      }
+      
+      // Formatear fecha en español
+      const formatted = date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC' // Importante: usar UTC para evitar problemas de zona horaria
+      });
+      
+      console.log('✅ formatBirthDate - Fecha formateada:', formatted);
+      return formatted;
+      
+    } catch (error) {
+      console.error('❌ formatBirthDate - Error al formatear fecha:', error);
+      return 'Error en fecha';
     }
   };
 
@@ -390,8 +495,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
       case 'cancelado':
       case 'cancelled':
         return '#f44336';
-      default:
-        return '#9e9e9e';
+      default:        return '#9e9e9e';
     }
   };
 
@@ -399,6 +503,13 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
   if (!user) {
     return null;
   }
+
+  // Debug para el render actual
+  console.log('🎨 PERFIL - RENDER - Estado actual userPerfil:', {
+    fecha_nacimiento: userPerfil.fecha_nacimiento,
+    dui: userPerfil.dui,
+    nombre: userPerfil.nombre
+  });
 
   return (
     <div className="perfil__main">
@@ -770,9 +881,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
                     required
                   />
                 </div>
-              </div>
-              <div className="perfil__form-row">
-                <div className="perfil__form-group" style={{ width: '100%' }}>
+              </div>              <div className="perfil__form-row">
+                <div className="perfil__form-group">
                   <label>Teléfono</label>
                   <input
                     type="text"
@@ -780,6 +890,38 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
                     onChange={e => setFormData({ ...formData, telefono: e.target.value })}
                     placeholder="+503 7123-4567"
                     required
+                  />
+                </div>
+              </div>
+                {/* Campos de solo lectura */}
+              <div className="perfil__form-row">
+                <div className="perfil__form-group">
+                  <label>Fecha de nacimiento</label>
+                  {console.log('🎯 RENDER - Valor de userPerfil.fecha_nacimiento antes de formatear:', userPerfil.fecha_nacimiento)}
+                  <input
+                    type="text"
+                    value={formatBirthDate(userPerfil.fecha_nacimiento)}
+                    readOnly
+                    style={{ 
+                      backgroundColor: '#f8f9fa', 
+                      color: '#6c757d',
+                      cursor: 'not-allowed',
+                      border: '1.3px solid #e9ecef'
+                    }}
+                  />
+                </div>
+                <div className="perfil__form-group">
+                  <label>Número de DUI</label>
+                  <input
+                    type="text"
+                    value={userPerfil.dui}
+                    readOnly
+                    style={{ 
+                      backgroundColor: '#f8f9fa', 
+                      color: '#6c757d',
+                      cursor: 'not-allowed',
+                      border: '1.3px solid #e9ecef'
+                    }}
                   />
                 </div>
               </div>
@@ -836,8 +978,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          </div>        )}
 
       </div>
 
@@ -852,7 +993,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
     </div>
   );
 }
-
 
 // --- MODAL CAMBIAR CONTRASEÑA ---
 function CambiarContraseñaModal({ telefono, email, onClose, onSuccess }) {
@@ -876,7 +1016,6 @@ function CambiarContraseñaModal({ telefono, email, onClose, onSuccess }) {
     { msg: "Debe contener al menos un número", valid: /\d/.test(newPass) },
     { msg: "Debe contener al menos un carácter especial", valid: /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(newPass) },
   ];
-
   const handleChangePass = (e) => {
     e.preventDefault();
     setChanging(true);
@@ -886,7 +1025,8 @@ function CambiarContraseñaModal({ telefono, email, onClose, onSuccess }) {
       onClose();
     }, 1200);
   };
- return (
+
+  return (
     <div className="modal__overlay" style={{ zIndex: 99999 }}>
       <div className="modal__content modal__full-white" style={{ maxWidth: 650, padding: 0 }}>
         {/* Header */}
