@@ -4,30 +4,26 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp, faFacebookMessenger, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import PropTypes from 'prop-types';
 
-export default function SocialIcon({ platform, index, total, isOpen }) {
-  const getIconStyles = () => {
+export default function SocialIcon({ platform, index, total, isOpen }) {  const getIconStyles = () => {
     if (!isOpen) return {};
 
-    const angle = Math.PI / 2;            // 90°
-    const arcStartAngle = Math.PI / 4;    // 45°
-    const itemAngle = arcStartAngle + (angle * index) / (total - 1);
-    const radius = 100; // increased radius to add more space between icons
-    const x = Math.cos(itemAngle) * radius;
-    const y = -Math.sin(itemAngle) * radius;
+    // Posicionamiento vertical (de arriba hacia abajo)
+    const spacing = 60; // Espaciado entre íconos
+    const y = -(spacing * (index + 1)); // Negativo para ir hacia arriba
+    const x = 0; // Sin desplazamiento horizontal
 
     return {
       transform: `translate(${x}px, ${y}px)`,
     };
   };
-
   const getIcon = () => {
     switch (platform.name) {
       case 'whatsapp':
-        return <FontAwesomeIcon icon={faWhatsapp} size="lg" color="white" />;
+        return <FontAwesomeIcon icon={faWhatsapp} style={{ fontSize: '20px', color: 'white' }} />;
       case 'messenger':
-        return <FontAwesomeIcon icon={faFacebookMessenger} size="lg" color="white" />;
+        return <FontAwesomeIcon icon={faFacebookMessenger} style={{ fontSize: '20px', color: 'white' }} />;
       case 'instagram':
-        return <FontAwesomeIcon icon={faInstagram} size="lg" color="white" />;
+        return <FontAwesomeIcon icon={faInstagram} style={{ fontSize: '20px', color: 'white' }} />;
       default:
         return null;
     }

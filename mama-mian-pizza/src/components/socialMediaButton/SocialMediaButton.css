@@ -3,8 +3,12 @@
     position: fixed;
     bottom: 34px;
     right: 69px;
-    z-index: 9999;
+    z-index: 10000; /* Aumentado para estar sobre todos los elementos */
     transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    /* Asegurar que siempre sea visible */
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
   }
   
   .social-media-button {
@@ -21,7 +25,7 @@
     border-radius: 50%;
     background-color: #FEB248;
     border: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
     color: #821717;
     display: flex;
     justify-content: center;
@@ -35,6 +39,7 @@
     background-color: #821717;
     transform: scale(1.05);
     color: #FEB248;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.3);
   }
   
   .social-media-button.active .toggle-button {
@@ -42,19 +47,18 @@
     transform: rotate(180deg);
     color: #fff;
   }
-  
-  /* Social Icons Container */
+    /* Social Icons Container */
   .social-icons-container {
     position: absolute;
     width: 66px;
-    height: 66px;
+    height: 200px; /* Aumentado para acomodar el layout vertical */
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end; /* Alinear al final para que crezca hacia arriba */
     z-index: 1;
+    bottom: 0; /* Posicionar desde abajo */
   }
-  
-  /* Individual Social Icon */
+    /* Individual Social Icon */
   .social-icon {
     position: absolute;
     width: 44px;
@@ -63,31 +67,44 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
+    color: white !important;
     text-decoration: none;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    /* include filter for hover effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
                 opacity 0.3s ease,
-                filter 0.3s ease;
+                filter 0.3s ease,
+                box-shadow 0.3s ease;
     opacity: 0;
     transform: scale(0.6) translate(0, 0);
     pointer-events: none;
   }
   
+  /* Estilos específicos para los íconos de FontAwesome */
+  .social-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+    color: white !important;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  }
   /* When menu is open */
   .social-media-button.active .social-icon {
     opacity: 1;
     pointer-events: auto;
+    /* Removido transform genérico para usar los específicos de nth-child */
   }
   
   .social-icon:hover {
     /* brighten icon on hover instead of scaling */
-    filter: brightness(1.2);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    filter: brightness(1.3) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.3);
+    /* Transform específico manejado por nth-child rules */
   }
   
-  /* Responsive adjustments */
+  .social-icon:hover svg {
+    transform: scale(1.1);
+  }
+    /* Responsive adjustments */
   @media (max-width: 768px) {
     .social-media-container {
       bottom: 16px;
@@ -97,10 +114,259 @@
     .toggle-button {
       width: 48px;
       height: 48px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
     
     .social-icon {
-      width: 38px;
-      height: 38px;
+      width: 42px;
+      height: 42px;
+      border-width: 2px;
+    }
+    
+    .social-icon svg {
+      width: 18px !important;
+      height: 18px !important;
+    }
+
+    /* Ajustes responsivos del contenedor */
+    .social-icons-container {
+      height: 180px;
     }
   }
+  @media (max-width: 480px) {
+    .social-media-container {
+      bottom: 20px;
+      right: 20px;
+    }
+    
+    .toggle-button {
+      width: 52px;
+      height: 52px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .social-icon {
+      width: 46px;
+      height: 46px;
+      border-width: 2px;
+    }
+    
+    .social-icon svg {
+      width: 20px !important;
+      height: 20px !important;
+    }
+
+    /* Ajustes responsivos del contenedor */
+    .social-icons-container {
+      height: 165px;
+    }
+  }
+
+  @media (max-width: 320px) {
+    .social-media-container {
+      bottom: 15px;
+      right: 15px;
+    }
+    
+    .toggle-button {
+      width: 46px;
+      height: 46px;
+    }
+    
+    .social-icon {
+      width: 40px;
+      height: 40px;
+      border-width: 1px;
+    }
+    
+    .social-icon svg {
+      width: 18px !important;
+      height: 18px !important;
+    }
+
+    /* Ajustes responsivos del contenedor */
+    .social-icons-container {
+      height: 150px;
+    }
+  }
+
+  /* ========================================= */
+  /*      MEJORAS ESPECÍFICAS PARA ÍCONOS     */
+  /* ========================================= */
+
+  /* Estilos específicos para cada red social */
+  .social-icon[href*="whatsapp"] {
+    background-color: #25D366 !important;
+  }
+
+  .social-icon[href*="whatsapp"]:hover {
+    background-color: #1DA851 !important;
+    box-shadow: 0 6px 12px rgba(37, 211, 102, 0.4), 0 3px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .social-icon[href*="messenger"] {
+    background-color: #0078FF !important;
+  }
+
+  .social-icon[href*="messenger"]:hover {
+    background-color: #0066CC !important;
+    box-shadow: 0 6px 12px rgba(0, 120, 255, 0.4), 0 3px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .social-icon[href*="instagram"] {
+    background: linear-gradient(45deg, #E1306C, #C13584, #833AB4, #5B51D8, #405DE6) !important;
+  }
+
+  .social-icon[href*="instagram"]:hover {
+    background: linear-gradient(45deg, #C13584, #A02C6B, #7232A8, #4A3FB8, #3650DC) !important;
+    box-shadow: 0 6px 12px rgba(225, 48, 108, 0.4), 0 3px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Mejoras para alta resolución (Retina) */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .social-icon svg {
+      transform: translateZ(0);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  }
+
+  /* Mejoras de accesibilidad */
+  @media (prefers-reduced-motion: reduce) {
+    .social-icon,
+    .toggle-button {
+      transition: none;
+    }
+  }
+
+  /* Contraste alto para mejor visibilidad */
+  @media (prefers-contrast: high) {
+    .social-icon {
+      border-width: 3px !important;
+      border-color: white !important;
+    }
+    
+    .social-icon svg {
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8)) !important;
+    }
+  }
+
+  /* ========================================= */
+  /*     POSICIONAMIENTO VERTICAL RESPONSIVO  */
+  /* ========================================= */
+
+  /* Espaciado vertical base para escritorio */
+.social-media-button.active .social-icon:nth-child(1) {
+  transform: translate(0px, -60px) scale(1);
+}
+
+.social-media-button.active .social-icon:nth-child(2) {
+  transform: translate(0px, -120px) scale(1);
+}
+
+.social-media-button.active .social-icon:nth-child(3) {
+  transform: translate(0px, -180px) scale(1);
+}
+
+/* Responsive: Tablets (768px) */
+@media (max-width: 768px) {
+  .social-media-button.active .social-icon:nth-child(1) {
+    transform: translate(0px, -55px) scale(1);
+  }
+  
+  .social-media-button.active .social-icon:nth-child(2) {
+    transform: translate(0px, -110px) scale(1);
+  }
+  
+  .social-media-button.active .social-icon:nth-child(3) {
+    transform: translate(0px, -165px) scale(1);
+  }
+}
+
+/* Responsive: Móviles grandes (480px) */
+@media (max-width: 480px) {
+  .social-media-button.active .social-icon:nth-child(1) {
+    transform: translate(0px, -50px) scale(1);
+  }
+  
+  .social-media-button.active .social-icon:nth-child(2) {
+    transform: translate(0px, -100px) scale(1);
+  }
+  
+  .social-media-button.active .social-icon:nth-child(3) {
+    transform: translate(0px, -150px) scale(1);
+  }
+}
+
+/* Responsive: Móviles pequeños (320px) */
+@media (max-width: 320px) {
+  .social-media-button.active .social-icon:nth-child(1) {
+    transform: translate(0px, -45px) scale(1);
+  }
+  
+  .social-media-button.active .social-icon:nth-child(2) {
+    transform: translate(0px, -90px) scale(1);
+  }
+  
+  .social-media-button.active .social-icon:nth-child(3) {
+    transform: translate(0px, -135px) scale(1);
+  }
+}
+
+/* Efectos hover manteniendo la posición vertical */
+.social-icon:hover:nth-child(1) {
+  transform: translate(0px, -60px) scale(1.1) !important;
+}
+
+.social-icon:hover:nth-child(2) {
+  transform: translate(0px, -120px) scale(1.1) !important;
+}
+
+.social-icon:hover:nth-child(3) {
+  transform: translate(0px, -180px) scale(1.1) !important;
+}
+
+/* Hover responsivo para tablets */
+@media (max-width: 768px) {
+  .social-icon:hover:nth-child(1) {
+    transform: translate(0px, -55px) scale(1.1) !important;
+  }
+  
+  .social-icon:hover:nth-child(2) {
+    transform: translate(0px, -110px) scale(1.1) !important;
+  }
+  
+  .social-icon:hover:nth-child(3) {
+    transform: translate(0px, -165px) scale(1.1) !important;
+  }
+}
+
+/* Hover responsivo para móviles grandes */
+@media (max-width: 480px) {
+  .social-icon:hover:nth-child(1) {
+    transform: translate(0px, -50px) scale(1.1) !important;
+  }
+  
+  .social-icon:hover:nth-child(2) {
+    transform: translate(0px, -100px) scale(1.1) !important;
+  }
+  
+  .social-icon:hover:nth-child(3) {
+    transform: translate(0px, -150px) scale(1.1) !important;
+  }
+}
+
+/* Hover responsivo para móviles pequeños */
+@media (max-width: 320px) {
+  .social-icon:hover:nth-child(1) {
+    transform: translate(0px, -45px) scale(1.1) !important;
+  }
+  
+  .social-icon:hover:nth-child(2) {
+    transform: translate(0px, -90px) scale(1.1) !important;
+  }
+  
+  .social-icon:hover:nth-child(3) {
+    transform: translate(0px, -135px) scale(1.1) !important;
+  }
+}
