@@ -742,11 +742,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
                     }
                   });
                   window.dispatchEvent(profileDataUpdateEvent);
-                  
-                  setEditSuccess(true);
-                  if (setToast) {
-                    setToast('¡Perfil actualizado correctamente!');
-                  }
+                    setEditSuccess(true);
                   setTimeout(() => setEditSuccess(false), 3000);
                 } else {
                   if (setToast) {
