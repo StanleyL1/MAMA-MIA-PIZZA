@@ -20,6 +20,7 @@ const Navbar = ({ onCartToggle, cartItemCount, user, onLogout }) => {
 const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+const [profilePhoto, setProfilePhoto] = useState(null);
 
 
 const toggleMobileMenu = () => {
@@ -52,6 +53,24 @@ useEffect(() => {
 
   document.addEventListener('click', handleClickOutside);
   return () => document.removeEventListener('click', handleClickOutside);
+}, []);
+
+// Actualizar foto de perfil cuando cambie el usuario
+useEffect(() => {
+  if (user) {
+    setProfilePhoto(user.foto_perfil || user.foto);
+  }
+}, [user]);
+
+// Listener para actualizaciones de foto de perfil en tiempo real
+useEffect(() => {
+  const handleProfilePhotoUpdate = (event) => {
+    console.log('📸 NAVBAR - Foto de perfil actualizada:', event.detail);
+    setProfilePhoto(event.detail.newPhoto);
+  };
+
+  window.addEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
+  return () => window.removeEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
 }, []);
 
 
@@ -112,10 +131,9 @@ useEffect(() => {
                 }}
                 onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255,255,255,0.1)'}
                 onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-              >        
-                <img 
+              >                <img 
                   alt='Foto de perfil'
-                  src={user.foto_perfil || user.foto || require('../../assets/perfilfoto.png')}
+                  src={profilePhoto || user.foto_perfil || user.foto || require('../../assets/perfilfoto.png')}
                   className="navbar__profile-photo"
                   style={{
                     width: '32px',
@@ -129,7 +147,7 @@ useEffect(() => {
                     console.log('❌ Error cargando imagen de perfil, usando por defecto');
                     e.target.src = require('../../assets/perfilfoto.png');
                   }}
-                />                <span className="navbar__profile-name" style={{ fontWeight: '500' }}>
+                /><span className="navbar__profile-name" style={{ fontWeight: '500' }}>
                   {user.nombre || user.name || 'Usuario'}
                 </span>
                 <span style={{ 

@@ -170,7 +170,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
       return false;
     }
   };
-
   // Función para manejar la selección de imagen
   const handleImageSelect = (event) => {
     const file = event.target.files[0];
@@ -189,22 +188,41 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
           setToast('La imagen debe ser menor a 5MB.');
         }
         return;
-      }
-
-      setSelectedImage(file);
+      }      setSelectedImage(file);
       
-      // Crear preview de la imagen
+      // Crear preview de la imagen inmediatamente
       const reader = new FileReader();
       reader.onload = (e) => {
-        setImagePreview(e.target.result);
+        const previewUrl = e.target.result;
+        setImagePreview(previewUrl);
+        
+        // Actualizar también la foto en userPerfil inmediatamente para mostrar en tiempo real
+        setUserPerfil(prev => ({
+          ...prev,
+          foto: previewUrl
+        }));
+        
+        // Disparar evento para actualizar navbar inmediatamente con la vista previa
+        const profileUpdateEvent = new CustomEvent('profilePhotoUpdated', {
+          detail: {
+            newPhoto: previewUrl,
+            userId: user.id
+          }
+        });
+        window.dispatchEvent(profileUpdateEvent);
+        
+        // Subir automáticamente la foto después de mostrar la vista previa
+        setTimeout(() => {
+          uploadProfilePhoto(file);
+        }, 100);
       };
       reader.readAsDataURL(file);
     }
   };
 
   // Función para subir la foto de perfil
-  const uploadProfilePhoto = async () => {
-    if (!selectedImage || !user?.id) {
+  const uploadProfilePhoto = async (file = selectedImage) => {
+    if (!file || !user?.id) {
       return false;
     }
 
@@ -212,7 +230,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
 
     try {
       const formData = new FormData();
-      formData.append('foto_perfil', selectedImage);
+      formData.append('foto_perfil', file);
 
       console.log('📸 Subiendo foto de perfil para usuario ID:', user.id);
 
@@ -225,19 +243,26 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
         const errorData = await response.json();
         console.error('❌ Error del servidor al subir foto:', errorData);
         throw new Error(`Error al subir foto: ${response.status} - ${errorData.message || 'Error desconocido'}`);
-      }
-
-      const result = await response.json();
+      }      const result = await response.json();
       console.log('✅ Foto de perfil actualizada:', result);
 
-      // Actualizar la foto en el estado local
-      setUserPerfil(prev => ({
-        ...prev,
-        foto: result.foto_perfil || result.foto || imagePreview
-      }));
+      // Actualizar la foto en el estado local con la URL real de la API
+      const newPhotoUrl = result.foto_perfil || result.foto;
+      if (newPhotoUrl) {
+        setUserPerfil(prev => ({
+          ...prev,
+          foto: newPhotoUrl
+        }));
 
-      // Limpiar estados de imagen
-      setSelectedImage(null);
+        // Disparar evento para actualizar navbar con la URL real
+        const profileUpdateEvent = new CustomEvent('profilePhotoUpdated', {
+          detail: {
+            newPhoto: newPhotoUrl,
+            userId: user.id
+          }
+        });
+        window.dispatchEvent(profileUpdateEvent);
+      }// Limpiar estados de imagen
       setImagePreview(null);
       
       // Reset del input file
@@ -314,7 +339,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
       });
     } else {
       // Limpiar estados de imagen cuando se cambie de tab
-      setSelectedImage(null);
       setImagePreview(null);
       const fileInput = document.getElementById('profile-photo-input');
       if (fileInput) {
@@ -649,8 +673,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
         {activeTab === 'editar' && (
           <div>
             <div className="perfil__titulo-editar">Editar Perfil</div>
-            
-            {/* Sección de foto de perfil */}
+              {/* Sección de foto de perfil */}
             <div className="perfil__foto-section">
               <div className="perfil__foto-title">Foto de perfil</div>
               <div className="perfil__foto-container">
@@ -668,35 +691,31 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
                     accept="image/*"
                     onChange={handleImageSelect}
                     style={{ display: 'none' }}
+                    disabled={uploadingImage}
                   />
-                  <label htmlFor="profile-photo-input" className="perfil__foto-select-btn">
-                    <FontAwesomeIcon icon={faCamera} />
-                    Seleccionar foto
+                  <label 
+                    htmlFor="profile-photo-input" 
+                    className={`perfil__foto-select-btn ${uploadingImage ? 'disabled' : ''}`}
+                    style={{ 
+                      pointerEvents: uploadingImage ? 'none' : 'auto',
+                      opacity: uploadingImage ? 0.6 : 1 
+                    }}
+                  >
+                    <FontAwesomeIcon icon={uploadingImage ? faSpinner : faCamera} className={uploadingImage ? 'spinning' : ''} />
+                    {uploadingImage ? 'Subiendo...' : 'Seleccionar foto'}
                   </label>
-                  {selectedImage && (
-                    <button
-                      type="button"
-                      onClick={uploadProfilePhoto}
-                      disabled={uploadingImage}
-                      className="perfil__foto-upload-btn"
-                    >
-                      {uploadingImage ? (
-                        <>
-                          <FontAwesomeIcon icon={faSpinner} className="spinning" />
-                          Subiendo...
-                        </>
-                      ) : (
-                        <>
-                          <FontAwesomeIcon icon={faCamera} />
-                          Actualizar foto
-                        </>
-                      )}
-                    </button>
+                  {uploadingImage && (
+                    <div className="perfil__foto-uploading">
+                      <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                      Actualizando foto de perfil...
+                    </div>
                   )}
                 </div>
               </div>
               <div className="perfil__foto-info">
                 Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 5MB
+                {!uploadingImage && <br />}
+                {!uploadingImage && <span style={{ color: '#ab1319', fontWeight: '500' }}>La foto se actualiza automáticamente al seleccionarla</span>}
               </div>
             </div>
 

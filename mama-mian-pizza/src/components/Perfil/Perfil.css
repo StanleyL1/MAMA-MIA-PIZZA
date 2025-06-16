@@ -1347,6 +1347,24 @@
   transform: translateY(-1px);
 }
 
+.perfil__foto-select-btn.disabled {
+  background: #f5f5f5;
+  color: #999;
+  border-color: #ddd;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.perfil__foto-uploading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ab1319;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 8px 0;
+}
+
 .perfil__foto-upload-btn {
   display: inline-flex;
   align-items: center;
