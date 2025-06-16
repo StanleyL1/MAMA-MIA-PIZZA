@@ -28,9 +28,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
     averageOrderValue: 0,
     favoriteProducts: 0
   });
-  const [loadingOrders, setLoadingOrders] = useState(false);
-  const [errorOrders, setErrorOrders] = useState(null);
-  const [updateMessage, setUpdateMessage] = useState('');
+  const [loadingOrders, setLoadingOrders] = useState(false);  const [errorOrders, setErrorOrders] = useState(null);  const [updateMessage, setUpdateMessage] = useState('');
+  const [profileMessage, setProfileMessage] = useState(''); // Mensaje local para mostrar abajo de la foto
+  const [profileMessageType, setProfileMessageType] = useState('success'); // 'success' o 'error'
     // Estado de perfil del usuario - usar datos reales si están disponibles
   const [userPerfil, setUserPerfil] = useState({
     nombre: user?.nombre || 'Usuario',
@@ -41,9 +41,15 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
     fecha_nacimiento: user?.fecha_nacimiento || 'No especificado',
     dui: user?.dui || user?.numero_dui || 'No especificado',
   });
-
   console.log('👤 PERFIL - Usuario recibido:', user);
   console.log('👤 PERFIL - Estado userPerfil:', userPerfil);
+  
+  // Función helper para mostrar mensajes locales
+  const showProfileMessage = (message, type = 'success') => {
+    setProfileMessage(message);
+    setProfileMessageType(type);
+    setTimeout(() => setProfileMessage(''), 3000);
+  };
   // Formulario de edición
   const [formData, setFormData] = useState({
     nombre: userPerfil.nombre,
@@ -174,22 +180,17 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
   // Función para manejar la selección de imagen
   const handleImageSelect = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      // Validar que sea una imagen
+    if (file) {      // Validar que sea una imagen
       if (!file.type.startsWith('image/')) {
-        if (setToast) {
-          setToast('Por favor selecciona un archivo de imagen válido.');
-        }
+        showProfileMessage('Por favor selecciona un archivo de imagen válido.', 'error');
         return;
       }
 
       // Validar tamaño (máximo 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        if (setToast) {
-          setToast('La imagen debe ser menor a 5MB.');
-        }
+        showProfileMessage('La imagen debe ser menor a 5MB.', 'error');
         return;
-      }      setSelectedImage(file);
+      }setSelectedImage(file);
       
       // Crear preview de la imagen inmediatamente
       const reader = new FileReader();
@@ -269,20 +270,15 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
       // Reset del input file
       const fileInput = document.getElementById('profile-photo-input');
       if (fileInput) {
-        fileInput.value = '';
-      }
+        fileInput.value = '';      }
 
-      if (setToast) {
-        setToast('¡Foto de perfil actualizada correctamente!');
-      }
+      showProfileMessage('¡Foto de perfil actualizada correctamente!');
 
       return true;
 
     } catch (error) {
       console.error('❌ Error al subir foto de perfil:', error);
-      if (setToast) {
-        setToast('Error al subir la foto. Intenta de nuevo.');
-      }
+      showProfileMessage('Error al subir la foto. Intenta de nuevo.', 'error');
       return false;
     } finally {
       setUploadingImage(false);
@@ -421,13 +417,17 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
   return (
     <div className="perfil__main">
       {/* CARD DE PERFIL */}
-      <div className="perfil__card">
-        <div className="perfil__foto-wrapper">
+      <div className="perfil__card">        <div className="perfil__foto-wrapper">
           <img src={userPerfil.foto} alt="Perfil" className="perfil__foto" />
           <div className="perfil__foto-edit">
             <FontAwesomeIcon icon={faCamera} />
           </div>
-        </div>        <div className="perfil__info">
+        </div>        {/* Mensaje local debajo de la foto */}
+        {profileMessage && (
+          <div className={`perfil__local-message ${profileMessageType === 'error' ? 'error' : ''}`}>
+            {profileMessage}
+          </div>
+        )}<div className="perfil__info">
           <div className="perfil__nombre">{userPerfil.nombre}</div>
           <div className="perfil__email">{userPerfil.email}</div>
           <div className="perfil__datos">
@@ -757,13 +757,10 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
                       userId: user.id
                     }
                   });
-                  window.dispatchEvent(profileDataUpdateEvent);
-                    setEditSuccess(true);
+                  window.dispatchEvent(profileDataUpdateEvent);                  setEditSuccess(true);
                   setTimeout(() => setEditSuccess(false), 3000);
                 } else {
-                  if (setToast) {
-                    setToast('Error al actualizar el perfil. Intenta de nuevo.');
-                  }
+                  showProfileMessage('Error al actualizar el perfil. Intenta de nuevo.', 'error');
                 }
               }}
             >
