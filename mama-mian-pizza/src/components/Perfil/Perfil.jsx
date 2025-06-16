@@ -514,13 +514,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
   return (
     <div className="perfil__main">
       {/* CARD DE PERFIL */}
-      <div className="perfil__card">
-        <div className="perfil__foto-wrapper">
+      <div className="perfil__card">        <div className="perfil__foto-wrapper">
           <img src={userPerfil.foto} alt="Perfil" className="perfil__foto" />
-          <div className="perfil__foto-edit">
-            <FontAwesomeIcon icon={faCamera} />
-          </div>
-        </div>        <div className="perfil__info">
+        </div><div className="perfil__info">
           <div className="perfil__nombre">{userPerfil.nombre}</div>
           <div className="perfil__email">{userPerfil.email}</div>
           <div className="perfil__datos">
