@@ -21,6 +21,7 @@ const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 const [profilePhoto, setProfilePhoto] = useState(null);
+const [profileName, setProfileName] = useState(null);
 
 
 const toggleMobileMenu = () => {
@@ -59,6 +60,7 @@ useEffect(() => {
 useEffect(() => {
   if (user) {
     setProfilePhoto(user.foto_perfil || user.foto);
+    setProfileName(user.nombre || user.name);
   }
 }, [user]);
 
@@ -71,6 +73,19 @@ useEffect(() => {
 
   window.addEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
   return () => window.removeEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
+}, []);
+
+// Listener para actualizaciones de datos de perfil en tiempo real
+useEffect(() => {
+  const handleProfileDataUpdate = (event) => {
+    console.log('👤 NAVBAR - Datos de perfil actualizados:', event.detail);
+    if (event.detail.nombre) {
+      setProfileName(event.detail.nombre);
+    }
+  };
+
+  window.addEventListener('profileDataUpdated', handleProfileDataUpdate);
+  return () => window.removeEventListener('profileDataUpdated', handleProfileDataUpdate);
 }, []);
 
 
@@ -147,8 +162,8 @@ useEffect(() => {
                     console.log('❌ Error cargando imagen de perfil, usando por defecto');
                     e.target.src = require('../../assets/perfilfoto.png');
                   }}
-                /><span className="navbar__profile-name" style={{ fontWeight: '500' }}>
-                  {user.nombre || user.name || 'Usuario'}
+                />                <span className="navbar__profile-name" style={{ fontWeight: '500' }}>
+                  {profileName || user.nombre || user.name || 'Usuario'}
                 </span>
                 <span style={{ 
                   marginLeft: '6px', 
@@ -183,9 +198,9 @@ useEffect(() => {
                       color: '#666',
                       fontWeight: '500' 
                     }}>
-                      {user.nombre || user.name || 'Usuario'}
+                      {profileName || user.nombre || user.name || 'Usuario'}
                     </div>
-                  </li>                  <li>
+                  </li><li>
                     <Link 
                       to="/Perfil" 
                       onClick={() => {

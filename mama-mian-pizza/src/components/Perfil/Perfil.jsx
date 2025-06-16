@@ -724,14 +724,25 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
               onSubmit={async (e) => {
                 e.preventDefault();
                 const success = await updateUserProfile(formData);
-                
-                if (success) {
+                  if (success) {
                   setUserPerfil(prev => ({
                     ...prev,
                     nombre: formData.nombre,
                     email: formData.email,
                     telefono: formData.telefono,
                   }));
+                  
+                  // Disparar evento para actualizar navbar con los nuevos datos
+                  const profileDataUpdateEvent = new CustomEvent('profileDataUpdated', {
+                    detail: {
+                      nombre: formData.nombre,
+                      email: formData.email,
+                      telefono: formData.telefono,
+                      userId: user.id
+                    }
+                  });
+                  window.dispatchEvent(profileDataUpdateEvent);
+                  
                   setEditSuccess(true);
                   if (setToast) {
                     setToast('¡Perfil actualizado correctamente!');
