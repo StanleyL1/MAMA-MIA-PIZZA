@@ -117,11 +117,6 @@
   border-bottom: 2.5px solid #ab1319;
 }
 
-/* Clase para controlar la visibilidad del texto en tabs */
-.perfil__tab-text {
-  display: inline;
-}
-
 /* CONTENIDO GENERAL */
 .perfil__contenido {
   max-width: 800px;
@@ -1894,6 +1889,60 @@
   .perfil__tab-btn:hover {
     border-bottom: 2.5px solid #ab1319;
     border-left: none;
+  }
+}
+
+/* ========================================= */
+/*     RESPONSIVE - OCULTAR NOMBRE USUARIO  */
+/* ========================================= */
+
+/* En móviles grandes (576px), reducir nombre y centrarlo */
+@media (max-width: 576px) and (min-width: 361px) {
+  .perfil__nombre {
+    font-size: 1.3rem !important;
+    text-align: center;
+  }
+}
+
+/* En móviles pequeños (400px), ocultar nombre pero mantener email */
+@media (max-width: 400px) and (min-width: 361px) {
+  .perfil__nombre {
+    display: none !important;
+  }
+  
+  .perfil__info {
+    text-align: center;
+  }
+  
+  .perfil__email {
+    margin-top: 0;
+    font-size: 1rem !important;
+    font-weight: 600;
+    text-align: center;
+  }
+}
+
+/* En móviles muy pequeños (360px), solo mostrar la foto */
+@media (max-width: 360px) {
+  .perfil__nombre,
+  .perfil__email,
+  .perfil__datos {
+    display: none !important;
+  }
+  
+  .perfil__info {
+    display: none !important;
+  }
+  
+  .perfil__card {
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 20px !important;
+    text-align: center;
+  }
+  
+  .perfil__foto-wrapper {
+    margin: 0 auto;
   }
 }
 
