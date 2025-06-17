@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import './PizzaModal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping, faCommentDots, faStar } from '@fortawesome/free-solid-svg-icons';
@@ -14,10 +15,10 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
   const [mostrarFormularioResena, setMostrarFormularioResena] = useState(false);
   const [nuevaResena, setNuevaResena] = useState({ rating: 0, comentario: '' });
   const [tamanos, setTamanos] = useState([]);
-  const [precioActual, setPrecioActual] = useState(pizza?.precio || '0');
-  const [cargandoTamanos, setCargandoTamanos] = useState(false);
+  const [precioActual, setPrecioActual] = useState(pizza?.precio || '0');  const [cargandoTamanos, setCargandoTamanos] = useState(false);
   const [cargandoReseñas, setCargandoReseñas] = useState(false);
   const [enviandoResena, setEnviandoResena] = useState(false);
+  const [showAuthAlert, setShowAuthAlert] = useState(false);
 
   const maxIngredientes = 4;
   const [ingredientes, setIngredientes] = useState([
@@ -533,7 +534,6 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
       alert('Por favor, selecciona una calificación y escribe un comentario');
     }
   };
-
   // Función para manejar la selección de estrellas de manera robusta
   const handleStarClick = (rating) => {
     // Asegurar que el rating esté en el rango válido
@@ -542,7 +542,22 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
       setNuevaResena(prev => ({ ...prev, rating: rating }));
     } else {
       console.warn('⚠️ Rating inválido seleccionado:', rating);
-    }  };
+    }
+  };
+
+  // Función para abrir el formulario de reseña con validación de autenticación
+  const handleOpenReviewForm = () => {
+    if (!user || !user.id) {
+      setShowAuthAlert(true);
+      return;
+    }
+    setMostrarFormularioResena(true);
+  };
+
+  // Función para cerrar el modal de autenticación
+  const handleCloseAuthAlert = () => {
+    setShowAuthAlert(false);
+  };
 
   return (
     <div className="modal__overlay" onClick={onClose}>
@@ -876,11 +891,10 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
                         <br />
                         ¡Sé el primero en dejar una reseña de este producto!
                       </p>                    </div>
-                  </div>
-                  {user && user.id ? (
+                  </div>                  {user && user.id ? (
                     <button 
                       className="reseñas__empty-btn" 
-                      onClick={() => setMostrarFormularioResena(true)}
+                      onClick={handleOpenReviewForm}
                       style={{
                         backgroundColor: '#991B1B',
                         color: 'white',
@@ -900,28 +914,45 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
                       Escribir primera reseña
                     </button>
                   ) : (
-                    <p style={{ textAlign: 'center', color: '#666', fontSize: '14px', marginTop: '16px' }}>
-                      Inicia sesión para escribir una reseña
-                    </p>
+                    <button 
+                      className="reseñas__empty-btn" 
+                      onClick={handleOpenReviewForm}
+                      style={{
+                        backgroundColor: '#991B1B',
+                        color: 'white',
+                        border: 'none',
+                        padding: '12px 24px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        marginTop: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faCommentDots} />
+                      Escribir primera reseña
+                    </button>
                   )}
                 </>
               ) : null}              {/* Mostrar reseñas ya publicadas */}
               {!cargandoReseñas && reseñas.length > 0 && (
                 <div className="reseñas__lista">
-                  {console.log(`🎨 Renderizando ${reseñas.length} reseñas:`, reseñas.map(r => ({ nombre: r.nombre, foto: r.foto })))}
-                  <div className="reseñas__clientes-titulo" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {console.log(`🎨 Renderizando ${reseñas.length} reseñas:`, reseñas.map(r => ({ nombre: r.nombre, foto: r.foto })))}                  <div className="reseñas__clientes-titulo" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>Reseñas de clientes</span>
-                    {user && user.id && !mostrarFormularioResena && (
+                    {!mostrarFormularioResena && (
                       <button 
                         className="reseñas__empty-btn" 
                         style={{ fontSize: '14px', padding: '8px 16px' }}
-                        onClick={() => setMostrarFormularioResena(true)}
+                        onClick={handleOpenReviewForm}
                       >
                         <FontAwesomeIcon icon={faCommentDots} style={{marginRight: 6}} />
                         Escribir reseña
                       </button>
                     )}
-                  </div>                  {reseñas.map((resena, i) => (
+                  </div>{reseñas.map((resena, i) => (
                     <div key={resena.id || i} className="reseñas__review">
                       {/* Foto de perfil del usuario con mejores estilos */}
                       <div className="reseñas__user-avatar">
@@ -1013,10 +1044,33 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
                   ))}
                 </div>
               )}
-            </div>
-          </div>
+            </div>          </div>
         )}
       </div>
+
+      {/* Modal de Autenticación Requerida */}
+      {showAuthAlert && (
+        <div className="modal__overlay" onClick={handleCloseAuthAlert}>
+          <div className="auth__alert__modal" onClick={(e) => e.stopPropagation()}>
+            <div className="auth__alert__icon">🔒</div>
+            <h2 className="auth__alert__title">¡Regístrate para continuar!</h2>
+            <p className="auth__alert__message">
+              Para compartir tu experiencia y calificar nuestro servicio, necesitas tener una cuenta.
+            </p>
+            <div className="auth__alert__buttons">
+              <button className="auth__cancel__button" onClick={handleCloseAuthAlert}>
+                Ahora no
+              </button>
+              <Link to="/register" className="auth__register__button">
+                Crear cuenta
+              </Link>
+            </div>
+            <p className="auth__login__text">
+              ¿Ya tienes cuenta? <Link to="/login" className="auth__login__link">Accede aquí</Link>
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
