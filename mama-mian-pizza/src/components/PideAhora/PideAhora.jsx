@@ -32,10 +32,10 @@ const mapContainerStyle = {
   boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
 };
 
-const PideAhora = ({ cartItems = [], setCartItems }) => {
+const PideAhora = ({ cartItems = [], setCartItems, user }) => {
   const navigate = useNavigate();
   const [step, setStep] = useState('Cuenta');
-  const [modo, setModo] = useState('invitado');
+  const [modo, setModo] = useState(user ? 'cuenta' : 'invitado');
   const [showPassword, setShowPassword] = useState(false);
   const [modoDireccion, setModoDireccion] = useState('formulario');
   const [pagoMetodo, setPagoMetodo] = useState('');
@@ -65,12 +65,24 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     apellido: '',
     telefono: '',
   });
-    const [cuentaData, setCuentaData] = useState({
-    nombre: '',
-    telefono: '',
-    email: '',
+  const [cuentaData, setCuentaData] = useState({
+    nombre: user ? user.nombre : '',
+    telefono: user ? (user.celular || user.telefono) : '',
+    email: user ? user.correo : '',
     password: '',
   });
+  
+  // Effect para actualizar datos cuando cambie el usuario
+  useEffect(() => {
+    if (user) {
+      setCuentaData({
+        nombre: user.nombre || '',
+        telefono: user.celular || user.telefono || '',
+        email: user.correo || '',
+        password: '',
+      });
+    }
+  }, [user]);
   
   const [direccionData, setDireccionData] = useState({
     direccionExacta: '',
@@ -513,20 +525,23 @@ const redirigirAWompi = () => {
               </h3>
               <p className="descripcion-compra">
                 Elige cómo quieres continuar
-              </p>
-
-              {/* Toggle: Invitado / Cuenta */}
+              </p>              {/* Toggle: Invitado / Cuenta */}
               <div className="toggle-compra">
                 <button
-                  className={`toggle-btn ${modo === 'invitado' ? 'activo' : ''}`}
-                  onClick={() => setModo('invitado')}
+                  className={`toggle-btn ${modo === 'invitado' ? 'activo' : ''} ${user ? 'disabled' : ''}`}
+                  onClick={() => !user && setModo('invitado')}
+                  disabled={user ? true : false}
+                  style={{
+                    opacity: user ? 0.5 : 1,
+                    cursor: user ? 'not-allowed' : 'pointer'
+                  }}
                 >
                   <FaUser 
                     className={`icono-usuario ${modo === 'invitado' ? 'active-icon' : ''}`}
                   />
                   <span className="toggle-titulo">Como invitado</span>
                   <span className="toggle-desc">
-                    Sin necesidad de registro
+                    {user ? 'Ya tienes sesión iniciada' : 'Sin necesidad de registro'}
                   </span>
                 </button>
                 <button
@@ -600,6 +615,13 @@ const redirigirAWompi = () => {
                         className="input-small"
                         value={cuentaData.nombre}
                         onChange={handleInputCuenta}
+                        disabled={user ? true : false}
+                        readOnly={user ? true : false}
+                        style={{
+                          backgroundColor: user ? '#f5f5f5' : 'white',
+                          color: user ? '#666' : 'black',
+                          cursor: user ? 'not-allowed' : 'text'
+                        }}
                       />
                     </div>
                     <div className="campo">
@@ -615,6 +637,13 @@ const redirigirAWompi = () => {
                           placeholder="000-0000"
                           value={cuentaData.telefono}
                           onChange={handleInputCuenta}
+                          disabled={user ? true : false}
+                          readOnly={user ? true : false}
+                          style={{
+                            backgroundColor: user ? '#f5f5f5' : 'white',
+                            color: user ? '#666' : 'black',
+                            cursor: user ? 'not-allowed' : 'text'
+                          }}
                         />
                       </div>
                     </div>
@@ -628,27 +657,51 @@ const redirigirAWompi = () => {
                       className="input-full"
                       value={cuentaData.email}
                       onChange={handleInputCuenta}
+                      disabled={user ? true : false}
+                      readOnly={user ? true : false}
+                      style={{
+                        backgroundColor: user ? '#f5f5f5' : 'white',
+                        color: user ? '#666' : 'black',
+                        cursor: user ? 'not-allowed' : 'text'
+                      }}
                     />
                   </div>
-                  <div className="campo password-campo">
-                    <label htmlFor="password">Contraseña</label>
-                    <div className="input-with-icon">
-                      <input
-                        name="password"
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        className="input-full"
-                        value={cuentaData.password}
-                        onChange={handleInputCuenta}
-                      />
-                      <span 
-                        className="toggle-password"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                      </span>
+                  {!user && (
+                    <div className="campo password-campo">
+                      <label htmlFor="password">Contraseña</label>
+                      <div className="input-with-icon">
+                        <input
+                          name="password"
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          className="input-full"
+                          value={cuentaData.password}
+                          onChange={handleInputCuenta}
+                        />
+                        <span 
+                          className="toggle-password"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  )}
+                  {user && (
+                    <div className="usuario-logueado-info">
+                      <p style={{ 
+                        color: '#28a745', 
+                        fontSize: '14px', 
+                        marginTop: '10px',
+                        padding: '10px',
+                        backgroundColor: '#d4edda',
+                        border: '1px solid #c3e6cb',
+                        borderRadius: '4px'
+                      }}>
+                        ✓ Datos cargados desde tu cuenta
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
