@@ -126,10 +126,10 @@ const triggerOrderUpdate = () => {
             onOrderUpdate={triggerOrderUpdate}
           />
         } />
-        <Route path="/Services" element={<Services />} />
-        <Route path="/pideahora" element={
+        <Route path="/Services" element={<Services />} />        <Route path="/pideahora" element={
           <PideAhora 
             cartItems={cartItems} 
+            setCartItems={setCartItems}
             user={user}
             onOrderComplete={triggerOrderUpdate}
             setToast={showToast}

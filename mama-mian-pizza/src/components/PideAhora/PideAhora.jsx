@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './PideAhora.css';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { useNavigate } from 'react-router-dom';
 
 /* IMPORTA TUS ASSETS: íconos, imágenes, etc. Ajusta las rutas según tu proyecto */
 import { 
@@ -31,7 +32,8 @@ const mapContainerStyle = {
   boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
 };
 
-const PideAhora = ({ cartItems = [] }) => {
+const PideAhora = ({ cartItems = [], setCartItems }) => {
+  const navigate = useNavigate();
   const [step, setStep] = useState('Cuenta');
   const [modo, setModo] = useState('invitado');
   const [showPassword, setShowPassword] = useState(false);
@@ -467,14 +469,24 @@ const redirigirAWompi = () => {
   const handleRealizarPedido = () => {
     setShowTerms(true);
   };
-
   const handleCerrarExito = () => {
     setShowSuccess(false);
-    // Aquí podrías redirigir o reiniciar el flujo, por ejemplo: setStep('Cuenta');
+    // Limpiar el carrito
+    if (setCartItems) {
+      setCartItems([]);
+    }
+    // Redirigir a la tienda (menu)
+    navigate('/menu');
   };
+  
   const handleDescargaPDF = () => {
     setShowSuccess(false);
-    // Aquí podrías redirigir o reiniciar el flujo, por ejemplo: setStep('Cuenta');
+    // Limpiar el carrito
+    if (setCartItems) {
+      setCartItems([]);
+    }
+    // Redirigir a la tienda (menu)
+    navigate('/menu');
   };
   return (
     <div className="contenedor-pideahora">
