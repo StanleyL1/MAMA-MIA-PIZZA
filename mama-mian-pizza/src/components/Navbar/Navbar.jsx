@@ -234,69 +234,6 @@ useEffect(() => {
                       Ver Perfil                    </Link>
                   </li>
 
-                  {/* Admin link - simplificado para testing */}
-                  <li>
-                    <Link 
-                      to="/admin/experiencias" 
-                      onClick={() => {
-                        console.log('🔧 Navegando a Admin Experiencias');
-                        setIsProfileMenuOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 16px',
-                        textDecoration: 'none',
-                        color: '#333',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        transition: 'background-color 0.2s'
-                      }}
-                      onMouseEnter={(e) => e.target.style.backgroundColor = '#f8f9fa'}
-                      onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                    >
-                      <span style={{ 
-                        marginRight: '8px', 
-                        color: '#28a745',
-                        fontSize: '16px' 
-                      }}>
-                        ⚙️
-                      </span>                      Admin Experiencias
-                    </Link>
-                  </li>
-
-                  {/* Test link - para desarrollo */}
-                  <li>
-                    <Link 
-                      to="/test/experiencias" 
-                      onClick={() => {
-                        console.log('🧪 Navegando a Test Experiencias');
-                        setIsProfileMenuOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '12px 16px',
-                        textDecoration: 'none',
-                        color: '#333',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        transition: 'background-color 0.2s'
-                      }}
-                      onMouseEnter={(e) => e.target.style.backgroundColor = '#f8f9fa'}
-                      onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                    >
-                      <span style={{ 
-                        marginRight: '8px', 
-                        color: '#17a2b8',
-                        fontSize: '16px' 
-                      }}>
-                        🧪
-                      </span>
-                      Test API
-                    </Link>
-                  </li>
-
                   <li style={{ borderTop: '1px solid #f0f0f0', margin: '8px 0 0 0' }}>
                     <button 
                       onClick={() => {
