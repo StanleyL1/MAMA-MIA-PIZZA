@@ -530,7 +530,7 @@ body{
 
 .review__header{
   font-size: 2.8rem;
-  margin-bottom: 48px;
+  margin-bottom: 16px;
   color: #EAB308;
   font-weight: 800;
   text-align: center;
@@ -549,6 +549,15 @@ body{
   height: 4px;
   background: linear-gradient(90deg, #991B1B, #FEB248);
   border-radius: 2px;
+}
+
+.review__subtitle {
+  font-size: 1.2rem;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 48px;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 .review__content{
@@ -1394,10 +1403,53 @@ body{
   margin: 20px 0;
 }
 
+.loading__testimonios {
+  text-align: center;
+  color: #6b7280;
+  font-size: 1.1rem;
+  padding: 40px 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.loading__testimonios p {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.loading__testimonios p::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d1d5db;
+  border-top: 2px solid #FEB248;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @media (max-width: 768px) {
   .no__testimonios {
     font-size: 1rem;
     padding: 30px 16px;
+  }
+  
+  .loading__testimonios {
+    font-size: 1rem;
+    padding: 30px 16px;
+  }
+  
+  .review__subtitle {
+    font-size: 1rem;
+    margin-bottom: 32px;
   }
 }
 

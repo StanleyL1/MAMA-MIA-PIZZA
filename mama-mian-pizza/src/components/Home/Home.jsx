@@ -18,11 +18,35 @@ const Home = ({ onAddToCart, user }) => {
   const [recomendacion, setRecomendaciones] = useState([]);
   const [selectedPizza, setSelectedPizza] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
-  // eslint-disable-next-line no-unused-vars
-  const [testimonios, setTestimonios] = useState([]);
+  const [rating, setRating] = useState(0);  const [comment, setComment] = useState('');  const [testimonios, setTestimonios] = useState([]);
   const [showAuthAlert, setShowAuthAlert] = useState(false);
+  const [loadingTestimonios, setLoadingTestimonios] = useState(true);
+  
+  // Función para formatear la fecha
+  const formatearFecha = (fechaString) => {
+    const fecha = new Date(fechaString);
+    const ahora = new Date();
+    const diferencia = ahora - fecha;
+    const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+    
+    if (dias === 0) {
+      return 'Hoy';
+    } else if (dias === 1) {
+      return 'Ayer';
+    } else if (dias < 7) {
+      return `Hace ${dias} días`;
+    } else if (dias < 30) {
+      const semanas = Math.floor(dias / 7);
+      return `Hace ${semanas} semana${semanas > 1 ? 's' : ''}`;
+    } else {
+      return fecha.toLocaleDateString('es-ES', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    }
+  };
+  
   useEffect(() => {
     const fetchRecomendations = async () => {
       try {
@@ -43,14 +67,41 @@ const Home = ({ onAddToCart, user }) => {
         console.log(error);
       }
     };    const fetchTestimonios = async () => {
+      setLoadingTestimonios(true);
       try {
-        // Aquí se podrá agregar la API para obtener testimonios reales
-        // const response = await fetch('https://api.mamamianpizza.com/api/testimonios');
-        // const data = await response.json();
-        // eslint-disable-next-line no-unused-vars
-        // setTestimonios(data.testimonios);
+        // Usar el endpoint para obtener todas las experiencias aprobadas (estado = 1)
+        const response = await fetch('https://api.mamamianpizza.com/api/experiencias/status/1');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Experiencias aprobadas recibidas:', data); // Debug
+        
+        if (data.experiencias && data.experiencias.length > 0) {
+          // Transformar la data para el componente TestimonialCard
+          const experienciasAprobadas = data.experiencias.map(exp => ({
+            name: exp.nombre_usuario || 'Usuario Anónimo',
+            avatar: exp.foto_perfil || null,
+            time: formatearFecha(exp.fecha_creacion),
+            comment: exp.contenido,
+            rating: exp.valoracion,
+            titulo: exp.titulo,
+            estado: exp.estado
+          }));
+          
+          console.log('Experiencias procesadas para mostrar:', experienciasAprobadas); // Debug
+          setTestimonios(experienciasAprobadas);
+        } else {
+          console.log('No se encontraron experiencias aprobadas'); // Debug
+          setTestimonios([]);
+        }
       } catch (error) {
-        console.log(error);
+        console.log('Error al cargar experiencias aprobadas:', error);
+        setTestimonios([]);
+      } finally {
+        setLoadingTestimonios(false);
       }
     };
 
@@ -222,16 +273,20 @@ const Home = ({ onAddToCart, user }) => {
               Ingredientes locales, frescos y sin conservantes.
             </p>
           </div>        </div>
-      </section>      {/* Testimonios */}
+      </section>      {/* Experiencias de Clientes */}
       <section className="review__section">
-        <h2 className="review__header">Lo que dicen nuestros clientes</h2>
-        <div className="review__content">
-          {testimonios.length > 0 ? (
+        <h2 className="review__header">Experiencias de nuestros clientes</h2>
+        <p className="review__subtitle">Testimonios verificados de clientes que han disfrutado nuestras pizzas</p>        <div className="review__content">
+          {loadingTestimonios ? (
+            <div className="loading__testimonios">
+              <p>Cargando experiencias de nuestros clientes...</p>
+            </div>
+          ) : testimonios.length > 0 ? (
             testimonios.map((item, index) => (
               <TestimonialCard data={item} key={index} />
             ))
           ) : (
-            <p className="no__testimonios">Aún no hay testimonios. ¡Sé el primero en compartir tu experiencia!</p>
+            <p className="no__testimonios">Aún no hay experiencias publicadas. ¡Sé el primero en compartir tu experiencia!</p>
           )}
         </div>
         

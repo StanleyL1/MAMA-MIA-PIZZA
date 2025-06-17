@@ -61,12 +61,13 @@ function ProductsCards({ data, onCardClick }) {
     );
   }
 
-  const { titulo, descripcion, imagen, precio, id_categoria } = data;return (
+  const { titulo, descripcion, imagen, id_categoria } = data;return (
     <div className="prodcard-container" onClick={() => {
       if (data && onCardClick) {
         onCardClick(data);
       }
     }}>
+
       <div className="prodcard-image-container">
         <img src={imagen} alt={titulo} className="prodcard-image" />
       </div>
