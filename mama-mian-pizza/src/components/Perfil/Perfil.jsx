@@ -953,7 +953,14 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       {showCambiarContra && (
         <CambiarContraseñaModal
           email={userPerfil.email}
+          user={user}
           onClose={() => setShowCambiarContra(false)}
+          onSuccess={(message) => {
+            showProfileMessage(message);
+            if (setToast) {
+              setToast(message);
+            }
+          }}
         />
       )}
     </div>
@@ -962,7 +969,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
 
 
 // --- MODAL CAMBIAR CONTRASEÑA ---
-function CambiarContraseñaModal({ email, onClose, onSuccess }) {
+function CambiarContraseñaModal({ email, onClose, onSuccess, user }) {
   const [currentPass, setCurrentPass] = useState("");
   const [newPass, setNewPass] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
@@ -978,7 +985,6 @@ function CambiarContraseñaModal({ email, onClose, onSuccess }) {
     { msg: "Debe contener al menos un número", valid: /\d/.test(newPass) },
     { msg: "Debe contener al menos un carácter especial", valid: /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(newPass) },
   ];
-
   const handleChangePass = async (e) => {
     e.preventDefault();
     setError("");
@@ -993,17 +999,65 @@ function CambiarContraseñaModal({ email, onClose, onSuccess }) {
       return;
     }
 
-    setChanging(true);
-    
-    try {
-      // Aquí iría la lógica para cambiar la contraseña en el backend
-      // Por ahora simulamos el proceso
-      await new Promise(resolve => setTimeout(resolve, 1500));
+    if (!user?.id) {
+      setError("Error: No se pudo identificar el usuario");
+      return;
+    }
+
+    setChanging(true);    try {
+      console.log('🔐 Cambiando contraseña para usuario ID:', user.id);
       
-      if (onSuccess) onSuccess();
+      const requestBody = {
+        id_usuario: user.id,
+        contrasenaActual: currentPass,
+        nuevaContrasena: newPass
+      };
+      
+      console.log('📤 Datos enviados:', requestBody);
+      
+      const response = await fetch('https://api.mamamianpizza.com/api/auth/change-password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log('📡 Status de respuesta:', response.status);
+      console.log('📡 Headers de respuesta:', response.headers);
+
+      const result = await response.json();
+      console.log('📥 Respuesta completa del servidor:', result);if (!response.ok) {
+        console.error('❌ Error HTTP:', response.status, response.statusText);
+        console.error('❌ Respuesta de error del servidor:', result);
+        
+        // Manejar errores específicos del servidor
+        if (response.status === 400) {
+          setError(result.message || result.error || "Datos inválidos. Verifica que la contraseña actual sea correcta.");
+        } else if (response.status === 401) {
+          setError(result.message || result.error || "La contraseña actual es incorrecta.");
+        } else if (response.status === 404) {
+          setError(result.message || result.error || "Usuario no encontrado.");
+        } else if (response.status === 422) {
+          setError(result.message || result.error || "Error de validación. Verifica que las contraseñas cumplan los requisitos.");
+        } else {
+          setError(result.message || result.error || `Error del servidor (${response.status}). Inténtalo de nuevo.`);
+        }
+        return;
+      }
+
+      console.log('✅ Contraseña cambiada exitosamente:', result);
+      
+      // Éxito
+      if (onSuccess) {
+        onSuccess("¡Contraseña actualizada correctamente!");
+      }
+      
       onClose();
+      
     } catch (error) {
-      setError("Error al cambiar la contraseña. Inténtalo de nuevo.");
+      console.error('❌ Error al cambiar contraseña:', error);
+      setError("Error de conexión. Verifica tu internet e inténtalo de nuevo.");
     } finally {
       setChanging(false);
     }

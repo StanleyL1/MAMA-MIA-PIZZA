@@ -686,7 +686,11 @@
   font-size: 1.1rem;
   color: #a81818;
   font-weight: 600;
-  margin: 12px 0 3px 0;
+  margin: 25px 0 8px 0;
+}
+
+.cambiar__pass-label:first-of-type {
+  margin-top: 12px;
 }
 
 .cambiar__pass-input-group {
@@ -694,12 +698,12 @@
   align-items: center;
   position: relative;
   width: 100%;
-  margin-bottom: 5px;
+  margin-bottom: 20px;
 }
 
 .cambiar__pass-input {
   width: 100%;
-  padding: 12px 44px 12px 12px;
+  padding: 12px;
   font-size: 1.15rem;
   border-radius: 8px;
   border: 1.5px solid #feb888;
@@ -708,19 +712,13 @@
 }
 
 .cambiar__show-btn {
-  position: absolute;
-  right: 11px;
-  background: none;
-  border: none;
-  color: #a81818;
-  font-size: 1.12rem;
-  cursor: pointer;
-  outline: none;
+  display: none;
 }
 
 .cambiar__pass-requisitos {
   font-size: 1.03rem;
-  margin: 6px 0 8px 0;
+  margin: 15px 0 20px 0;
+  padding: 10px 0;
 }
 
 .cambiar__pass-requisitos ul {
