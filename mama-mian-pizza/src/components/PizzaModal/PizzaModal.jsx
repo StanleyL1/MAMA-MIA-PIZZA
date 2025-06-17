@@ -922,52 +922,93 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
                       </button>
                     )}
                   </div>                  {reseñas.map((resena, i) => (
-                    <div key={resena.id || i} className="reseñas__review">                      <img
-                        src={resena.foto || require('../../assets/perfilfoto.png')}
-                        alt={resena.nombre || "Usuario"}
-                        className="reseñas__review-foto"
-                        style={{
-                          width: 55, 
-                          height: 55, 
-                          borderRadius: "50%", 
-                          objectFit: "cover", 
-                          marginRight: 24, 
-                          float: "left",
-                          border: "2px solid #e2e8f0",
-                          transition: "all 0.3s ease"
-                        }}                        onError={(e) => {
-                          // Si la imagen falla al cargar, usar la foto por defecto
-                          console.log(`❌ Error cargando imagen para ${resena.nombre}:`, e.target.src);
-                          e.target.src = require('../../assets/perfilfoto.png');
-                        }}
-                        onLoad={(e) => {
-                          // Agregar un efecto sutil cuando la imagen se carga
-                          console.log(`✅ Imagen cargada correctamente para ${resena.nombre}:`, e.target.src);
-                          e.target.style.opacity = '1';
-                        }}
-                        onLoadStart={(e) => {
-                          // Mostrar loading mientras se carga
-                          console.log(`🔄 Iniciando carga de imagen para ${resena.nombre}:`, e.target.src);
-                          e.target.style.opacity = '0.7';
-                        }}
-                      />
-                      <div style={{ marginLeft: 80 }}>                        <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 8 }}>
+                    <div key={resena.id || i} className="reseñas__review">
+                      {/* Foto de perfil del usuario con mejores estilos */}
+                      <div className="reseñas__user-avatar">
+                        <img
+                          src={resena.foto || require('../../assets/perfilfoto.png')}
+                          alt={`Foto de perfil de ${resena.nombre || "Usuario"}`}
+                          className="reseñas__review-foto"
+                          style={{
+                            width: 55, 
+                            height: 55, 
+                            borderRadius: "50%", 
+                            objectFit: "cover", 
+                            border: "3px solid #FEB248",
+                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                            transition: "all 0.3s ease",
+                            backgroundColor: "#f8f9fa"
+                          }}
+                          onError={(e) => {
+                            console.log(`❌ Error cargando imagen para ${resena.nombre}:`, e.target.src);
+                            e.target.src = require('../../assets/perfilfoto.png');
+                          }}
+                          onLoad={(e) => {
+                            console.log(`✅ Imagen cargada correctamente para ${resena.nombre}:`, e.target.src);
+                            e.target.style.opacity = '1';
+                          }}
+                          onLoadStart={(e) => {
+                            console.log(`🔄 Iniciando carga de imagen para ${resena.nombre}:`, e.target.src);
+                            e.target.style.opacity = '0.7';
+                          }}
+                        />
+                      </div>
+                      
+                      {/* Contenido de la reseña */}
+                      <div className="reseñas__review-content" style={{ flex: 1, marginLeft: 15 }}>
+                        {/* Header con nombre y fecha */}
+                        <div className="reseñas__review-header" style={{ 
+                          display: "flex", 
+                          justifyContent: "space-between", 
+                          alignItems: "center", 
+                          marginBottom: 8 
+                        }}>
+                          <div style={{ fontWeight: 600, fontSize: 16, color: "#333" }}>
+                            {resena.nombre}
+                          </div>
+                          <div style={{ fontSize: 14, color: "#7c7c7c" }}>
+                            {resena.fecha}
+                          </div>
+                        </div>
+                        
+                        {/* Estrellas de calificación */}
+                        <div className="reseñas__rating" style={{ 
+                          display: "flex", 
+                          alignItems: "center", 
+                          gap: 4, 
+                          marginBottom: 10 
+                        }}>
                           {[1,2,3,4,5].map(star => (
                             <FontAwesomeIcon
                               key={star}
                               icon={faStar}
                               className="reseñas__review-star"
-                              style={{ color: resena.rating >= star ? "#eab308" : "#d1d5db", fontSize: 24 }}
+                              style={{ 
+                                color: resena.rating >= star ? "#eab308" : "#d1d5db", 
+                                fontSize: 18,
+                                filter: resena.rating >= star ? "drop-shadow(0 1px 2px rgba(234, 179, 8, 0.3))" : "none"
+                              }}
                             />
                           ))}
+                          <span style={{ marginLeft: 8, fontSize: 14, color: "#666", fontWeight: 500 }}>
+                            ({resena.rating}/5)
+                          </span>
                         </div>
-                        <div className="reseñas__review-comment" style={{ fontSize: 17, marginBottom: 5, lineHeight: 1.4 }}>
-                          {resena.comentario}
+                        
+                        {/* Comentario */}
+                        <div className="reseñas__review-comment" style={{ 
+                          fontSize: 15, 
+                          lineHeight: 1.5, 
+                          color: "#444",
+                          backgroundColor: "#f8f9fa",
+                          padding: "12px 16px",
+                          borderRadius: "12px",
+                          border: "1px solid #e9ecef",
+                          fontStyle: "italic"
+                        }}>
+                          "{resena.comentario}"
                         </div>
-                        <div style={{ fontWeight: 600, fontSize: 16, marginTop: 7, color: "#333" }}>{resena.nombre}</div>
-                        <div style={{ fontSize: 14, color: "#7c7c7c", marginTop: 2 }}>{resena.fecha}</div>
                       </div>
-                      <div style={{ clear: "both" }} />
                     </div>
                   ))}
                 </div>

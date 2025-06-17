@@ -13,7 +13,6 @@ import Footer from '../footer/footer';
 import TestimonialCard from '../ComentsCards/ComentCards';
 import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png';
-import comentarioImg from '../../assets/comentario.png';
 
 import carrusel1 from '../../assets/carrusel1.jpeg';
 import carrusel2 from '../../assets/carrusel2.jpeg';
@@ -22,32 +21,16 @@ import './Home.css';
 
 const carouselImages = [carrusel1, carrusel2];
 
-const datosTestimonios = [
-  {
-    avatar: comentarioImg,
-    name: 'María Rodríguez',
-    time: 'hace 2 semanas',
-    comment: 'Garantizamos la entrega en 30 minutos o su pizza es gratis. Nuestro equipo de entrega es rápido, eficiente y siempre puntual.'
-  },
-  {
-    avatar: comentarioImg,
-    name: 'María Rodríguez',
-    time: 'hace 2 semanas',
-    comment: 'Garantizamos la entrega en 30 minutos o su pizza es gratis. Nuestro equipo de entrega es rápido, eficiente y siempre puntual.'
-  },
-  {
-    avatar: comentarioImg,
-    name: 'María Rodríguez',
-    time: 'hace 2 semanas',
-    comment: 'Garantizamos la entrega en 30 minutos o su pizza es gratis. Nuestro equipo de entrega es rápido, eficiente y siempre puntual.'
-  },
-];
-
 const Home = ({ onAddToCart, user }) => {
   const [popular, setPopular] = useState([]);
   const [recomendacion, setRecomendaciones] = useState([]);
   const [selectedPizza, setSelectedPizza] = useState(null);
-
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  // eslint-disable-next-line no-unused-vars
+  const [testimonios, setTestimonios] = useState([]);
+  const [showAuthAlert, setShowAuthAlert] = useState(false);
   useEffect(() => {
     const fetchRecomendations = async () => {
       try {
@@ -67,10 +50,21 @@ const Home = ({ onAddToCart, user }) => {
       } catch (error) {
         console.log(error);
       }
+    };    const fetchTestimonios = async () => {
+      try {
+        // Aquí se podrá agregar la API para obtener testimonios reales
+        // const response = await fetch('https://api.mamamianpizza.com/api/testimonios');
+        // const data = await response.json();
+        // eslint-disable-next-line no-unused-vars
+        // setTestimonios(data.testimonios);
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     fetchPopular();
     fetchRecomendations();
+    fetchTestimonios();
   }, []);
 
   const handleOpenPizza = (pizza) => {
@@ -80,10 +74,37 @@ const Home = ({ onAddToCart, user }) => {
   const handleCloseModal = () => {
     setSelectedPizza(null);
   };
-
   const handleAddToCart = (pizza, masa, tamano, instrucciones, ingredientes) => {
     onAddToCart(pizza, masa, tamano, instrucciones, ingredientes);
     handleCloseModal();
+  };
+  const handleOpenReviewModal = () => {
+    if (!user) {
+      setShowAuthAlert(true);
+      return;
+    }
+    setShowReviewModal(true);
+  };
+
+  const handleCloseReviewModal = () => {
+    setShowReviewModal(false);
+    setRating(0);
+    setComment('');
+  };
+
+  const handleCloseAuthAlert = () => {
+    setShowAuthAlert(false);
+  };
+
+  const handleRatingClick = (selectedRating) => {
+    setRating(selectedRating);
+  };
+
+  const handleSubmitReview = () => {
+    // Aquí puedes agregar la lógica para enviar la reseña
+    console.log('Calificación:', rating);
+    console.log('Comentario:', comment);
+    handleCloseReviewModal();
   };
 
   return (
@@ -186,19 +207,29 @@ const Home = ({ onAddToCart, user }) => {
               Ingredientes locales, frescos y sin conservantes.
             </p>
           </div>        </div>
-      </section>
-
-      {/* Testimonios */}
+      </section>      {/* Testimonios */}
       <section className="review__section">
         <h2 className="review__header">Lo que dicen nuestros clientes</h2>
         <div className="review__content">
-          {datosTestimonios.map((item, index) => (
-            <TestimonialCard data={item} key={index} />
-          ))}
+          {testimonios.length > 0 ? (
+            testimonios.map((item, index) => (
+              <TestimonialCard data={item} key={index} />
+            ))
+          ) : (
+            <p className="no__testimonios">Aún no hay testimonios. ¡Sé el primero en compartir tu experiencia!</p>
+          )}
         </div>
-      </section>
+        
+        {/* Comparte tu experiencia */}
+        <div className="share__experience__section">
+          <h2 className="share__experience__title">Comparte tu experiencia</h2>
+          <button className="write__review__button" onClick={handleOpenReviewModal}>
+            Escribir comentario
+          </button>
+        </div>
+      </section><Footer />
 
-      <Footer />      {/* Modal */}
+      {/* Modal de Pizza */}
       {selectedPizza && (
         <PizzaModal 
           pizza={selectedPizza}
@@ -206,6 +237,72 @@ const Home = ({ onAddToCart, user }) => {
           onAddToCart={handleAddToCart}
           user={user}
         />
+      )}      {/* Modal de Reseña */}
+      {showReviewModal && (
+        <div className="review__modal__overlay">
+          <div className="review__modal">
+            <h2 className="review__modal__title">Comparte tu experiencia</h2>
+            
+            <div className="rating__section">
+              <p className="rating__label">Calificación</p>
+              <div className="stars__container">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    className={`star ${star <= rating ? 'filled' : ''}`}
+                    onClick={() => handleRatingClick(star)}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="comment__section">
+              <label className="comment__label">Tu comentario</label>
+              <textarea
+                className="comment__textarea"
+                placeholder="Comparte tu experiencia con Mama Mian Pizza..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows="4"
+              />
+            </div>
+
+            <div className="modal__buttons">
+              <button className="cancel__button" onClick={handleCloseReviewModal}>
+                Cancelar
+              </button>
+              <button className="submit__button" onClick={handleSubmitReview}>
+                Publicar comentario
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Autenticación Requerida */}
+      {showAuthAlert && (
+        <div className="review__modal__overlay">
+          <div className="auth__alert__modal">
+            <div className="auth__alert__icon">🔒</div>
+            <h2 className="auth__alert__title">¡Regístrate para continuar!</h2>
+            <p className="auth__alert__message">
+              Para compartir tu experiencia y calificar nuestro servicio, necesitas tener una cuenta.
+            </p>
+            <div className="auth__alert__buttons">
+              <button className="auth__cancel__button" onClick={handleCloseAuthAlert}>
+                Ahora no
+              </button>
+              <Link to="/register" className="auth__register__button">
+                Crear cuenta
+              </Link>
+            </div>
+            <p className="auth__login__text">
+              ¿Ya tienes cuenta? <Link to="/login" className="auth__login__link">Accede aquí</Link>
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );
