@@ -7,7 +7,7 @@ import menuBookIcon from '../../assets/menuBook.png';
 import searchIcon from '../../assets/search.png';
 import './Menu.css';
 
-const Menu = ({ onAddToCart }) => {
+const Menu = ({ onAddToCart, user }) => {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -112,9 +112,10 @@ const Menu = ({ onAddToCart }) => {
              itemDesc.toLowerCase().includes(searchTerm.toLowerCase());
     });
   }, [menu, activeCategory, searchTerm]);
-
   const handleOpenModal = (product) => {
     console.log("Abriendo modal para producto:", product);
+    console.log("ID del producto:", product.id);
+    console.log("Propiedades del producto:", Object.keys(product));
     setSelectedProduct(product);
   };
 
@@ -236,8 +237,7 @@ const Menu = ({ onAddToCart }) => {
             </div>
           ) : filteredMenu.length > 0 ? (
             <div className="menu-card-container">
-              {filteredMenu.map((item, index) => (
-                <ProductsCards 
+              {filteredMenu.map((item, index) => (                <ProductsCards 
                   data={{
                     ...item,
                     nombre: item.titulo, // Compatibilidad para componentes que usan nombre en lugar de titulo
@@ -245,7 +245,7 @@ const Menu = ({ onAddToCart }) => {
                     precio: item.opciones && item.opciones.length > 0 ? item.opciones[0].precio : 0 // Usar el primer precio disponible
                   }} 
                   key={item.id || index} 
-                  onCardClick={() => handleOpenModal(item)} 
+                  onCardClick={(productData) => handleOpenModal(productData)} 
                 />
               ))}
             </div>
@@ -260,14 +260,13 @@ const Menu = ({ onAddToCart }) => {
         </div>
       </section>
 
-      <Footer noImage={true} />
-
-      {/* Modal del Producto */}
+      <Footer noImage={true} />      {/* Modal del Producto */}
       {selectedProduct && (
         <PizzaModal 
           pizza={selectedProduct}
           onClose={handleCloseModal}
           onAddToCart={handleAddToCart}
+          user={user}
         />
       )}
     </div>

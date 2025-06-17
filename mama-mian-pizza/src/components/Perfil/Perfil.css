@@ -234,7 +234,7 @@
 }
 
 .perfil__pedido-id::before {
-  content: "�️";
+  content: " ️";
   font-size: 1.1rem;
   animation: pulse 2s infinite;
 }

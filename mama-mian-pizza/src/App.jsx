@@ -114,13 +114,13 @@ const triggerOrderUpdate = () => {
       <Routes>
         <Route path="/forgot-password" element={<Recover />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
-        <Route path="/" element={<Home onAddToCart={handleAddToCart} />} />
-        <Route path="/menu" element={<Menu onAddToCart={handleAddToCart} />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />        <Route path="/" element={<Home onAddToCart={handleAddToCart} user={user} />} />
+        <Route path="/menu" element={<Menu onAddToCart={handleAddToCart} user={user} />} />
         <Route path="/sobrenosotros" element={<SobreNosotros />} />        <Route path="/Perfil" element={
           <Perfil 
             onAddToCart={handleAddToCart} 
             user={user} 
+            setUser={setUser}
             setToast={showToast}
             onOrderUpdate={triggerOrderUpdate}
           />
