@@ -1161,7 +1161,7 @@ body{
 }
 
 .comment__section {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .comment__label {
@@ -1192,6 +1192,64 @@ body{
 
 .comment__textarea::placeholder {
   color: #9ca3af;
+}
+
+/* Nuevos estilos para el título */
+.title__section {
+  margin-bottom: 24px;
+}
+
+.title__label {
+  color: var(--text-dark);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.title__input {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+.title__input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.1);
+}
+
+.title__input::placeholder {
+  color: #9ca3af;
+}
+
+/* Contador de caracteres */
+.character__count {
+  text-align: right;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+/* Texto de calificación */
+.rating__text {
+  margin-left: 12px;
+  font-size: 0.9rem;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+/* Nota del modal */
+.modal__note {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 16px;
+  font-style: italic;
 }
 
 .modal__buttons {
@@ -1230,14 +1288,22 @@ body{
   min-width: 180px;
 }
 
-.submit__button:hover {
+.submit__button:hover:not(:disabled) {
   background: #7c1d1d;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(153, 27, 27, 0.3);
 }
 
-.submit__button:active {
+.submit__button:active:not(:disabled) {
   transform: translateY(0);
+}
+
+.submit__button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.6;
 }
 
 /* ===================== */

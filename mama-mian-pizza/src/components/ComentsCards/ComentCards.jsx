@@ -5,7 +5,7 @@ import estrellaCom from '../../assets/EstrellaCom.png';
 import estrellaMedia from '../../assets/EstrellaMedia.png';
 import comentarioImg from '../../assets/comentario.png';
 
-function TestimonialCard({ data: { name, avatar, time, comment, rating, titulo } }) {
+function TestimonialCard({ data: { name, avatar, time, comment, rating, titulo, experienciaFoto } }) {
   // Función para renderizar las estrellas según la valoración
   const renderStars = (rating) => {
     const stars = [];
@@ -69,15 +69,28 @@ function TestimonialCard({ data: { name, avatar, time, comment, rating, titulo }
       <div className="testimonial-stars">
         {renderStars(rating || 5)}
         <span className="testimonial-rating-number">({rating}/5)</span>
-      </div>
-
-      {/* Título de la experiencia si existe */}
+      </div>      {/* Título de la experiencia si existe */}
       {titulo && (
         <h4 className="testimonial-title">{titulo}</h4>
       )}
 
       {/* Texto del testimonio */}
       <p className="testimonial-text">{comment}</p>
+
+      {/* Foto de la experiencia si existe */}
+      {experienciaFoto && (
+        <div className="testimonial-photo-container">
+          <img 
+            src={experienciaFoto}
+            alt={`Foto de la experiencia: ${titulo || 'experiencia'}`}
+            className="testimonial-experience-photo"
+            onError={(e) => {
+              console.log('Error cargando foto de experiencia, ocultando...');
+              e.target.parentElement.style.display = 'none';
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

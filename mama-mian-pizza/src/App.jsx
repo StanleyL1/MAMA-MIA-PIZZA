@@ -15,6 +15,8 @@ import Team from './components/Team/Team';
 import InformacionLegal from './components/InformacionLegal/InformacionLegal';
 import Perfil from './components/Perfil/Perfil';
 import SocialMediaButton from './components/socialMediaButton/SocialMediaButton';
+import AdminExperiencias from './components/AdminExperiencias/AdminExperiencias';
+import TestExperiencias from './components/TestExperiencias/TestExperiencias';
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -184,9 +186,10 @@ function App() {
             onOrderComplete={triggerOrderUpdate}
             setToast={showToast}
           />
-        } />
-        <Route path="/equipo-desarrollo" element={<Team />} />
+        } />        <Route path="/equipo-desarrollo" element={<Team />} />
         <Route path="/informacion-legal" element={<InformacionLegal />} />
+        <Route path="/admin/experiencias" element={<AdminExperiencias />} />
+        <Route path="/test/experiencias" element={<TestExperiencias />} />
       </Routes>
 
       {/* Overlay de notificación tipo toast */}

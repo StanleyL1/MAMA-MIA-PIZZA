@@ -7,6 +7,8 @@ import ProductsCards from '../productsCards/productsCards';
 import PizzaModal from '../PizzaModal/PizzaModal';
 import Footer from '../footer/footer';
 import TestimonialCard from '../ComentsCards/ComentCards';
+import Toast from '../Toast/Toast';
+import { obtenerExperienciasParaHome, crearExperienciaDesdeModal } from '../../services/experienciasService';
 import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png';
 import bannerVideo from '../../assets/banner.mp4';
@@ -18,34 +20,32 @@ const Home = ({ onAddToCart, user }) => {
   const [recomendacion, setRecomendaciones] = useState([]);
   const [selectedPizza, setSelectedPizza] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [rating, setRating] = useState(0);  const [comment, setComment] = useState('');  const [testimonios, setTestimonios] = useState([]);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [titulo, setTitulo] = useState('');
+  const [testimonios, setTestimonios] = useState([]);
   const [showAuthAlert, setShowAuthAlert] = useState(false);
   const [loadingTestimonios, setLoadingTestimonios] = useState(true);
-  
-  // Función para formatear la fecha
-  const formatearFecha = (fechaString) => {
-    const fecha = new Date(fechaString);
-    const ahora = new Date();
-    const diferencia = ahora - fecha;
-    const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
-    
-    if (dias === 0) {
-      return 'Hoy';
-    } else if (dias === 1) {
-      return 'Ayer';
-    } else if (dias < 7) {
-      return `Hace ${dias} días`;
-    } else if (dias < 30) {
-      const semanas = Math.floor(dias / 7);
-      return `Hace ${semanas} semana${semanas > 1 ? 's' : ''}`;
-    } else {
-      return fecha.toLocaleDateString('es-ES', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [toast, setToast] = useState(null);
+  // Función para cargar experiencias
+  const cargarExperiencias = async () => {
+    setLoadingTestimonios(true);
+    try {
+      const experiencias = await obtenerExperienciasParaHome();
+      setTestimonios(experiencias);
+      console.log('Experiencias cargadas:', experiencias);
+    } catch (error) {
+      console.error('Error al cargar experiencias:', error);
+      setTestimonios([]);
+    } finally {
+      setLoadingTestimonios(false);
     }
   };
+
+  useEffect(() => {
+    cargarExperiencias();
+  }, []);
   
   useEffect(() => {
     const fetchRecomendations = async () => {
@@ -66,48 +66,10 @@ const Home = ({ onAddToCart, user }) => {
       } catch (error) {
         console.log(error);
       }
-    };    const fetchTestimonios = async () => {
-      setLoadingTestimonios(true);
-      try {
-        // Usar el endpoint para obtener todas las experiencias aprobadas (estado = 1)
-        const response = await fetch('https://api.mamamianpizza.com/api/experiencias/status/1');
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('Experiencias aprobadas recibidas:', data); // Debug
-        
-        if (data.experiencias && data.experiencias.length > 0) {
-          // Transformar la data para el componente TestimonialCard
-          const experienciasAprobadas = data.experiencias.map(exp => ({
-            name: exp.nombre_usuario || 'Usuario Anónimo',
-            avatar: exp.foto_perfil || null,
-            time: formatearFecha(exp.fecha_creacion),
-            comment: exp.contenido,
-            rating: exp.valoracion,
-            titulo: exp.titulo,
-            estado: exp.estado
-          }));
-          
-          console.log('Experiencias procesadas para mostrar:', experienciasAprobadas); // Debug
-          setTestimonios(experienciasAprobadas);
-        } else {
-          console.log('No se encontraron experiencias aprobadas'); // Debug
-          setTestimonios([]);
-        }
-      } catch (error) {
-        console.log('Error al cargar experiencias aprobadas:', error);
-        setTestimonios([]);
-      } finally {
-        setLoadingTestimonios(false);
-      }
     };
 
     fetchPopular();
     fetchRecomendations();
-    fetchTestimonios();
   }, []);
 
   const handleOpenPizza = (pizza) => {
@@ -127,12 +89,11 @@ const Home = ({ onAddToCart, user }) => {
       return;
     }
     setShowReviewModal(true);
-  };
-
-  const handleCloseReviewModal = () => {
+  };  const handleCloseReviewModal = () => {
     setShowReviewModal(false);
     setRating(0);
     setComment('');
+    setTitulo('');
   };
 
   const handleCloseAuthAlert = () => {
@@ -142,12 +103,47 @@ const Home = ({ onAddToCart, user }) => {
   const handleRatingClick = (selectedRating) => {
     setRating(selectedRating);
   };
+  const handleSubmitReview = async () => {
+    if (!user || !user.id) {
+      setShowAuthAlert(true);
+      return;
+    }
 
-  const handleSubmitReview = () => {
-    // Aquí puedes agregar la lógica para enviar la reseña
-    console.log('Calificación:', rating);
-    console.log('Comentario:', comment);
-    handleCloseReviewModal();
+    // Validar datos básicos
+    if (!rating || !comment.trim()) {
+      setToast({
+        message: 'Por favor, califica tu experiencia y escribe un comentario.',
+        type: 'warning'
+      });
+      return;
+    }
+
+    setSubmittingReview(true);
+
+    try {
+      await crearExperienciaDesdeModal(
+        user,
+        titulo.trim() || 'Mi experiencia en Mama Mian Pizza',
+        rating,
+        comment.trim()
+      );
+
+      setToast({
+        message: '¡Gracias por compartir tu experiencia! Será revisada antes de publicarse.',
+        type: 'success'
+      });
+      handleCloseReviewModal();
+      // Recargar experiencias después de crear una nueva
+      cargarExperiencias();
+    } catch (error) {
+      console.error('Error al crear experiencia:', error);
+      setToast({
+        message: 'Hubo un error al enviar tu experiencia. Por favor, inténtalo de nuevo.',
+        type: 'error'
+      });
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   return (
@@ -314,7 +310,7 @@ const Home = ({ onAddToCart, user }) => {
             <h2 className="review__modal__title">Comparte tu experiencia</h2>
             
             <div className="rating__section">
-              <p className="rating__label">Calificación</p>
+              <p className="rating__label">Calificación *</p>
               <div className="stars__container">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <span
@@ -326,27 +322,64 @@ const Home = ({ onAddToCart, user }) => {
                   </span>
                 ))}
               </div>
+              {rating > 0 && (
+                <span className="rating__text">
+                  {rating === 1 && 'Muy malo'}
+                  {rating === 2 && 'Malo'}
+                  {rating === 3 && 'Regular'}
+                  {rating === 4 && 'Bueno'}
+                  {rating === 5 && 'Excelente'}
+                </span>
+              )}
             </div>
 
-            <div className="comment__section">
-              <label className="comment__label">Tu comentario</label>
-              <textarea
-                className="comment__textarea"
-                placeholder="Comparte tu experiencia con Mama Mian Pizza..."
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                rows="4"
+            <div className="title__section">
+              <label className="title__label">Título de tu experiencia (opcional)</label>
+              <input
+                type="text"
+                className="title__input"
+                placeholder="Ej: Excelente experiencia en Mama Mian"
+                value={titulo}
+                onChange={(e) => setTitulo(e.target.value)}
+                maxLength="100"
               />
             </div>
 
+            <div className="comment__section">
+              <label className="comment__label">Tu comentario *</label>
+              <textarea
+                className="comment__textarea"
+                placeholder="Comparte los detalles de tu experiencia con Mama Mian Pizza..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows="4"
+                maxLength="500"
+              />
+              <div className="character__count">
+                {comment.length}/500 caracteres
+              </div>
+            </div>
+
             <div className="modal__buttons">
-              <button className="cancel__button" onClick={handleCloseReviewModal}>
+              <button 
+                className="cancel__button" 
+                onClick={handleCloseReviewModal}
+                disabled={submittingReview}
+              >
                 Cancelar
               </button>
-              <button className="submit__button" onClick={handleSubmitReview}>
-                Publicar comentario
+              <button 
+                className="submit__button" 
+                onClick={handleSubmitReview}
+                disabled={submittingReview || !rating || !comment.trim()}
+              >
+                {submittingReview ? 'Enviando...' : 'Publicar experiencia'}
               </button>
             </div>
+            
+            <p className="modal__note">
+              * Tu experiencia será revisada antes de ser publicada
+            </p>
           </div>
         </div>
       )}
@@ -370,9 +403,17 @@ const Home = ({ onAddToCart, user }) => {
             </div>
             <p className="auth__login__text">
               ¿Ya tienes cuenta? <Link to="/login" className="auth__login__link">Accede aquí</Link>
-            </p>
-          </div>
+            </p>          </div>
         </div>
+      )}
+      
+      {/* Toast de notificaciones */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   );

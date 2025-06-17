@@ -143,6 +143,46 @@
   margin: 0;
 }
 
+/* Contenedor y foto de la experiencia */
+.testimonial-photo-container {
+  margin-top: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.testimonial-photo-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.testimonial-experience-photo {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+.testimonial-experience-photo:hover {
+  opacity: 0.95;
+}
+
+/* Ajustes responsive para la foto de experiencia */
+@media (max-width: 768px) {
+  .testimonial-experience-photo {
+    max-height: 200px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .testimonial-experience-photo {
+    max-height: 250px;
+  }
+}
+
 /* Media query para pantallas medianas y grandes */
 @media (min-width: 768px) {
   .testimonials-container {
