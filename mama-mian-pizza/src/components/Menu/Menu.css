@@ -1,305 +1,521 @@
-.menu-container{
-  background-color: #FFF9E6;
+/* ============================================
+   CONTENEDOR PRINCIPAL DEL MENÚ
+============================================ */
+.menu-container {
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFFBF0 100%);
+  min-height: 100vh;
+  padding: 0;
 }
 
-/* SECCIÓN: CATEGORÍAS Y BÚSQUEDA */
-.menu-categories-section {
+/* ============================================
+   HEADER DEL MENÚ
+============================================ */
+.menu-header {
   text-align: center;
-  background-color: #FFF9E6;
-}
-
-.menu-section-title {
-  font-size: 2rem;
+  padding: 4rem 2rem 2rem;
+  background: linear-gradient(135deg, var(--accent-color) 0%, #d97706 100%);
   color: var(--primary-color);
-  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
 }
 
-.menu-title-text {
-  margin-top: 3rem; /* ajusta según lo que necesites */
-  display: inline-block;
+.menu-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    url('../../assets/PizzaR.png'),
+    url('../../assets/PizzaR.png'),
+    url('../../assets/PizzaR.png'),
+    url('../../assets/PizzaR.png');
+  background-size: 80px 80px, 50px 50px, 65px 65px, 55px 55px;
+  background-position: 85% 20%, 20% 30%, 70% 75%, 10% 60%;
+  background-repeat: no-repeat;
+  opacity: 0.15;
+  animation: floatPizzaIcon 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.menu-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    url('../../assets/PizzaR.png'),
+    url('../../assets/PizzaR.png');
+  background-size: 60px 60px, 45px 45px;
+  background-position: 15% 75%, 90% 60%;
+  background-repeat: no-repeat;
+  opacity: 0.1;
+  animation: floatPizzaIcon 10s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+
+@keyframes floatPizzaIcon {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% { 
+    transform: translateY(-8px) rotate(3deg);
+  }
+}
+
+.menu-main-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
 }
 
 .menu-title-icon {
-  width: 32px;
-  height: auto;
-  margin-left: 0.5rem;
-  vertical-align: middle;
+  width: 48px;
+  height: 48px;
+  filter: brightness(0) saturate(100%) invert(11%) sepia(100%) saturate(3139%) hue-rotate(349deg) brightness(89%) contrast(107%);
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+.menu-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.8;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* ============================================
+   SECCIÓN DE FILTROS Y BÚSQUEDA
+============================================ */
+.menu-filters-section {
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .menu-categories {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
   justify-content: center;
+  gap: 1rem;
   margin-bottom: 2rem;
 }
 
 .menu-category-button {
-  background-color: #F59E0B;
+  background: white;
   color: var(--primary-color);
-  border: none;
-  border-radius: 8px;
+  border: 2px solid var(--accent-color);
+  border-radius: 50px;
   padding: 1rem 2rem;
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(153, 27, 27, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-category-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.5s;
+}
+
+.menu-category-button:hover::before {
+  left: 100%;
 }
 
 .menu-category-button:hover {
-  background-color: var(--primary-color);
-  color: #fff;
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(153, 27, 27, 0.3);
 }
 
 .menu-category-button.active {
-  background-color: var(--primary-color);
-  color: #fff;
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(153, 27, 27, 0.3);
 }
 
 .menu-search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.search-input-wrapper {
   position: relative;
-  width: 250px;
-  left: 43%;
+  width: 100%;
+  max-width: 400px;
 }
 
 .menu-search-input {
   width: 100%;
-  padding: 0.5rem 2.5rem 0.5rem 0.5rem;
+  padding: 1rem 3rem 1rem 1.5rem;
   border: 2px solid var(--accent-color);
-  border-radius: 4px;
+  border-radius: 50px;
   outline: none;
-  color: #991B1B;
-  font-weight: bold;
+  font-size: 1rem;
+  color: var(--primary-color);
+  background: white;
+  box-shadow: 0 4px 15px rgba(153, 27, 27, 0.1);
+  transition: all 0.3s ease;
+}
+
+.menu-search-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 6px 20px rgba(153, 27, 27, 0.2);
+  transform: translateY(-1px);
 }
 
 .menu-search-input::placeholder {
   color: var(--accent-color);
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
 .menu-search-icon {
   position: absolute;
   top: 50%;
-  right: 0.5rem;
+  right: 1.5rem;
   transform: translateY(-50%);
   width: 20px;
   height: 20px;
-  object-fit: contain;
-  cursor: pointer;
+  opacity: 0.6;
   pointer-events: none;
 }
 
-/* SECCIÓN: RECOMENDACIÓN DE LA CASA */
-.menu-recommendation-section {
+/* ============================================
+   SECCIÓN DE PRODUCTOS
+============================================ */
+.menu-products-section {
+  padding: 0 2rem 4rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.menu-products-header {
   text-align: center;
-  margin: 1rem auto;
-  max-width: 90%;
-  background-color: #FFF9E6;
-  border-radius: 8px;
-  padding: 3rem 1rem;
+  margin-bottom: 4rem;
+  padding: 2.5rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(153, 27, 27, 0.1);
 }
 
-.recommendation-title {
-  font-size: 1.5rem;
+.products-section-title {
+  font-size: 2rem;
   color: var(--primary-color);
-  margin-bottom: 1rem;
-}
-
-.menu-pizza-icon {
-  width: 32px;
-  height: auto;
-  margin-left: 0.5rem;
-  vertical-align: middle;
-}
-
-.menu-card-container {
+  margin: 0 0 0.5rem;
   display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
+  align-items: center;
   justify-content: center;
+  gap: 0.5rem;
 }
 
-/* Estilos para mensajes de carga y "no hay productos" */
+.section-title-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.products-count {
+  color: var(--accent-color);
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+.menu-content {
+  min-height: 400px;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 3rem 2.5rem;
+  padding: 2rem 1rem;
+  justify-items: center;
+}
+
+/* ============================================
+   ESTADOS DE CARGA Y ERROR
+============================================ */
 .loading-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 200px;
-  width: 100%;
+  min-height: 300px;
+  color: var(--primary-color);
+  gap: 1rem;
 }
 
-.loading-container p {
-  color: #991B1B;
-  font-size: 1.2rem;
-  font-weight: bold;
-  position: relative;
-  padding-left: 40px;
-}
-
-.loading-container p::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
-  border: 4px solid #FCD6A0;
-  border-top-color: #991B1B;
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--accent-color);
+  border-top-color: var(--primary-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: translateY(-50%) rotate(0deg); }
-  100% { transform: translateY(-50%) rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 
-.no-products-message {
+.loading-container p {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.error-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 249, 230, 0.8);
-  border: 2px dashed #991B1B;
-  border-radius: 12px;
-  padding: 2rem;
-  margin: 2rem auto;
-  width: 80%;
-  max-width: 600px;
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 8px 30px rgba(220, 38, 38, 0.1);
+  border: 2px solid #fef2f2;
+  min-height: 300px;
+  gap: 1rem;
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.error-container h3 {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.error-container p {
+  color: #666;
+  text-align: center;
+  margin: 0;
+}
+
+.retry-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.retry-button:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(153, 27, 27, 0.3);
+}
+
+/* ============================================
+   MENSAJE SIN PRODUCTOS
+============================================ */
+.no-products-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  border-radius: 20px;
+  padding: 4rem 2rem;
+  box-shadow: 0 8px 30px rgba(153, 27, 27, 0.1);
+  border: 2px dashed var(--accent-color);
+  min-height: 300px;
+  text-align: center;
 }
 
 .no-products-icon {
-  width: 60px;
-  height: 60px;
+  font-size: 4rem;
   margin-bottom: 1rem;
   opacity: 0.7;
 }
 
-.no-products-message p:nth-child(2) {
-  color: #991B1B;
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
+.no-products-container h3 {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  margin: 0 0 1rem;
 }
 
-.no-products-message p:last-child {
+.no-products-container p {
   color: #666;
   font-size: 1rem;
+  margin: 0 0 2rem;
+  line-height: 1.5;
 }
 
-/* RESPONSIVE DESIGN: Mobile adjustments */
+.no-products-suggestions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.clear-search-button,
+.show-all-button {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.8rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.clear-search-button:hover,
+.show-all-button:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+============================================ */
 @media (max-width: 768px) {
-  .menu-categories {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
+  .menu-header {
+    padding: 3rem 1rem 2rem;
   }
-/* Responsive: para pantallas pequeñas */
-@media screen and (max-width: 768px) {
-  .menu-category-button {
-    font-size: 1rem;
-    padding: 0.3rem 0.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 45px;
-    width: 200px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-  }
-
-}
-
-  .menu-search-container {
   
-    margin-top: 1rem;
-    left:20%;
-  }
-
-  .menu-search-input {
-    padding-right: 2.5rem;
-  }
-
-  .menu-section-title {
-    font-size: 1.5rem;
-  }
-
-  .recommendation-title {
-    font-size: 1.3rem;
-  }
-
-  .menu-card-container {
+  .menu-main-title {
+    font-size: 2rem;
     flex-direction: column;
-    align-items: center;
+    gap: 0.5rem;
   }
-
-  .no-products-message {
-    width: 95%;
-    padding: 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .menu-section-title,
-  .recommendation-title {
-    font-size: 1.25rem;
-  }
-
- 
-  .menu-search-input {
-    font-size: 0.9rem;
-  }
-
-  .loading-container p {
-    font-size: 1rem;
-  }
-
-  .no-products-icon {
-    width: 50px;
-    height: 50px;
-  }
-
-  .no-products-message p:nth-child(2) {
-    font-size: 1rem;
-  }
-
-  .no-products-message p:last-child {
-    font-size: 0.9rem;
-  }
-}
-@media (max-width: 480px) {
-  .menu-section-title {
-    font-size: 1.5rem;
-  }
-
-
-
-  .menu-categories {
-    flex-direction: column;
-  }
-
-  .recommendation-title {
-    font-size: 1.2rem;
-  }
-
-  .menu-pizza-icon,
+  
   .menu-title-icon {
-    width: 24px;
+    width: 40px;
+    height: 40px;
   }
-
-  .menu-recommendation-section {
+  
+  .menu-subtitle {
+    font-size: 1rem;
+  }
+  
+  .menu-filters-section {
     padding: 2rem 1rem;
   }
-
-  .loading-container p {
-    font-size: 1rem;
+  
+  .menu-categories {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
   }
-
-  .no-products-message {
-    width: 95%;
+  
+  .menu-category-button {
+    width: 100%;
+    max-width: 250px;
+    justify-content: center;
+  }
+  
+  .search-input-wrapper {
+    max-width: 100%;
+  }
+  
+  .menu-products-section {
+    padding: 0 1rem 3rem;
+  }
+  
+  .products-section-title {
+    font-size: 1.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+    .menu-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 2rem 0.5rem;
+  }
+  
+  .menu-products-header {
     padding: 1.5rem;
+  }
+  
+  .no-products-container {
+    padding: 3rem 1.5rem;
+  }
+  
+  .no-products-suggestions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .clear-search-button,
+  .show-all-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-main-title {
+    font-size: 1.8rem;
+  }
+  
+  .menu-category-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .menu-search-input {
+    padding: 0.8rem 2.5rem 0.8rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .products-section-title {
+    font-size: 1.3rem;
+  }
+  
+  .section-title-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .no-products-icon {
+    font-size: 3rem;
+  }
+  
+  .error-icon {
+    font-size: 2.5rem;
   }
 }

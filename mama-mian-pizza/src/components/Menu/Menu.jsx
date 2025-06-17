@@ -160,89 +160,82 @@ const Menu = ({ onAddToCart, user }) => {
   };
 
   console.log("Renderizando menú. Productos filtrados:", filteredMenu.length);
-
   return (
     <div className="menu-container">
-      
-      {/* SECCIÓN: CATEGORÍAS Y BÚSQUEDA */}
-      <section className="menu-categories-section">
-        <h2 className="menu-section-title">
-          <span className="menu-title-text">Nuestro Menú</span>
+      {/* HEADER DEL MENÚ */}
+      <div className="menu-header">
+        <h1 className="menu-main-title">
           <img 
             src={menuBookIcon} 
             alt="Ícono Libro Menú" 
             className="menu-title-icon" 
           />
-        </h2>
-
-        <div className="menu-categories">
-          <button
-            className={`menu-category-button ${activeCategory === "Todos" ? "active" : ""}`}
-            onClick={() => handleCategoryChange("Todos")}
-          >
-            Todos
-          </button>
-          <button
-            className={`menu-category-button ${activeCategory === "Pizzas" ? "active" : ""}`}
-            onClick={() => handleCategoryChange("Pizzas")}
-          >
-            Pizzas
-          </button>
-          <button
-            className={`menu-category-button ${activeCategory === "Bebidas" ? "active" : ""}`}
-            onClick={() => handleCategoryChange("Bebidas")}
-          >
-            Bebidas
-          </button>
-          <button
-            className={`menu-category-button ${activeCategory === "Complementos" ? "active" : ""}`}
-            onClick={() => handleCategoryChange("Complementos")}
-          >
-            Complementos
-          </button>
-        </div>
+          Nuestro Menú
+        </h1>
+        <p className="menu-subtitle">Descubre nuestros deliciosos sabores</p>
+      </div>      {/* SECCIÓN: FILTROS Y BÚSQUEDA */}
+      <section className="menu-filters-section">
         <div className="menu-search-container">
-          <input
-            type="text"
-            placeholder="Buscar..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="menu-search-input"
-          />
-          <img 
-            src={searchIcon} 
-            alt="Buscar" 
-            className="menu-search-icon" 
-          />
+          <div className="search-input-wrapper">
+            <input
+              type="text"
+              placeholder="Buscar productos..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="menu-search-input"
+            />
+            <img 
+              src={searchIcon} 
+              alt="Buscar" 
+              className="menu-search-icon" 
+            />
+          </div>
+        </div>
+        
+        <div className="menu-categories">
+          {['Todos', 'Pizzas', 'Bebidas', 'Complementos'].map((category) => (
+            <button
+              key={category}
+              className={`menu-category-button ${activeCategory === category ? "active" : ""}`}
+              onClick={() => handleCategoryChange(category)}
+            >
+              {category}
+            </button>
+          ))}
         </div>
       </section>
 
-      {/* SECCIÓN: PRODUCTOS FILTRADOS */}
-      <section className="menu-recommendation-section">
-        <div className="menu-recommendation-card">
-          <h3 className="recommendation-title">
-            {activeCategory === 'Todos' ? 'Todos los Productos' : activeCategory}{" "}
-            <img src={pizzaIcon} alt="Pizza Icon" className="menu-pizza-icon" />
-          </h3>
+      {/* SECCIÓN: PRODUCTOS */}
+      <section className="menu-products-section">        <div className="menu-products-header">
+          <h2 className="products-section-title">
+            {activeCategory === 'Todos' ? 'Todos nuestros Productos' : `Categoría: ${activeCategory}`}
+          </h2>
+        </div>
+
+        <div className="menu-content">
           {loading ? (
             <div className="loading-container">
-              <p>Cargando productos...</p>
+              <div className="loading-spinner"></div>
+              <p>Cargando productos deliciosos...</p>
             </div>
           ) : error ? (
             <div className="error-container">
+              <div className="error-icon">⚠️</div>
+              <h3>¡Ups! Algo salió mal</h3>
               <p>{error}</p>
               <button onClick={fetchMenu} className="retry-button">
-                Reintentar
+                <span>🔄</span> Reintentar
               </button>
             </div>
           ) : filteredMenu.length > 0 ? (
-            <div className="menu-card-container">
-              {filteredMenu.map((item, index) => (                <ProductsCards 
+            <div className="menu-grid">
+              {filteredMenu.map((item, index) => (
+                <ProductsCards 
                   data={{
                     ...item,
-                    nombre: item.titulo, // Compatibilidad para componentes que usan nombre en lugar de titulo
-                    url_imagen: item.imagen, // Compatibilidad para componentes que usan url_imagen
-                    precio: item.opciones && item.opciones.length > 0 ? item.opciones[0].precio : 0 // Usar el primer precio disponible
+                    nombre: item.titulo,
+                    url_imagen: item.imagen,
+                    precio: item.opciones && item.opciones.length > 0 ? item.opciones[0].precio : 0
                   }} 
                   key={item.id || index} 
                   onCardClick={(productData) => handleOpenModal(productData)} 
@@ -250,17 +243,40 @@ const Menu = ({ onAddToCart, user }) => {
               ))}
             </div>
           ) : (
-            <div className="no-products-message">
-              <img src={pizzaIcon} alt="No hay productos" className="no-products-icon" />
-              <p>No se encontraron productos {searchTerm ? `que coincidan con "${searchTerm}"` : ''} 
-                 {activeCategory !== 'Todos' ? ` en la categoría "${activeCategory}"` : ''}</p>
-              <p>Intenta con otra búsqueda o categoría</p>
+            <div className="no-products-container">
+              <div className="no-products-icon">🍕</div>
+              <h3>No encontramos productos</h3>
+              <p>
+                No hay productos disponibles
+                {searchTerm && <span> que coincidan con "<strong>{searchTerm}</strong>"</span>}
+                {activeCategory !== 'Todos' && <span> en la categoría <strong>{activeCategory}</strong></span>}
+              </p>
+              <div className="no-products-suggestions">
+                {searchTerm && (
+                  <button 
+                    onClick={() => setSearchTerm('')}
+                    className="clear-search-button"
+                  >
+                    Limpiar búsqueda
+                  </button>
+                )}
+                {activeCategory !== 'Todos' && (
+                  <button 
+                    onClick={() => handleCategoryChange('Todos')}
+                    className="show-all-button"
+                  >
+                    Ver todos los productos
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>
       </section>
 
-      <Footer noImage={true} />      {/* Modal del Producto */}
+      <Footer noImage={true} />
+      
+      {/* Modal del Producto */}
       {selectedProduct && (
         <PizzaModal 
           pizza={selectedProduct}
