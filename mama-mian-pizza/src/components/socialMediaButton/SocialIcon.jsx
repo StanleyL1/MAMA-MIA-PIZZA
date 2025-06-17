@@ -5,21 +5,6 @@ import { faWhatsapp, faFacebookMessenger, faInstagram } from '@fortawesome/free-
 import PropTypes from 'prop-types';
 
 export default function SocialIcon({ platform, index, total, isOpen }) {
-  const getIconStyles = () => {
-    if (!isOpen) return {};
-
-    const angle = Math.PI / 2;            // 90°
-    const arcStartAngle = Math.PI / 4;    // 45°
-    const itemAngle = arcStartAngle + (angle * index) / (total - 1);
-    const radius = 100; // increased radius to add more space between icons
-    const x = Math.cos(itemAngle) * radius;
-    const y = -Math.sin(itemAngle) * radius;
-
-    return {
-      transform: `translate(${x}px, ${y}px)`,
-    };
-  };
-
   const getIcon = () => {
     switch (platform.name) {
       case 'whatsapp':
@@ -38,9 +23,8 @@ export default function SocialIcon({ platform, index, total, isOpen }) {
       href={platform.url}
       className="social-icon"
       style={{
-        ...getIconStyles(),
         backgroundColor: platform.color,
-        transitionDelay: isOpen ? `${index * 0.05}s` : '0s',
+        transitionDelay: isOpen ? `${index * 0.1}s` : '0s', // Delay escalonado para animación
       }}
       target="_blank"
       rel="noopener noreferrer"

@@ -515,10 +515,11 @@ body{
 }
 
 /*CHAT BOT*/
-/* Botón flotante de Chat */
+/* Botón flotante de Chat - DESHABILITADO ya que se movió al App.jsx */
+/*
 .chat-floating-button {
   position: fixed;
-  bottom: 50%;   /* Aumentado para que quede más arriba */
+  bottom: 50%;
   right: 20px;
   display: flex;
   align-items: center;
@@ -526,6 +527,7 @@ body{
   border-radius: 50px;
   cursor: pointer;
 }
+*/
 
 /* Texto del botón */
 .chat-button-text {

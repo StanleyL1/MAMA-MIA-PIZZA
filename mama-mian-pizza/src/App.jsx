@@ -14,6 +14,7 @@ import Services from './components/Services/Services';
 import Team from './components/Team/Team';
 import InformacionLegal from './components/InformacionLegal/InformacionLegal';
 import Perfil from './components/Perfil/Perfil';
+import SocialMediaButton from './components/socialMediaButton/SocialMediaButton';
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -143,15 +144,16 @@ const triggerOrderUpdate = () => {
         <div className="toast-notification">
           <p>{toast.message}</p>
         </div>
-      )}
-
-      {/* Componente Cart - Solo se renderiza si isCartOpen es true */}
+      )}      {/* Componente Cart - Solo se renderiza si isCartOpen es true */}
       <Cart
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         cartItems={cartItems}
         setCartItems={setCartItems}
       />
+
+      {/* Botón flotante de redes sociales - visible en toda la aplicación */}
+      <SocialMediaButton />
     </BrowserRouter>
   );
 }

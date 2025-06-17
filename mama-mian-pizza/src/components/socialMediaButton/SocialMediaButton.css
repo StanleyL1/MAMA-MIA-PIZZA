@@ -3,8 +3,9 @@
     position: fixed;
     bottom: 34px;
     right: 69px;
-    z-index: 9999;
+    z-index: 99999; /* Aumentado para asegurar que siempre esté visible */
     transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    pointer-events: auto; /* Asegurar que siempre pueda recibir clicks */
   }
   
   .social-media-button {
@@ -13,15 +14,14 @@
     justify-content: center;
     align-items: center;
   }
-  
-  /* Toggle Button */
+    /* Toggle Button */
   .toggle-button {
     width: 56px;
     height: 56px;
     border-radius: 50%;
     background-color: #FEB248;
-    border: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: 2px solid #821717; /* Borde para mejor visibilidad */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Sombra más prominente */
     color: #821717;
     display: flex;
     justify-content: center;
@@ -29,6 +29,20 @@
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 2;
+    animation: pulse 2s infinite; /* Animación sutil para llamar la atención */
+  }
+  
+  /* Animación de pulso para llamar la atención */
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), 0 0 0 4px rgba(254, 178, 72, 0.3);
+    }
+    100% {
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
   }
   
   .toggle-button:hover {
@@ -41,22 +55,21 @@
     background-color: #ef4444;
     transform: rotate(180deg);
     color: #fff;
-  }
-  
-  /* Social Icons Container */
+  }  /* Social Icons Container */
   .social-icons-container {
     position: absolute;
     width: 66px;
-    height: 66px;
+    height: 200px; /* Altura para acomodar los iconos verticalmente */
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* Cambiar a vertical */
+    justify-content: flex-end; /* Alinear desde abajo hacia arriba */
     align-items: center;
     z-index: 1;
-  }
-  
-  /* Individual Social Icon */
+    bottom: 70px; /* Posicionar arriba del botón principal */
+    right: 0; /* Alinear con el botón principal */
+  }  /* Individual Social Icon */
   .social-icon {
-    position: absolute;
+    position: relative;
     width: 44px;
     height: 44px;
     border-radius: 50%;
@@ -66,18 +79,22 @@
     color: white;
     text-decoration: none;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    /* include filter for hover effect */
+    margin-bottom: 10px; /* Espacio entre iconos verticalmente */
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
                 opacity 0.3s ease,
                 filter 0.3s ease;
     opacity: 0;
-    transform: scale(0.6) translate(0, 0);
+    transform: scale(0.6) translateY(20px); /* Animación desde abajo hacia arriba */
     pointer-events: none;
   }
   
-  /* When menu is open */
+  /* Último icono (el de arriba) sin margen inferior */
+  .social-icon:last-child {
+    margin-bottom: 0;
+  }  /* When menu is open */
   .social-media-button.active .social-icon {
     opacity: 1;
+    transform: scale(1) translateY(0); /* Posición final vertical */
     pointer-events: auto;
   }
   
@@ -85,9 +102,7 @@
     /* brighten icon on hover instead of scaling */
     filter: brightness(1.2);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-  }
-  
-  /* Responsive adjustments */
+  }  /* Responsive adjustments */
   @media (max-width: 768px) {
     .social-media-container {
       bottom: 16px;
@@ -99,8 +114,38 @@
       height: 48px;
     }
     
+    .social-icons-container {
+      height: 160px; /* Reducir altura en móviles */
+      bottom: 60px; /* Ajustar posición arriba del botón */
+    }
+    
     .social-icon {
       width: 38px;
       height: 38px;
+      margin-bottom: 8px; /* Reducir espacio en móviles */
+    }
+  }
+  
+  /* Para pantallas muy pequeñas */
+  @media (max-width: 480px) {
+    .social-media-container {
+      bottom: 12px;
+      right: 12px;
+    }
+    
+    .social-icons-container {
+      height: 140px;
+      bottom: 55px;
+    }
+    
+    .social-icon {
+      width: 36px;
+      height: 36px;
+      margin-bottom: 6px;
+    }
+    
+    .toggle-button {
+      width: 44px;
+      height: 44px;
     }
   }

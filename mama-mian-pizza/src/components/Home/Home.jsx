@@ -14,7 +14,6 @@ import TestimonialCard from '../ComentsCards/ComentCards';
 import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png';
 import comentarioImg from '../../assets/comentario.png';
-import SocialMediaButton from '../socialMediaButton/SocialMediaButton';
 
 import carrusel1 from '../../assets/carrusel1.jpeg';
 import carrusel2 from '../../assets/carrusel2.jpeg';
@@ -186,14 +185,8 @@ const Home = ({ onAddToCart, user }) => {
             <p className="whyus__card__description">
               Ingredientes locales, frescos y sin conservantes.
             </p>
-          </div>
-        </div>
+          </div>        </div>
       </section>
-
-      {/* Botón flotante de Chat */}
-      <div className="chat-floating-button">
-        <SocialMediaButton />
-      </div>
 
       {/* Testimonios */}
       <section className="review__section">
