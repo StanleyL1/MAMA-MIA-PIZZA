@@ -218,11 +218,10 @@ const Login = ({ onLogin }) => {
                 // Llamar a onLogin con los datos finales
                 onLogin(userDataToSave);
                 setSuccess(true);
-                
-                // Redirigir después de 1 segundo
+                  // Redirigir después de 1 segundo
                 setTimeout(() => {
-                    console.log('Redirigiendo a /menu...');
-                    navigate('/menu');
+                    console.log('Redirigiendo al home...');
+                    navigate('/');
                 }, 1500);
             } else {
                 // Intentar obtener el mensaje de error de la respuesta
