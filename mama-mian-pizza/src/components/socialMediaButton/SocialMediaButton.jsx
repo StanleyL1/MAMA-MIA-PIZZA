@@ -7,17 +7,17 @@ const socialPlatforms = [
   {
     name: 'messenger',
     color: '#0078FF',
-    url: 'https://messenger.com/',
+    url: 'https://www.facebook.com/contrera05',
   },
   {
     name: 'instagram',
     color: '#E1306C',
-    url: 'https://instagram.com/',
+    url: 'https://www.instagram.com/mamamianpizza2020/',
   },
   {
     name: 'whatsapp',
     color: '#25D366',
-    url: 'https://whatsapp.com/',
+    url: 'https://api.whatsapp.com/send?phone=%2B50372928039&context=AfcmoFWxRioLE0peyRdiI58rm6GXMJqEvQwrJUiSV_NuYHmFh8T2tKURT2igaVics5wlqz1Q4wnIVQNegdGDKWeG7XhVXJZfhqoZH6_F8mwE1RYa1YAJnbAzTvsxVmC2HewHfsaEAtl7OpvF11gOoUDnbw&source=FB_Page&app=facebook&entry_point=page_cta&fbclid=IwY2xjawK92wpleHRuA2FlbQIxMABicmlkETFFZFRncTVUMGQ1Wjd1bDdiAR6-iy0em-jCsP-_dTP38sZkGL1C9ojlk1URhGMHwN_7eIt1Y9_Hw92Z9GoJ0w_aem_vDzE54p583hDCbMUdGQ_0Q',
   },
 ];
 
