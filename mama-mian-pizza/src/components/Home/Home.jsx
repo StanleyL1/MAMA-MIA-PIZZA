@@ -48,6 +48,19 @@ const Home = ({ onAddToCart }) => {
   const [popular, setPopular] = useState([]);
   const [recomendacion, setRecomendaciones] = useState([]);
   const [selectedPizza, setSelectedPizza] = useState(null);
+const [showCommentForm, setShowCommentForm] = useState(false);
+const [nuevoComentario, setNuevoComentario] = useState({
+  name: "Juan Pérez",         // O trae el nombre del usuario logueado
+  categoria: "Servicio",
+  rating: 5,
+  comment: "",
+});
+const [testimonios, setTestimonios] = useState([
+  // Ejemplo inicial
+  // { name: "María", categoria: "Comida", rating: 4, comment: "¡Delicioso!" }
+]);
+
+
 
   useEffect(() => {
     const fetchRecomendations = async () => {
@@ -59,6 +72,7 @@ const Home = ({ onAddToCart }) => {
         console.log(error);
       }
     };
+
 
     const fetchPopular = async () => {
       try {
@@ -86,7 +100,19 @@ const Home = ({ onAddToCart }) => {
     onAddToCart(pizza, masa, tamano, instrucciones, ingredientes);
     handleCloseModal();
   };
-
+const handlePublicarComentario = () => {
+    if (!nuevoComentario.comment || !nuevoComentario.name) return;
+    setTestimonios([
+      {
+        ...nuevoComentario,
+        avatar: nuevoComentario.avatar || comentarioImg,
+        time: "hace un momento",
+      },
+      ...testimonios
+    ]);
+    setNuevoComentario({ name: "", avatar: "", time: "hace un momento", comment: "", rating: 5 });
+    setShowCommentForm(false);
+  };
   return (
     <div className="main__content">
       
@@ -195,15 +221,132 @@ const Home = ({ onAddToCart }) => {
         <SocialMediaButton />
       </div>
 
-      {/* Testimonios */}
-      <section className="review__section">
-        <h2 className="review__header">Lo que dicen nuestros clientes</h2>
-        <div className="review__content">
-          {datosTestimonios.map((item, index) => (
-            <TestimonialCard data={item} key={index} />
+     <section className="review__section">
+  <h2 className="review__header">Lo que dicen nuestros clientes</h2>
+  <div className="review__share-bar">
+  <div className="review__share-left">
+    <span className="review__share-text">Comparte tu experiencia</span>
+  </div>
+  <button
+    className="review__share-btn"
+    onClick={() => setShowCommentForm(true)}
+  >
+    Escribir comentario
+  </button>
+</div>
+
+
+  {/* MODAL FORMULARIO */}
+  {showCommentForm && (
+  <div className="modal__overlay">
+    <div className="modal__content review__comment-form-card">
+      <button
+        className="modal__close-btn"
+        onClick={() => setShowCommentForm(false)}
+      >×</button>
+      <div className="review__form-header">
+        <h3>Escribe tu reseña</h3>
+      </div>
+      <div className="review__form-row">
+        <label>Categoría</label>
+        <select
+          className="review__form-select"
+          value={nuevoComentario.categoria}
+          onChange={e => setNuevoComentario({...nuevoComentario, categoria: e.target.value})}
+          required
+        >
+          <option value="Servicio">Servicio</option>
+          <option value="Entrega">Entrega</option>
+          <option value="Comida">Comida</option>
+        </select>
+      </div>
+      <div className="review__form-row">
+        <label>Calificación</label>
+        <div className="review__form-stars">
+          {[1,2,3,4,5].map(star => (
+            <span
+              key={star}
+              onClick={() => setNuevoComentario({...nuevoComentario, rating: star})}
+              style={{
+                cursor: "pointer",
+                fontSize: 28,
+                color: nuevoComentario.rating >= star ? "#eab308" : "#ddd",
+                marginRight: 4
+              }}
+            >★</span>
           ))}
         </div>
-      </section>
+      </div>
+      <div className="review__form-row">
+        <label>Comentario</label>
+        <textarea
+          className="review__form-textarea"
+          placeholder="Escribe aquí tu reseña"
+          rows={4}
+          value={nuevoComentario.comment}
+          onChange={e => setNuevoComentario({...nuevoComentario, comment: e.target.value})}
+          required
+        />
+      </div>
+      <div className="review__form-actions">
+        <button
+          className="review__form-btn review__form-btn--red"
+          onClick={handlePublicarComentario}
+          type="button"
+        >
+          Publicar reseña
+        </button>
+        <button className="review__form-btn" onClick={() => setShowCommentForm(false)} type="button">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+<div className="review__content">
+  {testimonios.map((item, index) => (
+   <div className="card__review">
+  <div className="review__card__user">
+    <img
+      src={item.foto || comentarioImg}
+      alt={item.name}
+      className="review__avatar"
+    />
+    <div className="review__card__user__information">
+      <h5>{item.name}</h5>
+      <p>{item.time}</p>
+    </div>
+  </div>
+  <div className="review__stars-cat-row">
+    {[1,2,3,4,5].map(star => (
+      <span
+        key={star}
+        style={{
+          color: item.rating >= star ? "#ffd600" : "#d4d7dd",
+          fontSize: 20,
+          marginRight: 1
+        }}
+      >★</span>
+    ))}
+    <span
+      className={`review__categoria-badge review__categoria-badge--${item.categoria.toLowerCase()}`}
+      style={{
+        marginLeft: 10
+      }}
+    >
+      {item.categoria}
+    </span>
+  </div>
+  <div className="review__comment">
+    <p>{item.comment}</p>
+  </div>
+</div>
+  ))}
+</div>
+
+</section>
 
       <Footer />
 

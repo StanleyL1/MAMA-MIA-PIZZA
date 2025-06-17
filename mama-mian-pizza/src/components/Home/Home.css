@@ -841,3 +841,253 @@ body{
     margin: 8px auto;
   }
 }
+/* ------ Barra de compartir ------ */
+.review__share-bar {
+  width: 100%;
+  margin: 18px 0 28px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(188, 107, 32, 0.08);
+  border: 1.5px solid #ffd3a8;
+  padding: 22px 28px 22px 22px;
+  min-height: 58px;
+}
+.review__share-text {
+  color: #991b1b;
+  font-size: 1.17rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.review__share-btn {
+  background: #ff7900;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 1.07rem;
+  cursor: pointer;
+  box-shadow: 0 2px 7px rgba(254, 178, 72, 0.12);
+  transition: background 0.2s, box-shadow 0.15s;
+}
+.review__share-btn:hover,
+.review__share-btn:focus {
+  background: #d46a04;
+  box-shadow: 0 5px 18px rgba(254, 178, 72, 0.23);
+}
+@media (max-width: 650px) {
+  .review__share-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 17px 12px 15px 12px;
+  }
+  .review__share-btn {
+    width: 100%;
+    margin-top: 9px;
+    font-size: 1rem;
+  }
+}
+
+/* ------ Modal para escribir comentario ------ */
+.modal__overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 99999;
+  background: rgba(40, 20, 20, 0.11);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding-top: 32px;
+  backdrop-filter: blur(1.5px);
+  animation: modalIn .2s;
+}
+@keyframes modalIn { from { opacity: 0; } to { opacity: 1; } }
+.modal__content.review__comment-form-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1.8px solid #eabebe;
+  max-width: 1070px;
+  min-width: 540px;
+  width: 75vw;
+  box-shadow: 0 8px 32px 0 rgba(190, 70, 60, 0.14);
+  padding: 34px 32px 28px 32px;
+  position: relative;
+  animation: popIn 0.17s;
+}
+@media (max-width: 700px) {
+  .modal__content.review__comment-form-card {
+    min-width: unset;
+    width: 98vw;
+    padding: 18px 5vw 18px 5vw;
+  }
+}
+@keyframes popIn { from {transform: scale(0.9); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+.modal__close-btn {
+  position: absolute;
+  top: 16px;
+  right: 22px;
+  background: none;
+  border: none;
+  font-size: 1.7rem;
+  color: #991B1B;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.modal__close-btn:hover { opacity: 1; }
+
+/* ------ Formulario ------ */
+.review__form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+.review__form-row label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #222;
+}
+.review__form-input {
+  padding: 10px 14px;
+  border: 1.5px solid #e4e4e4;
+  border-radius: 8px;
+  width: 60%;
+  font-size: 1rem;
+  outline: none;
+}
+.review__form-select {
+  background: #f8f7f7;
+  border: 1.5px solid #EAB308;
+  border-radius: 7px;
+  color: #991B1B;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 7px 10px;
+  outline: none;
+  min-width: 130px;
+  max-width: 200px;
+  margin-top: 4px;
+  transition: border-color 0.2s;
+}
+.review__form-select:focus { border-color: #991B1B; }
+.review__form-stars span {
+  font-size: 2rem;
+  margin-right: 3px;
+  transition: color 0.15s;
+  cursor: pointer;
+}
+.review__form-textarea {
+  border: 1.5px solid #c9c7c7;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 1.07rem;
+  resize: none;
+  min-height: 70px;
+  margin-top: 2px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.review__form-textarea:focus { border-color: #991B1B; }
+.review__form-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+.review__form-btn {
+  background: #fff;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  color: #991B1B;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 8px 22px;
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s;
+}
+.review__form-btn--red {
+  background: #991B1B;
+  color: #fff;
+  border-color: #991B1B;
+}
+.review__form-btn--red:hover {
+  background: #c82c2c;
+}
+.review__form-btn:hover:not(.review__form-btn--red) {
+  border-color: #c9c7c7;
+  background: #f8f7f7;
+}
+
+/* ------ Card de comentarios ------ */
+.card__review {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 1.5px 7px rgba(0,0,0,0.06);
+  border: 1.5px solid #e3e9f6;
+  padding: 18px 22px 14px 18px;
+  margin-bottom: 18px;
+  max-width: 320px;
+  min-width: 230px;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.review__card__user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.review__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5f7fa;
+}
+.review__card__user__information h5 {
+  margin: 0;
+  font-size: 1.04rem;
+  font-weight: 700;
+  color: #233c58;
+}
+.review__card__user__information p {
+  margin: 0;
+  font-size: 0.94rem;
+  color: #868ca0;
+  font-weight: 500;
+}
+.review__stars-cat-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 8px 0 3px 0;
+  margin-left: 48px; /* Alinea estrellas con texto, si lo quieres centrado respecto a texto */
+}
+.review__categoria-badge {
+  font-size: 0.80em;
+  font-weight: 600;
+  border-radius: 9px;
+  padding: 2.5px 12px 2.5px 12px;
+  margin-left: 7px;
+  vertical-align: middle;
+  display: inline-block;
+  border: none;
+  color: #fff;
+  background: #bbb;
+}
+.review__categoria-badge--servicio   { background: #3397fc; }
+.review__categoria-badge--comida     { background: #ff9900; }
+.review__categoria-badge--entrega    { background: #27c93f; }
+.review__comment p {
+  margin: 6px 0 0 0;
+  font-size: 1.02rem;
+  color: #25304a;
+  line-height: 1.42;
+  font-weight: 400;
+}

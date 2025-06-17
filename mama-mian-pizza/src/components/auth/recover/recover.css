@@ -1,157 +1,190 @@
-/* Contenedor principal: ocupa toda la pantalla y centra el contenido */
 .recover {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  padding: 1rem; /* espacio para que no quede pegado en móviles */
-  box-sizing: border-box;
+  align-items: center;
+  min-height: 90vh;
+  background: #fafbfc;
+}
+.recover__card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1.5px 20px 0 #e3e8ef70;
+  padding: 36px 36px 20px;
+  min-width: 430px;
+  max-width: 450px;
+  position: relative;
 }
 
-/* Contenedor del formulario */
-.recover__container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #991B1B;
-  border-radius: 10px;
-  padding: 2rem;
-  width: clamp(300px, 45%, 600px);
-  background-color: #FFFFFF;
-  gap: 1.25rem;
-  box-sizing: border-box;
-}
 
-/* Cabecera */
+.recover__back {
+  background: none;
+  border: none;
+  color: #c42f2f;
+  font-weight: 500;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
 .recover__header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  width: 100%;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 7px;
 }
-
-.recover__header h3 {
-  font-size: clamp(1.5rem, 2.5vw, 2rem);
-  color: #991B1B;
-  margin: 0;
+.recover__icon-lock {
+  background: #fff6e0;
+  color: #fe7d0c;
+  border-radius: 8px;
+  font-size: 1.8rem;
+  padding: 8px;
 }
-
-/* Contenido principal */
-.recover__main {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+.recover__title {
+  font-weight: 700;
+  font-size: 1.48rem;
+  color: #1c2126;
 }
-
-.recover__text {
+.recover__subtitle {
+  color: #a22722;
+  font-size: 1.08rem;
   text-align: center;
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  color: #991B1B;
-  margin: 0;
-  width: 90%;
+  margin-bottom: 18px;
 }
-
-/* Formulario */
-.recover__form {
+.recover__select-list {
   display: flex;
   flex-direction: column;
+  gap: 20px;
+}
+.recover__select-card {
+  border: 2px solid #e5e7eb;
+  background: #fff;
+  border-radius: 10px;
+  display: flex;
   align-items: center;
-  width: 100%;
+  padding: 18px 20px;
+  margin-bottom: 4px;
+  gap: 16px;
 }
-
-/* Input de correo */
-.recover__input {
-  width: 90%;
-  height: 40px;
-  border-radius: 10px;
-  border: 1px solid #991B1B;
-  padding: 0 0.75rem;
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  color: #991B1B;
-  box-sizing: border-box;
+.recover__select-card--selected {
+  background: #fff8f1;
+  border-color: #fe7d0c;
 }
-
-/* Botón para restablecer contraseña */
-.recover__btn {
-  border-radius: 10px;
-  padding: 0.75rem;
-  background-color: #feb248;
-  border: none;
-  font-size: clamp(1rem, 2vw, 1.1rem);
-  width: 50%;
-  color: #991B1B;
-  font-weight: bold;
+.recover__select-icon {
+  font-size: 1.7rem;
+}
+.recover__select-info {
+  flex: 1;
+}
+.recover__select-label {
+  font-weight: 600;
+  color: #242424;
+}
+.recover__select-value {
+  color: #7b7b7b;
+  font-size: 1.05rem;
+  margin-top: 2px;
+}
+.recover__select-btn {
+  background: #fff;
+  border: 1.6px solid #fe7d0c;
+  color: #fe7d0c;
+  padding: 7px 18px;
+  border-radius: 7px;
+  font-weight: 500;
+  font-size: 1.02rem;
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
+  transition: 0.12s;
 }
-
-.recover__btn:hover {
-  background-color: #991B1B;
-  color: #FFFFFF;
+.recover__select-btn--sms {
+  background: #2563eb;
+  border: none;
+  color: #fff;
 }
-
-/* Pie de página */
-.recover__footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
+.recover__form-code {
+  margin-top: 15px;
+}
+.recover__input-code {
   width: 100%;
+  border: 1.8px solid #ffae6c;
+  padding: 16px;
+  border-radius: 7px;
+  font-size: 1.3rem;
+  outline: none;
+  margin-bottom: 7px;
+  background: #fff;
 }
-
-.recover__link {
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  color: #991B1B;
-  text-decoration: none;
+.recover__btn{
+    background: #fe7d0c;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 11px 0;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1.1rem;
+  margin-top: 8px;
 }
-
-.recover__link:hover {
-  text-decoration: underline;
+.recover__btn--orange {
+  background: #fe7d0c;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 11px 0;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1.1rem;
+  margin-top: 8px;
 }
-
-.recover__link:visited {
-  color: #991B1B;
+.recover-back-btn {
+  width: 100%;
+  background: none;
+  border: 1.4px solid #eab308;
+  border-radius: 7px;
+  color: #c42f2f;
+  padding: 10px 0;
+  font-weight: 600;
+  font-size: 1.02rem;
+  cursor: pointer;
+  margin-top: 22px;
+  transition: 0.12s;
 }
+.recover__subtitle2 {
+  text-align: left;
+  margin-bottom: 20px;
+  color: #555;
+  font-size: 1.04rem;
+    text-align: center;
 
-/* MEDIA QUERIES para pantallas pequeñas (móviles y tabletas) */
-@media (max-width: 768px) {
-  .recover__container {
-    width: 90%;
-    padding: 1.5rem;
-  }
-  
-  .recover__btn {
-    width: 70%;
-  }
-
-  .recover__input {
-    width: 100%;
-  }
+  margin-top: -12px;
 }
-
-@media (max-width: 480px) {
-  .recover__container {
-    width: 95%;
-    padding: 1rem;
-  }
-
-  .recover__btn {
-    width: 90%;
-    padding: 1rem;
-    font-size: 1rem;
-  }
-
-  .recover__input {
-    width: 100%;
-    font-size: 1rem;
-  }
-
-  .recover__text {
-    width: 100%;
-    font-size: 1rem;
-  }
+.recover__input-label {
+  margin-bottom: 5px;
+  color: #842929;
+  font-weight: 500;
+}
+.recover__pass-input-group {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-bottom: 2px;
+}
+.recover__show-btn {
+  background: none;
+  border: none;
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.09rem;
+  color: #a22722;
+  cursor: pointer;
+}
+.recover__pass-requisitos {
+  margin: 6px 0 18px 0;
+  font-size: 0.98rem;
+  color: #ad1414;
+}
+.recover__pass-requisitos ul {
+  padding-left: 1.2em;
+  margin: 2px 0 0 0;
 }
