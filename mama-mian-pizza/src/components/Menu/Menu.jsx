@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import ProductsCards from '../productsCards/productsCards';
 import Footer from '../footer/footer';
 import PizzaModal from '../PizzaModal/PizzaModal';
-import pizzaIcon from '../../assets/PizzaR.png';
 import menuBookIcon from '../../assets/menuBook.png';
 import searchIcon from '../../assets/search.png';
 import './Menu.css';

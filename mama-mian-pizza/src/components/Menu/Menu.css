@@ -418,6 +418,21 @@
     padding: 3rem 1rem 2rem;
   }
   
+  /* Ajustes para pizzas del fondo en tablet/móvil */
+  .menu-header::before {
+    background-image: 
+      url('../../assets/PizzaR.png'),
+      url('../../assets/PizzaR.png');
+    background-size: 60px 60px, 40px 40px;
+    background-position: 85% 15%, 15% 70%;
+  }
+
+  .menu-header::after {
+    background-image: url('../../assets/PizzaR.png');
+    background-size: 45px 45px;
+    background-position: 80% 75%;
+  }
+  
   .menu-main-title {
     font-size: 2rem;
     flex-direction: column;
@@ -517,5 +532,18 @@
   
   .error-icon {
     font-size: 2.5rem;
+  }
+  
+  /* Pizzas del fondo más espaciadas en móviles pequeños */
+  .menu-header::before {
+    background-image: url('../../assets/PizzaR.png');
+    background-size: 50px 50px;
+    background-position: 85% 20%;
+  }
+
+  .menu-header::after {
+    background-image: url('../../assets/PizzaR.png');
+    background-size: 35px 35px;
+    background-position: 15% 75%;
   }
 }
