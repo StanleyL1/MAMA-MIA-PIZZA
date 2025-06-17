@@ -28,9 +28,68 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
     { id: 5, nombre: 'Carne', seleccionado: false },
     { id: 6, nombre: 'Champiñones', seleccionado: false },
     { id: 7, nombre: 'Aceitunas', seleccionado: false },
-    { id: 8, nombre: 'Cebolla', seleccionado: false }
-  ]);
-  const [ingredientesSeleccionados, setIngredientesSeleccionados] = useState(0);  // Función para cargar reseñas desde la API
+    { id: 8, nombre: 'Cebolla', seleccionado: false }  ]);
+  const [ingredientesSeleccionados, setIngredientesSeleccionados] = useState(0);  // Función auxiliar para cargar foto de perfil de usuario
+  const cargarFotoUsuario = async (userId) => {
+    console.log(`🖼️ Intentando cargar foto para usuario ID: ${userId}`);
+    
+    // Si no hay userId, retornar foto por defecto inmediatamente
+    if (!userId) {
+      console.log(`⚠️ No se proporcionó userId, usando foto por defecto`);
+      return require('../../assets/perfilfoto.png');
+    }
+    
+    const endpoints = [
+      `https://api.mamamianpizza.com/api/usuarios/${userId}/foto`,
+      `https://api.mamamianpizza.com/api/usuarios/${userId}/profile-image`,
+      `https://api.mamamianpizza.com/api/users/${userId}/avatar`,
+      `https://api.mamamianpizza.com/api/usuarios/${userId}/imagen`,
+      `https://api.mamamianpizza.com/api/usuarios/${userId}`
+    ];
+    
+    for (const endpoint of endpoints) {
+      try {
+        console.log(`🔍 Probando endpoint: ${endpoint}`);
+        const response = await fetch(endpoint);
+        console.log(`📡 Respuesta del endpoint ${endpoint}:`, response.status, response.statusText);
+        
+        if (response.ok) {
+          const contentType = response.headers.get('content-type');
+          console.log(`📄 Content-Type: ${contentType}`);
+          
+          if (contentType && contentType.startsWith('image/')) {
+            const blob = await response.blob();
+            const imageUrl = URL.createObjectURL(blob);
+            console.log(`✅ Foto cargada exitosamente para usuario ${userId}:`, imageUrl);
+            return imageUrl;
+          } else if (contentType && contentType.includes('json')) {
+            // Tal vez el endpoint retorna JSON con la URL de la imagen
+            const data = await response.json();
+            console.log(`📄 Datos JSON recibidos:`, data);
+            
+            // Buscar posibles campos de imagen
+            const imageFields = ['foto', 'imagen', 'avatar', 'profile_image', 'photo', 'picture'];
+            for (const field of imageFields) {
+              if (data[field]) {
+                console.log(`🖼️ Encontrada URL de imagen en campo '${field}':`, data[field]);
+                return data[field];
+              }
+            }
+          } else {
+            console.log(`❌ Content-Type no es imagen ni JSON: ${contentType}`);
+          }
+        }
+      } catch (error) {
+        console.log(`❌ Error al intentar cargar foto desde ${endpoint}:`, error);
+      }
+    }
+    
+    // Si ningún endpoint funciona, retornar foto por defecto
+    console.log(`⚠️ No se pudo cargar foto para usuario ${userId}, usando foto por defecto`);
+    return require('../../assets/perfilfoto.png');
+  };
+
+  // Función para cargar reseñas desde la API
   const cargarReseñas = useCallback(async () => {
     // Determinar el ID del producto de manera robusta
     const productId = pizza?.id || pizza?.id_producto || pizza?.product_id || pizza?.ID;
@@ -52,20 +111,33 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
         // Filtrar solo las reseñas del producto actual y que estén aprobadas
         const reseñasDelProducto = data.resenas ? data.resenas.filter(resena => 
           resena.producto.id === productId && resena.aprobada === 1
-        ) : [];
+        ) : [];        // Transformar las reseñas para que coincidan con el formato esperado
+        console.log(`🔄 Procesando ${reseñasDelProducto.length} reseñas para cargar fotos...`);
         
-        // Transformar las reseñas para que coincidan con el formato esperado
-        const reseñasFormateadas = reseñasDelProducto.map(resena => ({
-          id: resena.id_resena,
-          rating: resena.valoracion,
-          comentario: resena.comentario,
-          nombre: resena.usuario.nombre,
-          fecha: new Date(resena.fecha_creacion).toLocaleDateString('es-ES'),
-          foto: require('../../assets/perfilfoto.png'), // Usar foto por defecto
-          estado: resena.estado,
-          aprobada: resena.aprobada === 1
-        }));
-          setReseñas(reseñasFormateadas);
+        const reseñasFormateadas = await Promise.all(reseñasDelProducto.map(async (resena, index) => {
+          console.log(`👤 Procesando reseña ${index + 1} - Usuario: ${resena.usuario.nombre} (ID: ${resena.usuario.id})`);
+          
+          // Cargar foto de perfil del usuario
+          const fotoUsuario = await cargarFotoUsuario(resena.usuario.id);
+          
+          const reseñaFormateada = {
+            id: resena.id_resena,
+            rating: resena.valoracion,
+            comentario: resena.comentario,
+            nombre: resena.usuario.nombre,
+            userId: resena.usuario.id,
+            fecha: new Date(resena.fecha_creacion).toLocaleDateString('es-ES'),
+            foto: fotoUsuario,
+            estado: resena.estado,
+            aprobada: resena.aprobada === 1
+          };
+          
+          console.log(`📝 Reseña formateada:`, reseñaFormateada);
+          return reseñaFormateada;        }));
+        
+        setReseñas(reseñasFormateadas);
+        console.log(`📊 Total de reseñas establecidas: ${reseñasFormateadas.length}`);
+        console.log(`🖼️ Fotos de reseñas:`, reseñasFormateadas.map(r => ({ nombre: r.nombre, foto: r.foto })));
         
         // Guardar estadísticas generales
         setEstadisticasReseñas(data.estadisticas);
@@ -79,11 +151,9 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
       }
     } catch (error) {
       console.error('Error al cargar reseñas:', error);
-      setReseñas([]);
-    } finally {
+      setReseñas([]);    } finally {
       setCargandoReseñas(false);
-    }
-  }, [pizza]);
+    }  }, [pizza]);
   
   // Función para calcular el precio basado en el multiplicador del tamaño
   const calcularPrecio = (tamanoData) => {
@@ -244,8 +314,19 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
       console.log('🆔 pizza.id_producto:', pizza.id_producto);
       console.log('🆔 pizza.product_id:', pizza.product_id);
       console.log('🆔 pizza.ID:', pizza.ID);
-    }
-  }, [pizza]);
+    }  }, [pizza]);
+
+  // Efecto de limpieza para las URLs de blob de las fotos
+  useEffect(() => {
+    return () => {
+      // Limpiar URLs de blob cuando el componente se desmonte
+      reseñas.forEach(resena => {
+        if (resena.foto && resena.foto.startsWith('blob:')) {
+          URL.revokeObjectURL(resena.foto);
+        }
+      });
+    };
+  }, [reseñas]);
 
   if (!pizza) return null;
 
@@ -461,8 +542,7 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
       setNuevaResena(prev => ({ ...prev, rating: rating }));
     } else {
       console.warn('⚠️ Rating inválido seleccionado:', rating);
-    }
-  };
+    }  };
 
   return (
     <div className="modal__overlay" onClick={onClose}>
@@ -828,6 +908,7 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
               ) : null}              {/* Mostrar reseñas ya publicadas */}
               {!cargandoReseñas && reseñas.length > 0 && (
                 <div className="reseñas__lista">
+                  {console.log(`🎨 Renderizando ${reseñas.length} reseñas:`, reseñas.map(r => ({ nombre: r.nombre, foto: r.foto })))}
                   <div className="reseñas__clientes-titulo" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>Reseñas de clientes</span>
                     {user && user.id && !mostrarFormularioResena && (
@@ -841,43 +922,44 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
                       </button>
                     )}
                   </div>                  {reseñas.map((resena, i) => (
-                    <div key={resena.id || i} className="reseñas__review">
-                      <img
+                    <div key={resena.id || i} className="reseñas__review">                      <img
                         src={resena.foto || require('../../assets/perfilfoto.png')}
                         alt={resena.nombre || "Usuario"}
                         className="reseñas__review-foto"
                         style={{
-                          width: 55, height: 55, borderRadius: "50%", objectFit: "cover", marginRight: 24, float: "left"
+                          width: 55, 
+                          height: 55, 
+                          borderRadius: "50%", 
+                          objectFit: "cover", 
+                          marginRight: 24, 
+                          float: "left",
+                          border: "2px solid #e2e8f0",
+                          transition: "all 0.3s ease"
+                        }}                        onError={(e) => {
+                          // Si la imagen falla al cargar, usar la foto por defecto
+                          console.log(`❌ Error cargando imagen para ${resena.nombre}:`, e.target.src);
+                          e.target.src = require('../../assets/perfilfoto.png');
+                        }}
+                        onLoad={(e) => {
+                          // Agregar un efecto sutil cuando la imagen se carga
+                          console.log(`✅ Imagen cargada correctamente para ${resena.nombre}:`, e.target.src);
+                          e.target.style.opacity = '1';
+                        }}
+                        onLoadStart={(e) => {
+                          // Mostrar loading mientras se carga
+                          console.log(`🔄 Iniciando carga de imagen para ${resena.nombre}:`, e.target.src);
+                          e.target.style.opacity = '0.7';
                         }}
                       />
-                      <div style={{ marginLeft: 80 }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                            {[1,2,3,4,5].map(star => (
-                              <FontAwesomeIcon
-                                key={star}
-                                icon={faStar}
-                                className="reseñas__review-star"
-                                style={{ color: resena.rating >= star ? "#eab308" : "#d1d5db", fontSize: 24 }}
-                              />
-                            ))}
-                          </div>
-                          {resena.aprobada && (
-                            <div className="reseña__estado-aprobada">
-                              <span style={{
-                                backgroundColor: "#10b981",
-                                color: "white",
-                                padding: "4px 8px",
-                                borderRadius: "12px",
-                                fontSize: "12px",
-                                fontWeight: "600",
-                                textTransform: "uppercase",
-                                letterSpacing: "0.5px"
-                              }}>
-                                ✓ Aprobada
-                              </span>
-                            </div>
-                          )}
+                      <div style={{ marginLeft: 80 }}>                        <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 8 }}>
+                          {[1,2,3,4,5].map(star => (
+                            <FontAwesomeIcon
+                              key={star}
+                              icon={faStar}
+                              className="reseñas__review-star"
+                              style={{ color: resena.rating >= star ? "#eab308" : "#d1d5db", fontSize: 24 }}
+                            />
+                          ))}
                         </div>
                         <div className="reseñas__review-comment" style={{ fontSize: 17, marginBottom: 5, lineHeight: 1.4 }}>
                           {resena.comentario}
