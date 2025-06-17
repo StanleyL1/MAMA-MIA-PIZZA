@@ -1417,6 +1417,720 @@
   margin-top: 8px;
 }
 
-.pago-icon {
-  font-size: 20px;
+/* =====================================================================
+   MEDIA QUERIES RESPONSIVAS
+   ===================================================================== */
+
+/* === TABLETS GRANDES (max-width: 1200px) === */
+@media screen and (max-width: 1200px) {
+  .contenedor-pideahora {
+    padding: 30px 20px;
+  }
+  
+  .layout {
+    gap: 30px;
+  }
+  
+  .col-izquierda {
+    flex: 1 1 65%;
+  }
+  
+  .col-derecha {
+    flex: 0 0 30%;
+  }
+  
+  .barra-progreso {
+    margin-bottom: 30px;
+  }
+  
+  .paso .circulo {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+  
+  .texto-paso {
+    font-size: 0.95rem;
+  }
+}
+
+/* === TABLETS MEDIANOS (max-width: 1024px) === */
+@media screen and (max-width: 1024px) {
+  .contenedor-pideahora {
+    padding: 25px 15px;
+  }
+  
+  .layout {
+    gap: 25px;
+  }
+  
+  .titulo-compra {
+    font-size: 1.3rem;
+    margin: 25px 25px 15px 25px;
+  }
+  
+  .descripcion-compra {
+    margin: 0 25px 25px 25px;
+  }
+  
+  .toggle-compra, 
+  .toggle-direccion, 
+  .toggle-pago {
+    margin: 0 25px 30px 25px;
+    gap: 15px;
+  }
+  
+  .toggle-btn, 
+  .toggle-dir-btn {
+    padding: 15px 12px;
+  }
+  
+  .formulario-invitado,
+  .formulario-cuenta,
+  .contenido-direccion {
+    padding: 0 25px;
+  }
+  
+  .botones {
+    padding: 0 25px;
+    margin-top: 30px;
+  }
+}
+
+/* === TABLETS PEQUEÑOS (max-width: 768px) === */
+@media screen and (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .col-izquierda,
+  .col-derecha {
+    flex: 1;
+  }
+  
+  .col-derecha {
+    order: -1; /* Mueve el resumen arriba en móviles */
+  }
+  
+  .barra-progreso {
+    margin-bottom: 25px;
+    padding: 10px 0;
+  }
+  
+  .paso {
+    width: 25%;
+  }
+  
+  .paso .circulo {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  
+  .texto-paso {
+    font-size: 0.85rem;
+    text-align: center;
+    line-height: 1.2;
+  }
+  
+  .card-cuenta, 
+  .card-direccion, 
+  .card-pago, 
+  .card-confirmar {
+    margin-top: 20px;
+    border-radius: 12px;
+  }
+  
+  .titulo-compra {
+    font-size: 1.2rem;
+    margin: 20px 20px 15px 20px;
+  }
+  
+  .descripcion-compra,
+  .descripcion-pago {
+    margin: 0 20px 20px 20px;
+    font-size: 1rem;
+  }
+  
+  .toggle-compra, 
+  .toggle-direccion, 
+  .toggle-pago {
+    margin: 0 20px 25px 20px;
+    gap: 12px;
+  }
+  
+  .campos-dobles {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .campos-tres {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .formulario-invitado,
+  .formulario-cuenta,
+  .contenido-direccion {
+    padding: 0 20px;
+  }
+  
+  .botones {
+    padding: 0 20px;
+    margin-top: 25px;
+  }
+  
+  .btn-volver-cuenta,
+  .btn-volver-Direccion,
+  .btn-volver-pedido,
+  .btn-continuar-cuenta,
+  .btn-continuar-Direccion,
+  .btn-continuar-pago,
+  .btn-continuar-pedido {
+    padding: 14px 24px;
+    font-size: 1rem;
+  }
+  
+  /* Toggle de método de entrega */
+  .toggle-metodo-entrega {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .toggle-metodo-btn {
+    width: 100%;
+  }
+  
+  /* Información del local */
+  .contenido-recoger-local {
+    margin: 15px 15px;
+  }
+  
+  /* Secciones de confirmación */
+  .seccion-linea {
+    margin: 0 20px 20px 20px;
+  }
+  
+  .botones-confirmar {
+    padding: 0 20px;
+  }
+}
+
+/* === MÓVILES GRANDES (max-width: 640px) === */
+@media screen and (max-width: 640px) {
+  .contenedor-pideahora {
+    padding: 20px 10px;
+  }
+  
+  .barra-progreso {
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  
+  .paso {
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+  
+  .paso .circulo {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+  }
+  
+  .texto-paso {
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+  
+  .titulo-compra {
+    font-size: 1.1rem;
+    margin: 15px 15px 12px 15px;
+  }
+  
+  .icono-pizza {
+    width: 25px;
+    height: 25px;
+    margin-left: 8px;
+  }
+  
+  .toggle-compra, 
+  .toggle-direccion, 
+  .toggle-pago {
+    flex-direction: column;
+    margin: 0 15px 20px 15px;
+    gap: 12px;
+  }
+  
+  .toggle-btn, 
+  .toggle-dir-btn {
+    width: 100%;
+    padding: 15px 10px;
+  }
+  
+  .toggle-titulo {
+    font-size: 1rem;
+  }
+  
+  .toggle-desc {
+    font-size: 0.85rem;
+  }
+  
+  .icono-usuario,
+  .icono-metodo {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  
+  .formulario-invitado,
+  .formulario-cuenta,
+  .contenido-direccion {
+    padding: 0 15px;
+  }
+  
+  .campo label {
+    font-size: 0.9rem;
+  }
+  
+  .input-small,
+  .input-full,
+  .input-telefono,
+  .input-pais,
+  .select-departamento,
+  .input-municipio {
+    padding: 12px 15px;
+    font-size: 0.95rem;
+  }
+  
+  .telefono-prefix {
+    padding: 12px 10px;
+    font-size: 0.95rem;
+  }
+  
+  .botones,
+  .botones-confirmar {
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 15px;
+    margin-top: 20px;
+  }
+  
+  .btn-volver-cuenta,
+  .btn-volver-Direccion,
+  .btn-volver-pedido {
+    order: 2;
+  }
+  
+  .btn-continuar-cuenta,
+  .btn-continuar-Direccion,
+  .btn-continuar-pago,
+  .btn-continuar-pedido {
+    order: 1;
+    width: 100%;
+  }
+  
+  /* Ubicación en tiempo real */
+  .contenido-tiempo-real {
+    padding: 0 15px;
+  }
+  
+  .map-container {
+    margin: 15px 0;
+  }
+  
+  .btn-ubicacion,
+  .btn-actualizar {
+    width: 100%;
+    font-size: 0.95rem;
+  }
+  
+  /* Card de resumen */
+  .card-resumen {
+    margin-top: 15px;
+  }
+  
+  .resumen-titulo {
+    font-size: 1.1rem;
+  }
+  
+  .resumen-item {
+    padding: 12px;
+  }
+  
+  .resumen-img {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* === MÓVILES PEQUEÑOS (max-width: 480px) === */
+@media screen and (max-width: 480px) {
+  .contenedor-pideahora {
+    padding: 15px 5px;
+  }
+  
+  .barra-progreso {
+    justify-content: space-around;
+    margin-bottom: 15px;
+  }
+  
+  .paso {
+    min-width: 70px;
+  }
+  
+  .paso .circulo {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+  }
+  
+  .texto-paso {
+    font-size: 0.75rem;
+  }
+  
+  .card-cuenta, 
+  .card-direccion, 
+  .card-pago, 
+  .card-confirmar {
+    border-radius: 8px;
+    margin-top: 15px;
+  }
+  
+  .titulo-compra {
+    font-size: 1rem;
+    margin: 12px 12px 10px 12px;
+  }
+  
+  .descripcion-compra,
+  .descripcion-pago {
+    margin: 0 12px 15px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .toggle-compra, 
+  .toggle-direccion, 
+  .toggle-pago {
+    margin: 0 12px 15px 12px;
+    gap: 10px;
+  }
+  
+  .toggle-btn, 
+  .toggle-dir-btn {
+    padding: 12px 8px;
+    border-radius: 8px;
+  }
+  
+  .icono-usuario,
+  .icono-metodo {
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+  }
+  
+  .toggle-titulo {
+    font-size: 0.9rem;
+  }
+  
+  .toggle-desc {
+    font-size: 0.8rem;
+  }
+  
+  .formulario-invitado,
+  .formulario-cuenta,
+  .contenido-direccion {
+    padding: 0 12px;
+  }
+  
+  .campo {
+    margin-bottom: 15px;
+  }
+  
+  .campo label {
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+  }
+  
+  .input-small,
+  .input-full,
+  .input-telefono,
+  .input-pais,
+  .select-departamento,
+  .input-municipio {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+  }
+  
+  .telefono-prefix {
+    padding: 10px 8px;
+    font-size: 0.9rem;
+  }
+  
+  .botones,
+  .botones-confirmar {
+    padding: 0 12px;
+    margin-top: 15px;
+    gap: 10px;
+  }
+  
+  .btn-volver-cuenta,
+  .btn-volver-Direccion,
+  .btn-volver-pedido,
+  .btn-continuar-cuenta,
+  .btn-continuar-Direccion,
+  .btn-continuar-pago,
+  .btn-continuar-pedido {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
+  
+  /* Toggle método de entrega en móviles pequeños */
+  .toggle-metodo-entrega {
+    margin: 0 12px 15px 12px;
+  }
+  
+  .toggle-metodo-btn {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+  
+  .icono-metodo {
+    font-size: 1.2rem;
+  }
+  
+  /* Subtítulos */
+  .subtitulo-direccion {
+    margin: 15px 12px;
+    font-size: 16px;
+  }
+  
+  /* Información del local */
+  .contenido-recoger-local {
+    margin: 12px 12px;
+    padding: 12px;
+  }
+  
+  .info-local h4 {
+    font-size: 14px;
+  }
+  
+  .info-local p {
+    font-size: 13px;
+  }
+  
+  /* Secciones de confirmación */
+  .seccion-linea {
+    margin: 0 12px 15px 12px;
+  }
+  
+  .subtitulo-seccion {
+    font-size: 1rem;
+  }
+  
+  .metodo-entrega-info {
+    padding: 12px;
+    gap: 12px;
+  }
+  
+  .metodo-icon-container {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .metodo-icon {
+    font-size: 18px;
+  }
+  
+  .metodo-tipo {
+    font-size: 0.95rem;
+  }
+  
+  .metodo-tiempo {
+    font-size: 0.8rem;
+  }
+  
+  /* Card de resumen en móviles pequeños */
+  .resumen-titulo {
+    font-size: 1rem;
+    padding: 12px;
+  }
+  
+  .resumen-item {
+    padding: 10px;
+  }
+  
+  .resumen-img {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .resumen-detalle h4 {
+    font-size: 0.9rem;
+  }
+  
+  .resumen-detalle p {
+    font-size: 0.8rem;
+  }
+  
+  .cantidad {
+    font-size: 0.85rem;
+  }
+  
+  .precio {
+    font-size: 0.9rem;
+  }
+  
+  .resumen-total {
+    font-size: 1rem;
+    padding: 12px;
+  }
+}
+
+/* === MÓVILES MUY PEQUEÑOS (max-width: 360px) === */
+@media screen and (max-width: 360px) {
+  .contenedor-pideahora {
+    padding: 10px 3px;
+  }
+  
+  .paso .circulo {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+  
+  .texto-paso {
+    font-size: 0.7rem;
+  }
+  
+  .titulo-compra {
+    font-size: 0.95rem;
+    margin: 10px 10px 8px 10px;
+  }
+  
+  .icono-pizza {
+    width: 20px;
+    height: 20px;
+    margin-left: 6px;
+  }
+  
+  .toggle-compra, 
+  .toggle-direccion, 
+  .toggle-pago {
+    margin: 0 10px 12px 10px;
+  }
+  
+  .formulario-invitado,
+  .formulario-cuenta,
+  .contenido-direccion {
+    padding: 0 10px;
+  }
+  
+  .botones,
+  .botones-confirmar {
+    padding: 0 10px;
+    margin-top: 12px;
+  }
+  
+  .campo {
+    margin-bottom: 12px;
+  }
+  
+  .input-small,
+  .input-full,
+  .input-telefono {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .telefono-prefix {
+    padding: 8px 6px;
+    font-size: 0.85rem;
+  }
+  
+  .btn-volver-cuenta,
+  .btn-volver-Direccion,
+  .btn-volver-pedido,
+  .btn-continuar-cuenta,
+  .btn-continuar-Direccion,
+  .btn-continuar-pago,
+  .btn-continuar-pedido {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+/* === CORRECCIONES ADICIONALES PARA ELEMENTOS ESPECÍFICOS === */
+
+/* Modales responsivos */
+@media screen and (max-width: 768px) {
+  .modal-terminos,
+  .modal-exito {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 10px !important;
+    padding: 20px !important;
+  }
+  
+  .titulo-modal {
+    font-size: 1.2rem !important;
+  }
+  
+  .lista-terminos {
+    font-size: 0.9rem !important;
+  }
+  
+  .btn-aceptar,
+  .btn-confirm,
+  .btn-volverr-tienda {
+    width: 100% !important;
+    margin-bottom: 10px !important;
+  }
+}
+
+/* Ubicación en tiempo real - mejorar en móviles */
+@media screen and (max-width: 640px) {
+  .ubicacion-compartida {
+    padding: 0 10px;
+  }
+  
+  .direccion-info {
+    padding: 12px;
+  }
+  
+  .address-details h4 {
+    font-size: 1rem;
+  }
+  
+  .direccion-completa {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  
+  .coordinates-box {
+    font-size: 0.8rem;
+  }
+  
+  .coordinates-label {
+    font-weight: 600;
+  }
+}
+
+/* Ajustes finales para campos de formulario */
+@media screen and (max-width: 480px) {
+  .toggle-password {
+    right: 8px !important;
+  }
+  
+  .input-with-icon {
+    position: relative;
+  }
+  
+  .separador {
+    margin: 0 5px;
+  }
 }
