@@ -4,22 +4,27 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faStarHalf, faCartShopping } from '@fortawesome/free-solid-svg-icons';
 
 function ProductsCards({ data, onCardClick }) {
-  const { titulo, descripcion, imagen, precio, id_categoria } = data;
-  const [precioMediana, setPrecioMediana] = useState(precio);
+  // TODOS los hooks deben ir AL PRINCIPIO, antes de cualquier return o condicional
+  const [precioMediana, setPrecioMediana] = useState(data?.precio || '$0');
   const [cargandoPrecio, setCargandoPrecio] = useState(false);
 
-  // Función para obtener el precio de la pizza mediana
+  // useEffect también debe ir antes de cualquier return
   useEffect(() => {
+    // Solo ejecutar si tenemos datos válidos
+    if (!data || !data.titulo) return;
+    
+    const { titulo, precio, id_categoria } = data;
+    
     const fetchPrecioMediana = async () => {
       // Solo buscar precio de mediana para pizzas (id_categoria === 1)
       if (id_categoria === 1 || (titulo && titulo.toLowerCase().includes('pizza'))) {
         setCargandoPrecio(true);
         try {
           const response = await fetch('https://api.mamamianpizza.com/api/tamanos/tamanosandprices');
-          const data = await response.json();
+          const responseData = await response.json();
           
           // Buscar el precio de la pizza mediana
-          const mediana = data.find(item => 
+          const mediana = responseData.find(item => 
             item.nombre && item.nombre.toLowerCase().includes('mediana')
           );
           
@@ -44,9 +49,24 @@ function ProductsCards({ data, onCardClick }) {
     };
 
     fetchPrecioMediana();
-  }, [titulo, precio, id_categoria]);
-  return (
-    <div className="prodcard-container" onClick={() => onCardClick(data)}>
+  }, [data]);
+
+  // DESPUÉS de todos los hooks, ahora sí podemos hacer verificaciones y returns
+  if (!data) {
+    console.warn('ProductsCards: data prop is undefined');
+    return (
+      <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+        Error: No se pudo cargar el producto
+      </div>
+    );
+  }
+
+  const { titulo, descripcion, imagen, precio, id_categoria } = data;return (
+    <div className="prodcard-container" onClick={() => {
+      if (data && onCardClick) {
+        onCardClick(data);
+      }
+    }}>
       <div className="prodcard-image-container">
         <img src={imagen} alt={titulo} className="prodcard-image" />
       </div>
@@ -72,12 +92,13 @@ function ProductsCards({ data, onCardClick }) {
           <p className="card__product__price">
             {cargandoPrecio ? 'Cargando...' : precioMediana}
           </p>
-        </div>
-        <button 
+        </div>        <button 
           className="show__modal" 
           onClick={(e) => {
             e.stopPropagation();
-            onCardClick && onCardClick();
+            if (data && onCardClick) {
+              onCardClick(data);
+            }
           }}        >
           <FontAwesomeIcon icon={faCartShopping} />
         </button>
