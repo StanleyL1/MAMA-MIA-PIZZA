@@ -2,10 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faMedal, faTruck, faCarrot } from '@fortawesome/free-solid-svg-icons';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
 
 import ProductsCards from '../productsCards/productsCards';
 import PizzaModal from '../PizzaModal/PizzaModal';
@@ -13,13 +9,9 @@ import Footer from '../footer/footer';
 import TestimonialCard from '../ComentsCards/ComentCards';
 import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png';
-
-import carrusel1 from '../../assets/carrusel1.jpeg';
-import carrusel2 from '../../assets/carrusel2.jpeg';
+import bannerVideo from '../../assets/banner.mp4';
 
 import './Home.css';
-
-const carouselImages = [carrusel1, carrusel2];
 
 const Home = ({ onAddToCart, user }) => {
   const [popular, setPopular] = useState([]);
@@ -109,37 +101,33 @@ const Home = ({ onAddToCart, user }) => {
 
   return (
     <div className="main__content">
-      
-   {/* Carrusel HERO */}
-<section className="hero__carousel__container">
-  <Swiper
-    modules={[Autoplay]}
-    autoplay={{ delay: 9000 }}
-    loop
-    className="hero__carousel"
-  >
-    {carouselImages.map((img, idx) => (
-      <SwiperSlide key={idx}>
-        <div
-          className="hero__slide"
-          style={{
-            backgroundImage: `url(${img})`
-          }}
-        >
-          <div className="hero__overlay"></div> 
-            <div className="hero__text__container">
-            <h1 className="hero__title">Las mejores <span>pizzas</span></h1>            <p className="hero__text">
-              Ingredientes frescos, masa artesanal y sabores únicos que<br/>
-              te harán volver por más.
-            </p>
-            <button className="hero__button">
-              <Link to="/menu" className="link">Ver Menú</Link>
-            </button>
-          </div>
-        </div>
-      </SwiperSlide>
-    ))}
-  </Swiper>
+     {/* Video Banner HERO */}
+<section className="hero__video__container">
+  <div className="hero__video__wrapper">
+    <video
+      className="hero__video"
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="auto"
+      controls={false}
+    >
+      <source src={bannerVideo} type="video/mp4" />
+      Tu navegador no soporta el elemento de video.
+    </video>
+    <div className="hero__overlay"></div>
+    <div className="hero__text__container">
+      <h1 className="hero__title">Las mejores <span>pizzas</span></h1>            
+      <p className="hero__text">
+        Ingredientes frescos, masa artesanal y sabores únicos que<br/>
+        te harán volver por más.
+      </p>
+      <button className="hero__button">
+        <Link to="/menu" className="link">Ver Menú</Link>
+      </button>
+    </div>
+  </div>
 </section>
 
 

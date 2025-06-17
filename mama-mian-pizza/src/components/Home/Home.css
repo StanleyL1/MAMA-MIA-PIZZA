@@ -766,21 +766,37 @@ body{
   }
 }
 
-.hero__carousel__container {
+.hero__video__container {
   position: relative;
+  width: 100%;
+  height: 60vh;
+  overflow: hidden;
 }
 
-.hero__slide {
+.hero__video__wrapper {
   position: relative;
-  height: 60vh;
-  background-size: cover;
-  background-position: center;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   padding: 60px;
   color: white;
-  overflow: hidden; 
+}
+
+.hero__video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  /* Mejoras para rendimiento y calidad del video */
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .hero__overlay {
@@ -1230,5 +1246,51 @@ body{
   .no__testimonios {
     font-size: 1rem;
     padding: 30px 16px;
+  }
+}
+
+/* Responsive para video banner */
+@media (max-width: 768px) {
+  .hero__video__container {
+    height: 50vh;
+  }
+  
+  .hero__video__wrapper {
+    padding: 40px 20px;
+  }
+  
+  .hero__title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .hero__text {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero__video__container {
+    height: 45vh;
+  }
+  
+  .hero__video__wrapper {
+    padding: 30px 15px;
+  }
+  
+  .hero__title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+  }
+  
+  .hero__text {
+    font-size: 1rem;
+    margin-bottom: 25px;
+    text-align: left;
+  }
+  
+  .hero__text br {
+    display: none;
   }
 }
