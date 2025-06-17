@@ -26,46 +26,78 @@
 /* Tarjeta individual */
 .testimonial-card {
   background-color: #fff;
-  border-radius: 8px;
-  width: 90%;
+  border-radius: 16px;
+  width: 100%;
   max-width: 400px;
   height: auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 20px;
   text-align: left;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #f1f5f9;
+  position: relative;
+  overflow: hidden;
+}
+
+.testimonial-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #FEB248, #EAB308);
+}
+
+.testimonial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12), 0 8px 20px rgba(0, 0, 0, 0.08);
+  border-color: #e2e8f0;
 }
 
 /* Encabezado: avatar + nombre + tiempo */
 .testimonial-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .testimonial-avatar {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #f1f5f9;
+  transition: border-color 0.3s ease;
+}
+
+.testimonial-card:hover .testimonial-avatar {
+  border-color: #FEB248;
 }
 
 .testimonial-user-info {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .testimonial-name {
   margin: 0;
   font-size: 1.1rem;
-  color: #991B1B; /* Rojo intenso */
+  font-weight: 600;
+  color: #991B1B;
+  line-height: 1.3;
 }
 
 .testimonial-time {
-  font-size: 0.8rem;
-  color: #999;
+  font-size: 0.85rem;
+  color: #64748b;
   margin: 0;
-  margin-top: 0.25rem;
+  margin-top: 2px;
+  font-weight: 400;
 }
 
 /* Sección de estrellas */
