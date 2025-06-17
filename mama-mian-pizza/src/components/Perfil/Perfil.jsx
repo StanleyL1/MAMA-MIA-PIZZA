@@ -13,7 +13,7 @@ import './Perfil.css';
 
 const API_BASE_URL = 'https://api.mamamianpizza.com/api';
 
-export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
+export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, updateUser }) {
   const navigate = useNavigate();
   
   // Tabs: pedidos | reseñas | editar | seguridad
@@ -197,12 +197,19 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
       reader.onload = (e) => {
         const previewUrl = e.target.result;
         setImagePreview(previewUrl);
-        
-        // Actualizar también la foto en userPerfil inmediatamente para mostrar en tiempo real
+          // Actualizar también la foto en userPerfil inmediatamente para mostrar en tiempo real
         setUserPerfil(prev => ({
           ...prev,
           foto: previewUrl
         }));
+        
+        // Actualizar el usuario en App.jsx inmediatamente para sincronizar con navbar
+        if (updateUser) {
+          updateUser({
+            foto_perfil: previewUrl,
+            foto: previewUrl
+          });
+        }
         
         // Disparar evento para actualizar navbar inmediatamente con la vista previa
         const profileUpdateEvent = new CustomEvent('profilePhotoUpdated', {
@@ -246,15 +253,21 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
         console.error('❌ Error del servidor al subir foto:', errorData);
         throw new Error(`Error al subir foto: ${response.status} - ${errorData.message || 'Error desconocido'}`);
       }      const result = await response.json();
-      console.log('✅ Foto de perfil actualizada:', result);
-
-      // Actualizar la foto en el estado local con la URL real de la API
+      console.log('✅ Foto de perfil actualizada:', result);      // Actualizar la foto en el estado local con la URL real de la API
       const newPhotoUrl = result.foto_perfil || result.foto;
       if (newPhotoUrl) {
         setUserPerfil(prev => ({
           ...prev,
           foto: newPhotoUrl
         }));
+
+        // Actualizar el usuario en App.jsx para sincronizar con navbar
+        if (updateUser) {
+          updateUser({
+            foto_perfil: newPhotoUrl,
+            foto: newPhotoUrl
+          });
+        }
 
         // Disparar evento para actualizar navbar con la URL real
         const profileUpdateEvent = new CustomEvent('profilePhotoUpdated', {
@@ -740,13 +753,21 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
               onSubmit={async (e) => {
                 e.preventDefault();
                 const success = await updateUserProfile(formData);
-                  if (success) {
-                  setUserPerfil(prev => ({
+                  if (success) {                  setUserPerfil(prev => ({
                     ...prev,
                     nombre: formData.nombre,
                     email: formData.email,
                     telefono: formData.telefono,
                   }));
+                  
+                  // Actualizar el usuario en App.jsx para sincronizar con navbar
+                  if (updateUser) {
+                    updateUser({
+                      nombre: formData.nombre,
+                      correo: formData.email,
+                      telefono: formData.telefono
+                    });
+                  }
                   
                   // Disparar evento para actualizar navbar con los nuevos datos
                   const profileDataUpdateEvent = new CustomEvent('profileDataUpdated', {
@@ -757,7 +778,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
                       userId: user.id
                     }
                   });
-                  window.dispatchEvent(profileDataUpdateEvent);                  setEditSuccess(true);
+                  window.dispatchEvent(profileDataUpdateEvent);setEditSuccess(true);
                   setTimeout(() => setEditSuccess(false), 3000);
                 } else {
                   showProfileMessage('Error al actualizar el perfil. Intenta de nuevo.', 'error');
@@ -883,12 +904,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
           </div>
         )}
 
-      </div>
-
-      {/* MODAL CAMBIAR CONTRASEÑA */}
+      </div>      {/* MODAL CAMBIAR CONTRASEÑA */}
       {showCambiarContra && (
         <CambiarContraseñaModal
-          telefono={userPerfil.telefono}
           email={userPerfil.email}
           onClose={() => setShowCambiarContra(false)}
         />
@@ -899,7 +917,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate }) {
 
 
 // --- MODAL CAMBIAR CONTRASEÑA ---
-function CambiarContraseñaModal({ telefono, email, onClose, onSuccess }) {
+function CambiarContraseñaModal({ email, onClose, onSuccess }) {
   const [step, setStep] = useState("select");
   const [codigo, setCodigo] = useState("");
   const [newPass, setNewPass] = useState("");
@@ -907,8 +925,6 @@ function CambiarContraseñaModal({ telefono, email, onClose, onSuccess }) {
   const [confirmPass, setConfirmPass] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
   const [changing, setChanging] = useState(false);
-
-  const maskPhone = (phone) => phone ? phone.slice(0, 9) + "**" + phone.slice(-2) : "";
   const maskEmail = (mail) => {
     if (!mail) return "";
     const [user, domain] = mail.split('@');
@@ -942,31 +958,18 @@ function CambiarContraseñaModal({ telefono, email, onClose, onSuccess }) {
           <div className="cambiar__verif-title">
             <FontAwesomeIcon icon={faShieldAlt} style={{ marginRight: 7, color: "#c42f2f" }} />
             Verificación de Identidad
-          </div>
-
-          {/* Paso 1 */}
+          </div>          {/* Paso 1 */}
           {step === "select" && (
             <>
-              <div className="cambiar__verif-sub">Selecciona cómo quieres recibir el código de verificación</div>
-              {/* SMS */}
-              <div className="cambiar__verif-card cambiar__verif-card--selected">
-                <FontAwesomeIcon icon={faPhone} style={{ fontSize: 24, color: "#fe7d0c", marginRight: 16 }} />
-                <div style={{ flex: 1 }}>
-                  <div className="cambiar__verif-label">SMS al teléfono</div>
-                  <div className="cambiar__verif-value">{maskPhone(telefono)}</div>
-                </div>
-                <button className="cambiar__verif-btn cambiar__verif-btn--orange" onClick={() => setStep("codigo")}>
-                  Enviar SMS
-                </button>
-              </div>
+              <div className="cambiar__verif-sub">Se enviará un código de verificación a tu email</div>
               {/* Email */}
-              <div className="cambiar__verif-card">
+              <div className="cambiar__verif-card cambiar__verif-card--selected">
                 <FontAwesomeIcon icon={faEnvelope} style={{ fontSize: 24, color: "#b7262b", marginRight: 16 }} />
                 <div style={{ flex: 1 }}>
                   <div className="cambiar__verif-label">Email</div>
                   <div className="cambiar__verif-value">{maskEmail(email)}</div>
                 </div>
-                <button className="cambiar__verif-btn" onClick={() => setStep("codigo")}>
+                <button className="cambiar__verif-btn cambiar__verif-btn--orange" onClick={() => setStep("codigo")}>
                   Enviar Email
                 </button>
               </div>

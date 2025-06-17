@@ -21,6 +21,42 @@ const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
+// Estado local para la foto de perfil para actualizaciones en tiempo real
+const [currentProfilePhoto, setCurrentProfilePhoto] = useState(
+  user?.foto_perfil || user?.foto || require('../../assets/perfilfoto.png')
+);
+
+// Actualizar foto cuando cambie el usuario
+useEffect(() => {
+  setCurrentProfilePhoto(
+    user?.foto_perfil || user?.foto || require('../../assets/perfilfoto.png')
+  );
+}, [user]);
+
+// Escuchar eventos de actualización de foto de perfil
+useEffect(() => {
+  const handleProfilePhotoUpdate = (event) => {
+    console.log('📸 NAVBAR - Evento de actualización de foto recibido:', event.detail);
+    if (event.detail && event.detail.newPhoto) {
+      setCurrentProfilePhoto(event.detail.newPhoto);
+    }
+  };
+
+  const handleProfileDataUpdate = (event) => {
+    console.log('📝 NAVBAR - Evento de actualización de datos recibido:', event.detail);
+    // La actualización de datos se maneja a través del prop user
+    // Este evento se puede usar para hacer refresh si es necesario
+  };
+
+  window.addEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
+  window.addEventListener('profileDataUpdated', handleProfileDataUpdate);
+
+  return () => {
+    window.removeEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
+    window.removeEventListener('profileDataUpdated', handleProfileDataUpdate);
+  };
+}, []);
+
 
 const toggleMobileMenu = () => {
   setIsMobileMenuOpen(prev => !prev);
@@ -115,7 +151,7 @@ useEffect(() => {
               >        
                 <img 
                   alt='Foto de perfil'
-                  src={user.foto_perfil || user.foto || require('../../assets/perfilfoto.png')}
+                  src={currentProfilePhoto}
                   className="navbar__profile-photo"
                   style={{
                     width: '32px',
@@ -124,10 +160,10 @@ useEffect(() => {
                     marginRight: '8px',
                     objectFit: 'cover',
                     border: '2px solid rgba(255,255,255,0.3)'
-                  }}
-                  onError={(e) => {
+                  }}                  onError={(e) => {
                     console.log('❌ Error cargando imagen de perfil, usando por defecto');
                     e.target.src = require('../../assets/perfilfoto.png');
+                    setCurrentProfilePhoto(require('../../assets/perfilfoto.png'));
                   }}
                 />                <span className="navbar__profile-name" style={{ fontWeight: '500' }}>
                   {user.nombre || user.name || 'Usuario'}

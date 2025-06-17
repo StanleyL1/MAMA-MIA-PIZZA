@@ -21,6 +21,7 @@ function App() {
   const [cartItems, setCartItems] = useState([]);
   // Estado para notificaciones tipo toast
   const [toast, setToast] = useState({ show: false, message: '' });
+  const [user, setUser] = useState(null); // Estado del usuario
 
   const handleCartToggle = () => {
     setIsCartOpen(!isCartOpen);
@@ -60,49 +61,97 @@ function App() {
     setToast({ show: true, message: `✓ Agregado al carrito` });
     setTimeout(() => setToast({ show: false, message: '' }), 2000);
   };
-const [user, setUser] = useState(null); // Estado del usuario
 
-// Cargar usuario desde localStorage al iniciar la app
-useEffect(() => {
-  const savedUser = localStorage.getItem('mamamia_user');
-  if (savedUser) {
-    try {
-      const parsedUser = JSON.parse(savedUser);
-      console.log('👤 APP - Usuario cargado desde localStorage:', parsedUser);
-      setUser(parsedUser);
-    } catch (error) {
-      console.error('❌ Error al cargar usuario desde localStorage:', error);
-      localStorage.removeItem('mamamia_user');
+  // Cargar usuario desde localStorage al iniciar la app
+  useEffect(() => {
+    const savedUser = localStorage.getItem('mamamia_user');
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        console.log('👤 APP - Usuario cargado desde localStorage:', parsedUser);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('❌ Error al cargar usuario desde localStorage:', error);
+        localStorage.removeItem('mamamia_user');
+      }
     }
-  }
-}, []);
+  }, []);
 
-const handleLogin = (userData) => {
-  console.log('🔑 APP - Datos recibidos en handleLogin:', userData);
-  setUser(userData);
-  // Guardar en localStorage para persistencia
-  localStorage.setItem('mamamia_user', JSON.stringify(userData));
-  console.log('✅ APP - Usuario guardado en estado y localStorage');
-};
+  // Escuchar eventos de actualización de perfil
+  useEffect(() => {
+    const handleProfileUpdate = (event) => {
+      console.log('📝 APP - Actualizando datos de usuario:', event.detail);
+      if (event.detail && user) {
+        const updatedUser = {
+          ...user,
+          nombre: event.detail.nombre || user.nombre,
+          correo: event.detail.email || user.correo,
+          telefono: event.detail.telefono || user.telefono
+        };
+        setUser(updatedUser);
+        localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+      }
+    };
 
-const handleLogout = () => {
-  console.log('🚪 APP - Cerrando sesión');
-  setUser(null);
-  localStorage.removeItem('mamamia_user');
-  console.log('✅ APP - Usuario removido del estado y localStorage');
-};
+    const handlePhotoUpdate = (event) => {
+      console.log('📸 APP - Actualizando foto de usuario:', event.detail);
+      if (event.detail && event.detail.newPhoto && user) {
+        const updatedUser = {
+          ...user,
+          foto_perfil: event.detail.newPhoto,
+          foto: event.detail.newPhoto
+        };
+        setUser(updatedUser);
+        localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+      }
+    };
 
-// Función para mostrar toast desde componentes hijos
-const showToast = (message) => {
-  setToast({ show: true, message });
-  setTimeout(() => setToast({ show: false, message: '' }), 3000);
-};
+    window.addEventListener('profileDataUpdated', handleProfileUpdate);
+    window.addEventListener('profilePhotoUpdated', handlePhotoUpdate);
 
-// Trigger para actualizaciones de pedidos
-const triggerOrderUpdate = () => {
-  // Disparar evento para que el perfil se actualice
-  window.dispatchEvent(new CustomEvent('orderCompleted'));
-};
+    return () => {
+      window.removeEventListener('profileDataUpdated', handleProfileUpdate);
+      window.removeEventListener('profilePhotoUpdated', handlePhotoUpdate);
+    };
+  }, [user]);
+
+  const handleLogin = (userData) => {
+    console.log('🔑 APP - Datos recibidos en handleLogin:', userData);
+    setUser(userData);
+    // Guardar en localStorage para persistencia
+    localStorage.setItem('mamamia_user', JSON.stringify(userData));
+    console.log('✅ APP - Usuario guardado en estado y localStorage');
+  };
+
+  // Función para actualizar datos del usuario
+  const updateUser = (updates) => {
+    console.log('🔄 APP - Actualizando usuario:', updates);
+    if (user) {
+      const updatedUser = { ...user, ...updates };
+      setUser(updatedUser);
+      localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+      console.log('✅ APP - Usuario actualizado:', updatedUser);
+    }
+  };
+
+  const handleLogout = () => {
+    console.log('🚪 APP - Cerrando sesión');
+    setUser(null);
+    localStorage.removeItem('mamamia_user');
+    console.log('✅ APP - Usuario removido del estado y localStorage');
+  };
+
+  // Función para mostrar toast desde componentes hijos
+  const showToast = (message) => {
+    setToast({ show: true, message });
+    setTimeout(() => setToast({ show: false, message: '' }), 3000);
+  };
+
+  // Trigger para actualizaciones de pedidos
+  const triggerOrderUpdate = () => {
+    // Disparar evento para que el perfil se actualice
+    window.dispatchEvent(new CustomEvent('orderCompleted'));
+  };
 
   return (
     <BrowserRouter>
@@ -122,6 +171,7 @@ const triggerOrderUpdate = () => {
             onAddToCart={handleAddToCart} 
             user={user} 
             setUser={setUser}
+            updateUser={updateUser}
             setToast={showToast}
             onOrderUpdate={triggerOrderUpdate}
           />
