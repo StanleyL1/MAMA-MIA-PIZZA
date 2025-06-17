@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-   faHeart, faUser, faEdit, faShieldAlt, faCamera,
-  faArrowLeft, faPhone, faEnvelope, faEye, faEyeSlash,
+   faHeart, faUser, faEdit, faShieldAlt,
+  faArrowLeft, faEye, faEyeSlash,
   faRefresh, faSpinner, faExclamationTriangle, faShoppingBag,
   faClock, faCreditCard, faTruck
 } from "@fortawesome/free-solid-svg-icons";
@@ -27,19 +27,21 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     totalSpent: 0,
     averageOrderValue: 0,
     favoriteProducts: 0
-  });
-  const [loadingOrders, setLoadingOrders] = useState(false);  const [errorOrders, setErrorOrders] = useState(null);  const [updateMessage, setUpdateMessage] = useState('');
+  });  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [errorOrders, setErrorOrders] = useState(null);
+  const [updateMessage, setUpdateMessage] = useState('');
   const [profileMessage, setProfileMessage] = useState(''); // Mensaje local para mostrar abajo de la foto
   const [profileMessageType, setProfileMessageType] = useState('success'); // 'success' o 'error'
-    // Estado de perfil del usuario - usar datos reales si están disponibles
+  
+  // Estado de perfil del usuario - usar datos reales si están disponibles
   const [userPerfil, setUserPerfil] = useState({
     nombre: user?.nombre || 'Usuario',
     email: user?.correo || user?.email || 'usuario@email.com',
     telefono: user?.telefono || user?.celular || '+503 0000-0000',
     foto: user?.foto_perfil || user?.foto || perfilFoto,
     miembroDesde: user?.fecha_registro ? new Date(user.fecha_registro).getFullYear() : 2023,
-    fecha_nacimiento: user?.fecha_nacimiento || 'No especificado',
-    dui: user?.dui || user?.numero_dui || 'No especificado',
+    fecha_nacimiento: user?.fecha_nacimiento || '',
+    dui: user?.dui || user?.numero_dui || '',
   });
   console.log('👤 PERFIL - Usuario recibido:', user);
   console.log('👤 PERFIL - Estado userPerfil:', userPerfil);
@@ -57,6 +59,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     telefono: userPerfil.telefono,
   });
   const [editSuccess, setEditSuccess] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   
   // Estados para manejo de foto de perfil
   const [selectedImage, setSelectedImage] = useState(null);
@@ -99,9 +102,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         fecha: order.fecha_pedido || order.created_at || order.fecha,
         productos: order.productos || order.items || order.detalles || [],
         total: parseFloat(order.total) || 0,
-        estado: order.estado || order.status || 'Pendiente',
-        metodo_pago: order.metodo_pago || order.payment_method || 'No especificado',
-        tipo_entrega: order.tipo_entrega || order.delivery_type || 'No especificado',
+        estado: order.estado || order.status || 'Pendiente',        metodo_pago: order.metodo_pago || order.payment_method || '',
+        tipo_entrega: order.tipo_entrega || order.delivery_type || '',
         tiempo_entrega: order.tiempo_entrega || order.delivery_time || null,
         direccion: order.direccion || order.address || null,
         telefono: order.telefono || order.phone || null,
@@ -383,23 +385,36 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     } catch (error) {
       return 'Fecha no disponible';
     }
-  };
-
-  // Función para formatear fecha de nacimiento
+  };  // Función para formatear fecha de nacimiento
   const formatBirthDate = (dateString) => {
-    if (!dateString || dateString === 'No especificado') {
-      return 'No especificado';
+    if (!dateString || dateString.trim() === '') {
+      return '';
     }
     try {
       const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return '';
+      }
       return date.toLocaleDateString('es-ES', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
       });
     } catch (error) {
-      return 'No especificado';
+      return '';
     }
+  };
+
+  // Función helper para mostrar campos vacíos
+  const displayFieldValue = (value, placeholder = '') => {
+    if (!value || value.trim() === '') {
+      return placeholder ? (
+        <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>{placeholder}</span>
+      ) : (
+        <span style={{ color: '#d1d5db' }}>—</span>
+      );
+    }
+    return value;
   };
 
   // Función para obtener el color del estado
@@ -432,10 +447,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       {/* CARD DE PERFIL */}
       <div className="perfil__card">        <div className="perfil__foto-wrapper">
           <img src={userPerfil.foto} alt="Perfil" className="perfil__foto" />
-          <div className="perfil__foto-edit">
-            <FontAwesomeIcon icon={faCamera} />
-          </div>
-        </div>        {/* Mensaje local debajo de la foto */}
+        </div>{/* Mensaje local debajo de la foto */}
         {profileMessage && (
           <div className={`perfil__local-message ${profileMessageType === 'error' ? 'error' : ''}`}>
             {profileMessage}
@@ -461,12 +473,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
           <FontAwesomeIcon icon={faUser} /> <span className="perfil__tab-text">Mis Pedidos</span>
         </button>        <button className={`perfil__tab-btn${activeTab === 'reseñas' ? ' active' : ''}`} onClick={() => setActiveTab('reseñas')}>
           <FontAwesomeIcon icon={faHeart} /> <span className="perfil__tab-text">Mis reseñas</span>
-        </button>
-        <button className={`perfil__tab-btn${activeTab === 'editar' ? ' active' : ''}`} onClick={() => setActiveTab('editar')}>
-          <FontAwesomeIcon icon={faEdit} /> <span className="perfil__tab-text">Editar Perfil</span>
-        </button>
-        <button className={`perfil__tab-btn${activeTab === 'seguridad' ? ' active' : ''}`} onClick={() => setActiveTab('seguridad')}>
-          <FontAwesomeIcon icon={faShieldAlt} /> <span className="perfil__tab-text">Seguridad</span>
+        </button>        <button className={`perfil__tab-btn${activeTab === 'editar' ? ' active' : ''}`} onClick={() => setActiveTab('editar')}>
+          <FontAwesomeIcon icon={faEdit} /> <span className="perfil__tab-text">Perfil</span>
         </button>
       </div>{/* CONTENIDO SEGÚN TAB */}
       <div className="perfil__contenido">
@@ -546,14 +554,12 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                   Ver Menú
                 </button>
               </div>
-            )}
-
-            {!loadingOrders && !errorOrders && userOrders.length > 0 && 
-              userOrders.map(pedido => (
+            )}            {!loadingOrders && !errorOrders && userOrders.length > 0 && 
+              userOrders.map((pedido, index) => (
                 <div className="perfil__pedido-card" key={pedido.id}>
                   <div className="perfil__pedido-header">
                     <div>
-                      <span className="perfil__pedido-id">Pedido #{pedido.id}</span>
+                      <span className="perfil__pedido-id">Pedido #{index + 1}</span>
                       <span 
                         className="perfil__estado-badge"
                         style={{ backgroundColor: getStatusColor(pedido.estado) }}
@@ -566,16 +572,14 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
 
                   <div className="perfil__pedido-fecha">
                     {formatDate(pedido.fecha)}
-                  </div>
-
-                  <div className="perfil__pedido-info">
+                  </div>                  <div className="perfil__pedido-info">
                     <div className="perfil__pedido-metodo">
                       <FontAwesomeIcon icon={faCreditCard} />
-                      {pedido.metodo_pago}
+                      {pedido.metodo_pago || 'Sin especificar'}
                     </div>
                     <div className="perfil__pedido-entrega">
                       <FontAwesomeIcon icon={faTruck} />
-                      {pedido.tipo_entrega}
+                      {pedido.tipo_entrega || 'Sin especificar'}
                     </div>
                     {pedido.tiempo_entrega && (
                       <div className="perfil__pedido-tiempo">
@@ -583,7 +587,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                         {pedido.tiempo_entrega} min
                       </div>
                     )}
-                  </div>                  {/* Productos del pedido */}
+                  </div>{/* Productos del pedido */}
                   {Array.isArray(pedido.productos) && pedido.productos.length > 0 && (
                     <div className="perfil__pedido-productos">
                       <div className="perfil__productos-titulo">
@@ -667,17 +671,12 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                           <strong>Teléfono:</strong> {pedido.telefono}
                         </div>
                       )}
-                      {pedido.observaciones && (
-                        <div className="perfil__pedido-detalle">
+                      {pedido.observaciones && (                        <div className="perfil__pedido-detalle">
                           <strong>Observaciones:</strong> {pedido.observaciones}
                         </div>
                       )}
                     </div>
                   )}
-
-                  <button className="perfil__pedido-detalles-btn">
-                    Ver Detalles Completos
-                  </button>
                 </div>
               ))
             }
@@ -698,207 +697,253 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
               </button>
             </div>
           </div>
-        )}        {/* --- EDITAR PERFIL --- */}
+        )}        {/* --- PERFIL --- */}
         {activeTab === 'editar' && (
           <div>
-            <div className="perfil__titulo-editar">Editar Perfil</div>
-              {/* Sección de foto de perfil */}
-            <div className="perfil__foto-section">
-              <div className="perfil__foto-title">Foto de perfil</div>
-              <div className="perfil__foto-container">
-                <div className="perfil__foto-preview">
-                  <img 
-                    src={imagePreview || userPerfil.foto} 
-                    alt="Vista previa" 
-                    className="perfil__foto-preview-img"
-                  />
-                </div>
-                <div className="perfil__foto-controls">
-                  <input
-                    type="file"
-                    id="profile-photo-input"
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                    style={{ display: 'none' }}
-                    disabled={uploadingImage}
-                  />
-                  <label 
-                    htmlFor="profile-photo-input" 
-                    className={`perfil__foto-select-btn ${uploadingImage ? 'disabled' : ''}`}
-                    style={{ 
-                      pointerEvents: uploadingImage ? 'none' : 'auto',
-                      opacity: uploadingImage ? 0.6 : 1 
-                    }}
-                  >
-                    <FontAwesomeIcon icon={uploadingImage ? faSpinner : faCamera} className={uploadingImage ? 'spinning' : ''} />
-                    {uploadingImage ? 'Subiendo...' : 'Seleccionar foto'}
-                  </label>
-                  {uploadingImage && (
-                    <div className="perfil__foto-uploading">
-                      <FontAwesomeIcon icon={faSpinner} className="spinning" />
-                      Actualizando foto de perfil...
+            <div className="perfil__titulo-editar">Mi Perfil</div>
+            
+            {/* Card con foto y datos del perfil */}
+            <div className="perfil__data-card">
+              {/* Sección de foto */}
+              <div className="perfil__foto-section">
+                <div className="perfil__foto-container">
+                  <div className="perfil__foto-preview">
+                    <img 
+                      src={imagePreview || userPerfil.foto} 
+                      alt="Foto de perfil" 
+                      className="perfil__foto-preview-img"
+                    />
+                  </div>
+                  {isEditing && (
+                    <div className="perfil__foto-controls">
+                      <input
+                        type="file"
+                        id="profile-photo-input"
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        style={{ display: 'none' }}
+                        disabled={uploadingImage}
+                      />
+                      <label 
+                        htmlFor="profile-photo-input" 
+                        className={`perfil__foto-select-btn ${uploadingImage ? 'disabled' : ''}`}
+                        style={{ 
+                          pointerEvents: uploadingImage ? 'none' : 'auto',
+                          opacity: uploadingImage ? 0.6 : 1 
+                        }}
+                      >
+                        {uploadingImage ? 'Subiendo...' : 'Cambiar foto'}
+                      </label>
+                      {uploadingImage && (
+                        <div className="perfil__foto-uploading">
+                          <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                          Actualizando foto...
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
+                {isEditing && (
+                  <div className="perfil__foto-info">
+                    Formatos: JPG, PNG, GIF. Max: 5MB
+                  </div>
+                )}
               </div>
-              <div className="perfil__foto-info">
-                Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 5MB
-                {!uploadingImage && <br />}
-                {!uploadingImage && <span style={{ color: '#ab1319', fontWeight: '500' }}>La foto se actualiza automáticamente al seleccionarla</span>}
+
+              {/* Sección de datos */}
+              <div className="perfil__data-section">
+                {!isEditing ? (                  // Vista de solo lectura
+                  <div className="perfil__data-view">
+                    <div className="perfil__data-header">
+                      <h3>Información Personal</h3>
+                    </div>
+                    
+                    <div className="perfil__data-grid">
+                      <div className="perfil__data-item">
+                        <label>Nombre completo</label>
+                        <div className="perfil__data-value">{userPerfil.nombre}</div>
+                      </div>
+                      <div className="perfil__data-item">
+                        <label>Correo electrónico</label>
+                        <div className="perfil__data-value">{userPerfil.email}</div>
+                      </div>
+                      <div className="perfil__data-item">
+                        <label>Teléfono</label>
+                        <div className="perfil__data-value">{userPerfil.telefono}</div>
+                      </div>                      <div className="perfil__data-item">
+                        <label>Fecha de nacimiento</label>
+                        <div className="perfil__data-value">
+                          {displayFieldValue(formatBirthDate(userPerfil.fecha_nacimiento))}
+                        </div>
+                      </div>
+                      <div className="perfil__data-item">
+                        <label>Número de DUI</label>
+                        <div className="perfil__data-value">
+                          {displayFieldValue(userPerfil.dui)}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="perfil__button-container">
+                      <button 
+                        className="perfil__edit-btn"
+                        onClick={() => setIsEditing(true)}
+                      >
+                        <FontAwesomeIcon icon={faEdit} /> Editar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Vista de edición
+                  <form
+                    className="perfil__edit-form"
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const success = await updateUserProfile(formData);
+                      if (success) {
+                        setUserPerfil(prev => ({
+                          ...prev,
+                          nombre: formData.nombre,
+                          email: formData.email,
+                          telefono: formData.telefono,
+                        }));
+                        
+                        // Actualizar el usuario en App.jsx para sincronizar con navbar
+                        if (updateUser) {
+                          updateUser({
+                            nombre: formData.nombre,
+                            correo: formData.email,
+                            telefono: formData.telefono
+                          });
+                        }
+                        
+                        // Disparar evento para actualizar navbar con los nuevos datos
+                        const profileDataUpdateEvent = new CustomEvent('profileDataUpdated', {
+                          detail: {
+                            nombre: formData.nombre,
+                            email: formData.email,
+                            telefono: formData.telefono,
+                            userId: user.id
+                          }
+                        });
+                        window.dispatchEvent(profileDataUpdateEvent);
+
+                        setEditSuccess(true);
+                        setIsEditing(false);
+                        setTimeout(() => setEditSuccess(false), 3000);
+                      } else {
+                        showProfileMessage('Error al actualizar el perfil. Intenta de nuevo.', 'error');
+                      }
+                    }}                  >
+                    <div className="perfil__data-header">
+                      <h3>Editar Información Personal</h3>
+                    </div>
+
+                    <div className="perfil__form-grid">
+                      <div className="perfil__form-group">
+                        <label>Nombre completo</label>
+                        <input
+                          type="text"
+                          value={formData.nombre}
+                          onChange={e => setFormData({ ...formData, nombre: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="perfil__form-group">
+                        <label>Correo electrónico</label>
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={e => setFormData({ ...formData, email: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="perfil__form-group">
+                        <label>Teléfono</label>
+                        <input
+                          type="text"
+                          value={formData.telefono}
+                          onChange={e => setFormData({ ...formData, telefono: e.target.value })}
+                          placeholder="+503 7123-4567"
+                          required
+                        />
+                      </div>                      <div className="perfil__form-group">
+                        <label>Fecha de nacimiento</label>
+                        <input
+                          type="text"
+                          value={formatBirthDate(userPerfil.fecha_nacimiento)}
+                          placeholder="Sin fecha registrada"
+                          readOnly
+                          style={{ 
+                            backgroundColor: '#f8f9fa', 
+                            color: '#6c757d',
+                            cursor: 'not-allowed',
+                            border: '1.3px solid #e9ecef'
+                          }}
+                        />
+                      </div>
+                      <div className="perfil__form-group">
+                        <label>Número de DUI</label>
+                        <input
+                          type="text"
+                          value={userPerfil.dui}
+                          placeholder="Sin DUI registrado"
+                          readOnly
+                          style={{ 
+                            backgroundColor: '#f8f9fa', 
+                            color: '#6c757d',
+                            cursor: 'not-allowed',
+                            border: '1.3px solid #e9ecef'
+                          }}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="perfil__button-container">
+                      <div className="perfil__edit-buttons">
+                        <button 
+                          type="button"
+                          className="perfil__cancel-btn"
+                          onClick={() => {
+                            setIsEditing(false);
+                            setFormData({
+                              nombre: userPerfil.nombre,
+                              email: userPerfil.email,
+                              telefono: userPerfil.telefono,
+                            });
+                          }}
+                        >
+                          Cancelar
+                        </button>
+                        <button type="submit" className="perfil__save-btn">
+                          Guardar cambios
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
 
-            <form
-              className="perfil__form-editar"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const success = await updateUserProfile(formData);
-                  if (success) {                  setUserPerfil(prev => ({
-                    ...prev,
-                    nombre: formData.nombre,
-                    email: formData.email,
-                    telefono: formData.telefono,
-                  }));
-                  
-                  // Actualizar el usuario en App.jsx para sincronizar con navbar
-                  if (updateUser) {
-                    updateUser({
-                      nombre: formData.nombre,
-                      correo: formData.email,
-                      telefono: formData.telefono
-                    });
-                  }
-                  
-                  // Disparar evento para actualizar navbar con los nuevos datos
-                  const profileDataUpdateEvent = new CustomEvent('profileDataUpdated', {
-                    detail: {
-                      nombre: formData.nombre,
-                      email: formData.email,
-                      telefono: formData.telefono,
-                      userId: user.id
-                    }
-                  });
-                  window.dispatchEvent(profileDataUpdateEvent);setEditSuccess(true);
-                  setTimeout(() => setEditSuccess(false), 3000);
-                } else {
-                  showProfileMessage('Error al actualizar el perfil. Intenta de nuevo.', 'error');
-                }
-              }}
-            >
-              <div className="perfil__form-row">
-                <div className="perfil__form-group">
-                  <label>Nombre completo</label>
-                  <input
-                    type="text"
-                    value={formData.nombre}
-                    onChange={e => setFormData({ ...formData, nombre: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="perfil__form-group">
-                  <label>Correo electrónico</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>              <div className="perfil__form-row">
-                <div className="perfil__form-group">
-                  <label>Teléfono</label>
-                  <input
-                    type="text"
-                    value={formData.telefono}
-                    onChange={e => setFormData({ ...formData, telefono: e.target.value })}
-                    placeholder="+503 7123-4567"
-                    required
-                  />
-                </div>
-              </div>
-              
-              {/* Campos de solo lectura */}
-              <div className="perfil__form-row">
-                <div className="perfil__form-group">
-                  <label>Fecha de nacimiento</label>
-                  <input
-                    type="text"
-                    value={formatBirthDate(userPerfil.fecha_nacimiento)}
-                    readOnly
-                    style={{ 
-                      backgroundColor: '#f8f9fa', 
-                      color: '#6c757d',
-                      cursor: 'not-allowed',
-                      border: '1.3px solid #e9ecef'
-                    }}
-                  />
-                </div>
-                <div className="perfil__form-group">
-                  <label>Número de DUI</label>
-                  <input
-                    type="text"
-                    value={userPerfil.dui}
-                    readOnly
-                    style={{ 
-                      backgroundColor: '#f8f9fa', 
-                      color: '#6c757d',
-                      cursor: 'not-allowed',
-                      border: '1.3px solid #e9ecef'
-                    }}
-                  />
-                </div>
-              </div>
-              <button type="submit" className="perfil__guardar-btn">
-                Guardar cambios
-              </button>
-              {editSuccess && (
-                <div className="perfil__edit-success">¡Perfil actualizado correctamente!</div>
-              )}
-            </form>
-          </div>
-        )}
+            {editSuccess && (
+              <div className="perfil__edit-success">¡Perfil actualizado correctamente!</div>
+            )}
 
-        {/* --- SEGURIDAD --- */}
-        {activeTab === 'seguridad' && (
-          <div>
-            <div className="perfil__titulo-seguridad">Configuración de Seguridad</div>
-            {/* Contraseña */}
-            <div className="perfil__security-card">
-              <div className="perfil__security-title">
-                <FontAwesomeIcon icon={faShieldAlt} style={{ marginRight: 7, color: "#a81818" }} />
-                Contraseña
-              </div>
-              <div className="perfil__security-desc">
-                Mantén tu cuenta segura con una contraseña fuerte
-              </div>
-              <button className="perfil__security-btn" onClick={() => setShowCambiarContra(true)}>
-                Cambiar contraseña
-              </button>
-            </div>
-            {/* Información de contacto */}
-            <div className="perfil__contacto-titulo">
-              Información de contacto
-            </div>
-            <div className="perfil__contacto-cards">
-              <div className="perfil__contacto-card">
-                <div className="perfil__contacto-row">
-                  <FontAwesomeIcon icon={faPhone} style={{ marginRight: 10, color: "#a81818" }} />
-                  <div>
-                    <div className="perfil__contacto-label">Teléfono</div>
-                    <div className="perfil__contacto-value">{userPerfil.telefono}</div>
-                  </div>
-                  <button className="perfil__verificar-btn">Verificar</button>
+            {/* Sección de Seguridad */}
+            <div className="perfil__security-section" style={{ marginTop: '40px' }}>
+              <div className="perfil__titulo-seguridad">Configuración de Seguridad</div>
+              {/* Contraseña */}
+              <div className="perfil__security-card">
+                <div className="perfil__security-title">
+                  <FontAwesomeIcon icon={faShieldAlt} style={{ marginRight: 7, color: "#a81818" }} />
+                  Contraseña
                 </div>
-              </div>
-              <div className="perfil__contacto-card">
-                <div className="perfil__contacto-row">
-                  <FontAwesomeIcon icon={faEnvelope} style={{ marginRight: 10, color: "#a81818" }} />
-                  <div>
-                    <div className="perfil__contacto-label">Email</div>
-                    <div className="perfil__contacto-value">{userPerfil.email}</div>
-                  </div>
-                  <span className="perfil__verificado-label">Verificado</span>
+                <div className="perfil__security-desc">
+                  Mantén tu cuenta segura con una contraseña fuerte
                 </div>
+                <button className="perfil__security-btn" onClick={() => setShowCambiarContra(true)}>
+                  Cambiar contraseña
+                </button>
               </div>
             </div>
           </div>
@@ -918,18 +963,15 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
 
 // --- MODAL CAMBIAR CONTRASEÑA ---
 function CambiarContraseñaModal({ email, onClose, onSuccess }) {
-  const [step, setStep] = useState("select");
-  const [codigo, setCodigo] = useState("");
+  const [currentPass, setCurrentPass] = useState("");
   const [newPass, setNewPass] = useState("");
-  const [showPass, setShowPass] = useState(false);
   const [confirmPass, setConfirmPass] = useState("");
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showCurrentPass, setShowCurrentPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [changing, setChanging] = useState(false);
-  const maskEmail = (mail) => {
-    if (!mail) return "";
-    const [user, domain] = mail.split('@');
-    return user[0] + '.p***@' + domain;
-  };
+  const [error, setError] = useState("");
+
   const requisitos = [
     { msg: "Debe tener al menos 8 caracteres", valid: newPass.length >= 8 },
     { msg: "Debe contener al menos una letra mayúscula", valid: /[A-Z]/.test(newPass) },
@@ -937,89 +979,100 @@ function CambiarContraseñaModal({ email, onClose, onSuccess }) {
     { msg: "Debe contener al menos un carácter especial", valid: /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(newPass) },
   ];
 
-  const handleChangePass = (e) => {
+  const handleChangePass = async (e) => {
     e.preventDefault();
+    setError("");
+    
+    if (newPass !== confirmPass) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
+
+    if (!requisitos.every(r => r.valid)) {
+      setError("La nueva contraseña no cumple con los requisitos de seguridad");
+      return;
+    }
+
     setChanging(true);
-    setTimeout(() => {
-      setChanging(false);
+    
+    try {
+      // Aquí iría la lógica para cambiar la contraseña en el backend
+      // Por ahora simulamos el proceso
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       if (onSuccess) onSuccess();
       onClose();
-    }, 1200);
+    } catch (error) {
+      setError("Error al cambiar la contraseña. Inténtalo de nuevo.");
+    } finally {
+      setChanging(false);
+    }
   };
- return (
+
+  return (
     <div className="modal__overlay" style={{ zIndex: 99999 }}>
-      <div className="modal__content modal__full-white" style={{ maxWidth: 650, padding: 0 }}>
+      <div className="modal__content modal__full-white" style={{ maxWidth: 500, padding: 0 }}>
         {/* Header */}
         <button className="modal__back-btn" onClick={onClose} style={{ margin: 20 }}>
           <FontAwesomeIcon icon={faArrowLeft} /> Volver
         </button>
         <div className="cambiar__titulo">Cambiar Contraseña</div>
+        
         <div className="cambiar__box">
           <div className="cambiar__verif-title">
             <FontAwesomeIcon icon={faShieldAlt} style={{ marginRight: 7, color: "#c42f2f" }} />
-            Verificación de Identidad
-          </div>          {/* Paso 1 */}
-          {step === "select" && (
-            <>
-              <div className="cambiar__verif-sub">Se enviará un código de verificación a tu email</div>
-              {/* Email */}
-              <div className="cambiar__verif-card cambiar__verif-card--selected">
-                <FontAwesomeIcon icon={faEnvelope} style={{ fontSize: 24, color: "#b7262b", marginRight: 16 }} />
-                <div style={{ flex: 1 }}>
-                  <div className="cambiar__verif-label">Email</div>
-                  <div className="cambiar__verif-value">{maskEmail(email)}</div>
-                </div>
-                <button className="cambiar__verif-btn cambiar__verif-btn--orange" onClick={() => setStep("codigo")}>
-                  Enviar Email
-                </button>
-              </div>
-            </>
+            Actualizar Contraseña
+          </div>
+
+          {error && (
+            <div style={{
+              background: '#ffebee',
+              color: '#c62828',
+              padding: '12px',
+              borderRadius: '8px',
+              marginBottom: '16px',
+              fontSize: '0.9rem'
+            }}>
+              {error}
+            </div>
           )}
 
-          {/* Paso 2: Código */}
-          {step === "codigo" && (
-            <form className="cambiar__codigo-form" onSubmit={e => { e.preventDefault(); setStep("nueva"); }}>
-              <div className="cambiar__verif-sub" style={{ marginBottom: 16 }}>Código de verificación</div>
+          <form className="cambiar__pass-form" onSubmit={handleChangePass}>
+            {/* Contraseña actual */}
+            <div className="cambiar__pass-label">Contraseña actual</div>
+            <div className="cambiar__pass-input-group">
               <input
-                className="cambiar__codigo-input"
-                type="text"
-                value={codigo}
-                onChange={e => setCodigo(e.target.value)}
-                placeholder="123456"
-                maxLength={6}
-                style={{
-                  textAlign: 'center',
-                  fontSize: '1.5rem',
-                  letterSpacing: '0.5em',
-                  width: '100%',
-                  marginBottom: 18
-                }}
-                autoFocus
+                type={showCurrentPass ? "text" : "password"}
+                value={currentPass}
+                onChange={e => setCurrentPass(e.target.value)}
+                className="cambiar__pass-input"
                 required
+                autoFocus
+                placeholder="Ingresa tu contraseña actual"
               />
-              <button className="cambiar__verif-btn cambiar__verif-btn--orange" style={{ width: '100%', fontWeight: 500 }} type="submit">
-                Verificar código
+              <button type="button" tabIndex={-1} className="cambiar__show-btn" onClick={() => setShowCurrentPass(p => !p)}>
+                <FontAwesomeIcon icon={showCurrentPass ? faEye : faEyeSlash} />
               </button>
-            </form>
-          )}
+            </div>
 
-          {/* Paso 3: Nueva contraseña */}
-          {step === "nueva" && (
-            <form className="cambiar__pass-form" onSubmit={handleChangePass}>
-              <div className="cambiar__pass-label">Nueva contraseña</div>
-              <div className="cambiar__pass-input-group">
-                <input
-                  type={showPass ? "text" : "password"}
-                  value={newPass}
-                  onChange={e => setNewPass(e.target.value)}
-                  className="cambiar__pass-input"
-                  required
-                  autoFocus
-                />
-                <button type="button" tabIndex={-1} className="cambiar__show-btn" onClick={() => setShowPass(p => !p)}>
-                  <FontAwesomeIcon icon={showPass ? faEye : faEyeSlash} />
-                </button>
-              </div>
+            {/* Nueva contraseña */}
+            <div className="cambiar__pass-label">Nueva contraseña</div>
+            <div className="cambiar__pass-input-group">
+              <input
+                type={showNewPass ? "text" : "password"}
+                value={newPass}
+                onChange={e => setNewPass(e.target.value)}
+                className="cambiar__pass-input"
+                required
+                placeholder="Ingresa tu nueva contraseña"
+              />
+              <button type="button" tabIndex={-1} className="cambiar__show-btn" onClick={() => setShowNewPass(p => !p)}>
+                <FontAwesomeIcon icon={showNewPass ? faEye : faEyeSlash} />
+              </button>
+            </div>
+
+            {/* Requisitos de seguridad */}
+            {newPass && (
               <div className="cambiar__pass-requisitos">
                 <div>Requisitos de seguridad:</div>
                 <ul>
@@ -1030,31 +1083,46 @@ function CambiarContraseñaModal({ email, onClose, onSuccess }) {
                   ))}
                 </ul>
               </div>
-              <div className="cambiar__pass-label">Confirmar contraseña</div>
-              <div className="cambiar__pass-input-group">
-                <input
-                  type={showConfirm ? "text" : "password"}
-                  value={confirmPass}
-                  onChange={e => setConfirmPass(e.target.value)}
-                  className="cambiar__pass-input"
-                  required
-                />
-                <button type="button" tabIndex={-1} className="cambiar__show-btn" onClick={() => setShowConfirm(p => !p)}>
-                  <FontAwesomeIcon icon={showConfirm ? faEye : faEyeSlash} />
-                </button>
-              </div>
-              <button
-                className="cambiar__verif-btn cambiar__verif-btn--orange"
-                style={{ width: '100%', fontWeight: 500, marginTop: 18, opacity: (newPass && confirmPass && newPass === confirmPass && requisitos.every(r => r.valid)) ? 1 : 0.5 }}
-                type="submit"
-                disabled={!(newPass && confirmPass && newPass === confirmPass && requisitos.every(r => r.valid)) || changing}
-              >
-                Cambiar contraseña
-              </button>
-            </form>
-          )}
+            )}
 
-         
+            {/* Confirmar nueva contraseña */}
+            <div className="cambiar__pass-label">Confirmar nueva contraseña</div>
+            <div className="cambiar__pass-input-group">
+              <input
+                type={showConfirmPass ? "text" : "password"}
+                value={confirmPass}
+                onChange={e => setConfirmPass(e.target.value)}
+                className="cambiar__pass-input"
+                required
+                placeholder="Confirma tu nueva contraseña"
+              />
+              <button type="button" tabIndex={-1} className="cambiar__show-btn" onClick={() => setShowConfirmPass(p => !p)}>
+                <FontAwesomeIcon icon={showConfirmPass ? faEye : faEyeSlash} />
+              </button>
+            </div>
+
+            {/* Botón guardar cambios */}
+            <button
+              className="cambiar__verif-btn cambiar__verif-btn--orange"
+              style={{ 
+                width: '100%', 
+                fontWeight: 500, 
+                marginTop: 24,
+                opacity: (currentPass && newPass && confirmPass && newPass === confirmPass && requisitos.every(r => r.valid)) ? 1 : 0.5 
+              }}
+              type="submit"
+              disabled={!(currentPass && newPass && confirmPass && newPass === confirmPass && requisitos.every(r => r.valid)) || changing}
+            >
+              {changing ? (
+                <>
+                  <FontAwesomeIcon icon={faSpinner} spin style={{ marginRight: 8 }} />
+                  Guardando cambios...
+                </>
+              ) : (
+                'Guardar cambios'
+              )}
+            </button>
+          </form>
         </div>
       </div>
     </div>
