@@ -1,15 +1,23 @@
 import React from 'react';
 import './footer.css';
-import footerImage from '../../assets/footer.png'; // Ruta de la imagen de fondo
+import bannerVideo from '../../assets/banner final.mp4'; // Ruta del video de fondo del banner final
 
 const Footer = ({ noImage }) => {
-  return (
-    <footer className="final-footer-section">
+  return (    <footer className="final-footer-section">
       {!noImage && (
-        <div
-          className="final-footer-background"
-          style={{ backgroundImage: `url(${footerImage})` }}
-        >
+        <div className="final-footer-background">
+          <video
+            className="final-footer-video"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            controls={false}
+          >
+            <source src={bannerVideo} type="video/mp4" />
+            Tu navegador no soporta el elemento de video.
+          </video>
           <div className="final-footer-overlay">
             <div className="final-footer-text-box final-footer-text-left">
               Del horno a tu paladar, Mamá Mian te invita a disfrutar

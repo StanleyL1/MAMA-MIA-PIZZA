@@ -7,15 +7,39 @@
 
 .final-footer-background {
   background-color: var(--accent-color);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  min-height: 400px;
+  min-height: 500px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  overflow: hidden;
+}
+
+.final-footer-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  /* Mejoras para rendimiento y calidad del video */
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Efecto de zoom sutil */
+  animation: subtleZoom 20s ease-in-out infinite alternate;
+}
+
+@keyframes subtleZoom {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.05);
+  }
 }
 
 .final-footer-overlay {
@@ -25,20 +49,39 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 2rem;
+  flex-wrap: wrap;  gap: 2rem;
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  border-radius: 16px;
+  padding: 2rem;
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .final-footer-text-left {
   font-size: 2.2rem;
-  color: white; /* Cambiado a blanco */
+  color: #FFD700;
   font-weight: bold;
   font-family: 'Bold', sans-serif;
   border-radius: 8px;
   max-width: 100%;
   text-align: center;
-  margin-left: 12%;
+  margin-left: 0;
   flex: 1;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9), 1px 1px 3px rgba(0, 0, 0, 0.8);
+  line-height: 1.3;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.4));
 }
 
 /* Enlace del equipo de desarrollo */
@@ -157,6 +200,21 @@
 /* ------------ RESPONSIVE ------------ */
 
 @media (max-width: 768px) {
+  .final-footer-background {
+    min-height: 380px;
+    padding: 1.5rem;
+  }
+  
+  .final-footer-overlay {
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+  
+  .final-footer-text-left {
+    font-size: 1.8rem;
+    margin-left: 0;
+  }
+
   .final-footer-overlay {
     flex-direction: column;
     text-align: center;
@@ -194,6 +252,20 @@
 }
 
 @media (max-width: 480px) {
+  .final-footer-background {
+    min-height: 320px;
+    padding: 1rem;
+  }
+    .final-footer-overlay {
+    padding: 1rem;
+    background: transparent;
+  }
+  
+  .final-footer-text-left {
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+
   .final-footer-text-left {
     font-size: 1.5rem;
   }

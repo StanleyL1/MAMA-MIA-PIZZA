@@ -128,15 +128,27 @@ const Home = ({ onAddToCart, user }) => {
       </button>
     </div>
   </div>
-</section>
-
-
-      {/* Recomendación de la Casa */}
+</section>      {/* Recomendación de la Casa */}
       <section className="house__choice__section">
-        <h1 className="house__choice__title">
-          Recomendación de la Casa <img src={pizzaIcon} alt="Pizza Icon" />
-        </h1>
-        <div className="whyus__content">
+        <div className="section__header">
+          <div className="section__header__content">
+            <div className="section__badge">
+              <img src={pizzaIcon} alt="Pizza Icon" className="section__icon" />
+              <span className="section__badge__text">Chef's Choice</span>
+            </div>
+            <h1 className="section__title">
+              Recomendación de la Casa
+            </h1>
+            <p className="section__subtitle">
+              Nuestros platos más especiales, seleccionados cuidadosamente por nuestro chef
+            </p>
+          </div>
+          <div className="section__decoration">
+            <div className="decoration__circle decoration__circle--orange"></div>
+            <div className="decoration__circle decoration__circle--red"></div>
+          </div>
+        </div>
+        <div className="products__grid">
           {recomendacion.map((item, index) => (
             <ProductsCards 
               data={item}
@@ -145,14 +157,29 @@ const Home = ({ onAddToCart, user }) => {
             />
           ))}
         </div>
-      </section>
-
-      {/* Pizzas Populares */}
+      </section>      {/* Pizzas Populares */}
       <section className="trending__section">
-        <h2 className="trending__title">
-          Las más populares <img src={fireIcon} alt="Fire Icon" />
-        </h2>
-        <div className="whyus__content">
+        <div className="section__header section__header--trending">
+          <div className="section__header__content">
+            <div className="section__badge section__badge--fire">
+              <img src={fireIcon} alt="Fire Icon" className="section__icon section__icon--fire" />
+              <span className="section__badge__text">Trending Now</span>
+            </div>
+            <h2 className="section__title section__title--trending">
+              Las más populares
+            </h2>
+            <p className="section__subtitle">
+              Los sabores que todos aman y que no puedes dejar de probar
+            </p>
+          </div>
+          <div className="section__decoration section__decoration--trending">
+            <div className="decoration__circle decoration__circle--yellow"></div>
+            <div className="decoration__circle decoration__circle--orange"></div>
+            <div className="decoration__spark"></div>
+            <div className="decoration__spark decoration__spark--2"></div>
+          </div>
+        </div>
+        <div className="products__grid products__grid--trending">
           {popular.map((item, index) => (
             <ProductsCards 
               data={item}
