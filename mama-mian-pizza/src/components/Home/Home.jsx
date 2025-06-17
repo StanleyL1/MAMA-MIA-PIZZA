@@ -7,10 +7,10 @@ import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
+
 import ProductsCards from '../productsCards/productsCards';
 import PizzaModal from '../PizzaModal/PizzaModal';
 import Footer from '../footer/footer';
-import TestimonialCard from '../ComentsCards/ComentCards';
 import pizzaIcon from '../../assets/PizzaR.png';
 import fireIcon from '../../assets/fuego.png';
 import comentarioImg from '../../assets/comentario.png';
@@ -23,26 +23,6 @@ import './Home.css';
 
 const carouselImages = [carrusel1, carrusel2];
 
-const datosTestimonios = [
-  {
-    avatar: comentarioImg,
-    name: 'María Rodríguez',
-    time: 'hace 2 semanas',
-    comment: 'Garantizamos la entrega en 30 minutos o su pizza es gratis. Nuestro equipo de entrega es rápido, eficiente y siempre puntual.'
-  },
-  {
-    avatar: comentarioImg,
-    name: 'María Rodríguez',
-    time: 'hace 2 semanas',
-    comment: 'Garantizamos la entrega en 30 minutos o su pizza es gratis. Nuestro equipo de entrega es rápido, eficiente y siempre puntual.'
-  },
-  {
-    avatar: comentarioImg,
-    name: 'María Rodríguez',
-    time: 'hace 2 semanas',
-    comment: 'Garantizamos la entrega en 30 minutos o su pizza es gratis. Nuestro equipo de entrega es rápido, eficiente y siempre puntual.'
-  },
-];
 
 const Home = ({ onAddToCart }) => {
   const [popular, setPopular] = useState([]);
