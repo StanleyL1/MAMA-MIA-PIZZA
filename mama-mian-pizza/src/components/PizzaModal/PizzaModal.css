@@ -1263,6 +1263,97 @@ input:checked + .modal__slider:before {
   font-weight: bold;
 }
 
+/* ========== ESTILOS PARA FOTOS DE PERFIL EN RESEÑAS ========== */
+.reseñas__review-foto {
+  transition: all 0.3s ease;
+  opacity: 1;
+  position: relative;
+  cursor: pointer;
+}
+
+.reseñas__review-foto:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+  border-color: #FEB248 !important;
+}
+
+/* Animación de carga de imagen */
+.reseñas__review-foto[style*="opacity: 0.7"] {
+  animation: imageLoading 1s infinite;
+}
+
+@keyframes imageLoading {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.3; }
+}
+
+/* Mejoras para el contenedor de la foto de perfil */
+.reseñas__user-avatar {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.reseñas__user-avatar::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #FEB248, #f59e0b, #FEB248);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.reseñas__user-avatar:hover::before {
+  opacity: 0.3;
+}
+
+/* Indicador de imagen cargada correctamente */
+.reseñas__review-foto[style*="opacity: 1"] {
+  animation: imageLoaded 0.5s ease-out;
+}
+
+@keyframes imageLoaded {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Estilos para imagen de placeholder/error */
+.reseñas__review-foto[src*="perfilfoto.png"] {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0 !important;
+  opacity: 0.8;
+}
+
+/* Responsive para fotos de perfil */
+@media (max-width: 768px) {
+  .reseñas__review-foto {
+    width: 45px !important;
+    height: 45px !important;
+    border-width: 2px !important;
+  }
+  
+  .reseñas__user-avatar {
+    margin-right: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reseñas__review-foto {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
 /* Responsive para reseñas */
 @media (max-width: 768px) {
   .reseñas__review {
@@ -1282,5 +1373,25 @@ input:checked + .modal__slider:before {
   
   .reseñas__review-comment {
     margin-top: 10px;
+  }
+}
+
+/* Responsive para estadísticas de reseñas */
+@media (max-width: 768px) {
+  .reseñas__container div[style*="gridTemplateColumns"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .reseñas__container div[style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    font-size: 12px !important;
+  }
+  
+  .reseñas__container h4[style*="fontSize"] {
+    font-size: 14px !important;
   }
 }

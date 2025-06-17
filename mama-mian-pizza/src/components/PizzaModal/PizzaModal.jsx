@@ -29,67 +29,11 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
     { id: 5, nombre: 'Carne', seleccionado: false },
     { id: 6, nombre: 'Champiñones', seleccionado: false },
     { id: 7, nombre: 'Aceitunas', seleccionado: false },
-    { id: 8, nombre: 'Cebolla', seleccionado: false }  ]);
-  const [ingredientesSeleccionados, setIngredientesSeleccionados] = useState(0);  // Función auxiliar para cargar foto de perfil de usuario
-  const cargarFotoUsuario = async (userId) => {
-    console.log(`🖼️ Intentando cargar foto para usuario ID: ${userId}`);
-    
-    // Si no hay userId, retornar foto por defecto inmediatamente
-    if (!userId) {
-      console.log(`⚠️ No se proporcionó userId, usando foto por defecto`);
-      return require('../../assets/perfilfoto.png');
-    }
-    
-    const endpoints = [
-      `https://api.mamamianpizza.com/api/usuarios/${userId}/foto`,
-      `https://api.mamamianpizza.com/api/usuarios/${userId}/profile-image`,
-      `https://api.mamamianpizza.com/api/users/${userId}/avatar`,
-      `https://api.mamamianpizza.com/api/usuarios/${userId}/imagen`,
-      `https://api.mamamianpizza.com/api/usuarios/${userId}`
-    ];
-    
-    for (const endpoint of endpoints) {
-      try {
-        console.log(`🔍 Probando endpoint: ${endpoint}`);
-        const response = await fetch(endpoint);
-        console.log(`📡 Respuesta del endpoint ${endpoint}:`, response.status, response.statusText);
-        
-        if (response.ok) {
-          const contentType = response.headers.get('content-type');
-          console.log(`📄 Content-Type: ${contentType}`);
-          
-          if (contentType && contentType.startsWith('image/')) {
-            const blob = await response.blob();
-            const imageUrl = URL.createObjectURL(blob);
-            console.log(`✅ Foto cargada exitosamente para usuario ${userId}:`, imageUrl);
-            return imageUrl;
-          } else if (contentType && contentType.includes('json')) {
-            // Tal vez el endpoint retorna JSON con la URL de la imagen
-            const data = await response.json();
-            console.log(`📄 Datos JSON recibidos:`, data);
-            
-            // Buscar posibles campos de imagen
-            const imageFields = ['foto', 'imagen', 'avatar', 'profile_image', 'photo', 'picture'];
-            for (const field of imageFields) {
-              if (data[field]) {
-                console.log(`🖼️ Encontrada URL de imagen en campo '${field}':`, data[field]);
-                return data[field];
-              }
-            }
-          } else {
-            console.log(`❌ Content-Type no es imagen ni JSON: ${contentType}`);
-          }
-        }
-      } catch (error) {
-        console.log(`❌ Error al intentar cargar foto desde ${endpoint}:`, error);
-      }
-    }
-    
-    // Si ningún endpoint funciona, retornar foto por defecto
-    console.log(`⚠️ No se pudo cargar foto para usuario ${userId}, usando foto por defecto`);
-    return require('../../assets/perfilfoto.png');
-  };
+    { id: 8, nombre: 'Cebolla', seleccionado: false }  ]);  const [ingredientesSeleccionados, setIngredientesSeleccionados] = useState(0);
 
+  // La función cargarFotoUsuario ya no es necesaria porque obtenemos
+  // la foto directamente del endpoint de reseñas
+  
   // Función para cargar reseñas desde la API
   const cargarReseñas = useCallback(async () => {
     // Determinar el ID del producto de manera robusta
@@ -113,13 +57,20 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
         const reseñasDelProducto = data.resenas ? data.resenas.filter(resena => 
           resena.producto.id === productId && resena.aprobada === 1
         ) : [];        // Transformar las reseñas para que coincidan con el formato esperado
-        console.log(`🔄 Procesando ${reseñasDelProducto.length} reseñas para cargar fotos...`);
+        console.log(`🔄 Procesando ${reseñasDelProducto.length} reseñas para mostrar...`);
         
-        const reseñasFormateadas = await Promise.all(reseñasDelProducto.map(async (resena, index) => {
+        const reseñasFormateadas = reseñasDelProducto.map((resena, index) => {
           console.log(`👤 Procesando reseña ${index + 1} - Usuario: ${resena.usuario.nombre} (ID: ${resena.usuario.id})`);
+            // Usar la foto de perfil directamente del endpoint, o imagen por defecto
+          const fotoUsuario = resena.usuario.foto_perfil || require('../../assets/perfilfoto.png');
+          console.log(`🖼️ Foto para ${resena.usuario.nombre}:`, fotoUsuario);
           
-          // Cargar foto de perfil del usuario
-          const fotoUsuario = await cargarFotoUsuario(resena.usuario.id);
+          // Formatear fecha de manera más legible
+          const fechaFormateada = new Date(resena.fecha_creacion).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
           
           const reseñaFormateada = {
             id: resena.id_resena,
@@ -127,18 +78,22 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
             comentario: resena.comentario,
             nombre: resena.usuario.nombre,
             userId: resena.usuario.id,
-            fecha: new Date(resena.fecha_creacion).toLocaleDateString('es-ES'),
+            fecha: fechaFormateada,
             foto: fotoUsuario,
             estado: resena.estado,
             aprobada: resena.aprobada === 1
           };
-          
-          console.log(`📝 Reseña formateada:`, reseñaFormateada);
-          return reseñaFormateada;        }));
-        
-        setReseñas(reseñasFormateadas);
+            console.log(`📝 Reseña formateada:`, reseñaFormateada);
+          return reseñaFormateada;
+        });
+          setReseñas(reseñasFormateadas);
         console.log(`📊 Total de reseñas establecidas: ${reseñasFormateadas.length}`);
-        console.log(`🖼️ Fotos de reseñas:`, reseñasFormateadas.map(r => ({ nombre: r.nombre, foto: r.foto })));
+        console.log(`🖼️ Fotos de reseñas:`, reseñasFormateadas.map(r => ({ 
+          nombre: r.nombre, 
+          foto: r.foto,
+          fechaOriginal: r.fecha,
+          valoracion: r.rating 
+        })));
         
         // Guardar estadísticas generales
         setEstadisticasReseñas(data.estadisticas);
@@ -483,27 +438,19 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(resenaData)
-        });
-
-        if (response.ok) {
+        });        if (response.ok) {
           const data = await response.json();
           console.log('✅ Reseña creada exitosamente:', data);
           
-          // Agregar la nueva reseña localmente
-          const nuevaResenaLocal = {
-            rating: nuevaResena.rating,
-            comentario: nuevaResena.comentario,
-            nombre: user.nombre || 'Usuario',
-            fecha: new Date().toISOString().slice(0, 10),
-            foto: user.foto_perfil || user.foto || require('../../assets/perfilfoto.png')
-          };
+          // Recargar todas las reseñas desde el endpoint para obtener datos actualizados
+          await cargarReseñas();
           
-          setReseñas(prev => [nuevaResenaLocal, ...prev]);
+          // Limpiar formulario
           setNuevaResena({ rating: 0, comentario: '' });
           setMostrarFormularioResena(false);
           
           // Mostrar mensaje de éxito
-          alert('¡Reseña publicada exitosamente!');        } else {
+          alert('¡Reseña publicada exitosamente! Tu reseña será visible una vez que sea aprobada por nuestro equipo.');} else {
           const errorData = await response.json();
           console.error('❌ Error al crear reseña:', errorData);
           console.error('❌ Status:', response.status);
