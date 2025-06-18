@@ -813,154 +813,478 @@ input:checked + .modal__slider:before {
 
 @media (max-width: 768px) {
   .modal__overlay {
-    padding: 16px;
+    padding: 8px;
+    align-items: flex-start;
+    padding-top: 20px;
   }
   
   .modal__content {
     width: 100%;
-    max-height: 95vh;
-    border-radius: 12px;
+    max-width: 100%;
+    max-height: 92vh;
+    height: auto;
+    border-radius: 16px;
+    margin: 0;
   }
   
   .modal__pedido-container {
     flex-direction: column;
     min-height: auto;
-  }  .modal__image-section {
+    height: auto;
+  }
+  
+  .modal__image-section {
     flex: none;
-    height: 280px;
-    padding: 20px;
+    height: 200px;
+    padding: 15px;
     background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 50%, #FFE082 100%);
-  }.modal__image-section::before {
-    width: 230px;
-    height: 230px;
+  }
+  
+  .modal__image-section::before {
+    width: 160px;
+    height: 160px;
   }
 
   .modal__image-section::after {
-    width: 250px;
-    height: 250px;
+    width: 180px;
+    height: 180px;
   }
 
   .modal__pizza-image {
-    width: 210px;
-    height: 210px;
-    border: 4px solid #fff;
+    width: 140px;
+    height: 140px;
+    border: 3px solid #fff;
   }
   
   .modal__content-section {
     flex: 1;
+    overflow: hidden;
   }
-    .modal__header {
-    padding: 16px 16px 10px 16px;
+  
+  .modal__header {
+    padding: 12px 16px 8px 16px;
   }
   
   .modal__pizza-title {
-    font-size: 20px;
-    margin-bottom: 12px;
+    font-size: 18px;
+    margin-bottom: 10px;
+    line-height: 1.3;
   }
   
   .modal__tabs {
-    gap: 4px;
-  }
-    .modal__tab {
-    padding: 10px 12px;
-    font-size: 13px;
-    gap: 6px;
-  }
-  
-  .modal__form-section {
-    padding: 16px;
-  }
-  
-  .modal__option-group {
-    margin-bottom: 18px;
-  }
-  
-  .modal__description-section {
-    padding: 0 20px 20px 20px;
-  }
-  
-  .modal__desc-title {
-    margin: 16px 0 10px 0;
-    font-size: 18px;
-  }
-  
-  .modal__footer {
-    padding: 20px;
-    flex-direction: column;
-    gap: 20px;
-    align-items: stretch;
-  }
-  
-  .modal__price-section {
-    align-items: center;
-    text-align: center;
-  }
-  
-  .modal__pizza-price {
-    font-size: 28px;
-  }
-  
-  .modal__add-button {
-    width: 100%;
-    justify-content: center;
-    padding: 16px 24px;
-  }
-  .modal__ingredientes-container {
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-  }
-  
-  .modal__close-button {
-    top: 12px;
-    right: 12px;
-    width: 28px;
-    height: 28px;
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 480px) {
-  .modal__tabs {
-    flex-direction: row;
     gap: 2px;
   }
   
   .modal__tab {
-    padding: 10px 12px;
-    font-size: 13px;
-    flex: 1;
-    justify-content: center;
-  }
-  
-  .modal__option-group {
-    margin-bottom: 20px;
-  }
-  
-  .modal__pizza-title {
-    font-size: 22px;
-  }
-  
-  .modal__pizza-price {
-    font-size: 26px;
+    padding: 8px 10px;
+    font-size: 12px;
+    gap: 4px;
   }
   
   .modal__form-section {
-    padding: 16px;
+    padding: 12px 16px;
+    max-height: 40vh;
+    overflow-y: auto;
   }
   
-  .modal__header {
-    padding: 16px 16px 8px 16px;
+  .modal__option-group {
+    margin-bottom: 14px;
+  }
+  
+  .modal__option-label {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  .modal__toggle-button {
+    padding: 8px 12px;
+    font-size: 12px;
   }
   
   .modal__description-section {
     padding: 0 16px 16px 16px;
   }
   
+  .modal__desc-title {
+    margin: 12px 0 8px 0;
+    font-size: 16px;
+  }
+  
+  .modal__desc-text {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  
   .modal__footer {
     padding: 16px;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .modal__price-section {
+    align-items: center;
+    text-align: center;
+    margin-bottom: 0;
+  }
+  
+  .modal__pizza-price {
+    font-size: 24px;
+  }
+  
+  .modal__add-button {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+  
+  .modal__ingredientes-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .modal__ingrediente-item {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  
+  .modal__close-button {
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
   }
 }
 
+@media (max-width: 480px) {
+  .modal__overlay {
+    padding: 4px;
+    align-items: flex-start;
+    padding-top: 10px;
+  }
+  
+  .modal__content {
+    width: 100%;
+    max-width: 100%;
+    max-height: 95vh;
+    height: auto;
+    border-radius: 12px;
+    margin: 0;
+  }
+  
+  .modal__image-section {
+    height: 160px;
+    padding: 10px;
+  }
+  
+  .modal__image-section::before {
+    width: 120px;
+    height: 120px;
+  }
+
+  .modal__image-section::after {
+    width: 140px;
+    height: 140px;
+  }
+
+  .modal__pizza-image {
+    width: 100px;
+    height: 100px;
+    border: 2px solid #fff;
+  }
+  
+  .modal__tabs {
+    flex-direction: row;
+    gap: 1px;
+  }
+  
+  .modal__tab {
+    padding: 8px 6px;
+    font-size: 11px;
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .modal__option-group {
+    margin-bottom: 16px;
+  }
+  
+  .modal__option-label {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  
+  .modal__toggle-button {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+  
+  .modal__pizza-title {
+    font-size: 16px;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  
+  .modal__pizza-price {
+    font-size: 22px;
+  }
+  
+  .modal__form-section {
+    padding: 10px 12px;
+    max-height: 35vh;
+    overflow-y: auto;
+  }
+  
+  .modal__header {
+    padding: 10px 12px 6px 12px;
+  }
+  
+  .modal__description-section {
+    padding: 0 12px 12px 12px;
+  }
+  
+  .modal__desc-title {
+    margin: 8px 0 6px 0;
+    font-size: 14px;
+  }
+  
+  .modal__desc-text {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+  
+  .modal__footer {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .modal__add-button {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  .modal__ingredientes-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  
+  .modal__ingrediente-item {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+  
+  .modal__close-button {
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+  
+  .modal__personalizaciones-wrapper {
+    gap: 8px;
+  }
+  
+  .modal__personalizar-wrapper {
+    gap: 8px;
+  }
+  
+  .modal__toggle-slider {
+    width: 44px;
+    height: 24px;
+  }
+}
+
+/* ===================== */
+/*  MEJORAS ADICIONALES PARA MÓVILES */
+/* ===================== */
+
+/* Mejoras para pantallas muy pequeñas - menos de 360px */
+@media (max-width: 360px) {
+  .modal__overlay {
+    padding: 2px;
+    padding-top: 5px;
+  }
+  
+  .modal__content {
+    border-radius: 8px;
+  }
+  
+  .modal__image-section {
+    height: 140px;
+    padding: 8px;
+  }
+  
+  .modal__image-section::before {
+    width: 100px;
+    height: 100px;
+  }
+
+  .modal__image-section::after {
+    width: 120px;
+    height: 120px;
+  }
+
+  .modal__pizza-image {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .modal__pizza-title {
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  
+  .modal__tab {
+    padding: 6px 4px;
+    font-size: 10px;
+  }
+  
+  .modal__form-section {
+    padding: 8px 10px;
+    max-height: 32vh;
+  }
+  
+  .modal__option-label {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  
+  .modal__toggle-button {
+    padding: 5px 6px;
+    font-size: 10px;
+  }
+  
+  .modal__pizza-price {
+    font-size: 20px;
+  }
+  
+  .modal__add-button {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Mejoras para landscape en móviles */
+@media (max-width: 812px) and (max-height: 480px) and (orientation: landscape) {
+  .modal__overlay {
+    padding: 4px;
+    align-items: center;
+    padding-top: 4px;
+  }
+  
+  .modal__content {
+    max-height: 96vh;
+    height: auto;
+  }
+  
+  .modal__pedido-container {
+    flex-direction: row;
+    min-height: auto;
+  }
+  
+  .modal__image-section {
+    flex: 0 0 35%;
+    height: auto;
+    padding: 10px;
+  }
+  
+  .modal__image-section::before {
+    width: 120px;
+    height: 120px;
+  }
+
+  .modal__image-section::after {
+    width: 140px;
+    height: 140px;
+  }
+
+  .modal__pizza-image {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .modal__content-section {
+    flex: 1;
+    overflow: hidden;
+  }
+  
+  .modal__form-section {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  
+  .modal__footer {
+    padding: 10px 16px;
+  }
+}
+
+/* Optimizaciones adicionales para scrolling en móviles */
+@media (max-width: 768px) {
+  .modal__form-section {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #FEB248 transparent;
+  }
+  
+  .modal__form-section::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .modal__form-section::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .modal__form-section::-webkit-scrollbar-thumb {
+    background: #FEB248;
+    border-radius: 2px;
+  }
+  
+  .modal__form-section::-webkit-scrollbar-thumb:hover {
+    background: #f59e0b;
+  }
+  
+  /* Mejorar toque en dispositivos móviles */
+  .modal__tab,
+  .modal__toggle-button,
+  .modal__add-button,
+  .modal__close-button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  /* Prevenir zoom en inputs en iOS */
+  .modal__form-section input,
+  .modal__form-section select,
+  .modal__form-section textarea {
+    font-size: 16px;
+  }
+}
+
+/* Estados de hover deshabilitados en dispositivos táctiles */
+@media (hover: none) and (pointer: coarse) {
+  .modal__pizza-image:hover {
+    transform: none;
+    box-shadow: 
+      0 12px 30px rgba(0, 0, 0, 0.15),
+      0 0 0 4px rgba(254, 178, 72, 0.2),
+      inset 0 0 0 3px rgba(255, 255, 255, 0.8);
+  }
+  
+  .modal__image-section:hover::before {
+    background: radial-gradient(circle, rgba(254, 178, 72, 0.15) 0%, rgba(254, 178, 72, 0.08) 50%, transparent 70%);
+    transform: translate(-50%, -50%);
+  }
+  
+  .modal__image-section:hover::after {
+    border-color: rgba(254, 178, 72, 0.3);
+    transform: translate(-50%, -50%);
+  }
+}
 
 /* ============ RESEÑAS (modal blanco) ============ */
 .reseñas__container {
@@ -1069,20 +1393,43 @@ input:checked + .modal__slider:before {
 
 @media (max-width: 768px) {
   .reseñas__container {
-    padding: 20px;
+    padding: 16px;
+    max-height: 50vh;
+    overflow-y: auto;
   }
-    .modal__resenas-header {
-    padding: 16px 16px 12px 16px;
+  
+  .modal__resenas-header {
+    padding: 12px 16px 8px 16px;
+  }
+  
+  .reseñas__clientes-titulo {
+    font-size: 1rem;
+    margin-bottom: 16px;
   }
   
   .reseñas__empty {
-    padding: 28px 20px;
+    padding: 20px 16px;
     margin: 0;
   }
   
+  .reseñas__empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+  
+  .reseñas__empty-title {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  
+  .reseñas__empty-message {
+    font-size: 0.9rem;
+  }
+  
   .reseñas__review {
-    padding: 18px;
-    gap: 14px;
+    padding: 14px;
+    gap: 12px;
+    margin-bottom: 12px;
   }
   
   .reseñas__review-header {
@@ -1092,63 +1439,169 @@ input:checked + .modal__slider:before {
   }
   
   .reseñas__rating {
-    padding: 6px 10px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
   }
   
-  .reseñas__review-foto {
-    width: 50px !important;
-    height: 50px !important;
-    border-width: 2px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .reseñas__container {
-    padding: 16px;
-  }
-  
-  .modal__resenas-header {    padding: 12px 12px 8px 12px;
-  }
-  
-  .reseñas__empty {
-    padding: 24px 16px;
-  }
-  
-  .reseñas__review {
-    padding: 16px;
-    gap: 12px;
+  .reseñas__review-star {
+    font-size: 12px;
   }
   
   .reseñas__review-foto {
     width: 45px !important;
     height: 45px !important;
+    border-width: 2px !important;
   }
   
   .reseñas__review-content {
-    margin-left: 10px !important;
-  }
-  
-  .reseñas__rating {
-    padding: 6px 8px;
-    gap: 4px;
-  }
-  
-  .reseñas__review-star {
-    font-size: 14px !important;
-  }
-  
-  .reseñas__rating-text {
-    font-size: 0.8rem !important;
+    margin-left: 8px !important;
   }
   
   .reseñas__review-comment {
-    padding: 14px 16px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  
+  .reseñas__form-card {
+    padding: 20px 16px 16px 16px;
+    margin-bottom: 20px;
+  }
+  
+  .reseñas__form-title {
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+  
+  .reseñas__form-field {
+    margin-bottom: 14px;
+  }
+  
+  .reseñas__form-label {
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+  }
+  
+  .reseñas__form-star {
+    font-size: 20px;
+  }
+  
+  .reseñas__form-textarea {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+  
+  .reseñas__form-button {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reseñas__container {
+    padding: 12px;
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+  
+  .modal__resenas-header {
+    padding: 10px 12px 6px 12px;
+  }
+  
+  .reseñas__clientes-titulo {
     font-size: 0.95rem;
+    margin-bottom: 12px;
+  }
+  
+  .reseñas__empty {
+    padding: 16px 12px;
+  }
+  
+  .reseñas__empty-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
+  
+  .reseñas__empty-title {
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+  
+  .reseñas__empty-message {
+    font-size: 0.85rem;
+  }
+  
+  .reseñas__review {
+    padding: 12px;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .reseñas__review-foto {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  .reseñas__review-content {
+    margin-left: 6px !important;
+  }
+  
+  .reseñas__rating {
+    padding: 4px 6px;
+    gap: 3px;
+  }
+  
+  .reseñas__review-star {
+    font-size: 11px !important;
+  }
+  
+  .reseñas__rating-text {
+    font-size: 0.75rem !important;
+  }
+  
+  .reseñas__review-comment {
+    padding: 8px 10px;
+    font-size: 0.8rem;
   }
   
   .reseñas__review-comment::before,
   .reseñas__review-comment::after {
-    font-size: 20px;
+    font-size: 16px;
+  }
+  
+  .reseñas__form-card {
+    padding: 16px 12px 12px 12px;
+    margin-bottom: 16px;
+  }
+  
+  .reseñas__form-title {
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+  }
+  
+  .reseñas__form-field {
+    margin-bottom: 12px;
+  }
+  
+  .reseñas__form-label {
+    font-size: 0.85rem;
+    margin-bottom: 3px;
+  }
+  
+  .reseñas__form-star {
+    font-size: 18px;
+  }
+  
+  .reseñas__form-textarea {
+    font-size: 13px;
+    padding: 8px 10px;
+    min-height: 60px;
+  }
+  
+  .reseñas__form-button {
+    padding: 8px 14px;
+    font-size: 13px;
+    width: 100%;
   }
 }
 .reseñas__form-card {
