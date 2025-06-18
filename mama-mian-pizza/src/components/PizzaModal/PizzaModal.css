@@ -964,81 +964,50 @@ input:checked + .modal__slider:before {
 
 /* ============ RESEÑAS (modal blanco) ============ */
 .reseñas__container {
-  padding: 24px;
+  padding: 28px;
   min-height: auto;
-  background: #fafbfc;
+  background: linear-gradient(135deg, #fafbfc 0%, #f8fafc 100%);
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  max-width: 100%;
-  margin: 0;
+  max-width: 100%;  margin: 0;
   overflow-y: auto;
   flex: 1;
 }
 
-.reseñas__header {
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
+.reseñas__clientes-titulo {
   margin-bottom: 20px;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #1f2937;
+  text-align: left;
   display: flex;
   align-items: center;
-  min-height: 60px;
-  padding: 16px 20px;
-  gap: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  gap: 10px;
 }
 
-.reseñas__header-stars {
-  display: flex;
-  gap: 4px;
-}
-
-.reseñas__header-rating {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-}
-
-.reseñas__average {
+.reseñas__clientes-titulo::before {
+  content: '💬';
   font-size: 1.1rem;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.reseñas__count {
-  font-size: 0.9rem;
-  color: #6b7280;
-}
-
-.reseñas__header-extra {
-  flex: 1;
-  text-align: right;
-}
-
-.reseñas__clientes-titulo {
-  margin-bottom: 16px;
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: #1f2937;
-  text-align: center;
 }
 
 .reseñas__empty {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 32px 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  border: 1px solid #e1e5e9;
+  border-radius: 16px;
+  padding: 40px 28px;
   margin: 0 auto;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 400px;
+  max-width: 450px;
   width: 100%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.04);
+  position: relative;
 }
 
 .reseñas__empty-icon {
@@ -1061,8 +1030,8 @@ input:checked + .modal__slider:before {
 }
 
 .reseñas__empty-btn {
-  padding: 12px 24px;
-  font-size: 1rem;
+  padding: 8px 16px;
+  font-size: 0.9rem;
   background: #991B1B;
   color: #fff;
   border: none;
@@ -1071,88 +1040,115 @@ input:checked + .modal__slider:before {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(153, 27, 27, 0.2);
+  box-shadow: 0 3px 8px rgba(153, 27, 27, 0.2);
 }
 
 .reseñas__empty-btn:hover {
   background: #7f1d1d;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(153, 27, 27, 0.3);
+  box-shadow: 0 4px 12px rgba(153, 27, 27, 0.3);
 }
 
 /* Responsive para reseñas */
 @media (max-width: 1024px) {
   .reseñas__container {
-    padding: 20px;
+    padding: 24px;
   }
   
   .modal__resenas-header {
     padding: 20px 20px 16px 20px;
   }
+  
+  .reseñas__review {
+    padding: 20px;
+    gap: 16px;
+  }
 }
 
 @media (max-width: 768px) {
   .reseñas__container {
-    padding: 16px;
+    padding: 20px;
   }
-  
-  .modal__resenas-header {
+    .modal__resenas-header {
     padding: 16px 16px 12px 16px;
   }
   
-  .reseñas__header {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 16px;
-    min-height: auto;
-    gap: 12px;
-  }
-  
   .reseñas__empty {
-    padding: 24px 16px;
+    padding: 28px 20px;
     margin: 0;
   }
   
-  .reseñas__empty-titulo {
-    font-size: 1.2rem;
+  .reseñas__review {
+    padding: 18px;
+    gap: 14px;
   }
   
-  .reseñas__empty-text {
-    font-size: 0.9rem;
+  .reseñas__review-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  
+  .reseñas__rating {
+    padding: 6px 10px;
+  }
+  
+  .reseñas__review-foto {
+    width: 50px !important;
+    height: 50px !important;
+    border-width: 2px !important;
   }
 }
 
 @media (max-width: 480px) {
   .reseñas__container {
-    padding: 12px;
+    padding: 16px;
   }
   
-  .modal__resenas-header {
-    padding: 12px 12px 8px 12px;
-  }
-  
-  .reseñas__header {
-    padding: 12px;
-    gap: 8px;
+  .modal__resenas-header {    padding: 12px 12px 8px 12px;
   }
   
   .reseñas__empty {
-    padding: 20px 12px;
+    padding: 24px 16px;
   }
   
-  .reseñas__empty-titulo {
-    font-size: 1.1rem;
+  .reseñas__review {
+    padding: 16px;
+    gap: 12px;
   }
   
-  .reseñas__empty-text {
-    font-size: 0.85rem;
+  .reseñas__review-foto {
+    width: 45px !important;
+    height: 45px !important;
   }
   
-  .reseñas__empty-btn {
-    padding: 10px 20px;
-    font-size: 0.9rem;
+  .reseñas__review-content {
+    margin-left: 10px !important;
+  }
+  
+  .reseñas__rating {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+  
+  .reseñas__review-star {
+    font-size: 14px !important;
+  }
+  
+  .reseñas__rating-text {
+    font-size: 0.8rem !important;
+  }
+  
+  .reseñas__review-comment {
+    padding: 14px 16px;
+    font-size: 0.95rem;
+  }
+  
+  .reseñas__review-comment::before,
+  .reseñas__review-comment::after {
+    font-size: 20px;
   }
 }
 .reseñas__form-card {
@@ -1244,33 +1240,75 @@ input:checked + .modal__slider:before {
 }
 
 .reseñas__lista {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
 }
+
 .reseñas__review {
-  background: #fff;
-  border: 1px solid #e9ecef;
-  border-radius: 12px;
-  padding: 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  border: 1px solid #e1e5e9;
+  border-radius: 16px;
+  padding: 24px;
   font-size: 1rem;
   box-sizing: border-box;
   display: flex;
   align-items: flex-start;
-  gap: 15px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  gap: 18px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.reseñas__review::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #FEB248 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .reseñas__review:hover {
   border-color: #FEB248;
-  box-shadow: 0 4px 12px rgba(254, 178, 72, 0.15);
-  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 24px rgba(254, 178, 72, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+}
+
+.reseñas__review:hover::before {
+  opacity: 1;
 }
 
 .reseñas__user-avatar {
   flex-shrink: 0;
+  position: relative;
+}
+
+.reseñas__user-avatar::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #FEB248, #f59e0b, #FEB248);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.reseñas__user-avatar:hover::after {
+  opacity: 0.3;
 }
 
 .reseñas__review-content {
@@ -1282,14 +1320,47 @@ input:checked + .modal__slider:before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+
+.reseñas__review-header .reviewer-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #1f2937;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.reseñas__review-header .review-date {
+  font-size: 0.9rem;
+  color: #9ca3af;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .reseñas__rating {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 12px;
+  border: 1px solid #fbbf24;
+  width: fit-content;
+}
+
+.reseñas__review-star {
+  filter: drop-shadow(0 1px 2px rgba(234, 179, 8, 0.4));
+}
+
+.reseñas__rating-text {
+  font-weight: 600;
+  color: #92400e;
+  font-size: 0.9rem;
 }
 
 .reseñas__review-author {
@@ -1299,59 +1370,77 @@ input:checked + .modal__slider:before {
 }
 
 .reseñas__review-comment {
-  color: #444;
-  font-size: 15px;
-  line-height: 1.5;
-  background-color: #f8f9fa;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
-  font-style: italic;
+  color: #374151;
+  font-size: 1rem;
+  line-height: 1.6;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 16px 20px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  font-style: normal;
   position: relative;
+  margin-top: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .reseñas__review-comment::before {
   content: '"';
   position: absolute;
-  left: 8px;
-  top: 8px;
-  font-size: 18px;
+  left: 12px;
+  top: 10px;
+  font-size: 24px;
   color: #FEB248;
   font-weight: bold;
+  line-height: 1;
+  opacity: 0.7;
 }
 
 .reseñas__review-comment::after {
   content: '"';
   position: absolute;
-  right: 8px;
-  bottom: 8px;
-  font-size: 18px;
+  right: 12px;
+  bottom: 6px;
+  font-size: 24px;
   color: #FEB248;
   font-weight: bold;
+  line-height: 1;
+  opacity: 0.7;
 }
 
 /* ========== ESTILOS PARA FOTOS DE PERFIL EN RESEÑAS ========== */
 .reseñas__review-foto {
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 1;
   position: relative;
   cursor: pointer;
+  border: 3px solid #FEB248 !important;
+  box-shadow: 
+    0 4px 12px rgba(254, 178, 72, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.08) !important;
 }
 
 .reseñas__review-foto:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
-  border-color: #FEB248 !important;
+  transform: scale(1.08);
+  box-shadow: 
+    0 8px 20px rgba(254, 178, 72, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.12) !important;
+  border-color: #f59e0b !important;
 }
 
 /* Animación de carga de imagen */
 .reseñas__review-foto[style*="opacity: 0.7"] {
-  animation: imageLoading 1s infinite;
+  animation: imageLoading 1.5s infinite ease-in-out;
 }
 
 @keyframes imageLoading {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 0.3; }
+  0%, 100% { 
+    opacity: 0.7; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.4; 
+    transform: scale(1.02);
+  }
 }
 
 /* Mejoras para el contenedor de la foto de perfil */
@@ -1363,105 +1452,56 @@ input:checked + .modal__slider:before {
 .reseñas__user-avatar::before {
   content: '';
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
   border-radius: 50%;
   background: linear-gradient(45deg, #FEB248, #f59e0b, #FEB248);
   z-index: -1;
   opacity: 0;
   transition: opacity 0.3s ease;
+  animation: rotateGradient 3s linear infinite;
+}
+
+@keyframes rotateGradient {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .reseñas__user-avatar:hover::before {
-  opacity: 0.3;
+  opacity: 0.6;
 }
 
 /* Indicador de imagen cargada correctamente */
 .reseñas__review-foto[style*="opacity: 1"] {
-  animation: imageLoaded 0.5s ease-out;
+  animation: imageLoaded 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes imageLoaded {
   from {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.7) rotate(-5deg);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) rotate(0deg);
   }
 }
 
 /* Estilos para imagen de placeholder/error */
 .reseñas__review-foto[src*="perfilfoto.png"] {
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 2px solid #e2e8f0 !important;
-  opacity: 0.8;
+  border: 3px solid #cbd5e1 !important;
+  opacity: 0.9;
+  box-shadow: 
+    0 2px 8px rgba(203, 213, 225, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Responsive para fotos de perfil */
-@media (max-width: 768px) {
-  .reseñas__review-foto {
-    width: 45px !important;
-    height: 45px !important;
-    border-width: 2px !important;
-  }
-  
-  .reseñas__user-avatar {
-    margin-right: 10px;
-  }
-}
+/* Responsive para fotos de perfil se maneja en la sección anterior */
 
-@media (max-width: 480px) {
-  .reseñas__review-foto {
-    width: 40px !important;
-    height: 40px !important;
-  }
-}
-
-/* Responsive para reseñas */
-@media (max-width: 768px) {
-  .reseñas__review {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .reseñas__user-avatar {
-    align-self: center;
-  }
-  
-  .reseñas__review-header {
-    flex-direction: column;
-    gap: 4px;
-    text-align: center;
-  }
-  
-  .reseñas__review-comment {
-    margin-top: 10px;
-  }
-}
-
-/* Responsive para estadísticas de reseñas */
-@media (max-width: 768px) {
-  .reseñas__container div[style*="gridTemplateColumns"] {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .reseñas__container div[style*="gridTemplateColumns"] {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 8px !important;
-    font-size: 12px !important;
-  }
-  
-  .reseñas__container h4[style*="fontSize"] {
-    font-size: 14px !important;
-  }
-}
+/* Los responsive específicos se manejan en la sección anterior */
 
 /* Estilos especiales para modal de pizzas de recomendación */
 .modal__image-section--recommendation {
