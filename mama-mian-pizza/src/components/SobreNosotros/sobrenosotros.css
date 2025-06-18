@@ -6,6 +6,7 @@
   padding: 0;
   margin: 0;
   position: relative;
+  overflow-x: hidden; /* Prevenir scroll horizontal */
 }
 
 .sobrenos-container::before {
@@ -30,6 +31,8 @@
   color: var(--primary-color);
   position: relative;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .sobrenos-header::before,
@@ -39,18 +42,21 @@
 }
 
 .sobrenos-title {
-  font-size: 3.8rem;
+  font-size: clamp(2rem, 5vw, 3.8rem); /* Tamaño responsivo fluido */
   font-weight: bold;
-  margin: 0 0 1rem 0;  text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+  margin: 0 0 1rem 0;
+  text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
   position: relative;
   z-index: 2;
   font-family: 'Georgia', serif;
-  letter-spacing: 2px;
+  letter-spacing: clamp(0.5px, 0.5vw, 2px);
   color: var(--primary-color);
+  word-wrap: break-word;
+  hyphens: auto;
 }
 
 .sobrenos-subtitle {
-  font-size: 1.9rem;
+  font-size: clamp(1.2rem, 3vw, 1.9rem); /* Tamaño responsivo fluido */
   opacity: 0.95;
   font-style: italic;
   position: relative;
@@ -62,6 +68,8 @@
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
+  flex-wrap: wrap;
+  text-align: center;
 }
 
 .pizza-icon {
@@ -92,7 +100,7 @@
   background: linear-gradient(135deg, var(--secondary-color) 0%, #FFFBEB 100%);
   max-width: 900px;
   width: 100%;
-  padding: 3.5rem;
+  padding: clamp(2rem, 4vw, 3.5rem); /* Padding responsivo */
   border-radius: 25px;
   box-shadow: 
     0 8px 32px rgba(153, 27, 27, 0.2),
@@ -104,6 +112,7 @@
   background-image: 
     radial-gradient(circle at 30% 20%, rgba(234, 179, 8, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 70% 80%, rgba(252, 214, 160, 0.1) 0%, transparent 50%);
+  box-sizing: border-box;
 }
 
 .sobrenos-card:hover {
@@ -140,13 +149,15 @@
 
 .sobrenos-card h2 {
   color: var(--primary-color);
-  font-size: 2.4rem;
+  font-size: clamp(1.8rem, 4vw, 2.4rem); /* Tamaño responsivo fluido */
   margin-bottom: 2rem;
   text-align: center;
   position: relative;
   font-family: 'Georgia', serif;
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  word-wrap: break-word;
+  hyphens: auto;
 }
 
 .sobrenos-card h2::after {
@@ -160,14 +171,16 @@
 }
 
 .sobrenos-card p {
-  font-size: 1.4rem;
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem); /* Tamaño responsivo fluido */
   line-height: 1.9;
   color: var(--text-dark);
   margin-bottom: 2rem;
   text-align: justify;
-  text-indent: 2.5rem;
+  text-indent: clamp(1rem, 3vw, 2.5rem); /* Sangría responsiva */
   font-family: 'Georgia', serif;
   text-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.05);
+  word-wrap: break-word;
+  hyphens: auto;
 }
 
 /* Sección final nostálgica */
@@ -258,9 +271,10 @@
 /* Contenido con imágenes */
 .sobrenos-content-with-image {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 3rem;
   margin-top: 1rem;
+  flex-wrap: wrap;
 }
 
 .sobrenos-content-with-image.reverse {
@@ -269,21 +283,32 @@
 
 .sobrenos-text-content {
   flex: 1;
+  min-width: 280px; /* Asegura un ancho mínimo */
 }
 
 .sobrenos-image-container {
   flex: 0 0 300px;
   text-align: center;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .sobrenos-story-image {
   width: 100%;
-  height: 250px;
+  min-height: 200px;
+  max-height: 300px;
+  aspect-ratio: 4/3; /* Mantiene proporción 4:3 siempre */
   object-fit: cover;
+  object-position: center center;
   border-radius: 15px;
   border: 4px solid var(--text);
   box-shadow: 0 8px 25px rgba(153, 27, 27, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .sobrenos-story-image:hover {
@@ -296,8 +321,10 @@
   font-style: italic;
   color: var(--primary-color);
   font-family: 'Georgia', serif;
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 2vw, 1.1rem); /* Tamaño responsivo */
   text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  text-align: center;
+  word-wrap: break-word;
 }
 
 /* Galería de pizzas */
@@ -313,16 +340,23 @@
   gap: 2.5rem;
   margin: 2rem 0;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .pizza-image {
-  width: 300px;
-  height: 240px;
+  width: clamp(200px, 25vw, 300px); /* Ancho flexible entre 200px y 300px */
+  aspect-ratio: 5/4; /* Proporción 5:4 para pizzas */
   object-fit: cover;
+  object-position: center center;
   border-radius: 15px;
   border: 3px solid var(--accent-color);
   box-shadow: 0 8px 25px rgba(234, 179, 8, 0.3);
   transition: all 0.3s ease;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .pizza-image:hover {
@@ -338,13 +372,17 @@
 
 .team-image {
   width: 100%;
-  max-width: 400px;
-  height: 250px;
+  max-width: clamp(250px, 40vw, 400px); /* Ancho máximo flexible */
+  aspect-ratio: 3/2; /* Proporción 3:2 para imagen del equipo */
   object-fit: cover;
+  object-position: center center;
   border-radius: 20px;
   border: 4px solid var(--text);
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   transition: transform 0.3s ease;
+  display: block;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .team-image:hover {
@@ -360,8 +398,122 @@
   text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
+/* Media queries nostálgicas para tablets grandes */
+@media (max-width: 1200px) {
+  .sobrenos-header {
+    padding: 3.5rem 2rem 2.5rem;
+  }
+  
+  .sobrenos-title {
+    font-size: 3.4rem;
+  }
+  
+  .sobrenos-card {
+    max-width: 800px;
+    padding: 3rem;
+  }
+  
+  .sobrenos-content-with-image {
+    gap: 2.5rem;
+  }
+  
+  .sobrenos-image-container {
+    flex: 0 0 280px;
+  }
+  
+  .pizza-image {
+    width: clamp(180px, 22vw, 280px);
+  }
+}
+
+/* Media queries para pantallas cuadradas/medianas (tablets horizontales, monitores cuadrados) */
+@media (max-width: 1100px) and (min-width: 900px) {
+  .sobrenos-content-with-image {
+    flex-direction: row;
+    gap: 2.5rem;
+    align-items: flex-start;
+  }
+  
+  .sobrenos-content-with-image.reverse {
+    flex-direction: row-reverse;
+  }
+  
+  .sobrenos-image-container {
+    flex: 0 0 280px;
+    max-width: 280px;
+    margin: 0;
+  }
+  
+  .sobrenos-text-content {
+    flex: 1;
+    min-width: 0; /* Previene overflow del texto */
+  }
+  
+  .pizza-images {
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .pizza-image {
+    width: clamp(200px, 20vw, 260px);
+  }
+  
+  .team-image {
+    max-width: clamp(280px, 35vw, 340px);
+  }
+  
+  .sobrenos-card {
+    padding: 2.8rem;
+  }
+  
+  .image-caption {
+    font-size: 1rem;
+    margin-top: 0.8rem;
+  }
+}
+
+/* Media queries para tablets en orientación portrait */
+@media (max-width: 900px) and (min-width: 769px) {
+  .sobrenos-content-with-image {
+    flex-direction: column;
+    gap: 1.8rem;
+    text-align: center;
+  }
+  
+  .sobrenos-content-with-image.reverse {
+    flex-direction: column;
+  }
+  
+  .sobrenos-image-container {
+    flex: none;
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  
+  .pizza-images {
+    gap: 1.5rem;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .pizza-image {
+    width: clamp(180px, 18vw, 250px);
+  }
+  
+  .team-image {
+    max-width: clamp(250px, 32vw, 330px);
+  }
+}
+
 /* Media queries nostálgicas para tablets */
 @media (max-width: 1024px) {
+  .sobrenos-header {
+    padding: 3rem 1.5rem 2.5rem;
+  }
+  
   .sobrenos-title {
     font-size: 3.2rem;
     letter-spacing: 1px;
@@ -371,9 +523,14 @@
     font-size: 1.6rem;
   }
   
+  .sobrenos-section {
+    padding: 3rem 1rem;
+  }
+  
   .sobrenos-card {
-    padding: 3rem;
+    padding: 2.5rem;
     border-radius: 20px;
+    max-width: 100%;
   }
   
   .sobrenos-card h2 {
@@ -385,6 +542,10 @@
     text-indent: 2rem;
   }
   
+  .sobrenos-message {
+    padding: 2.5rem;
+  }
+  
   .sobrenos-message p {
     font-size: 1.4rem;
   }
@@ -393,6 +554,7 @@
   .sobrenos-content-with-image {
     flex-direction: column;
     gap: 2rem;
+    text-align: center;
   }
   
   .sobrenos-content-with-image.reverse {
@@ -402,13 +564,18 @@
   .sobrenos-image-container {
     flex: none;
     width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
   }
   
   .sobrenos-story-image {
     height: 220px;
+    width: 100%;
   }
-    .pizza-images {
+  
+  .pizza-images {
     gap: 1.5rem;
+    justify-content: center;
   }
   
   .pizza-image {
@@ -425,16 +592,20 @@
 /* Media queries nostálgicas para pantallas pequeñas */
 @media (max-width: 768px) {
   .sobrenos-header {
-    padding: 3rem 1rem 2.5rem;
+    padding: 2.5rem 1rem 2rem;
   }
   
   .sobrenos-title {
-    font-size: 2.8rem;
+    font-size: 2.6rem;
     letter-spacing: 1px;
+    line-height: 1.2;
   }
   
   .sobrenos-subtitle {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    line-height: 1.4;
   }
   
   .pizza-icon {
@@ -443,13 +614,14 @@
   }
   
   .sobrenos-section {
-    padding: 2.5rem 0.8rem;
+    padding: 2rem 1rem;
   }
   
   .sobrenos-card {
-    padding: 2.5rem;
+    padding: 2rem;
     border-radius: 18px;
     border-width: 2px;
+    margin: 0 0.5rem;
   }
   
   .sobrenos-card::before {
@@ -461,8 +633,9 @@
   }
   
   .sobrenos-card h2 {
-    font-size: 1.9rem;
+    font-size: 1.8rem;
     margin-bottom: 1.5rem;
+    line-height: 1.3;
   }
   
   .sobrenos-card h2::after {
@@ -470,17 +643,19 @@
   }
   
   .sobrenos-card p {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     text-indent: 1.5rem;
-    line-height: 1.8;
+    line-height: 1.7;
+    text-align: left;
+    margin-bottom: 1.5rem;
   }
   
   .sobrenos-final {
-    padding: 3rem 1rem;
+    padding: 2.5rem 1rem;
   }
   
   .sobrenos-message {
-    padding: 2rem;
+    padding: 1.8rem;
     border-radius: 15px;
   }
   
@@ -490,95 +665,26 @@
   }
   
   .sobrenos-message p {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    text-align: center;
+  }
+  
+  .sobrenos-welcome {
+    padding: 1.5rem;
     font-size: 1.3rem;
-    line-height: 1.9;
-  }
-  
-  .sobrenos-welcome {
-    padding: 1.5rem;
-    font-size: 1.4rem;
     border-radius: 12px;
   }
   
-  .sobrenos-welcome::before {
+  .sobrenos-welcome strong {
     font-size: 1.5rem;
-    padding: 6px;
+    line-height: 1.4;
   }
-  
-  .sobrenos-welcome strong {
-    font-size: 1.6rem;
-  }
-}
-
-/* Media queries nostálgicas para celulares */
-@media (max-width: 480px) {
-  .sobrenos-header {
-    padding: 2.5rem 1rem 2rem;
-  }
-  
-  .sobrenos-title {
-    font-size: 2.3rem;
-    letter-spacing: 0.5px;
-  }
-  
-  .sobrenos-subtitle {
-    font-size: 1.2rem;
-  }
-  
-  .pizza-icon {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .sobrenos-section {
-    padding: 2rem 0.5rem;
-  }
-  
-  .sobrenos-card {
-    padding: 2rem;
-    margin: 0 0.5rem;
-    border-radius: 15px;
-  }
-  
-  .sobrenos-card h2 {
-    font-size: 1.7rem;
-  }
-  
-  .sobrenos-card h2::after {
-    font-size: 1rem;
-  }
-  
-  .sobrenos-card p {
-    font-size: 1.1rem;
-    text-indent: 1rem;
-  }
-  
-  .sobrenos-message {
-    padding: 1.5rem;
-    border-radius: 12px;
-  }
-  
-  .sobrenos-message::before,
-  .sobrenos-message::after {
-    font-size: 2.5rem;
-  }
-  .sobrenos-message p {
-    font-size: 1.2rem;
-  }
-  
-  .sobrenos-welcome {
-    font-size: 1.2rem;
-    padding: 1.2rem;
-  }
-  
-  .sobrenos-welcome strong {
-    font-size: 1.4rem;
-  }
-
-  /* Responsivo para imágenes en móvil */
+    /* Responsivo para imágenes en móvil */
   .sobrenos-content-with-image {
     flex-direction: column;
-    gap: 2rem;
+    gap: 1.5rem;
+    text-align: center;
   }
   
   .sobrenos-content-with-image.reverse {
@@ -588,24 +694,267 @@
   .sobrenos-image-container {
     flex: none;
     width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
   }
   
-  .sobrenos-story-image {
-    height: 200px;
+  .pizza-images {
+    gap: 1.2rem;
+    flex-direction: column;
+    align-items: center;
   }
-    .pizza-images {
+  
+  .pizza-image {
+    width: clamp(250px, 80vw, 300px);
+    max-width: 90%;
+  }
+  
+  .team-image {
+    max-width: clamp(250px, 70vw, 320px);
+  }
+}
+
+/* Media queries nostálgicas para celulares */
+@media (max-width: 480px) {
+  .sobrenos-header {
+    padding: 2rem 0.8rem 1.5rem;
+  }
+  
+  .sobrenos-title {
+    font-size: 2.2rem;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
+  
+  .sobrenos-subtitle {
+    font-size: 1.1rem;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0 1rem;
+  }
+  
+  .pizza-icon {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .sobrenos-section {
+    padding: 1.5rem 0.5rem;
+  }
+  
+  .sobrenos-card {
+    padding: 1.5rem;
+    margin: 0 0.3rem;
+    border-radius: 15px;
+  }
+  
+  .sobrenos-card h2 {
+    font-size: 1.6rem;
+    line-height: 1.3;
+    margin-bottom: 1.2rem;
+  }
+  
+  .sobrenos-card h2::after {
+    font-size: 1rem;
+  }
+  
+  .sobrenos-card p {
+    font-size: 1.05rem;
+    text-indent: 0.8rem;
+    line-height: 1.6;
+    text-align: left;
+    margin-bottom: 1.2rem;
+  }
+  
+  .sobrenos-final {
+    padding: 2rem 0.8rem;
+  }
+  
+  .sobrenos-message {
+    padding: 1.3rem;
+    border-radius: 12px;
+  }
+  
+  .sobrenos-message::before,
+  .sobrenos-message::after {
+    font-size: 2.5rem;
+  }
+  
+  .sobrenos-message p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    text-align: center;
+  }
+  
+  .sobrenos-welcome {
+    font-size: 1.1rem;
+    padding: 1.2rem;
+  }
+  
+  .sobrenos-welcome strong {
+    font-size: 1.3rem;
+    line-height: 1.4;
+  }
+  /* Responsivo para imágenes en móvil pequeño */
+  .sobrenos-content-with-image {
+    flex-direction: column;
+    gap: 1.2rem;
+    text-align: center;
+  }
+  
+  .sobrenos-content-with-image.reverse {
+    flex-direction: column;
+  }
+  
+  .sobrenos-image-container {
+    flex: none;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  
+  .pizza-images {
     gap: 1rem;
     flex-direction: column;
     align-items: center;
   }
   
   .pizza-image {
-    width: 280px;
-    height: 200px;
+    width: clamp(200px, 75vw, 260px);
+    max-width: 90%;
+    border-width: 2px;
   }
   
   .team-image {
+    max-width: clamp(200px, 65vw, 280px);
+    border-width: 3px;
+  }
+}
+
+/* Media queries para celulares muy pequeños */
+@media (max-width: 360px) {
+  .sobrenos-header {
+    padding: 1.5rem 0.5rem 1.2rem;
+  }
+  
+  .sobrenos-title {
+    font-size: 1.9rem;
+    letter-spacing: 0.3px;
+  }
+  
+  .sobrenos-subtitle {
+    font-size: 1rem;
+    padding: 0 0.5rem;
+  }
+  
+  .sobrenos-section {
+    padding: 1.2rem 0.3rem;
+  }
+  
+  .sobrenos-card {
+    padding: 1.2rem;
+    margin: 0 0.2rem;
+    border-radius: 12px;
+  }
+  
+  .sobrenos-card h2 {
+    font-size: 1.4rem;
+  }
+  
+  .sobrenos-card p {
+    font-size: 0.95rem;
+    text-indent: 0.5rem;
+    line-height: 1.5;
+  }
+  
+  .sobrenos-final {
+    padding: 1.5rem 0.5rem;
+  }
+  
+  .sobrenos-message {
+    padding: 1rem;
+    border-radius: 10px;
+  }
+  
+  .sobrenos-message p {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  
+  .sobrenos-welcome {
+    font-size: 1rem;
+    padding: 1rem;
+  }
+  
+  .sobrenos-welcome strong {
+    font-size: 1.2rem;
+  }
+    .sobrenos-image-container {
+    max-width: 250px;
+  }
+  
+  .pizza-image {
+    width: clamp(160px, 70vw, 220px);
+  }
+  
+  .team-image {
+    max-width: clamp(180px, 60vw, 240px);
+  }
+}
+
+/* Media query específico para pantallas cuadradas o con aspect ratio cercano a 1:1 */
+@media screen and (aspect-ratio: 1/1), 
+       screen and (min-aspect-ratio: 0.9/1) and (max-aspect-ratio: 1.1/1) {
+  .sobrenos-content-with-image {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+  
+  .sobrenos-content-with-image.reverse {
+    flex-direction: column;
+  }
+  
+  .sobrenos-image-container {
+    flex: none;
     max-width: 300px;
-    height: 200px;
+    margin: 0 auto;
+  }
+  
+  .pizza-images {
+    flex-direction: row;
+    gap: 1.5rem;
+    justify-content: center;
+  }
+  
+  .pizza-image {
+    width: clamp(160px, 18vw, 220px);
+  }
+  
+  .team-image {
+    max-width: clamp(200px, 25vw, 280px);
+  }
+}
+
+/* Media query para pantallas muy anchas pero bajas (aspect ratio > 1.5) */
+@media screen and (min-aspect-ratio: 1.5/1) and (max-width: 1200px) {
+  .sobrenos-content-with-image {
+    flex-direction: row;
+    gap: 2rem;
+    align-items: center;
+  }
+  
+  .sobrenos-image-container {
+    flex: 0 0 200px;
+  }
+  
+  .pizza-images {
+    flex-direction: row;
+    gap: 1.2rem;
+    justify-content: space-around;
+  }
+  
+  .pizza-image {
+    width: clamp(140px, 15vw, 180px);
   }
 }
