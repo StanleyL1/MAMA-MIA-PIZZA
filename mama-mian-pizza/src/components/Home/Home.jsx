@@ -194,13 +194,13 @@ const Home = ({ onAddToCart, user }) => {
             <div className="decoration__circle decoration__circle--orange"></div>
             <div className="decoration__circle decoration__circle--red"></div>
           </div>
-        </div>
-        <div className="products__grid">
+        </div>        <div className="products__grid">
           {recomendacion.map((item, index) => (
             <ProductsCards 
               data={item}
               key={index}
               onCardClick={() => handleOpenPizza(item)}
+              isRecommendation={true}
             />
           ))}
         </div>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './productsCards.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faStarHalf, faCartShopping } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faCartShopping } from '@fortawesome/free-solid-svg-icons';
 
-function ProductsCards({ data, onCardClick }) {
+function ProductsCards({ data, onCardClick, isRecommendation = false }) {
   // TODOS los hooks deben ir AL PRINCIPIO, antes de cualquier return o condicional
   const [precioMediana, setPrecioMediana] = useState(data?.precio || '$0');
   const [cargandoPrecio, setCargandoPrecio] = useState(false);
@@ -61,8 +61,8 @@ function ProductsCards({ data, onCardClick }) {
     );
   }
 
-  const { titulo, descripcion, imagen, id_categoria } = data;return (
-    <div className="prodcard-container" onClick={() => {
+  const { titulo, descripcion, imagen, id_categoria } = data;  return (
+    <div className={`prodcard-container ${isRecommendation ? 'prodcard-container--recommendation' : ''}`} onClick={() => {
       if (data && onCardClick) {
         onCardClick(data);
       }
@@ -74,14 +74,12 @@ function ProductsCards({ data, onCardClick }) {
       <div className="prodcard-content">
         <h3 className="prodcard-titulo" title={titulo}>{titulo}</h3>
         <p className="card__product__description">{descripcion}</p>
-        
-        <div className="stars__containers">
+          <div className="stars__containers">
           <FontAwesomeIcon icon={faStar} />
           <FontAwesomeIcon icon={faStar} />
           <FontAwesomeIcon icon={faStar} />
           <FontAwesomeIcon icon={faStar} />
-          <FontAwesomeIcon icon={faStar} />
-          <FontAwesomeIcon icon={faStarHalf} />      
+          <FontAwesomeIcon icon={faStar} />    
         </div>
       </div>
       
