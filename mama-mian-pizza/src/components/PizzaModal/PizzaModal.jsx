@@ -4,7 +4,7 @@ import './PizzaModal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping, faCommentDots, faStar } from '@fortawesome/free-solid-svg-icons';
 
-function PizzaModal({ pizza, onClose, onAddToCart, user }) {
+function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = false }) {
   const [masa, setMasa] = useState('Tradicional');
   const [tamano, setTamano] = useState('Personal');
   const [instrucciones, setInstrucciones] = useState('');
@@ -523,9 +523,8 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
 
         {activeTab === 'pedido' ? (
           // Vista de pedido
-          <div className="modal__pedido-container">
-            {/* Imagen de la pizza */}
-            <div className="modal__image-section">
+          <div className="modal__pedido-container">            {/* Imagen de la pizza */}
+            <div className={`modal__image-section ${isRecommendation ? 'modal__image-section--recommendation' : ''}`}>
               <img src={pizza.imagen} alt={pizza.titulo} className="modal__pizza-image" />
             </div>
 

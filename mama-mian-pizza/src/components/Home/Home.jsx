@@ -19,6 +19,7 @@ const Home = ({ onAddToCart, user }) => {
   const [popular, setPopular] = useState([]);
   const [recomendacion, setRecomendaciones] = useState([]);
   const [selectedPizza, setSelectedPizza] = useState(null);
+  const [selectedPizzaIsRecommendation, setSelectedPizzaIsRecommendation] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -71,13 +72,14 @@ const Home = ({ onAddToCart, user }) => {
     fetchPopular();
     fetchRecomendations();
   }, []);
-
-  const handleOpenPizza = (pizza) => {
+  const handleOpenPizza = (pizza, isRecommendation = false) => {
     setSelectedPizza(pizza);
+    setSelectedPizzaIsRecommendation(isRecommendation);
   };
 
   const handleCloseModal = () => {
     setSelectedPizza(null);
+    setSelectedPizzaIsRecommendation(false);
   };
   const handleAddToCart = (pizza, masa, tamano, instrucciones, ingredientes) => {
     onAddToCart(pizza, masa, tamano, instrucciones, ingredientes);
@@ -199,7 +201,7 @@ const Home = ({ onAddToCart, user }) => {
             <ProductsCards 
               data={item}
               key={index}
-              onCardClick={() => handleOpenPizza(item)}
+              onCardClick={() => handleOpenPizza(item, true)}
               isRecommendation={true}
             />
           ))}
@@ -296,12 +298,12 @@ const Home = ({ onAddToCart, user }) => {
       </section><Footer />
 
       {/* Modal de Pizza */}
-      {selectedPizza && (
-        <PizzaModal 
+      {selectedPizza && (        <PizzaModal 
           pizza={selectedPizza}
           onClose={handleCloseModal}
           onAddToCart={handleAddToCart}
           user={user}
+          isRecommendation={selectedPizzaIsRecommendation}
         />
       )}      {/* Modal de Reseña */}
       {showReviewModal && (
