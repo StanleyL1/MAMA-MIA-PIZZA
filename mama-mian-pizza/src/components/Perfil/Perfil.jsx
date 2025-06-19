@@ -10,6 +10,7 @@ import {
 
 import perfilFoto from '../../assets/perfilfoto.png';
 import './Perfil.css';
+import { updateUserData, updateUserPhoto } from '../../utils/userStorage';
 
 const API_BASE_URL = 'https://api.mamamianpizza.com/api';
 
@@ -245,7 +246,25 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         throw new Error(`Error al actualizar perfil: ${response.status} - ${errorData.message || 'Error desconocido'}`);
       }
 
-      const result = await response.json();      console.log('✅ Perfil actualizado:', result);
+      const result = await response.json();
+      
+      // INMEDIATAMENTE actualizar localStorage para persistencia
+      const updatedUserData = {
+        ...user,
+        nombre: updatedData.nombre,
+        correo: updatedData.email,
+        telefono: updatedData.telefono,
+      };
+      
+      // Guardar en localStorage usando las utilidades
+      updateUserData(updatedUserData);
+      
+      // Actualizar el estado global del usuario
+      if (updateUser) {
+        updateUser(updatedUserData);
+      }
+      
+      console.log('✅ Perfil actualizado y guardado en localStorage:', result);
       return true;
 
     } catch (error) {
@@ -275,13 +294,24 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       if (!response.ok) {
         console.log('❌ Error al obtener perfil del usuario:', response.status);
         return;
-      }
-
-      const profileData = await response.json();
+      }      const profileData = await response.json();
       console.log('✅ Datos del perfil obtenidos:', profileData);
 
       // Actualizar el estado userPerfil con los datos reales de la API
       if (profileData) {
+        const updatedProfile = {
+          ...user,
+          nombre: profileData.nombre || user.nombre,
+          correo: profileData.correo || user.correo,
+          celular: profileData.celular || user.telefono,
+          telefono: profileData.celular || user.telefono,
+          foto_perfil: profileData.foto_perfil || user.foto_perfil,
+          foto: profileData.foto_perfil || user.foto,
+          fecha_nacimiento: profileData.fecha_nacimiento || user.fecha_nacimiento,
+          dui: profileData.dui || user.dui,
+          sexo: profileData.sexo || user.sexo,
+        };
+        
         setUserPerfil(prev => ({
           ...prev,
           nombre: profileData.nombre || prev.nombre,
@@ -293,22 +323,16 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
           sexo: profileData.sexo || prev.sexo,
         }));
 
+        // INMEDIATAMENTE guardar en localStorage para persistencia
+        updateUserData(updatedProfile);
+
         // También actualizar el usuario en el estado global si es necesario
         if (updateUser) {
-          updateUser({
-            ...user,
-            nombre: profileData.nombre || user.nombre,
-            correo: profileData.correo || user.correo,
-            celular: profileData.celular || user.telefono,
-            foto_perfil: profileData.foto_perfil || user.foto_perfil,
-            fecha_nacimiento: profileData.fecha_nacimiento || user.fecha_nacimiento,
-            dui: profileData.dui || user.dui,
-            sexo: profileData.sexo || user.sexo,
-          });
+          updateUser(updatedProfile);
         }
 
-        console.log('✅ Perfil actualizado con datos de la API');
-      }    } catch (error) {
+        console.log('✅ Perfil actualizado con datos de la API y guardado en localStorage');
+      }} catch (error) {
       console.error('❌ Error al obtener perfil:', error);
     }
   }, [user, updateUser]); // Incluir user y updateUser en dependencias
@@ -389,7 +413,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         console.error('❌ Error del servidor al subir foto:', errorData);
         throw new Error(`Error al subir foto: ${response.status} - ${errorData.message || 'Error desconocido'}`);
       }      const result = await response.json();
-      console.log('✅ Foto de perfil actualizada:', result);      // Actualizar la foto en el estado local con la URL real de la API
+      console.log('✅ Foto de perfil actualizada:', result);      
+
+      // Actualizar la foto en el estado local con la URL real de la API
       const newPhotoUrl = result.foto_perfil || result.foto;
       if (newPhotoUrl) {
         setUserPerfil(prev => ({
@@ -397,9 +423,13 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
           foto: newPhotoUrl
         }));
 
+        // INMEDIATAMENTE guardar en localStorage para persistencia
+        const updatedUserData = updateUserPhoto(newPhotoUrl);
+        
         // Actualizar el usuario en App.jsx para sincronizar con navbar
         if (updateUser) {
           updateUser({
+            ...user,
             foto_perfil: newPhotoUrl,
             foto: newPhotoUrl
           });
@@ -413,6 +443,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
           }
         });
         window.dispatchEvent(profileUpdateEvent);
+        
+        console.log('💾 Foto guardada en localStorage:', updatedUserData);
       }// Limpiar estados de imagen
       setImagePreview(null);
       

@@ -49,13 +49,52 @@ export const saveUserData = (userData) => {
     if (userData.id) {
       localStorage.setItem('userId', userData.id.toString());
     }
-    if (userData.correo) {
-      localStorage.setItem('userEmail', userData.correo);
+    if (userData.correo || userData.email) {
+      localStorage.setItem('userEmail', userData.correo || userData.email);
     }
     localStorage.setItem('userData', JSON.stringify(userData));
+    // También guardar en la clave que usa App.jsx para mejor compatibilidad
+    localStorage.setItem('mamamia_user', JSON.stringify(userData));
     console.log('💾 STORAGE - Datos del usuario guardados:', userData.id);
   } catch (error) {
     console.error('Error al guardar datos del usuario en localStorage:', error);
+  }
+};
+
+/**
+ * Actualizar datos específicos del usuario sin sobrescribir todo
+ * @param {object} updates - Datos a actualizar
+ */
+export const updateUserData = (updates) => {
+  try {
+    const currentUserData = getUserData();
+    if (currentUserData) {
+      const updatedUserData = { ...currentUserData, ...updates };
+      saveUserData(updatedUserData);
+      console.log('🔄 STORAGE - Datos del usuario actualizados:', updates);
+      return updatedUserData;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error al actualizar datos del usuario:', error);
+    return null;
+  }
+};
+
+/**
+ * Actualizar foto de perfil del usuario
+ * @param {string} newPhotoUrl - Nueva URL de la foto
+ */
+export const updateUserPhoto = (newPhotoUrl) => {
+  try {
+    const updates = {
+      foto_perfil: newPhotoUrl,
+      foto: newPhotoUrl
+    };
+    return updateUserData(updates);
+  } catch (error) {
+    console.error('Error al actualizar foto del usuario:', error);
+    return null;
   }
 };
 
@@ -67,6 +106,7 @@ export const clearUserData = () => {
     localStorage.removeItem('userId');
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userData');
+    localStorage.removeItem('mamamia_user'); // También limpiar la clave de App.jsx
     console.log('🧹 STORAGE - Datos del usuario limpiados');
   } catch (error) {
     console.error('Error al limpiar datos del usuario:', error);
@@ -94,7 +134,25 @@ export const getUserInfo = () => {
   return {
     id: userData.id,
     nombre: userData.nombre,
-    email: userData.correo,
+    email: userData.correo || userData.email,
     foto: userData.foto_perfil || userData.foto
   };
+};
+
+/**
+ * Sincronizar datos entre las diferentes claves de localStorage
+ */
+export const syncUserDataKeys = () => {
+  try {
+    const userData = getUserData();
+    const mamamiaUser = localStorage.getItem('mamamia_user');
+    
+    if (userData && !mamamiaUser) {
+      localStorage.setItem('mamamia_user', JSON.stringify(userData));
+    } else if (!userData && mamamiaUser) {
+      localStorage.setItem('userData', mamamiaUser);
+    }
+  } catch (error) {
+    console.error('Error al sincronizar claves de localStorage:', error);
+  }
 };

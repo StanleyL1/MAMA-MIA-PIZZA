@@ -28,10 +28,15 @@ const [currentProfilePhoto, setCurrentProfilePhoto] = useState(
 
 // Actualizar foto cuando cambie el usuario
 useEffect(() => {
-  setCurrentProfilePhoto(
-    user?.foto_perfil || user?.foto || require('../../assets/perfilfoto.png')
-  );
-}, [user]);
+  const newPhoto = user?.foto_perfil || user?.foto || require('../../assets/perfilfoto.png');
+  console.log('🔄 NAVBAR - Actualizando foto por cambio de usuario:', {
+    oldPhoto: currentProfilePhoto,
+    newPhoto: newPhoto,
+    user: user ? { id: user.id, nombre: user.nombre } : null
+  });
+  setCurrentProfilePhoto(newPhoto);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [user]); // currentProfilePhoto intencionalmente omitido para evitar loops
 
 // Escuchar eventos de actualización de foto de perfil
 useEffect(() => {
@@ -39,23 +44,45 @@ useEffect(() => {
     console.log('📸 NAVBAR - Evento de actualización de foto recibido:', event.detail);
     if (event.detail && event.detail.newPhoto) {
       setCurrentProfilePhoto(event.detail.newPhoto);
+      console.log('✅ NAVBAR - Foto actualizada en tiempo real');
     }
   };
 
   const handleProfileDataUpdate = (event) => {
     console.log('📝 NAVBAR - Evento de actualización de datos recibido:', event.detail);
-    // La actualización de datos se maneja a través del prop user
-    // Este evento se puede usar para hacer refresh si es necesario
+    // Los datos se actualizarán a través del prop user desde App.jsx
+    // Forzar una re-renderización si es necesario
+    if (event.detail && user) {
+      console.log('✅ NAVBAR - Datos del perfil actualizados');
+    }
+  };
+
+  // También escuchar cambios en localStorage para sincronización
+  const handleStorageChange = () => {
+    const savedUser = localStorage.getItem('mamamia_user');
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        if (parsedUser && parsedUser.foto_perfil !== currentProfilePhoto) {
+          setCurrentProfilePhoto(parsedUser.foto_perfil || parsedUser.foto || require('../../assets/perfilfoto.png'));
+          console.log('📦 NAVBAR - Foto sincronizada desde localStorage');
+        }
+      } catch (error) {
+        console.error('❌ Error al sincronizar desde localStorage:', error);
+      }
+    }
   };
 
   window.addEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
   window.addEventListener('profileDataUpdated', handleProfileDataUpdate);
+  window.addEventListener('storage', handleStorageChange);
 
   return () => {
     window.removeEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
     window.removeEventListener('profileDataUpdated', handleProfileDataUpdate);
+    window.removeEventListener('storage', handleStorageChange);
   };
-}, []);
+}, [user, currentProfilePhoto]);
 
 
 const toggleMobileMenu = () => {
