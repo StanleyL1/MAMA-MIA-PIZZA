@@ -424,24 +424,35 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
 
         // INMEDIATAMENTE guardar en localStorage para persistencia
         const updatedUserData = updateUserPhoto(newPhotoUrl);
-        
-        // Actualizar el usuario en App.jsx para sincronizar con navbar
+          // Actualizar el usuario en App.jsx para sincronizar con navbar
         if (updateUser) {
           updateUser({
             ...user,
             foto_perfil: newPhotoUrl,
             foto: newPhotoUrl
           });
-        }
-
-        // Disparar evento para actualizar navbar con la URL real
-        const profileUpdateEvent = new CustomEvent('profilePhotoUpdated', {
-          detail: {
-            newPhoto: newPhotoUrl,
-            userId: user.id
-          }
-        });
-        window.dispatchEvent(profileUpdateEvent);
+        }        // Disparar eventos después de un pequeño delay para asegurar sincronización
+        setTimeout(() => {
+          // Disparar evento para actualizar navbar con la URL real
+          const profileUpdateEvent = new CustomEvent('profilePhotoUpdated', {
+            detail: {
+              newPhoto: newPhotoUrl,
+              userId: user.id
+            }
+          });
+          window.dispatchEvent(profileUpdateEvent);
+          
+          // También forzar un evento de storage para sincronización entre pestañas
+          window.dispatchEvent(new StorageEvent('storage', {
+            key: 'mamamia_user',
+            newValue: JSON.stringify({
+              ...user,
+              foto_perfil: newPhotoUrl,
+              foto: newPhotoUrl
+            }),
+            url: window.location.href
+          }));
+        }, 100);
         
         console.log('💾 Foto guardada en localStorage:', updatedUserData);
       }// Limpiar estados de imagen

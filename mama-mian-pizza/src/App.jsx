@@ -154,13 +154,27 @@ function App() {
       console.log('✅ APP - Usuario actualizado en estado y localStorage:', updatedUser);
     }
   };
-
   const handleLogout = () => {
     console.log('🚪 APP - Cerrando sesión');
+    // Antes de limpiar, guardar la foto actual para mantenerla visible
+    if (user?.foto_perfil || user?.foto) {
+      const currentPhoto = user.foto_perfil || user.foto;
+      try {
+        // Mantener solo la foto en localStorage para mostrar después del logout
+        const photoOnlyData = {
+          foto_perfil: currentPhoto,
+          foto: currentPhoto
+        };
+        localStorage.setItem('mamamia_last_photo', JSON.stringify(photoOnlyData));
+      } catch (error) {
+        console.error('❌ Error al guardar foto para después del logout:', error);
+      }
+    }
+    
     setUser(null);
-    // Usar la función mejorada para limpiar datos
+    // Usar la función mejorada para limpiar datos de usuario
     clearUserData();
-    console.log('✅ APP - Usuario removido del estado y localStorage');
+    console.log('✅ APP - Usuario removido del estado, foto preservada');
   };
 
   // Función para mostrar toast desde componentes hijos
