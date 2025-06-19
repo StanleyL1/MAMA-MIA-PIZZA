@@ -331,9 +331,21 @@ const Login = ({ onLogin }) => {
                 } else {
                     console.warn('⚠️ LOGIN - No se pudo guardar datos en localStorage: ID no disponible');
                 }
-                
-                // Llamar a onLogin con los datos finales
+                  // Llamar a onLogin con los datos finales
                 onLogin(userDataToSave);
+                
+                // Disparar evento para que el navbar se actualice inmediatamente
+                if (userDataToSave.foto_perfil || userDataToSave.foto) {
+                    const loginPhotoEvent = new CustomEvent('profilePhotoUpdated', {
+                        detail: {
+                            newPhoto: userDataToSave.foto_perfil || userDataToSave.foto,
+                            userId: userDataToSave.id
+                        }
+                    });
+                    window.dispatchEvent(loginPhotoEvent);
+                    console.log('📸 LOGIN - Evento de foto disparado para navbar');
+                }
+                
                 setSuccess(true);
                   // Redirigir después de 1 segundo
                 setTimeout(() => {

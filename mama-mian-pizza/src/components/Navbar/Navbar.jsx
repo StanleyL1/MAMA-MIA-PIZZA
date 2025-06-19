@@ -22,9 +22,47 @@ const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
 // Estado local para la foto de perfil para actualizaciones en tiempo real
-const [currentProfilePhoto, setCurrentProfilePhoto] = useState(
-  user?.foto_perfil || user?.foto || require('../../assets/perfilfoto.png')
-);
+const [currentProfilePhoto, setCurrentProfilePhoto] = useState(() => {
+  // Inicializar con datos del usuario o desde localStorage como fallback
+  if (user?.foto_perfil || user?.foto) {
+    return user.foto_perfil || user.foto;
+  }
+  
+  // Intentar cargar desde localStorage si no hay usuario todavía
+  try {
+    const savedUser = localStorage.getItem('mamamia_user');
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      return parsedUser.foto_perfil || parsedUser.foto || require('../../assets/perfilfoto.png');
+    }
+  } catch (error) {
+    console.error('❌ Error al cargar foto desde localStorage:', error);
+  }
+  
+  return require('../../assets/perfilfoto.png');
+});
+
+// Cargar foto de perfil desde localStorage al montar el componente
+useEffect(() => {
+  const loadPhotoFromStorage = () => {
+    try {
+      const savedUser = localStorage.getItem('mamamia_user');
+      if (savedUser) {
+        const parsedUser = JSON.parse(savedUser);
+        if (parsedUser && (parsedUser.foto_perfil || parsedUser.foto)) {
+          const photoUrl = parsedUser.foto_perfil || parsedUser.foto;
+          setCurrentProfilePhoto(photoUrl);
+          console.log('🔄 NAVBAR - Foto cargada desde localStorage al montar:', photoUrl);
+        }
+      }
+    } catch (error) {
+      console.error('❌ NAVBAR - Error al cargar foto desde localStorage:', error);
+    }
+  };
+
+  // Ejecutar inmediatamente al montar
+  loadPhotoFromStorage();
+}, []); // Solo ejecutar una vez al montar
 
 // Actualizar foto cuando cambie el usuario
 useEffect(() => {
@@ -38,6 +76,17 @@ useEffect(() => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [user]); // currentProfilePhoto intencionalmente omitido para evitar loops
 
+// Detectar cambios específicos en la foto del usuario
+useEffect(() => {
+  if (user) {
+    const newPhoto = user.foto_perfil || user.foto;
+    if (newPhoto && newPhoto !== currentProfilePhoto) {
+      setCurrentProfilePhoto(newPhoto);
+      console.log('🔄 NAVBAR - Foto actualizada por cambio de prop user:', newPhoto);
+    }
+  }
+}, [user, currentProfilePhoto]); // Incluir user completo en las dependencias
+
 // Escuchar eventos de actualización de foto de perfil
 useEffect(() => {
   const handleProfilePhotoUpdate = (event) => {
@@ -47,7 +96,6 @@ useEffect(() => {
       console.log('✅ NAVBAR - Foto actualizada en tiempo real');
     }
   };
-
   const handleProfileDataUpdate = (event) => {
     console.log('📝 NAVBAR - Evento de actualización de datos recibido:', event.detail);
     // Los datos se actualizarán a través del prop user desde App.jsx
@@ -56,23 +104,20 @@ useEffect(() => {
       console.log('✅ NAVBAR - Datos del perfil actualizados');
     }
   };
-
   // También escuchar cambios en localStorage para sincronización
   const handleStorageChange = () => {
     const savedUser = localStorage.getItem('mamamia_user');
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
-        if (parsedUser && parsedUser.foto_perfil !== currentProfilePhoto) {
-          setCurrentProfilePhoto(parsedUser.foto_perfil || parsedUser.foto || require('../../assets/perfilfoto.png'));
-          console.log('📦 NAVBAR - Foto sincronizada desde localStorage');
-        }
+        const newPhoto = parsedUser.foto_perfil || parsedUser.foto || require('../../assets/perfilfoto.png');
+        setCurrentProfilePhoto(newPhoto);
+        console.log('📦 NAVBAR - Foto sincronizada desde localStorage:', newPhoto);
       } catch (error) {
         console.error('❌ Error al sincronizar desde localStorage:', error);
       }
     }
   };
-
   window.addEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
   window.addEventListener('profileDataUpdated', handleProfileDataUpdate);
   window.addEventListener('storage', handleStorageChange);
@@ -82,7 +127,7 @@ useEffect(() => {
     window.removeEventListener('profileDataUpdated', handleProfileDataUpdate);
     window.removeEventListener('storage', handleStorageChange);
   };
-}, [user, currentProfilePhoto]);
+}, [user]); // user es usado en handleProfileDataUpdate
 
 
 const toggleMobileMenu = () => {
@@ -117,7 +162,27 @@ useEffect(() => {
   return () => document.removeEventListener('click', handleClickOutside);
 }, []);
 
-
+// Debug: Mostrar información en consola sobre el estado actual
+useEffect(() => {
+  console.log('🔍 NAVBAR DEBUG - Estado actual:', {
+    user: user ? {
+      id: user.id,
+      nombre: user.nombre,
+      foto_perfil: user.foto_perfil,
+      foto: user.foto
+    } : 'NO USER',
+    currentProfilePhoto,
+    localStorage: (() => {
+      try {
+        const saved = localStorage.getItem('mamamia_user');
+        return saved ? JSON.parse(saved) : null;
+      } catch {
+        return 'ERROR';
+      }
+    })()
+  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [user, currentProfilePhoto]); // Incluir ambas dependencias pero con disable para evitar renders excesivos
 
 
 
