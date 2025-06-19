@@ -37,14 +37,13 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
   
   // Ref para controlar si ya se han cargado los datos iniciales
   const initialDataLoaded = useRef(false);
-  
-  // Estado de perfil del usuario - usar datos reales si están disponibles
+    // Estado de perfil del usuario - usar datos reales si están disponibles
   const [userPerfil, setUserPerfil] = useState({
     nombre: user?.nombre || 'Usuario',
     email: user?.correo || user?.email || 'usuario@email.com',
     telefono: user?.telefono || user?.celular || '+503 0000-0000',
     foto: user?.foto_perfil || user?.foto || perfilFoto,
-    miembroDesde: user?.fecha_registro ? new Date(user.fecha_registro).getFullYear() : 2023,
+    miembroDesde: user?.fecha_registro ? new Date(user.fecha_registro).getFullYear() : new Date().getFullYear(),
     fecha_nacimiento: user?.fecha_nacimiento || '',
     dui: user?.dui || user?.numero_dui || '',
   });
