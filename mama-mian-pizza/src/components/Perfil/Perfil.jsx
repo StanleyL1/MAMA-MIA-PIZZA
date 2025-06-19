@@ -216,7 +216,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       }    } finally {
       setLoadingOrders(false);
     }
-  }, [user?.id, loadingOrders]); // Solo incluir ID y estado de carga para evitar re-renders// Función para actualizar perfil en la API
+  }, [user, loadingOrders]); // Incluir user completo para dependencias// Función para actualizar perfil en la API
   const updateUserProfile = async (updatedData) => {
     if (!user?.id) {
       console.log('❌ No hay ID de usuario para actualizar perfil');
@@ -311,7 +311,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       }    } catch (error) {
       console.error('❌ Error al obtener perfil:', error);
     }
-  }, [user?.id]); // Solo incluir el ID del usuario
+  }, [user, updateUser]); // Incluir user y updateUser en dependencias
   
   // Función para manejar la selección de imagen
   const handleImageSelect = (event) => {
@@ -536,7 +536,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       }    }
     
     return false;
-  }, [user?.id, user?.correo]); // Solo incluir ID y correo del usuario
+  }, [user, updateUser]); // Incluir user y updateUser en dependencias
   
   // Ejecutar validación del ID cuando el componente se monte o cambie el usuario
   useEffect(() => {
@@ -549,11 +549,10 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
           // Solo cargar datos si no se necesitó corregir el ID
           fetchUserProfile(); // Obtener datos del perfil
           fetchUserOrders();  // Obtener pedidos
-        }
-        // Si se corrigió el ID, el efecto se ejecutará de nuevo y cargará los datos
+        }        // Si se corrigió el ID, el efecto se ejecutará de nuevo y cargará los datos
       });
     }
-  }, [user?.id, user?.correo]);
+  }, [user?.id, user?.correo, fetchUserOrders, fetchUserProfile, validateAndFixUserId]); // Incluir todas las dependencias
   
   // Reset del flag cuando cambie el usuario
   useEffect(() => {
