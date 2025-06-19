@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-regular-svg-icons';
 import { faBars, faCartShopping, faUserCircle, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import Logo from '../../assets/Logo1.png';
 import './Navbar.css';
 import { Link } from 'react-router-dom';
-import { getLastProfilePhoto } from '../../utils/userStorage';
 
 
 const Navbar = ({ onCartToggle, cartItemCount, user, onLogout }) => {
@@ -23,31 +23,22 @@ const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
 // Estado local para la foto de perfil para actualizaciones en tiempo real
 const [currentProfilePhoto, setCurrentProfilePhoto] = useState(() => {
-  // Primero intentar desde el prop user
+  // Inicializar con datos del usuario o desde localStorage como fallback
   if (user?.foto_perfil || user?.foto) {
     return user.foto_perfil || user.foto;
   }
   
-  // Luego intentar desde localStorage
+  // Intentar cargar desde localStorage si no hay usuario todavía
   try {
     const savedUser = localStorage.getItem('mamamia_user');
     if (savedUser) {
       const parsedUser = JSON.parse(savedUser);
-      if (parsedUser?.foto_perfil || parsedUser?.foto) {
-        return parsedUser.foto_perfil || parsedUser.foto;
-      }
-    }
-    
-    // Si no hay usuario logueado, intentar obtener la última foto guardada
-    const lastPhoto = getLastProfilePhoto();
-    if (lastPhoto) {
-      return lastPhoto;
+      return parsedUser.foto_perfil || parsedUser.foto || require('../../assets/perfilfoto.png');
     }
   } catch (error) {
     console.error('❌ Error al cargar foto desde localStorage:', error);
   }
   
-  // Por defecto usar la imagen predeterminada
   return require('../../assets/perfilfoto.png');
 });
 
@@ -74,42 +65,18 @@ useEffect(() => {
 }, []); // Solo ejecutar una vez al montar
 
 // Actualizar foto cuando cambie el usuario
-// eslint-disable-next-line react-hooks/exhaustive-deps
 useEffect(() => {
-  if (user) {
-    const newPhoto = user.foto_perfil || user.foto;
-    if (newPhoto && newPhoto !== currentProfilePhoto) {
-      setCurrentProfilePhoto(newPhoto);
-      console.log('🔄 NAVBAR - Foto actualizada por cambio de usuario:', newPhoto);
-    }  } else {
-    // Si no hay usuario (logout), intentar mantener la última foto conocida
-    try {
-      const savedUser = localStorage.getItem('mamamia_user');
-      if (savedUser) {
-        const parsedUser = JSON.parse(savedUser);
-        if (parsedUser?.foto_perfil || parsedUser?.foto) {
-          setCurrentProfilePhoto(parsedUser.foto_perfil || parsedUser.foto);
-          return;
-        }
-      }
-      
-      // Si no hay usuario en localStorage, usar la última foto guardada
-      const lastPhoto = getLastProfilePhoto();
-      if (lastPhoto) {
-        setCurrentProfilePhoto(lastPhoto);
-        console.log('📸 NAVBAR - Usando última foto guardada después del logout:', lastPhoto);
-      } else {
-        setCurrentProfilePhoto(require('../../assets/perfilfoto.png'));
-      }
-    } catch (error) {
-      console.error('❌ Error al cargar foto desde localStorage:', error);      setCurrentProfilePhoto(require('../../assets/perfilfoto.png'));
-    }
-  }
+  const newPhoto = user?.foto_perfil || user?.foto || require('../../assets/perfilfoto.png');
+  console.log('🔄 NAVBAR - Actualizando foto por cambio de usuario:', {
+    oldPhoto: currentProfilePhoto,
+    newPhoto: newPhoto,
+    user: user ? { id: user.id, nombre: user.nombre } : null
+  });
+  setCurrentProfilePhoto(newPhoto);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [user]);
+}, [user]); // currentProfilePhoto intencionalmente omitido para evitar loops
 
 // Detectar cambios específicos en la foto del usuario
-// eslint-disable-next-line react-hooks/exhaustive-deps
 useEffect(() => {
   if (user) {
     const newPhoto = user.foto_perfil || user.foto;
@@ -118,8 +85,7 @@ useEffect(() => {
       console.log('🔄 NAVBAR - Foto actualizada por cambio de prop user:', newPhoto);
     }
   }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [user, currentProfilePhoto]);
+}, [user, currentProfilePhoto]); // Incluir user completo en las dependencias
 
 // Escuchar eventos de actualización de foto de perfil
 useEffect(() => {
@@ -127,63 +93,41 @@ useEffect(() => {
     console.log('📸 NAVBAR - Evento de actualización de foto recibido:', event.detail);
     if (event.detail && event.detail.newPhoto) {
       setCurrentProfilePhoto(event.detail.newPhoto);
-      console.log('✅ NAVBAR - Foto actualizada en tiempo real:', event.detail.newPhoto);
+      console.log('✅ NAVBAR - Foto actualizada en tiempo real');
     }
   };
-
   const handleProfileDataUpdate = (event) => {
     console.log('📝 NAVBAR - Evento de actualización de datos recibido:', event.detail);
     // Los datos se actualizarán a través del prop user desde App.jsx
+    // Forzar una re-renderización si es necesario
     if (event.detail && user) {
       console.log('✅ NAVBAR - Datos del perfil actualizados');
     }
   };
-
-  // Escuchar cambios en localStorage para sincronización entre pestañas
-  const handleStorageChange = (event) => {
-    if (event.key === 'mamamia_user' && event.newValue) {
+  // También escuchar cambios en localStorage para sincronización
+  const handleStorageChange = () => {
+    const savedUser = localStorage.getItem('mamamia_user');
+    if (savedUser) {
       try {
-        const parsedUser = JSON.parse(event.newValue);
-        const newPhoto = parsedUser.foto_perfil || parsedUser.foto;
-        if (newPhoto) {
-          setCurrentProfilePhoto(newPhoto);
-          console.log('📦 NAVBAR - Foto sincronizada desde localStorage (storage event):', newPhoto);
-        }
+        const parsedUser = JSON.parse(savedUser);
+        const newPhoto = parsedUser.foto_perfil || parsedUser.foto || require('../../assets/perfilfoto.png');
+        setCurrentProfilePhoto(newPhoto);
+        console.log('📦 NAVBAR - Foto sincronizada desde localStorage:', newPhoto);
       } catch (error) {
         console.error('❌ Error al sincronizar desde localStorage:', error);
       }
     }
   };
-
-  // Función para forzar actualización desde localStorage
-  const forceUpdateFromStorage = () => {
-    try {
-      const savedUser = localStorage.getItem('mamamia_user');
-      if (savedUser) {
-        const parsedUser = JSON.parse(savedUser);
-        const newPhoto = parsedUser.foto_perfil || parsedUser.foto;
-        if (newPhoto && newPhoto !== currentProfilePhoto) {
-          setCurrentProfilePhoto(newPhoto);
-          console.log('� NAVBAR - Foto forzada desde localStorage:', newPhoto);
-        }
-      }
-    } catch (error) {
-      console.error('❌ Error al forzar actualización desde localStorage:', error);
-    }
-  };
-
   window.addEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
   window.addEventListener('profileDataUpdated', handleProfileDataUpdate);
   window.addEventListener('storage', handleStorageChange);
-  window.addEventListener('focus', forceUpdateFromStorage); // Actualizar al volver a la pestaña
+
   return () => {
     window.removeEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
     window.removeEventListener('profileDataUpdated', handleProfileDataUpdate);
     window.removeEventListener('storage', handleStorageChange);
-    window.removeEventListener('focus', forceUpdateFromStorage);
   };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [user, currentProfilePhoto]);
+}, [user]); // user es usado en handleProfileDataUpdate
 
 
 const toggleMobileMenu = () => {
@@ -419,60 +363,23 @@ useEffect(() => {
                   </li>
                 </ul>
               )}
-            </div>  ) : (
-    // Si no está logueado, mostrar foto de perfil actualizada con opción de login
-    <div className="navbar__profile-logged" style={{ position: 'relative' }}>
-      <button
-        className="navbar__profile-btn"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (window.innerWidth > 768) {
-            window.location.href = "/login";
-          } else {
-            setIsUserMenuOpen(prev => !prev);
-            setIsMobileMenuOpen(false);
-          }
-        }}
-        aria-label="Iniciar sesión"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: 'white',
-          padding: '8px 12px',
-          borderRadius: '6px',
-          fontSize: '14px',
-          transition: 'background-color 0.2s'
-        }}
-        onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-      >        
-        <img 
-          alt='Foto de perfil'
-          src={currentProfilePhoto}
-          className="navbar__profile-photo"
-          style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            marginRight: '8px',
-            objectFit: 'cover',
-            border: '2px solid rgba(255,255,255,0.3)',
-            opacity: '0.8' // Hacer la foto un poco transparente para indicar que no hay sesión
-          }}                  
-          onError={(e) => {
-            console.log('❌ Error cargando imagen de perfil, usando por defecto');
-            e.target.src = require('../../assets/perfilfoto.png');
-          }}
-        />                
-        <span className="navbar__profile-name" style={{ fontWeight: '500', opacity: '0.8' }}>
-          Iniciar Sesión
-        </span>
-      </button>
-    </div>
+            </div>
+  ) : (
+    // Si no está logueado, icono user como antes
+    <button
+      className="icon-button"
+      onClick={() => {
+        if (window.innerWidth > 768) {
+          window.location.href = "/login";
+        } else {
+          setIsUserMenuOpen(prev => !prev);
+          setIsMobileMenuOpen(false);
+        }
+      }}
+      aria-label="Usuario"
+    >
+      <FontAwesomeIcon icon={faUser} className="icon-img" />
+    </button>
   )}
 
   {/* Dropdown solo si no hay usuario */}

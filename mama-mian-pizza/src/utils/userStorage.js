@@ -91,19 +91,7 @@ export const updateUserPhoto = (newPhotoUrl) => {
       foto_perfil: newPhotoUrl,
       foto: newPhotoUrl
     };
-    
-    // Actualizar datos del usuario principal
-    const updatedUserData = updateUserData(updates);
-    
-    // También guardar la foto por separado para persistencia después del logout
-    localStorage.setItem('mamamia_last_photo', JSON.stringify({
-      foto_perfil: newPhotoUrl,
-      foto: newPhotoUrl,
-      updated_at: new Date().toISOString()
-    }));
-    
-    console.log('📸 STORAGE - Foto actualizada y guardada para persistencia:', newPhotoUrl);
-    return updatedUserData;
+    return updateUserData(updates);
   } catch (error) {
     console.error('Error al actualizar foto del usuario:', error);
     return null;
@@ -166,35 +154,5 @@ export const syncUserDataKeys = () => {
     }
   } catch (error) {
     console.error('Error al sincronizar claves de localStorage:', error);
-  }
-};
-
-/**
- * Obtener la última foto de perfil guardada (para mostrar después del logout)
- * @returns {string|null} URL de la última foto o null si no existe
- */
-export const getLastProfilePhoto = () => {
-  try {
-    const lastPhoto = localStorage.getItem('mamamia_last_photo');
-    if (lastPhoto) {
-      const photoData = JSON.parse(lastPhoto);
-      return photoData.foto_perfil || photoData.foto;
-    }
-    return null;
-  } catch (error) {
-    console.error('Error al obtener última foto de perfil:', error);
-    return null;
-  }
-};
-
-/**
- * Limpiar solo la foto guardada para después del logout
- */
-export const clearLastProfilePhoto = () => {
-  try {
-    localStorage.removeItem('mamamia_last_photo');
-    console.log('🧹 STORAGE - Última foto de perfil limpiada');
-  } catch (error) {
-    console.error('Error al limpiar última foto de perfil:', error);
   }
 };
