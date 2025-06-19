@@ -64,7 +64,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
   // Estados para manejo de foto de perfil
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [uploadingImage, setUploadingImage] = useState(false);// Función para obtener pedidos del usuario desde la API
+  const [uploadingImage, setUploadingImage] = useState(false);  // Función para obtener pedidos del usuario desde la API
   const fetchUserOrders = useCallback(async () => {
     if (!user?.id) {
       console.log('❌ No hay ID de usuario para obtener pedidos');
@@ -77,8 +77,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     try {
       const userId = user.id;
       console.log('🔍 Obteniendo pedidos para usuario ID:', userId);
-      
-      const response = await fetch(`${API_BASE_URL}/customers/${userId}/orders`, {
+        // Usar el endpoint correcto para obtener todos los pedidos del usuario
+      const response = await fetch(`${API_BASE_URL}/orders/orders/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -86,48 +86,77 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       });
 
       if (!response.ok) {
+        // Si el endpoint no existe o retorna error, mostrar mensaje específico
+        if (response.status === 404) {
+          console.log('📭 No se encontraron pedidos para este usuario');
+          setUserOrders([]);
+          setUserStats({
+            totalOrders: 0,
+            totalSpent: 0,
+            averageOrderValue: 0,
+            favoriteProducts: 0,
+            pedidoMinimo: 0,
+            pedidoMaximo: 0,
+          });
+          return;
+        }
         throw new Error(`Error al obtener pedidos: ${response.status}`);
-      }
-
-      const data = await response.json();
+      }      const data = await response.json();
       console.log('📦 Respuesta completa de la API:', data);
 
-      // Extraer pedidos y estadísticas de la respuesta
-      const pedidos = data.pedidos || [];
-      const estadisticas = data.estadisticas || {};
+      // Verificar si la respuesta es HTML (error 404 del servidor)
+      if (typeof data === 'string' && data.includes('<!DOCTYPE html>')) {
+        console.log('⚠️ El endpoint no está implementado en el servidor');
+        setErrorOrders('La funcionalidad de historial de pedidos estará disponible próximamente.');
+        return;
+      }
 
-      // Procesar los datos de pedidos
+      // El endpoint puede devolver un objeto único o un array de pedidos
+      // Si es un objeto único, lo convertimos en array
+      const pedidos = Array.isArray(data) ? data : [data];
+
+      // Procesar los datos de pedidos con la nueva estructura
       const processedOrders = pedidos.map(order => ({
-        id: order.id || order.order_id,
-        fecha: order.fecha_pedido || order.created_at || order.fecha,
-        productos: order.productos || order.items || order.detalles || [],
+        id: order.id_pedido,
+        codigo_pedido: order.codigo_pedido,
+        fecha: order.fecha_pedido,
+        productos: order.detalles || [],
         total: parseFloat(order.total) || 0,
-        estado: order.estado || order.status || 'Pendiente',        metodo_pago: order.metodo_pago || order.payment_method || '',
-        tipo_entrega: order.tipo_entrega || order.delivery_type || '',
-        tiempo_entrega: order.tiempo_entrega || order.delivery_time || null,
-        direccion: order.direccion || order.address || null,
-        telefono: order.telefono || order.phone || null,
-        observaciones: order.observaciones || order.notes || null,
+        subtotal: parseFloat(order.subtotal) || 0,
+        costo_envio: parseFloat(order.costo_envio) || 0,
+        impuestos: parseFloat(order.impuestos) || 0,
+        estado: order.estado || 'Pendiente',
+        metodo_pago: order.metodo_pago || '',
+        tiempo_entrega: order.tiempo_estimado_entrega || null,
+        fecha_entrega: order.fecha_entrega || null,
+        direccion: order.direccion || null,
+        telefono: order.telefono || null,
+        observaciones: order.notas_adicionales || null,
+        nombre_cliente: order.nombre_cliente || '',
+        apellido_cliente: order.apellido_cliente || '',
+        email: order.email || '',
+        tipo_cliente: order.tipo_cliente || '',
+        aceptado_terminos: order.aceptado_terminos || 0,
       }));
 
       setUserOrders(processedOrders);
 
-      // Usar estadísticas de la API si están disponibles, sino calcular
+      // Calcular estadísticas basadas en los pedidos obtenidos
       const stats = {
-        totalOrders: parseInt(estadisticas.totalPedidos) || processedOrders.length,
-        totalSpent: parseFloat(estadisticas.totalGastado) || processedOrders.reduce((sum, order) => sum + order.total, 0),
-        averageOrderValue: parseFloat(estadisticas.promedioPedido) || (
-          processedOrders.length > 0 
-            ? processedOrders.reduce((sum, order) => sum + order.total, 0) / processedOrders.length 
-            : 0
-        ),
+        totalOrders: processedOrders.length,
+        totalSpent: processedOrders.reduce((sum, order) => sum + order.total, 0),
+        averageOrderValue: processedOrders.length > 0 
+          ? processedOrders.reduce((sum, order) => sum + order.total, 0) / processedOrders.length 
+          : 0,
         favoriteProducts: processedOrders.reduce((count, order) => 
           count + (Array.isArray(order.productos) ? order.productos.length : 0), 0
         ),
-        primerPedido: estadisticas.primerPedido,
-        ultimoPedido: estadisticas.ultimoPedido,
-        pedidoMinimo: parseFloat(estadisticas.pedidoMinimo) || 0,
-        pedidoMaximo: parseFloat(estadisticas.pedidoMaximo) || 0,
+        pedidoMinimo: processedOrders.length > 0 
+          ? Math.min(...processedOrders.map(order => order.total)) 
+          : 0,
+        pedidoMaximo: processedOrders.length > 0 
+          ? Math.max(...processedOrders.map(order => order.total)) 
+          : 0,
       };
 
       setUserStats(stats);
@@ -137,11 +166,15 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
 
     } catch (error) {
       console.error('❌ Error al obtener pedidos:', error);
-      setErrorOrders('Error al cargar los pedidos. Por favor, intenta de nuevo.');
+      if (error.message.includes('Cannot GET')) {
+        setErrorOrders('La funcionalidad de historial de pedidos estará disponible próximamente.');
+      } else {
+        setErrorOrders('Error al cargar los pedidos. Por favor, intenta de nuevo.');
+      }
     } finally {
       setLoadingOrders(false);
     }
-  }, [user?.id]);  // Función para actualizar perfil en la API
+  }, [user?.id]);// Función para actualizar perfil en la API
   const updateUserProfile = async (updatedData) => {
     if (!user?.id) {
       console.log('❌ No hay ID de usuario para actualizar perfil');
@@ -416,22 +449,30 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     }
     return value;
   };
-
   // Función para obtener el color del estado
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'entregado':
       case 'completed':
+      case 'completado':
         return '#4caf50';
       case 'en preparacion':
+      case 'preparando':
       case 'preparing':
         return '#ff9800';
       case 'enviado':
+      case 'en camino':
       case 'shipped':
         return '#2196f3';
       case 'cancelado':
       case 'cancelled':
         return '#f44336';
+      case 'pendiente':
+      case 'pending':
+        return '#ffa726';
+      case 'confirmado':
+      case 'confirmed':
+        return '#66bb6a';
       default:
         return '#9e9e9e';
     }
@@ -530,15 +571,26 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                 <FontAwesomeIcon icon={faSpinner} className="spinning" />
                 Cargando tus pedidos...
               </div>
-            )}
-
-            {errorOrders && (
+            )}            {errorOrders && (
               <div className="perfil__error">
                 <FontAwesomeIcon icon={faExclamationTriangle} />
                 {errorOrders}
-                <button className="perfil__retry-btn" onClick={handleRefreshOrders}>
-                  Reintentar
-                </button>
+                {!errorOrders.includes('próximamente') && (
+                  <button className="perfil__retry-btn" onClick={handleRefreshOrders}>
+                    Reintentar
+                  </button>
+                )}
+                {errorOrders.includes('próximamente') && (
+                  <div className="perfil__coming-soon">
+                    <p>Mientras tanto, puedes:</p>
+                    <button 
+                      className="perfil__empty-btn"
+                      onClick={() => navigate('/menu')}
+                    >
+                      Explorar Menú
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -559,12 +611,14 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                 <div className="perfil__pedido-card" key={pedido.id}>
                   <div className="perfil__pedido-header">
                     <div>
-                      <span className="perfil__pedido-id">Pedido #{index + 1}</span>
+                      <span className="perfil__pedido-id">
+                        Pedido #{pedido.codigo_pedido || pedido.id}
+                      </span>
                       <span 
                         className="perfil__estado-badge"
                         style={{ backgroundColor: getStatusColor(pedido.estado) }}
                       >
-                        {pedido.estado}
+                        {pedido.estado.charAt(0).toUpperCase() + pedido.estado.slice(1)}
                       </span>
                     </div>
                     <div className="perfil__pedido-total">${pedido.total.toFixed(2)}</div>
@@ -572,22 +626,46 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
 
                   <div className="perfil__pedido-fecha">
                     {formatDate(pedido.fecha)}
-                  </div>                  <div className="perfil__pedido-info">
+                  </div>
+
+                  <div className="perfil__pedido-info">
                     <div className="perfil__pedido-metodo">
                       <FontAwesomeIcon icon={faCreditCard} />
-                      {pedido.metodo_pago || 'Sin especificar'}
+                      {pedido.metodo_pago.charAt(0).toUpperCase() + pedido.metodo_pago.slice(1)}
                     </div>
                     <div className="perfil__pedido-entrega">
                       <FontAwesomeIcon icon={faTruck} />
-                      {pedido.tipo_entrega || 'Sin especificar'}
+                      {pedido.tipo_cliente === 'registrado' ? 'Entrega a domicilio' : 'Recogida en tienda'}
                     </div>
                     {pedido.tiempo_entrega && (
                       <div className="perfil__pedido-tiempo">
                         <FontAwesomeIcon icon={faClock} />
-                        {pedido.tiempo_entrega} min
+                        {pedido.tiempo_entrega} min estimados
                       </div>
                     )}
-                  </div>{/* Productos del pedido */}
+                  </div>
+
+                  {/* Desglose del pedido */}
+                  <div className="perfil__pedido-desglose">
+                    <div className="perfil__pedido-desglose-item">
+                      <span>Subtotal:</span>
+                      <span>${pedido.subtotal.toFixed(2)}</span>
+                    </div>
+                    {pedido.costo_envio > 0 && (
+                      <div className="perfil__pedido-desglose-item">
+                        <span>Costo de envío:</span>
+                        <span>${pedido.costo_envio.toFixed(2)}</span>
+                      </div>
+                    )}
+                    {pedido.impuestos > 0 && (
+                      <div className="perfil__pedido-desglose-item">
+                        <span>Impuestos:</span>
+                        <span>${pedido.impuestos.toFixed(2)}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Productos del pedido */}
                   {Array.isArray(pedido.productos) && pedido.productos.length > 0 && (
                     <div className="perfil__pedido-productos">
                       <div className="perfil__productos-titulo">
@@ -595,36 +673,23 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                       </div>
                       {pedido.productos.map((producto, index) => (
                         <div className="perfil__producto-item" key={index}>
-                          {/* Imagen del producto */}
-                          {(producto.imagen || producto.image || producto.img) && (
-                            <div className="perfil__producto-imagen-wrapper">
-                              <img 
-                                src={producto.imagen || producto.image || producto.img} 
-                                alt={producto.titulo || producto.nombre || producto.name || 'Producto'}
-                                className="perfil__producto-imagen"
-                              /> {console.log(pedido.productos)}
-                            </div>
-                          )}
-                          
                           <div className="perfil__producto-info">
                             {/* Título del producto */}
                             <div className="perfil__producto-nombre">
-                              { producto.nombre_producto}
+                              {producto.nombre_producto}
                             </div>
                             
                             {/* Descripción del producto */}
-                            {(producto.descripcion || producto.detalles || producto.description) && (
+                            {producto.descripcion && (
                               <div className="perfil__producto-descripcion">
-                                {producto.descripcion || producto.detalles || producto.description}
+                                {producto.descripcion}
                               </div>
                             )}
                             
                             {/* Cantidad */}
-                            {producto.cantidad && (
-                              <div className="perfil__producto-detalle">
-                                Cantidad: {producto.cantidad}
-                              </div>
-                            )}
+                            <div className="perfil__producto-detalle">
+                              Cantidad: {producto.cantidad}
+                            </div>
                             
                             {/* Masa y Tamaño */}
                             {(producto.masa || producto.tamano) && (
@@ -635,23 +700,23 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                               </div>
                             )}
                             
-                            {/* Ingredientes */}
-                            {producto.ingredientes && Array.isArray(producto.ingredientes) && (
+                            {/* Instrucciones especiales */}
+                            {producto.instrucciones_especiales && (
                               <div className="perfil__producto-detalle">
-                                Ingredientes: {producto.ingredientes.join(', ')}
+                                Instrucciones: {producto.instrucciones_especiales}
                               </div>
                             )}
-                            
-                            {/* Instrucciones */}
-                            {producto.instrucciones && (
+
+                            {/* Método de entrega */}
+                            {producto.metodo_entrega !== undefined && (
                               <div className="perfil__producto-detalle">
-                                Instrucciones: {producto.instrucciones}
+                                Entrega: {producto.metodo_entrega === 1 ? 'A domicilio' : 'Recogida en tienda'}
                               </div>
                             )}
                           </div>
                           
                           <div className="perfil__producto-precio">
-                            ${producto.subtotal || 0}
+                            ${parseFloat(producto.subtotal || producto.precio_unitario || 0).toFixed(2)}
                           </div>
                         </div>
                       ))}
@@ -663,16 +728,22 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                     <div className="perfil__pedido-extra">
                       {pedido.direccion && (
                         <div className="perfil__pedido-detalle">
-                          <strong>Dirección:</strong> {pedido.direccion}
+                          <strong>Dirección de entrega:</strong> {pedido.direccion}
                         </div>
                       )}
                       {pedido.telefono && (
                         <div className="perfil__pedido-detalle">
-                          <strong>Teléfono:</strong> {pedido.telefono}
+                          <strong>Teléfono de contacto:</strong> {pedido.telefono}
                         </div>
                       )}
-                      {pedido.observaciones && (                        <div className="perfil__pedido-detalle">
-                          <strong>Observaciones:</strong> {pedido.observaciones}
+                      {pedido.observaciones && (
+                        <div className="perfil__pedido-detalle">
+                          <strong>Notas adicionales:</strong> {pedido.observaciones}
+                        </div>
+                      )}
+                      {pedido.fecha_entrega && (
+                        <div className="perfil__pedido-detalle">
+                          <strong>Fecha de entrega:</strong> {formatDate(pedido.fecha_entrega)}
                         </div>
                       )}
                     </div>
