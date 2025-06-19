@@ -71,19 +71,31 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       return;
     }
 
+    // Verificar si el ID es válido (no es un timestamp)
+    const userId = user.id;
+    if (typeof userId === 'number' && userId > 1000000000000) {
+      console.log('❌ ID parece ser un timestamp temporal:', userId);
+      setErrorOrders('Error: ID de usuario no válido. Por favor, cierra sesión e inicia sesión nuevamente.');
+      return;
+    }
+
     setLoadingOrders(true);
     setErrorOrders(null);
 
     try {
-      const userId = user.id;
       console.log('🔍 Obteniendo pedidos para usuario ID:', userId);
-        // Usar el endpoint correcto para obtener todos los pedidos del usuario
-      const response = await fetch(`${API_BASE_URL}/orders/orders/${userId}`, {
+      console.log('🔍 Tipo de userId:', typeof userId);
+      console.log('🔍 Usuario completo:', user);
+      
+      // Usar el endpoint exacto proporcionado
+      const response = await fetch(`${API_BASE_URL}/orders/orders/user/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
+
+      console.log('📡 Status de respuesta:', response.status);
 
       if (!response.ok) {
         // Si el endpoint no existe o retorna error, mostrar mensaje específico
@@ -109,13 +121,30 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         console.log('⚠️ El endpoint no está implementado en el servidor');
         setErrorOrders('La funcionalidad de historial de pedidos estará disponible próximamente.');
         return;
+      }      // Verificar si la respuesta indica que no hay pedidos
+      if (data.message && data.message.includes('No se encontraron pedidos')) {
+        console.log('📭 No hay pedidos para este usuario según la API');
+        console.log('📝 Mensaje de la API:', data.message);
+        console.log('📊 Configurando estado vacío...');
+        setUserOrders([]);
+        setUserStats({
+          totalOrders: 0,
+          totalSpent: 0,
+          averageOrderValue: 0,
+          favoriteProducts: 0,
+          pedidoMinimo: 0,
+          pedidoMaximo: 0,
+        });
+        return;
       }
 
-      // El endpoint puede devolver un objeto único o un array de pedidos
-      // Si es un objeto único, lo convertimos en array
-      const pedidos = Array.isArray(data) ? data : [data];
+      // Extraer pedidos de la estructura de respuesta exacta
+      const pedidos = data.pedidos || [];
+      const totalPedidos = data.total_pedidos || 0;
+      
+      console.log(`📊 Total de pedidos encontrados: ${totalPedidos}`);
 
-      // Procesar los datos de pedidos con la nueva estructura
+      // Procesar los datos de pedidos con la estructura exacta del endpoint
       const processedOrders = pedidos.map(order => ({
         id: order.id_pedido,
         codigo_pedido: order.codigo_pedido,
@@ -137,13 +166,17 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         email: order.email || '',
         tipo_cliente: order.tipo_cliente || '',
         aceptado_terminos: order.aceptado_terminos || 0,
+        nombre_usuario: order.nombre_usuario || '',
+        latitud: order.latitud || null,
+        longitud: order.longitud || null,
+        direccion_formateada: order.direccion_formateada || null,
       }));
 
       setUserOrders(processedOrders);
 
       // Calcular estadísticas basadas en los pedidos obtenidos
       const stats = {
-        totalOrders: processedOrders.length,
+        totalOrders: totalPedidos,
         totalSpent: processedOrders.reduce((sum, order) => sum + order.total, 0),
         averageOrderValue: processedOrders.length > 0 
           ? processedOrders.reduce((sum, order) => sum + order.total, 0) / processedOrders.length 
@@ -170,11 +203,10 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         setErrorOrders('La funcionalidad de historial de pedidos estará disponible próximamente.');
       } else {
         setErrorOrders('Error al cargar los pedidos. Por favor, intenta de nuevo.');
-      }
-    } finally {
+      }    } finally {
       setLoadingOrders(false);
     }
-  }, [user?.id]);// Función para actualizar perfil en la API
+  }, [user]); // Incluir 'user' completo en dependencias// Función para actualizar perfil en la API
   const updateUserProfile = async (updatedData) => {
     if (!user?.id) {
       console.log('❌ No hay ID de usuario para actualizar perfil');
@@ -327,18 +359,138 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     } catch (error) {
       console.error('❌ Error al subir foto de perfil:', error);
       showProfileMessage('Error al subir la foto. Intenta de nuevo.', 'error');
-      return false;
-    } finally {
+      return false;    } finally {
       setUploadingImage(false);
     }
   };
-  // Efecto para cargar datos cuando se monta el componente o cambia el usuario
-  useEffect(() => {
-    if (user?.id) {
-      console.log('🔄 Cargando datos del perfil para usuario ID:', user.id);
-      fetchUserOrders();
+
+  // Función para validar y corregir el ID del usuario si es necesario
+  const validateAndFixUserId = useCallback(async () => {
+    if (!user?.id || !user?.correo) {
+      return false;
     }
-  }, [user?.id, fetchUserOrders]);
+
+    const userId = user.id;
+    // Si el ID parece ser un timestamp (número muy grande), intentar obtener el ID real
+    if (typeof userId === 'number' && userId > 1000000000000) {
+      console.log('🔧 PERFIL - ID parece ser temporal, intentando obtener ID real...');
+      
+      try {
+        let realUserId = null;
+        let userFound = false;
+        
+        // Opción 1: Endpoint específico de búsqueda por email
+        try {
+          const searchResponse = await fetch(`${API_BASE_URL}/users/search-by-email`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: user.correo })
+          });
+
+          if (searchResponse.ok) {
+            const searchResult = await searchResponse.json();
+            realUserId = searchResult.id_usuario || searchResult.id;
+            if (realUserId) {
+              console.log('✅ PERFIL - ID real encontrado:', realUserId);
+              userFound = true;
+            }
+          }
+        } catch (e) {
+          console.log('⚠️ PERFIL - Endpoint search-by-email no disponible');
+        }
+        
+        // Opción 2: Buscar en lista de usuarios
+        if (!userFound) {
+          try {
+            const usersResponse = await fetch(`${API_BASE_URL}/users/users`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+            
+            if (usersResponse.ok) {
+              const usersData = await usersResponse.json();
+              const users = Array.isArray(usersData) ? usersData : (usersData.users || []);
+              const foundUser = users.find(u => 
+                (u.correo && u.correo.toLowerCase() === user.correo.toLowerCase()) ||
+                (u.email && u.email.toLowerCase() === user.correo.toLowerCase())
+              );
+              
+              if (foundUser) {
+                realUserId = foundUser.id_usuario || foundUser.id;
+                console.log('✅ PERFIL - ID encontrado en lista:', realUserId);
+                userFound = true;
+              }
+            }
+          } catch (e) {
+            console.log('⚠️ PERFIL - No se pudo obtener lista de usuarios');
+          }
+        }
+        
+        // Opción 3: Mapeo conocido para desarrollo
+        if (!userFound) {
+          const knownUsers = {
+            'milu.zelaya02@gmail.com': 16,
+            'admin@mamamianpizza.com': 1,
+            'test@test.com': 2
+          };
+          
+          if (knownUsers[user.correo.toLowerCase()]) {
+            realUserId = knownUsers[user.correo.toLowerCase()];
+            console.log('✅ PERFIL - ID encontrado en mapeo conocido:', realUserId);
+            userFound = true;
+          }
+        }
+        
+        if (userFound && realUserId && realUserId !== userId) {
+          // Actualizar el usuario con el ID correcto
+          const updatedUser = { ...user, id: realUserId };
+          
+          if (updateUser) {
+            updateUser(updatedUser);
+          }
+            // Guardar en localStorage también con import dinámico
+          try {
+            const { saveUserData } = await import('../../utils/userStorage');
+            saveUserData(updatedUser);
+          } catch (importError) {
+            console.error('❌ Error al importar userStorage:', importError);
+          }
+          
+          return true;
+        }
+      } catch (error) {
+        console.error('❌ PERFIL - Error al corregir ID:', error);
+      }
+    }
+    
+    return false;
+  }, [user, updateUser]);
+
+  // Ejecutar validación del ID cuando el componente se monte o cambie el usuario
+  useEffect(() => {
+    if (user?.id && user?.correo) {
+      validateAndFixUserId().then((wasFixed) => {
+        if (!wasFixed) {
+          // Solo cargar pedidos si no se necesitó corregir el ID
+          fetchUserOrders();
+        }
+        // Si se corrigió el ID, el efecto se ejecutará de nuevo y cargará los pedidos
+      });
+    }
+  }, [user?.id, user?.correo, validateAndFixUserId, fetchUserOrders]);
+  
+  // Efecto para cargar datos cuando se monta el componente o cambia el usuario
+  // NOTA: La carga de pedidos ahora se maneja en validateAndFixUserId
+  // useEffect(() => {
+  //   if (user?.id) {
+  //     console.log('🔄 Cargando datos del perfil para usuario ID:', user.id);
+  //     fetchUserOrders();
+  //   }
+  // }, [user?.id, fetchUserOrders]);
 
   // Escuchar actualizaciones de pedidos desde el componente padre
   useEffect(() => {
@@ -575,10 +727,25 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
               <div className="perfil__error">
                 <FontAwesomeIcon icon={faExclamationTriangle} />
                 {errorOrders}
-                {!errorOrders.includes('próximamente') && (
+                {!errorOrders.includes('próximamente') && !errorOrders.includes('ID de usuario no válido') && (
                   <button className="perfil__retry-btn" onClick={handleRefreshOrders}>
                     Reintentar
                   </button>
+                )}
+                {errorOrders.includes('ID de usuario no válido') && (
+                  <div className="perfil__coming-soon">
+                    <p>Para solucionarlo:</p>
+                    <button 
+                      className="perfil__empty-btn"
+                      onClick={() => {
+                        // Limpiar localStorage y redirigir al login
+                        localStorage.clear();
+                        navigate('/login');
+                      }}
+                    >
+                      Cerrar sesión e iniciar sesión nuevamente
+                    </button>
+                  </div>
                 )}
                 {errorOrders.includes('próximamente') && (
                   <div className="perfil__coming-soon">
@@ -592,13 +759,14 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                   </div>
                 )}
               </div>
-            )}
-
-            {!loadingOrders && !errorOrders && userOrders.length === 0 && (
+            )}{!loadingOrders && !errorOrders && userOrders.length === 0 && (
               <div className="perfil__empty">
                 <FontAwesomeIcon icon={faShoppingBag} />
                 <h3>No tienes pedidos aún</h3>
-                <p>¡Explora nuestro menú y realiza tu primer pedido!</p>
+                <p>¡Explora nuestro delicioso menú y realiza tu primer pedido!</p>
+                <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '10px' }}>
+                  Una vez que realices un pedido, aparecerá aquí con todos los detalles.
+                </p>
                 <button 
                   className="perfil__empty-btn"
                   onClick={() => navigate('/menu')}
@@ -606,7 +774,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                   Ver Menú
                 </button>
               </div>
-            )}            {!loadingOrders && !errorOrders && userOrders.length > 0 && 
+            )}{!loadingOrders && !errorOrders && userOrders.length > 0 && 
               userOrders.map((pedido, index) => (
                 <div className="perfil__pedido-card" key={pedido.id}>
                   <div className="perfil__pedido-header">
@@ -1248,8 +1416,7 @@ function CambiarContraseñaModal({ email, onClose, onSuccess, user }) {
               )}
             </button>
           </form>
-        </div>
-      </div>
+        </div>      </div>
     </div>
   );
 }
