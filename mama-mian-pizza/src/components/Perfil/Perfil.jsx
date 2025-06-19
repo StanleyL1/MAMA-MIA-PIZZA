@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -27,11 +27,15 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     totalSpent: 0,
     averageOrderValue: 0,
     favoriteProducts: 0
-  });  const [loadingOrders, setLoadingOrders] = useState(false);
+  });  
+  const [loadingOrders, setLoadingOrders] = useState(false);
   const [errorOrders, setErrorOrders] = useState(null);
   const [updateMessage, setUpdateMessage] = useState('');
   const [profileMessage, setProfileMessage] = useState(''); // Mensaje local para mostrar abajo de la foto
   const [profileMessageType, setProfileMessageType] = useState('success'); // 'success' o 'error'
+  
+  // Ref para controlar si ya se han cargado los datos iniciales
+  const initialDataLoaded = useRef(false);
   
   // Estado de perfil del usuario - usar datos reales si están disponibles
   const [userPerfil, setUserPerfil] = useState({
@@ -76,6 +80,12 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     if (typeof userId === 'number' && userId > 1000000000000) {
       console.log('❌ ID parece ser un timestamp temporal:', userId);
       setErrorOrders('Error: ID de usuario no válido. Por favor, cierra sesión e inicia sesión nuevamente.');
+      return;
+    }
+
+    // Evitar llamadas múltiples si ya estamos cargando
+    if (loadingOrders) {
+      console.log('⏳ Ya hay una carga de pedidos en progreso, saltando...');
       return;
     }
 
@@ -206,7 +216,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       }    } finally {
       setLoadingOrders(false);
     }
-  }, [user]); // Incluir 'user' completo en dependencias// Función para actualizar perfil en la API
+  }, [user?.id, loadingOrders]); // Solo incluir ID y estado de carga para evitar re-renders// Función para actualizar perfil en la API
   const updateUserProfile = async (updatedData) => {
     if (!user?.id) {
       console.log('❌ No hay ID de usuario para actualizar perfil');
@@ -235,8 +245,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         throw new Error(`Error al actualizar perfil: ${response.status} - ${errorData.message || 'Error desconocido'}`);
       }
 
-      const result = await response.json();
-      console.log('✅ Perfil actualizado:', result);
+      const result = await response.json();      console.log('✅ Perfil actualizado:', result);
       return true;
 
     } catch (error) {
@@ -244,6 +253,66 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       return false;
     }
   };
+
+  // Función para obtener los datos del perfil desde la API
+  const fetchUserProfile = useCallback(async () => {
+    if (!user?.id) {
+      console.log('❌ No hay ID de usuario para obtener perfil');
+      return;
+    }
+
+    try {
+      const userId = user.id;
+      console.log('🔍 Obteniendo perfil para usuario ID:', userId);
+      
+      const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        console.log('❌ Error al obtener perfil del usuario:', response.status);
+        return;
+      }
+
+      const profileData = await response.json();
+      console.log('✅ Datos del perfil obtenidos:', profileData);
+
+      // Actualizar el estado userPerfil con los datos reales de la API
+      if (profileData) {
+        setUserPerfil(prev => ({
+          ...prev,
+          nombre: profileData.nombre || prev.nombre,
+          email: profileData.correo || prev.email,
+          telefono: profileData.celular || prev.telefono,
+          foto: profileData.foto_perfil || prev.foto,
+          fecha_nacimiento: profileData.fecha_nacimiento || prev.fecha_nacimiento,
+          dui: profileData.dui || prev.dui,
+          sexo: profileData.sexo || prev.sexo,
+        }));
+
+        // También actualizar el usuario en el estado global si es necesario
+        if (updateUser) {
+          updateUser({
+            ...user,
+            nombre: profileData.nombre || user.nombre,
+            correo: profileData.correo || user.correo,
+            celular: profileData.celular || user.telefono,
+            foto_perfil: profileData.foto_perfil || user.foto_perfil,
+            fecha_nacimiento: profileData.fecha_nacimiento || user.fecha_nacimiento,
+            dui: profileData.dui || user.dui,
+            sexo: profileData.sexo || user.sexo,
+          });
+        }
+
+        console.log('✅ Perfil actualizado con datos de la API');
+      }    } catch (error) {
+      console.error('❌ Error al obtener perfil:', error);
+    }
+  }, [user?.id]); // Solo incluir el ID del usuario
+  
   // Función para manejar la selección de imagen
   const handleImageSelect = (event) => {
     const file = event.target.files[0];
@@ -464,25 +533,33 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         }
       } catch (error) {
         console.error('❌ PERFIL - Error al corregir ID:', error);
-      }
-    }
+      }    }
     
     return false;
-  }, [user, updateUser]);
-
+  }, [user?.id, user?.correo]); // Solo incluir ID y correo del usuario
+  
   // Ejecutar validación del ID cuando el componente se monte o cambie el usuario
   useEffect(() => {
-    if (user?.id && user?.correo) {
+    if (user?.id && user?.correo && !initialDataLoaded.current) {
+      console.log('🔄 PERFIL - Cargando datos iniciales para usuario:', user.id);
+      initialDataLoaded.current = true;
+      
       validateAndFixUserId().then((wasFixed) => {
         if (!wasFixed) {
-          // Solo cargar pedidos si no se necesitó corregir el ID
-          fetchUserOrders();
+          // Solo cargar datos si no se necesitó corregir el ID
+          fetchUserProfile(); // Obtener datos del perfil
+          fetchUserOrders();  // Obtener pedidos
         }
-        // Si se corrigió el ID, el efecto se ejecutará de nuevo y cargará los pedidos
+        // Si se corrigió el ID, el efecto se ejecutará de nuevo y cargará los datos
       });
     }
-  }, [user?.id, user?.correo, validateAndFixUserId, fetchUserOrders]);
+  }, [user?.id, user?.correo]);
   
+  // Reset del flag cuando cambie el usuario
+  useEffect(() => {
+    initialDataLoaded.current = false;
+  }, [user?.id]);
+
   // Efecto para cargar datos cuando se monta el componente o cambia el usuario
   // NOTA: La carga de pedidos ahora se maneja en validateAndFixUserId
   // useEffect(() => {
@@ -551,11 +628,16 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       navigate('/login');
     }
   }, [user, navigate]);
-
   // Función para manejar la actualización manual de pedidos
   const handleRefreshOrders = async () => {
     await fetchUserOrders();
   };
+
+  // Función para manejar la actualización manual del perfil
+  const handleRefreshProfile = async () => {
+    await fetchUserProfile();
+  };
+  
   // Función para formatear fecha
   const formatDate = (dateString) => {
     try {
@@ -939,7 +1021,17 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         )}        {/* --- PERFIL --- */}
         {activeTab === 'editar' && (
           <div>
-            <div className="perfil__titulo-editar">Mi Perfil</div>
+            <div className="perfil__titulo-editar">
+              Mi Perfil
+              <button 
+                className="perfil__refresh-btn" 
+                onClick={handleRefreshProfile}
+                style={{ marginLeft: 'auto', fontSize: '0.9rem' }}
+              >
+                <FontAwesomeIcon icon={faRefresh} />
+                Actualizar datos
+              </button>
+            </div>
             
             {/* Card con foto y datos del perfil */}
             <div className="perfil__data-card">
