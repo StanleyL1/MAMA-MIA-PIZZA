@@ -723,17 +723,18 @@
 
 .perfil__retry-btn {
   background: #ab1319;
-  color: #fff;
+  color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 4px;
   font-size: 0.9rem;
-  transition: background 0.3s ease;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: background 0.2s;
 }
 
 .perfil__retry-btn:hover {
-  background: #8e0f14;
+  background: #891015;
 }
 
 .perfil__resenas-list {
@@ -2297,20 +2298,27 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* RESPONSIVE PARA PEDIDOS DE API */
-@media (max-width: 768px) {
-  .perfil__pedido-info {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-  
-  .perfil__pedido-resumen {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-  
-  .perfil__pedido-total-final {
-    align-self: flex-end;
-  }
+/* LOADING OVERLAY PARA FOTO */
+.perfil__loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ab1319;
+  font-size: 1.5rem;
+}
+
+.perfil__loading-overlay .spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
