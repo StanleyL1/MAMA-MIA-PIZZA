@@ -87,12 +87,8 @@ export default function CrearExperiencia({ user, onClose, onExperienciaCreada, s
       };
       
       const result = await crearExperiencia(experienciaData);
-      
-      if (setToast) {
-        setToast({
-          message: '¡Experiencia enviada exitosamente! Será revisada antes de ser publicada.',
-          type: 'success'
-        });
+        if (setToast && typeof setToast === 'function') {
+        setToast('¡Experiencia enviada exitosamente! Será revisada antes de ser publicada.');
       }
       
       if (onExperienciaCreada) {
@@ -113,12 +109,8 @@ export default function CrearExperiencia({ user, onClose, onExperienciaCreada, s
       
     } catch (error) {
       console.error('Error al crear experiencia:', error);
-      
-      if (setToast) {
-        setToast({
-          message: 'Error al enviar la experiencia. Por favor, inténtalo de nuevo.',
-          type: 'error'
-        });
+        if (setToast && typeof setToast === 'function') {
+        setToast('Error al enviar la experiencia. Por favor, inténtalo de nuevo.');
       }
     } finally {
       setIsSubmitting(false);

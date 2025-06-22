@@ -13,8 +13,7 @@ import { useUsuario } from '../../hooks/useUsuario';
 import ModalExperiencia from '../CrearExperiencia/ModalExperiencia';
 
 export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, updateUser }) {
-  const navigate = useNavigate();
-  // Hook para manejar información del usuario
+  const navigate = useNavigate();  // Hook para manejar información del usuario
   const {
     userInfo,
     loading: loadingUserInfo,
@@ -22,15 +21,13 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     fetchUserInfo,
     updateUserInfo,
     updateProfilePhoto,
-    changePassword,
-    retry
+    changePassword
   } = useUsuario();
-  
-  // Tabs: pedidos | reseñas | editar | seguridad
+    // Tabs: pedidos | reseñas | editar | seguridad
   const [activeTab, setActiveTab] = useState('pedidos');
   
-  const [profileMessage, setProfileMessage] = useState(''); // Mensaje local para mostrar abajo de la foto
-  const [profileMessageType, setProfileMessageType] = useState('success'); // 'success' o 'error'
+  // Estados para errores específicos de edición
+  const [photoError, setPhotoError] = useState('');
   // Estados para editar perfil
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
@@ -72,13 +69,15 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
-    confirm: false
-  });  // Función helper para mostrar mensajes locales
-  const showProfileMessage = (message, type = 'success') => {
-    setProfileMessage(message);
-    setProfileMessageType(type);
-    setTimeout(() => setProfileMessage(''), 3000);
-  };
+    confirm: false  });
+  
+  // Función helper para mostrar mensajes usando toast
+  const showProfileMessage = useCallback((message, type = 'success') => {
+    // Usar toast para mostrar el mensaje
+    if (setToast && typeof setToast === 'function') {
+      setToast(message);
+    }
+  }, [setToast]);
   // Función para renderizar estrellas
   const renderEstrellas = (valoracion) => {
     const estrellas = [];
@@ -185,13 +184,12 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     fetchResenas();
     fetchExperiencias();
   };
-
   // Manejar creación de nueva experiencia
   const handleExperienciaCreada = (nuevaExperiencia) => {
-    setToast({
-      message: '¡Experiencia creada exitosamente!',
-      type: 'success'
-    });
+    // Verificar que setToast existe y es una función antes de usarla
+    if (setToast && typeof setToast === 'function') {
+      setToast('¡Experiencia creada exitosamente!');
+    }
     
     // Refrescar la lista de experiencias
     fetchExperiencias();
@@ -245,7 +243,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       fetchResenas();
       fetchExperiencias();
     }
-  }, [user, navigate, fetchUserInfo, fetchPedidos, fetchResenas, fetchExperiencias]);
+  }, [user, navigate, fetchUserInfo, fetchPedidos, fetchResenas, fetchExperiencias, showProfileMessage]);
 
   // Manejar cambios en el formulario de perfil
   const handleFormChange = (e) => {
@@ -263,39 +261,40 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       [name]: value
     }));
   };
-
   // Manejar selección de foto
   const handlePhotoSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
       if (file.type.startsWith('image/')) {
         setSelectedPhoto(file);
+        setPhotoError(''); // Limpiar errores previos
         const reader = new FileReader();
         reader.onload = (e) => {
           setPhotoPreview(e.target.result);
         };
         reader.readAsDataURL(file);
       } else {
-        showProfileMessage('Por favor selecciona un archivo de imagen válido', 'error');
+        setPhotoError('Por favor selecciona un archivo de imagen válido');
       }
     }
-  };  // Guardar nueva foto
+  };// Guardar nueva foto
   const handleSavePhoto = async () => {
     if (selectedPhoto && userInfo?.id_usuario) {
       try {
-        await updateProfilePhoto(userInfo.id_usuario, selectedPhoto);
-        
-        setPhotoMode(false);
+        await updateProfilePhoto(userInfo.id_usuario, selectedPhoto);        setPhotoMode(false);
         setSelectedPhoto(null);
         setPhotoPreview(null);
-        showProfileMessage('Foto de perfil actualizada correctamente');
-        if (setToast) {
-          setToast({ message: 'Foto de perfil actualizada correctamente', type: 'success' });
+        setPhotoError(''); // Limpiar errores
+          // Verificar que setToast existe y es una función antes de usarla
+        if (setToast && typeof setToast === 'function') {
+          setToast('Foto de perfil actualizada correctamente');
         }
       } catch (error) {
-        showProfileMessage('Error al actualizar la foto de perfil', 'error');
-        if (setToast) {
-          setToast({ message: 'Error al actualizar la foto de perfil', type: 'error' });
+        console.error('Error al actualizar la foto de perfil:', error);
+        setPhotoError('Error al actualizar la foto de perfil');
+          // Verificar que setToast existe y es una función antes de usarla
+        if (setToast && typeof setToast === 'function') {
+          setToast('Error al actualizar la foto de perfil');
         }
       }
     }
@@ -304,6 +303,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     setPhotoMode(false);
     setSelectedPhoto(null);
     setPhotoPreview(null);
+    setPhotoError(''); // Limpiar errores
   };
 
   // Función para formatear fecha
@@ -394,14 +394,12 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       await updateUserInfo(userInfo.id_usuario, updateData);
       
       setEditMode(false);
-      showProfileMessage('Perfil actualizado correctamente');
-      if (setToast) {
-        setToast({ message: 'Perfil actualizado correctamente', type: 'success' });
+      showProfileMessage('Perfil actualizado correctamente');      if (setToast && typeof setToast === 'function') {
+        setToast('Perfil actualizado correctamente');
       }
     } catch (error) {
-      showProfileMessage('Error al actualizar el perfil', 'error');
-      if (setToast) {
-        setToast({ message: 'Error al actualizar el perfil', type: 'error' });
+      showProfileMessage('Error al actualizar el perfil', 'error');      if (setToast && typeof setToast === 'function') {
+        setToast('Error al actualizar el perfil');
       }
     }
   };// Cambiar contraseña
@@ -438,14 +436,12 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         newPassword: '',
         confirmPassword: ''
       });
-      showProfileMessage('Contraseña cambiada correctamente');
-      if (setToast) {
-        setToast({ message: 'Contraseña cambiada correctamente', type: 'success' });
+      showProfileMessage('Contraseña cambiada correctamente');      if (setToast && typeof setToast === 'function') {
+        setToast('Contraseña cambiada correctamente');
       }
     } catch (error) {
-      showProfileMessage('Error al cambiar la contraseña', 'error');
-      if (setToast) {
-        setToast({ message: 'Error al cambiar la contraseña', type: 'error' });
+      showProfileMessage('Error al cambiar la contraseña', 'error');      if (setToast && typeof setToast === 'function') {
+        setToast('Error al cambiar la contraseña');
       }
     }
   };
@@ -468,93 +464,41 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
               <FontAwesomeIcon icon={faUser} className="spinning" />
             </div>
           )}
-        </div>
-          <div className="perfil__info">
+        </div>          <div className="perfil__info">
           <h2 className="perfil__nombre">
             {loadingUserInfo ? 'Cargando...' : (userInfo?.nombre || user?.nombre || 'Usuario')}
           </h2>
           <p className="perfil__email">
             {loadingUserInfo ? 'Cargando...' : (userInfo?.correo || user?.email || 'No disponible')}
           </p>
-            {/* Debug info - remover en producción */}
-          {process.env.NODE_ENV === 'development' && userInfo && (
-            <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '10px' }}>
-              <strong>Debug - Datos del usuario:</strong><br/>
-              ID: {userInfo.id_usuario}<br/>
-              Nombre: {userInfo.nombre || 'null'}<br/>
-              Correo: {userInfo.correo || 'null'}<br/>
-              Celular: {userInfo.celular || 'null'}<br/>
-              Fecha nacimiento: {userInfo.fecha_nacimiento || 'null'}<br/>
-              Fecha formateada: {formatearFechaParaMostrar(userInfo.fecha_nacimiento)}<br/>
-              Sexo: {userInfo.sexo || 'null'}<br/>
-              DUI: {userInfo.dui || 'null'}<br/>
-              Foto: {userInfo.foto_perfil || 'null'}
-            </div>
-          )}
           
           <div className="perfil__datos">
             <span>
               <FontAwesomeIcon icon={faPhone} />
               {loadingUserInfo ? 'Cargando...' : (userInfo?.celular || 'No disponible')}
             </span>
-            <span>
-              <FontAwesomeIcon icon={faMapMarkerAlt} />
-              {loadingUserInfo ? 'Cargando...' : 
-                (userInfo?.dui ? `DUI: ${userInfo.dui}` : 'DUI no registrado')
-              }
-            </span>            <span>
-              <FontAwesomeIcon icon={faCalendarAlt} />
-              {loadingUserInfo ? 'Cargando...' : 
-                `Nacimiento: ${formatearFechaParaMostrar(userInfo?.fecha_nacimiento)}`
-              }
-            </span>
+            {userInfo?.dui && (
+              <span>
+                <FontAwesomeIcon icon={faMapMarkerAlt} />
+                DUI: {userInfo.dui}
+              </span>
+            )}
+            {userInfo?.fecha_nacimiento && (
+              <span>
+                <FontAwesomeIcon icon={faCalendarAlt} />
+                Nacimiento: {formatearFechaParaMostrar(userInfo.fecha_nacimiento)}
+              </span>
+            )}
             {userInfo?.sexo && (
               <span>
                 <FontAwesomeIcon icon={faUser} />
-                Sexo: {userInfo.sexo}
+                {userInfo.sexo === 'M' ? 'Masculino' : userInfo.sexo === 'F' ? 'Femenino' : userInfo.sexo}
               </span>
             )}
-          </div>
-            {/* Error de carga de usuario */}
+          </div>          {/* Error de carga de usuario */}
           {errorUserInfo && (
             <div className="perfil__message error">
-              {errorUserInfo}                <button 
-                  className="perfil__retry-btn"
-                  onClick={() => {
-                    console.log('Reintentando carga de información del usuario...');
-                    retry(user?.id);
-                  }}
-                  disabled={loadingUserInfo}
-                >
-                  {loadingUserInfo ? 'Cargando...' : 'Reintentar'}
-                </button>
-            </div>
-          )}
-          
-          {/* Botón de recarga manual */}
-          {!loadingUserInfo && !errorUserInfo && userInfo && (
-            <button 
-              className="perfil__refresh-btn"
-              onClick={() => {
-                console.log('Recarga manual de información del usuario...');
-                fetchUserInfo(user?.id);
-              }}
-              style={{ 
-                background: 'none', 
-                border: 'none', 
-                color: '#ab1319', 
-                cursor: 'pointer',
-                fontSize: '0.9rem',
-                marginTop: '10px'
-              }}
-            >
-              🔄 Actualizar información
-            </button>
-          )}
-          
-          {profileMessage && (
-            <div className={`perfil__message ${profileMessageType === 'error' ? 'error' : 'success'}`}>
-              {profileMessage}
+              {errorUserInfo}
             </div>
           )}
         </div>
@@ -901,11 +845,17 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                           >
                             Cancelar
                           </button>
-                        </div>
-                      )}
+                        </div>                      )}
                     </div>
                   )}
                 </div>
+                
+                {/* Error de foto */}
+                {photoError && (
+                  <div className="perfil__message error">
+                    {photoError}
+                  </div>
+                )}
               </div>
 
               <div className="perfil__form-row">
