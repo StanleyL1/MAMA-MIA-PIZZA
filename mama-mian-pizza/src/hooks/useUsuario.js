@@ -41,9 +41,13 @@ export const useUsuario = () => {
       console.log('Carga de información del usuario finalizada');
     }
   }, []);
-
   // Actualizar información del usuario
   const updateUserInfo = useCallback(async (userId, updateData) => {
+    console.log('=== HOOK useUsuario: updateUserInfo ===');
+    console.log('userId:', userId);
+    console.log('updateData:', updateData);
+    console.log('userInfo antes de actualizar:', userInfo);
+    
     if (!userId) {
       throw new Error('ID de usuario requerido');
     }
@@ -53,12 +57,16 @@ export const useUsuario = () => {
     
     try {
       const updatedUser = await actualizarUsuario(userId, updateData);
+      console.log('Usuario actualizado desde API:', updatedUser);
       
       // Actualizar el estado local con la nueva información
-      setUserInfo(prevInfo => ({
-        ...prevInfo,
+      const newUserInfo = {
+        ...userInfo,
         ...updatedUser
-      }));
+      };
+      
+      console.log('Nuevo userInfo que se va a setear:', newUserInfo);
+      setUserInfo(newUserInfo);
       
       return updatedUser;
     } catch (error) {
@@ -68,10 +76,14 @@ export const useUsuario = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
-
+  }, [userInfo]);
   // Actualizar foto de perfil
   const updateProfilePhoto = useCallback(async (userId, file) => {
+    console.log('=== HOOK useUsuario: updateProfilePhoto ===');
+    console.log('userId:', userId);
+    console.log('file:', file);
+    console.log('userInfo actual:', userInfo);
+    
     if (!userId || !file) {
       throw new Error('ID de usuario y archivo requeridos');
     }
@@ -80,7 +92,9 @@ export const useUsuario = () => {
     setError(null);
     
     try {
-      const result = await actualizarFotoPerfil(userId, file);
+      // Pasar los datos actuales del usuario para mantenerlos
+      const result = await actualizarFotoPerfil(userId, file, userInfo);
+      console.log('Resultado actualización foto:', result);
       
       // Refrescar información del usuario para obtener la nueva URL de la foto
       await fetchUserInfo(userId);
@@ -93,7 +107,7 @@ export const useUsuario = () => {
     } finally {
       setLoading(false);
     }
-  }, [fetchUserInfo]);
+  }, [fetchUserInfo, userInfo]);
 
   // Cambiar contraseña
   const changePassword = useCallback(async (userId, passwordData) => {

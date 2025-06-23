@@ -374,31 +374,56 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     }
   };  // Guardar cambios en el perfil
   const handleSaveProfile = async () => {
+    console.log('=== INICIANDO GUARDADO DE PERFIL ===');
+    console.log('formData:', formData);
+    console.log('userInfo:', userInfo);
+    
     if (!formData.nombre.trim()) {
+      console.log('Error: Nombre vacío');
       showProfileMessage('El nombre es requerido', 'error');
       return;
-    }    if (!userInfo?.id_usuario) {
+    }
+    
+    if (!userInfo?.id_usuario) {
+      console.log('Error: No hay id_usuario en userInfo');
       showProfileMessage('Error: No se pudo obtener la información del usuario', 'error');
       return;
-    }
-
-    try {      
+    }    try {      
       const updateData = {
         nombre: formData.nombre,
-        celular: formData.celular,
+        correo: userInfo.correo, // Mantener el correo existente
+        telefono: formData.celular,
         fecha_nacimiento: formData.fecha_nacimiento || null,
-        sexo: formData.sexo || null,
-        dui: formData.dui || null
+        sexo: formData.sexo || null
       };
 
-      await updateUserInfo(userInfo.id_usuario, updateData);
+      // Solo agregar campos opcionales si tienen valor
+      if (formData.dui) {
+        updateData.dui = formData.dui;
+      }
+
+      console.log('Datos a enviar al servidor:', updateData);
+      console.log('ID de usuario:', userInfo.id_usuario);
+      
+      const result = await updateUserInfo(userInfo.id_usuario, updateData);
+      console.log('Resultado de la actualización:', result);
       
       setEditMode(false);
-      showProfileMessage('Perfil actualizado correctamente');      if (setToast && typeof setToast === 'function') {
+      showProfileMessage('Perfil actualizado correctamente');
+      
+      if (setToast && typeof setToast === 'function') {
         setToast('Perfil actualizado correctamente');
       }
+      
+      console.log('=== GUARDADO EXITOSO ===');
     } catch (error) {
-      showProfileMessage('Error al actualizar el perfil', 'error');      if (setToast && typeof setToast === 'function') {
+      console.error('=== ERROR AL GUARDAR PERFIL ===');
+      console.error('Error completo:', error);
+      console.error('Mensaje del error:', error.message);
+      
+      showProfileMessage('Error al actualizar el perfil', 'error');
+      
+      if (setToast && typeof setToast === 'function') {
         setToast('Error al actualizar el perfil');
       }
     }
@@ -420,13 +445,23 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     }    if (!userInfo?.id_usuario) {
       showProfileMessage('Error: No se pudo obtener la información del usuario', 'error');
       return;
-    }
-
-    try {      
+    }    try {      
       const passwordUpdateData = {
+        nombre: userInfo.nombre,
+        correo: userInfo.correo,
+        telefono: userInfo.celular || '',
+        fecha_nacimiento: userInfo.fecha_nacimiento || null,
+        sexo: userInfo.sexo || null,
         current_password: passwordData.currentPassword,
         new_password: passwordData.newPassword
       };
+
+      // Solo agregar DUI si existe
+      if (userInfo.dui) {
+        passwordUpdateData.dui = userInfo.dui;
+      }
+
+      console.log('Datos para cambio de contraseña:', passwordUpdateData);
 
       await changePassword(userInfo.id_usuario, passwordUpdateData);
       

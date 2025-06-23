@@ -59,7 +59,12 @@ export const obtenerUsuario = async (userId) => {
  */
 export const actualizarUsuario = async (userId, userData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+    console.log('=== ACTUALIZANDO USUARIO EN API ===');
+    console.log('userId:', userId);
+    console.log('userData:', userData);
+    console.log('URL completa:', `${API_BASE_URL}/users/${userId}/profile`);
+    
+    const response = await fetch(`${API_BASE_URL}/users/${userId}/profile`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -67,13 +72,21 @@ export const actualizarUsuario = async (userId, userData) => {
       body: JSON.stringify(userData),
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+
     if (!response.ok) {
-      throw new Error(`Error ${response.status}: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('Error response body:', errorText);
+      throw new Error(`Error ${response.status}: ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('Response data:', data);
+    console.log('=== ACTUALIZACIÓN EXITOSA ===');
     return data;
   } catch (error) {
+    console.error('=== ERROR EN ACTUALIZACIÓN ===');
     console.error('Error al actualizar usuario:', error);
     throw error;
   }
@@ -83,25 +96,53 @@ export const actualizarUsuario = async (userId, userData) => {
  * Actualiza la foto de perfil de un usuario
  * @param {number} userId - ID del usuario
  * @param {File} file - Archivo de imagen
+ * @param {Object} currentUserData - Datos actuales del usuario para mantenerlos
  * @returns {Promise<Object>} - Respuesta del servidor
  */
-export const actualizarFotoPerfil = async (userId, file) => {
+export const actualizarFotoPerfil = async (userId, file, currentUserData = {}) => {
   try {
+    console.log('=== ACTUALIZANDO FOTO DE PERFIL ===');
+    console.log('userId:', userId);
+    console.log('file:', file);
+    console.log('currentUserData:', currentUserData);
+    
     const formData = new FormData();
+    
+    // Agregar todos los datos del usuario existentes
+    if (currentUserData.nombre) formData.append('nombre', currentUserData.nombre);
+    if (currentUserData.correo) formData.append('correo', currentUserData.correo);
+    if (currentUserData.celular) formData.append('telefono', currentUserData.celular);
+    if (currentUserData.fecha_nacimiento) formData.append('fecha_nacimiento', currentUserData.fecha_nacimiento);
+    if (currentUserData.sexo) formData.append('sexo', currentUserData.sexo);
+    
+    // Agregar la foto
     formData.append('foto_perfil', file);
 
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/foto`, {
+    console.log('FormData entries:');
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+
+    const response = await fetch(`${API_BASE_URL}/users/${userId}/profile`, {
       method: 'PUT',
       body: formData,
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+
     if (!response.ok) {
-      throw new Error(`Error ${response.status}: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('Error response body:', errorText);
+      throw new Error(`Error ${response.status}: ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('Response data:', data);
+    console.log('=== ACTUALIZACIÓN DE FOTO EXITOSA ===');
     return data;
   } catch (error) {
+    console.error('=== ERROR EN ACTUALIZACIÓN DE FOTO ===');
     console.error('Error al actualizar foto de perfil:', error);
     throw error;
   }
@@ -115,7 +156,11 @@ export const actualizarFotoPerfil = async (userId, file) => {
  */
 export const cambiarPassword = async (userId, passwordData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/password`, {
+    console.log('=== CAMBIANDO CONTRASEÑA ===');
+    console.log('userId:', userId);
+    console.log('URL completa:', `${API_BASE_URL}/users/${userId}/profile`);
+    
+    const response = await fetch(`${API_BASE_URL}/users/${userId}/profile`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -123,13 +168,21 @@ export const cambiarPassword = async (userId, passwordData) => {
       body: JSON.stringify(passwordData),
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+
     if (!response.ok) {
-      throw new Error(`Error ${response.status}: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('Error response body:', errorText);
+      throw new Error(`Error ${response.status}: ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('Response data:', data);
+    console.log('=== CAMBIO DE CONTRASEÑA EXITOSO ===');
     return data;
   } catch (error) {
+    console.error('=== ERROR EN CAMBIO DE CONTRASEÑA ===');
     console.error('Error al cambiar contraseña:', error);
     throw error;
   }
