@@ -708,11 +708,14 @@
 }
 
 .perfil__error {
-  text-align: center;
-  padding: 30px;
-  background: #fff3cd;
-  border: 1px solid #ffeaa7;
-  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 8px;
+  color: #c53030;
   margin-bottom: 20px;
 }
 
@@ -1150,9 +1153,19 @@
 }
 
 .perfil__message.error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Input de contraseña con toggle */
@@ -2148,6 +2161,7 @@
   border-radius: 50%;
   border: 3px solid #f1e3e3;
   box-shadow: 0 4px 15px rgba(168, 24, 24, 0.1);
+  transition: all 0.3s ease;
 }
 
 .perfil__photo-controls {
@@ -2159,17 +2173,47 @@
 
 .perfil__photo-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 12px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+/* Botón principal para cambiar foto */
+.perfil__photo-change-btn {
+  background: linear-gradient(135deg, #ab1319, #8b0f14);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(171, 19, 25, 0.3);
+  min-width: 160px;
+  justify-content: center;
+}
+
+.perfil__photo-change-btn:hover {
+  background: linear-gradient(135deg, #c41e3a, #ab1319);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(171, 19, 25, 0.4);
+}
+
+.perfil__photo-change-btn:active {
+  transform: translateY(0);
 }
 
 /* Label como botón para el input file */
 .perfil__photo-controls label {
-  background: #f8f9fa;
-  color: #666;
-  border: 2px solid #e0e0e0;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  color: #495057;
+  border: 2px solid #dee2e6;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 25px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -2178,11 +2222,56 @@
   align-items: center;
   gap: 8px;
   text-decoration: none;
+  min-width: 160px;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .perfil__photo-controls label:hover {
-  background: #e9ecef;
-  border-color: #ccc;
+  background: linear-gradient(135deg, #e9ecef, #dee2e6);
+  border-color: #adb5bd;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Botones de acción mejorados */
+.perfil__photo-action-btn {
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.perfil__photo-action-btn--save {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+}
+
+.perfil__photo-action-btn--save:hover {
+  background: linear-gradient(135deg, #218838, #28a745);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
+}
+
+.perfil__photo-action-btn--cancel {
+  background: linear-gradient(135deg, #6c757d, #5a6268);
+  color: white;
+  box-shadow: 0 2px 6px rgba(108, 117, 125, 0.3);
+}
+
+.perfil__photo-action-btn--cancel:hover {
+  background: linear-gradient(135deg, #5a6268, #495057);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(108, 117, 125, 0.4);
 }
 
 /* RESPONSIVE PARA FOTO */
@@ -2191,14 +2280,29 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    gap: 20px;
   }
   
   .perfil__photo-controls {
     align-items: center;
+    width: 100%;
   }
   
   .perfil__photo-actions {
     justify-content: center;
+    width: 100%;
+  }
+
+  .perfil__photo-change-btn,
+  .perfil__photo-controls label,
+  .perfil__photo-action-btn {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .perfil__photo-preview-img {
+    width: 100px;
+    height: 100px;
   }
 }
 
@@ -2298,27 +2402,72 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* LOADING OVERLAY PARA FOTO */
-.perfil__loading-overlay {
+/* Información adicional de la foto */
+.perfil__photo-info {
+  margin-top: 15px;
+  padding: 15px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.perfil__photo-info p {
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.perfil__photo-info p:last-child {
+  margin-bottom: 0;
+}
+
+.perfil__photo-info strong {
+  color: #343a40;
+  font-weight: 600;
+  min-width: 100px;
+}
+
+/* Loading state para foto */
+.perfil__photo-loading {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   background: rgba(255, 255, 255, 0.8);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.2rem;
   color: #ab1319;
-  font-size: 1.5rem;
 }
 
-.perfil__loading-overlay .spinning {
+.perfil__photo-loading .spinning {
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* Estados deshabilitados */
+.perfil__photo-action-btn:disabled,
+.perfil__photo-change-btn:disabled,
+.perfil__photo-controls label.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.perfil__photo-action-btn:disabled:hover,
+.perfil__photo-change-btn:disabled:hover,
+.perfil__photo-controls label.disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
 }

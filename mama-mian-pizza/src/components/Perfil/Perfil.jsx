@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
    faHeart, faUser, faEdit, faShieldAlt, faPhone, faMapMarkerAlt, 
-   faCalendarAlt, faEye, faEyeSlash, faLock, faEnvelope, faCamera
+   faCalendarAlt, faEye, faEyeSlash, faLock, faEnvelope, faCamera, faSpinner
 } from "@fortawesome/free-solid-svg-icons";
 
 import './Perfil.css';
@@ -36,12 +36,12 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     fecha_nacimiento: '',
     sexo: '',
     dui: ''
-  });
-  // Estados para información del usuario desde API se manejan en el hook useUsuario
+  });  // Estados para información del usuario desde API se manejan en el hook useUsuario
   // Estados para cambiar foto
   const [photoMode, setPhotoMode] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [savingPhoto, setSavingPhoto] = useState(false);
   // Estados para pedidos
   const [pedidos, setPedidos] = useState([]);
   const [loadingPedidos, setLoadingPedidos] = useState(false);
@@ -260,42 +260,60 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       ...prev,
       [name]: value
     }));
-  };
-  // Manejar selección de foto
+  };  // Manejar selección de foto
   const handlePhotoSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.type.startsWith('image/')) {
-        setSelectedPhoto(file);
-        setPhotoError(''); // Limpiar errores previos
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setPhotoPreview(e.target.result);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        setPhotoError('Por favor selecciona un archivo de imagen válido');
+      // Validar tipo de archivo
+      if (!file.type.startsWith('image/')) {
+        setPhotoError('Por favor selecciona un archivo de imagen válido (JPG, PNG, GIF)');
+        return;
       }
+
+      // Validar tamaño del archivo (5MB máximo)
+      const maxSize = 5 * 1024 * 1024; // 5MB en bytes
+      if (file.size > maxSize) {
+        setPhotoError('El archivo es demasiado grande. El tamaño máximo permitido es 5MB');
+        return;
+      }
+
+      setSelectedPhoto(file);
+      setPhotoError(''); // Limpiar errores previos
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPhotoPreview(e.target.result);
+      };
+      reader.onerror = () => {
+        setPhotoError('Error al leer el archivo. Por favor intenta de nuevo.');
+      };
+      reader.readAsDataURL(file);
     }
   };// Guardar nueva foto
   const handleSavePhoto = async () => {
     if (selectedPhoto && userInfo?.id_usuario) {
+      setSavingPhoto(true);
       try {
-        await updateProfilePhoto(userInfo.id_usuario, selectedPhoto);        setPhotoMode(false);
+        await updateProfilePhoto(userInfo.id_usuario, selectedPhoto);        
+        setPhotoMode(false);
         setSelectedPhoto(null);
         setPhotoPreview(null);
         setPhotoError(''); // Limpiar errores
-          // Verificar que setToast existe y es una función antes de usarla
+          
+        // Verificar que setToast existe y es una función antes de usarla
         if (setToast && typeof setToast === 'function') {
           setToast('Foto de perfil actualizada correctamente');
         }
       } catch (error) {
         console.error('Error al actualizar la foto de perfil:', error);
-        setPhotoError('Error al actualizar la foto de perfil');
-          // Verificar que setToast existe y es una función antes de usarla
+        setPhotoError('Error al actualizar la foto de perfil. Por favor intenta de nuevo.');
+          
+        // Verificar que setToast existe y es una función antes de usarla
         if (setToast && typeof setToast === 'function') {
           setToast('Error al actualizar la foto de perfil');
         }
+      } finally {
+        setSavingPhoto(false);
       }
     }
   };// Cancelar cambio de foto
@@ -304,6 +322,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     setSelectedPhoto(null);
     setPhotoPreview(null);
     setPhotoError(''); // Limpiar errores
+    setSavingPhoto(false); // Resetear estado de guardado
   };
 
   // Función para formatear fecha
@@ -832,63 +851,83 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         {activeTab === 'editar' && (
           <div className="perfil__editar-section">            <div className="perfil__titulo-editar">Editar Perfil</div>
             
-            <div className="perfil__form-container">
-              {/* Sección de foto de perfil */}
+            <div className="perfil__form-container">              {/* Sección de foto de perfil */}
               <div className="perfil__photo-section">
-                <h4 className="perfil__section-title">Foto de Perfil</h4>
+                <h4 className="perfil__section-title">
+                  <FontAwesomeIcon icon={faCamera} />
+                  Foto de Perfil
+                </h4>
                 <div className="perfil__photo-container">                  <div className="perfil__photo-preview">
                     <img 
                       src={photoPreview || userInfo?.foto_perfil || "/assets/Usuario.png"} 
                       alt="Vista previa"
                       className="perfil__photo-preview-img"
-                    />
+                    />                    {/* Estado de carga */}
+                    {savingPhoto && (
+                      <div className="perfil__photo-loading">
+                        <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                      </div>
+                    )}
                   </div>
                   
-                  {!photoMode ? (
-                    <button 
-                      className="perfil__btn-secondary"
-                      onClick={() => setPhotoMode(true)}
-                    >
-                      <FontAwesomeIcon icon={faCamera} />
-                      Cambiar Foto
-                    </button>
-                  ) : (
-                    <div className="perfil__photo-controls">
-                      <input
-                        type="file"
-                        id="photo-upload"
-                        accept="image/*"
-                        onChange={handlePhotoSelect}
-                        style={{ display: 'none' }}
-                      />
-                      <label htmlFor="photo-upload" className="perfil__btn-secondary">
+                  <div className="perfil__photo-controls">
+                    {!photoMode ? (
+                      <button 
+                        className="perfil__photo-change-btn"
+                        onClick={() => setPhotoMode(true)}
+                      >
                         <FontAwesomeIcon icon={faCamera} />
-                        Seleccionar Foto
-                      </label>
-                      
-                      {selectedPhoto && (
-                        <div className="perfil__photo-actions">
-                          <button 
-                            className="perfil__btn-primary"
-                            onClick={handleSavePhoto}
-                          >
-                            Guardar Foto
-                          </button>
-                          <button 
-                            className="perfil__btn-secondary"
-                            onClick={handleCancelPhoto}
-                          >
-                            Cancelar
-                          </button>
-                        </div>                      )}
-                    </div>
-                  )}
+                        Cambiar Foto
+                      </button>
+                    ) : (
+                      <>
+                        <input
+                          type="file"
+                          id="photo-upload"
+                          accept="image/*"
+                          onChange={handlePhotoSelect}
+                          style={{ display: 'none' }}
+                        />
+                        <label htmlFor="photo-upload">
+                          <FontAwesomeIcon icon={faCamera} />
+                          {selectedPhoto ? 'Cambiar Imagen' : 'Seleccionar Imagen'}
+                        </label>
+                          {selectedPhoto && (
+                          <div className="perfil__photo-actions">                            <button 
+                              className="perfil__photo-action-btn perfil__photo-action-btn--save"
+                              onClick={handleSavePhoto}
+                              disabled={!selectedPhoto || savingPhoto}
+                            >
+                              <FontAwesomeIcon icon={savingPhoto ? faSpinner : faCamera} className={savingPhoto ? 'spinning' : ''} />
+                              {savingPhoto ? 'Guardando...' : 'Guardar'}
+                            </button>
+                            <button 
+                              className="perfil__photo-action-btn perfil__photo-action-btn--cancel"
+                              onClick={handleCancelPhoto}
+                              disabled={savingPhoto}
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
                 
                 {/* Error de foto */}
                 {photoError && (
                   <div className="perfil__message error">
                     {photoError}
+                  </div>
+                )}
+
+                {/* Información adicional */}
+                {photoMode && !selectedPhoto && (
+                  <div className="perfil__photo-info">
+                    <p><strong>Formatos aceptados:</strong> JPG, PNG, GIF</p>
+                    <p><strong>Tamaño máximo:</strong> 5MB</p>
+                    <p><strong>Recomendación:</strong> Imagen cuadrada para mejor resultado</p>
                   </div>
                 )}
               </div>
