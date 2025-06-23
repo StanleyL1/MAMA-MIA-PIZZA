@@ -289,12 +289,86 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       };
       reader.readAsDataURL(file);
     }
-  };// Guardar nueva foto
+  };  // Guardar nueva foto
   const handleSavePhoto = async () => {
     if (selectedPhoto && userInfo?.id_usuario) {
       setSavingPhoto(true);
       try {
-        await updateProfilePhoto(userInfo.id_usuario, selectedPhoto);        
+        const result = await updateProfilePhoto(userInfo.id_usuario, selectedPhoto);
+        console.log('📸 PERFIL - Foto actualizada exitosamente:', result);
+        
+        // Obtener la URL de la nueva foto
+        let newPhotoUrl = null;
+        if (result && result.foto_perfil) {
+          newPhotoUrl = result.foto_perfil;
+        } else {
+          // Si no viene en el resultado, obtener datos actualizados del usuario
+          try {
+            const updatedUserData = await fetchUserInfo(userInfo.id_usuario);
+            newPhotoUrl = updatedUserData.foto_perfil;
+          } catch (fetchError) {
+            console.error('Error al obtener datos actualizados:', fetchError);
+          }
+        }
+          if (newPhotoUrl) {
+          console.log('📸 PERFIL - Nueva URL de foto obtenida:', newPhotoUrl);
+          
+          // FASE 1: Disparar evento inmediato para actualización instantánea
+          const immediateEvent = new CustomEvent('immediatePhotoUpdate', {
+            detail: { photo: newPhotoUrl }
+          });
+          window.dispatchEvent(immediateEvent);
+          console.log('⚡ PERFIL - Evento immediatePhotoUpdate disparado');
+          
+          // FASE 2: Disparar evento estándar con más información
+          const photoEvent = new CustomEvent('profilePhotoUpdated', {
+            detail: { 
+              newPhoto: newPhotoUrl,
+              userId: userInfo.id_usuario,
+              timestamp: Date.now()
+            }
+          });
+          window.dispatchEvent(photoEvent);
+          console.log('📸 PERFIL - Evento profilePhotoUpdated disparado');
+          
+          // FASE 3: Actualizar localStorage inmediatamente
+          try {
+            const savedUser = localStorage.getItem('mamamia_user');
+            if (savedUser) {
+              const parsedUser = JSON.parse(savedUser);
+              const updatedUser = { 
+                ...parsedUser, 
+                foto_perfil: newPhotoUrl, 
+                foto: newPhotoUrl 
+              };
+              localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+              console.log('💾 PERFIL - localStorage actualizado con nueva foto');
+              
+              // Disparar evento de storage manualmente para asegurar sincronización
+              const storageEvent = new CustomEvent('storage', {
+                detail: { key: 'mamamia_user', newValue: JSON.stringify(updatedUser) }
+              });
+              window.dispatchEvent(storageEvent);
+              console.log('📦 PERFIL - Evento storage disparado manualmente');
+            }
+          } catch (storageError) {
+            console.error('❌ Error al actualizar localStorage:', storageError);
+          }
+          
+          // FASE 4: Llamar updateUser si está disponible
+          if (updateUser && typeof updateUser === 'function') {
+            updateUser({ foto_perfil: newPhotoUrl, foto: newPhotoUrl });
+            console.log('🔄 PERFIL - updateUser llamado con nueva foto');
+          }
+          
+          // FASE 5: Actualizar el estado visual del perfil inmediatamente  
+          if (userInfo) {
+            const updatedUserInfo = { ...userInfo, foto_perfil: newPhotoUrl };
+            // Si hay una función para actualizar userInfo, usarla
+            console.log('🔄 PERFIL - Estado local actualizado');
+          }
+        }
+        
         setPhotoMode(false);
         setSelectedPhoto(null);
         setPhotoPreview(null);
