@@ -360,13 +360,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
             updateUser({ foto_perfil: newPhotoUrl, foto: newPhotoUrl });
             console.log('🔄 PERFIL - updateUser llamado con nueva foto');
           }
-          
-          // FASE 5: Actualizar el estado visual del perfil inmediatamente  
-          if (userInfo) {
-            const updatedUserInfo = { ...userInfo, foto_perfil: newPhotoUrl };
-            // Si hay una función para actualizar userInfo, usarla
-            console.log('🔄 PERFIL - Estado local actualizado');
-          }
+            // FASE 5: El estado visual del perfil se actualiza automáticamente
+          // a través del refetch de userInfo que ya se hace en updateProfilePhoto
+          console.log('🔄 PERFIL - Estado se actualizará automáticamente');
         }
         
         setPhotoMode(false);

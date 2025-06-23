@@ -136,9 +136,8 @@ useEffect(() => {
       setCurrentProfilePhoto(newPhoto);
     }
   };
-  
   fetchUserPhotoIfNeeded();
-}, [user?.id, user?.foto_perfil, user?.foto]); // Solo las propiedades específicas
+}, [user, currentProfilePhoto]); // Incluir user completo para acceso a todas las propiedades
 
 // Debug: Observar cambios en currentProfilePhoto
 useEffect(() => {
@@ -213,8 +212,7 @@ useEffect(() => {
   // Agregar todos los event listeners
   window.addEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
   window.addEventListener('immediatePhotoUpdate', handleImmediatePhotoUpdate);
-  window.addEventListener('profileDataUpdated', handleProfileDataUpdate);
-  window.addEventListener('storage', handleStorageChange);
+  window.addEventListener('profileDataUpdated', handleProfileDataUpdate);  window.addEventListener('storage', handleStorageChange);
 
   // Cleanup
   return () => {
@@ -223,7 +221,7 @@ useEffect(() => {
     window.removeEventListener('profileDataUpdated', handleProfileDataUpdate);
     window.removeEventListener('storage', handleStorageChange);
   };
-}, [user]); // Solo user como dependencia para evitar re-creación constante
+}, [user, currentProfilePhoto]); // Incluir currentProfilePhoto para evitar stale closures
 
 
 const toggleMobileMenu = () => {
