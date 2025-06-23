@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
    faHeart, faUser, faEdit, faShieldAlt, faPhone, faMapMarkerAlt, 
-   faCalendarAlt, faEye, faEyeSlash, faLock, faEnvelope, faCamera, faSpinner
+   faCalendarAlt, faLock, faEnvelope, faCamera, faSpinner, faSync
 } from "@fortawesome/free-solid-svg-icons";
 
 import './Perfil.css';
@@ -60,16 +60,11 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
   const [isModalExperienciaOpen, setIsModalExperienciaOpen] = useState(false);
 
   // Estados para cambiar contraseña
-  const [passwordMode, setPasswordMode] = useState(false);
-  const [passwordData, setPasswordData] = useState({
+  const [passwordMode, setPasswordMode] = useState(false);  const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-  const [showPasswords, setShowPasswords] = useState({
-    current: false,
-    new: false,
-    confirm: false  });
   
   // Función helper para mostrar mensajes usando toast
   const showProfileMessage = useCallback((message, type = 'success') => {
@@ -528,10 +523,21 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       return;
     }
 
-    if (passwordData.newPassword.length < 6) {
-      showProfileMessage('La contraseña debe tener al menos 6 caracteres', 'error');
+    // Validaciones de seguridad para la nueva contraseña
+    if (passwordData.newPassword.length < 8) {
+      showProfileMessage('La contraseña debe tener al menos 8 caracteres', 'error');
       return;
-    }    if (!userInfo?.id_usuario) {
+    }
+
+    // Verificar que tenga al menos una letra mayúscula
+    if (!/[A-Z]/.test(passwordData.newPassword)) {
+      showProfileMessage('La contraseña debe contener al menos una letra mayúscula', 'error');
+      return;
+    }    // Verificar que tenga al menos un carácter especial
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(passwordData.newPassword)) {
+      showProfileMessage('La contraseña debe contener al menos un carácter especial (!@#$%^&*)', 'error');
+      return;
+    }if (!userInfo?.id_usuario) {
       showProfileMessage('Error: No se pudo obtener la información del usuario', 'error');
       return;
     }    try {      
@@ -646,15 +652,14 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       {/* CONTENIDO SEGÚN TAB */}
       <div className="perfil__contenido">        {/* --- HISTORIAL DE PEDIDOS --- */}
         {activeTab === 'pedidos' && (
-          <div className="perfil__pedidos-section">
-            <div className="perfil__titulo-historial">
+          <div className="perfil__pedidos-section">            <div className="perfil__titulo-historial">
               Historial de Pedidos
               <button 
                 className="perfil__refresh-btn"
                 onClick={fetchPedidos}
                 disabled={loadingPedidos}
               >
-                <FontAwesomeIcon icon={faUser} className={loadingPedidos ? 'spinning' : ''} />
+                <FontAwesomeIcon icon={faSync} className={loadingPedidos ? 'spinning' : ''} />
                 {loadingPedidos ? 'Cargando...' : 'Actualizar'}
               </button>
             </div>
@@ -764,53 +769,51 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         {activeTab === 'reseñas' && (
           <div className="perfil__reseñas-section">
             <div className="perfil__titulo-historial">
-              Mis Reseñas y Experiencias
-              <button 
+              Mis Reseñas y Experiencias              <button
                 className="perfil__refresh-btn"
                 onClick={refreshResenasYExperiencias}
                 disabled={loadingResenas || loadingExperiencias}
                 title="Actualizar reseñas y experiencias"
               >
-                🔄
+                <FontAwesomeIcon icon={faSync} />
               </button>
-            </div>
-              {/* Información del usuario sobre reseñas y experiencias */}
-            {(userResenasInfo || experiencias.length > 0) && (
-              <div className="perfil__resenas-stats">
-                {userResenasInfo && (
-                  <>
-                    <div className="perfil__stat-item">
-                      <span className="perfil__stat-number">{userResenasInfo.total_resenas}</span>
-                      <span className="perfil__stat-label">Total reseñas</span>
-                    </div>
-                    <div className="perfil__stat-item">
-                      <span className="perfil__stat-number">{userResenasInfo.resenas_aprobadas}</span>
-                      <span className="perfil__stat-label">Reseñas aprobadas</span>
-                    </div>
-                    <div className="perfil__stat-item">
-                      <span className="perfil__stat-number">{userResenasInfo.resenas_pendientes}</span>
-                      <span className="perfil__stat-label">Reseñas pendientes</span>
-                    </div>
-                  </>
-                )}
-                <div className="perfil__stat-item">
-                  <span className="perfil__stat-number">{experiencias.length}</span>
-                  <span className="perfil__stat-label">Total experiencias</span>
-                </div>
-                <div className="perfil__stat-item">
-                  <span className="perfil__stat-number">
-                    {experiencias.filter(exp => exp.estado === 1).length}
-                  </span>
-                  <span className="perfil__stat-label">Experiencias aprobadas</span>
-                </div>
-                <div className="perfil__stat-item">
-                  <span className="perfil__stat-number">
-                    {experiencias.filter(exp => exp.estado === 0).length}
-                  </span>
-                  <span className="perfil__stat-label">Experiencias pendientes</span>
-                </div>
+            </div>              {/* Información del usuario sobre reseñas y experiencias */}
+            <div className="perfil__resenas-stats">
+              <div className="perfil__stat-item">
+                <span className="perfil__stat-number">
+                  {userResenasInfo ? userResenasInfo.total_resenas : resenas.length}
+                </span>
+                <span className="perfil__stat-label">Total reseñas</span>
               </div>
-            )}            {/* Estado de carga */}
+              <div className="perfil__stat-item">
+                <span className="perfil__stat-number">
+                  {userResenasInfo ? userResenasInfo.resenas_aprobadas : resenas.filter(r => r.aprobada || r.estado === 'aprobada').length}
+                </span>
+                <span className="perfil__stat-label">Reseñas aprobadas</span>
+              </div>
+              <div className="perfil__stat-item">
+                <span className="perfil__stat-number">
+                  {userResenasInfo ? userResenasInfo.resenas_pendientes : resenas.filter(r => !r.aprobada && r.estado !== 'aprobada').length}
+                </span>
+                <span className="perfil__stat-label">Reseñas pendientes</span>
+              </div>
+              <div className="perfil__stat-item">
+                <span className="perfil__stat-number">{experiencias.length}</span>
+                <span className="perfil__stat-label">Total experiencias</span>
+              </div>
+              <div className="perfil__stat-item">
+                <span className="perfil__stat-number">
+                  {experiencias.filter(exp => exp.estado === 1).length}
+                </span>
+                <span className="perfil__stat-label">Experiencias aprobadas</span>
+              </div>
+              <div className="perfil__stat-item">
+                <span className="perfil__stat-number">
+                  {experiencias.filter(exp => exp.estado === 0).length}
+                </span>
+                <span className="perfil__stat-label">Experiencias pendientes</span>
+              </div>
+            </div>{/* Estado de carga */}
             {(loadingResenas || loadingExperiencias) && (
               <div className="perfil__loading">
                 <p>Cargando reseñas y experiencias...</p>
@@ -1155,65 +1158,44 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                     Cambiar Contraseña
                   </button>
                 ) : (
-                  <div className="perfil__password-form">
-                    <div className="perfil__form-row">
+                  <div className="perfil__password-form">                    <div className="perfil__form-row">
                       <label className="perfil__label">Contraseña actual</label>
-                      <div className="perfil__password-input">
-                        <input
-                          type={showPasswords.current ? "text" : "password"}
-                          name="currentPassword"
-                          value={passwordData.currentPassword}
-                          onChange={handlePasswordChange}
-                          className="perfil__input"
-                        />
-                        <button
-                          type="button"
-                          className="perfil__password-toggle"
-                          onClick={() => setShowPasswords(prev => ({...prev, current: !prev.current}))}
-                        >
-                          <FontAwesomeIcon icon={showPasswords.current ? faEyeSlash : faEye} />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="perfil__form-row">
+                      <input
+                        type="password"
+                        name="currentPassword"
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordChange}
+                        className="perfil__input"
+                      />
+                    </div>                    <div className="perfil__form-row">
                       <label className="perfil__label">Nueva contraseña</label>
-                      <div className="perfil__password-input">
-                        <input
-                          type={showPasswords.new ? "text" : "password"}
-                          name="newPassword"
-                          value={passwordData.newPassword}
-                          onChange={handlePasswordChange}
-                          className="perfil__input"
-                        />
-                        <button
-                          type="button"
-                          className="perfil__password-toggle"
-                          onClick={() => setShowPasswords(prev => ({...prev, new: !prev.new}))}
-                        >
-                          <FontAwesomeIcon icon={showPasswords.new ? faEyeSlash : faEye} />
-                        </button>
+                      <input
+                        type="password"
+                        name="newPassword"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange}
+                        className="perfil__input"
+                        placeholder="Ingresa tu nueva contraseña"
+                      />
+                      <div className="perfil__password-requirements">
+                        <small>
+                          <strong>Requisitos de contraseña:</strong>
+                          <ul>
+                            <li>Mínimo 8 caracteres</li>
+                            <li>Al menos una letra mayúscula</li>
+                            <li>Al menos un carácter especial (!@#$%^&*)</li>
+                          </ul>
+                        </small>
                       </div>
-                    </div>
-
-                    <div className="perfil__form-row">
+                    </div><div className="perfil__form-row">
                       <label className="perfil__label">Confirmar nueva contraseña</label>
-                      <div className="perfil__password-input">
-                        <input
-                          type={showPasswords.confirm ? "text" : "password"}
-                          name="confirmPassword"
-                          value={passwordData.confirmPassword}
-                          onChange={handlePasswordChange}
-                          className="perfil__input"
-                        />
-                        <button
-                          type="button"
-                          className="perfil__password-toggle"
-                          onClick={() => setShowPasswords(prev => ({...prev, confirm: !prev.confirm}))}
-                        >
-                          <FontAwesomeIcon icon={showPasswords.confirm ? faEyeSlash : faEye} />
-                        </button>
-                      </div>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordChange}
+                        className="perfil__input"
+                      />
                     </div>
 
                     <div className="perfil__edit-actions">
