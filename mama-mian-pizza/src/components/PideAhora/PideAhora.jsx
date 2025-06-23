@@ -59,14 +59,11 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   const [orderSuccess, setOrderSuccess] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [orderCode, setOrderCode] = useState('');
-  
-  const [invitadoData, setInvitadoData] = useState({
-    nombre: '',
-    apellido: '',
+    const [invitadoData, setInvitadoData] = useState({
+    nombreCompleto: '',
     telefono: '',
-  });    const [cuentaData, setCuentaData] = useState({
-    nombre: '',
-    apellido: '',
+  });const [cuentaData, setCuentaData] = useState({
+    nombreCompleto: '',
     telefono: '',
     email: '',
     password: '',
@@ -264,10 +261,21 @@ const redirigirAWompi = () => {
       getAddressFromCoordinates(userLocation.lat, userLocation.lng);
     }
   }, [userLocation, getAddressFromCoordinates]);
-
   // Función para avanzar al siguiente paso
   const handleContinuar = () => {
     if (step === 'Cuenta') {
+      // Validar campos de invitado
+      if (modo === 'invitado') {
+        if (!invitadoData.nombreCompleto || !invitadoData.telefono) {
+          alert('Por favor completa todos los campos requeridos.');
+          return;
+        }      } else {
+        // Validar campos de cuenta registrada
+        if (!cuentaData.nombreCompleto || !cuentaData.telefono || !cuentaData.email || !cuentaData.password) {
+          alert('Por favor completa todos los campos requeridos.');
+          return;
+        }
+      }
       setStep('Dirección');
     } else if (step === 'Dirección') {
       setStep('Pago');
@@ -297,17 +305,13 @@ const redirigirAWompi = () => {
       // Construir objeto con la estructura exacta esperada por el backend
       const pedidoData = {
         // Tipo de cliente: registrado o invitado
-        tipo_cliente: modo === 'invitado' ? 'invitado' : 'registrado',
-          // Datos del cliente según el payload exacto
+        tipo_cliente: modo === 'invitado' ? 'invitado' : 'registrado',        // Datos del cliente según el payload exacto
         cliente: modo === 'invitado'
           ? { 
-              nombre: invitadoData.nombre,
-              apellido: invitadoData.apellido,
+              nombre: invitadoData.nombreCompleto,
               telefono: invitadoData.telefono
-            }
-          : {
-              nombre: cuentaData.nombre,
-              apellido: cuentaData.apellido,
+            }          : {
+              nombre: cuentaData.nombreCompleto,
               telefono: cuentaData.telefono,
               email: cuentaData.email,
               password: cuentaData.password 
@@ -541,34 +545,19 @@ const redirigirAWompi = () => {
                     Guarda tu historial
                   </span>
                 </button>
-              </div>
-
-              {/* Formulario de Invitado */}
+              </div>              {/* Formulario de Invitado */}
               {modo === 'invitado' && (
                 <div className="formulario-invitado">
-                  <div className="campos-dobles">
-                    <div className="campo">
-                      <label htmlFor="nombre">Nombre</label>
-                      <input
-                        name="nombre"
-                        id="nombre"
-                        type="text"
-                        className="input-small"
-                        value={invitadoData.nombre}
-                        onChange={handleInputInvitado}
-                      />
-                    </div>
-                    <div className="campo">
-                      <label htmlFor="apellido">Apellido</label>
-                      <input
-                        name="apellido"
-                        id="apellido"
-                        type="text"
-                        className="input-small"
-                        value={invitadoData.apellido}
-                        onChange={handleInputInvitado}
-                      />
-                    </div>
+                  <div className="campo">
+                    <label htmlFor="nombreCompleto">Nombre completo</label>
+                    <input
+                      name="nombreCompleto"
+                      id="nombreCompleto"
+                      type="text"
+                      className="input-small"
+                      value={invitadoData.nombreCompleto}
+                      onChange={handleInputInvitado}
+                    />
                   </div>
                   <div className="campo">
                     <label htmlFor="telefono">Número de teléfono</label>
@@ -590,29 +579,16 @@ const redirigirAWompi = () => {
               )}              {/* Formulario de Cuenta */}
               {modo === 'cuenta' && (
                 <div className="formulario-cuenta">
-                  <div className="campos-dobles">
-                    <div className="campo">
-                      <label htmlFor="nombreCuenta">Nombre</label>
-                      <input
-                        name="nombre"
-                        id="nombreCuenta"
-                        type="text"
-                        className="input-small"
-                        value={cuentaData.nombre}
-                        onChange={handleInputCuenta}
-                      />
-                    </div>
-                    <div className="campo">
-                      <label htmlFor="apellidoCuenta">Apellido</label>
-                      <input
-                        name="apellido"
-                        id="apellidoCuenta"
-                        type="text"
-                        className="input-small"
-                        value={cuentaData.apellido}
-                        onChange={handleInputCuenta}
-                      />
-                    </div>
+                  <div className="campo">
+                    <label htmlFor="nombreCompletoCuenta">Nombre completo</label>
+                    <input
+                      name="nombreCompleto"
+                      id="nombreCompletoCuenta"
+                      type="text"
+                      className="input-small"
+                      value={cuentaData.nombreCompleto}
+                      onChange={handleInputCuenta}
+                    />
                   </div>
                   <div className="campos-dobles">
                     <div className="campo">
@@ -973,23 +949,21 @@ const redirigirAWompi = () => {
     <p className="descripcion-confirmar">
       Revisa los detalles de tu pedido antes de confirmar
     </p>
-    
-    {/* Sección de Información Personal */}
+      {/* Sección de Información Personal */}
     <div className="seccion-linea">
-      <h4 className="subtitulo-seccion">Información personal</h4>      {modo === 'invitado' ? (
+      <h4 className="subtitulo-seccion">Información personal</h4>
+      {modo === 'invitado' ? (
         <>
-          <p>{invitadoData.nombre} {invitadoData.apellido}</p>
+          <p>{invitadoData.nombreCompleto}</p>
           <p>Teléfono: +503 {invitadoData.telefono}</p>
-        </>
-      ) : (
+        </>      ) : (
         <>
-          <p>{cuentaData.nombre} {cuentaData.apellido}</p>
+          <p>{cuentaData.nombreCompleto}</p>
           <p>Email: {cuentaData.email}</p>
           <p>Teléfono: +503 {cuentaData.telefono}</p>
         </>
       )}
     </div>
-
     {/* Sección de Método de entrega y dirección */}
     <div className="seccion-linea">
       <h4 className="subtitulo-seccion">
