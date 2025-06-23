@@ -16,10 +16,10 @@
 /* Contenedor del modal */
 .modal__content {
   position: relative;
-  width: 80%;
-  max-width: 600px;
+  width: 90%;
+  max-width: 900px;
   height: auto;
-  max-height: 80vh;
+  max-height: 90vh;
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.1), 0 8px 8px -5px rgba(0, 0, 0, 0.04);
@@ -92,8 +92,8 @@
 .modal__pedido-container {
   display: flex;
   height: 100%;
-  min-height: 450px;
-  max-height: 80vh;
+  min-height: 550px;
+  max-height: 90vh;
 }
 
 /* Sección de imagen */
@@ -179,16 +179,16 @@
 
 /* Header con título y tabs */
 .modal__header {
-  padding: 20px 20px 12px 20px;
+  padding: 28px 28px 16px 28px;
   border-bottom: 1px solid #e5e7eb;
   background: #ffffff;
 }
 
 .modal__pizza-title {
-  font-size: 26px;
+  font-size: 28px;
   color: #991B1B;
   font-weight: 700;
-  margin: 0 0 16px 0;
+  margin: 0 0 18px 0;
   line-height: 1.2;
   letter-spacing: -0.3px;
 }
@@ -229,13 +229,13 @@
 /* Sección del formulario */
 .modal__form-section {
   flex: 1;
-  padding: 18px 20px;
+  padding: 24px 28px;
   overflow-y: auto;
   background: #ffffff;
 }
 
 .modal__option-group {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .modal__option-label {
@@ -527,13 +527,13 @@ input:checked + .modal__slider:before {
 
 /* Footer con precio y botón */
 .modal__footer {
-  padding: 20px;
+  padding: 28px;
   border-top: 1px solid #e5e7eb;
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 28px;
 }
 
 .modal__price-section {
@@ -564,11 +564,11 @@ input:checked + .modal__slider:before {
   gap: 12px;
   background: linear-gradient(135deg, #FEB248 0%, #f59e0b 100%);
   color: #991B1B;
-  padding: 16px 28px;
+  padding: 18px 32px;
   border: none;
   border-radius: 12px;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 17px;
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
@@ -591,7 +591,7 @@ input:checked + .modal__slider:before {
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-height: 600px;
+  min-height: 650px;
   max-height: 90vh;
   overflow: hidden;
 }
