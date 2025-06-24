@@ -372,10 +372,10 @@ const redirigirAWompi = () => {
       };
       
       console.log('Datos del pedido preparados:', pedidoData);
-      console.log('Enviando pedido a https://api.mamamianpizza.com/api/orders/neworder');
+      console.log('Enviando pedido a https://api.mamamianpizza.com/api/orders/orders/neworder');
       
       // Enviar los datos al servidor
-      const response = await fetch('https://api.mamamianpizza.com/api/orders/neworder', {
+      const response = await fetch('https://api.mamamianpizza.com/api/orders/orders/neworder', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
