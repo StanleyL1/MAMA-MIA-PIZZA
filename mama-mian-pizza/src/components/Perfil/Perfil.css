@@ -631,6 +631,36 @@
   border-color: #ccc;
 }
 
+.perfil__btn-danger {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+}
+
+.perfil__btn-danger:hover {
+  background: linear-gradient(135deg, #c82333, #a71e2a);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.perfil__btn-danger:disabled {
+  background: #d6d8db;
+  color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .perfil__edit-actions {
   display: flex;
   gap: 15px;
@@ -700,6 +730,73 @@
   color: #6c757d;
   font-size: 0.9rem;
   margin-bottom: 2px;
+}
+
+/* ESTILOS PARA DESACTIVAR CUENTA */
+.perfil__security-item--danger {
+  border: 1px solid #f5c6cb;
+  background: #f8d7da;
+}
+
+.perfil__security-item--danger:hover {
+  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.15);
+  border-color: #dc3545;
+}
+
+.perfil__security-item--danger .perfil__security-info h4 {
+  color: #dc3545;
+}
+
+.perfil__warning {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  border-left: 4px solid #ffc107;
+}
+
+.perfil__warning strong {
+  color: #856404;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.perfil__warning ul {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+}
+
+.perfil__warning li {
+  color: #856404;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.perfil__deactivate-form {
+  margin-top: 20px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #dc3545;
+}
+
+.perfil__textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+.perfil__textarea:focus {
+  outline: none;
+  border-color: #ab1319;
+  box-shadow: 0 0 0 3px rgba(171, 19, 25, 0.1);
 }
 
 /* TÍTULOS MEJORADOS */
@@ -2837,5 +2934,212 @@
     padding: 15px 12px;
     font-size: 0.95rem;
     min-height: 40px;
+  }
+}
+
+/* RESPONSIVE PARA SECCIÓN DE DESACTIVAR CUENTA */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 768px) {
+  .perfil__security-item--danger {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .perfil__security-info h4 {
+    font-size: 1.2rem;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .perfil__warning {
+    padding: 14px;
+    margin-top: 14px;
+  }
+  
+  .perfil__warning ul {
+    padding-left: 16px;
+  }
+  
+  .perfil__deactivate-form {
+    padding: 16px;
+  }
+  
+  .perfil__textarea {
+    min-height: 80px;
+    font-size: 0.95rem;
+  }
+  
+  .perfil__edit-actions {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  
+  .perfil__btn-danger,
+  .perfil__btn-secondary {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 1rem;
+  }
+}
+
+/* Móviles */
+@media (max-width: 576px) {
+  .perfil__security-item--danger {
+    padding: 16px;
+    border-radius: 8px;
+  }
+  
+  .perfil__security-info h4 {
+    font-size: 1.1rem;
+    gap: 6px;
+  }
+  
+  .perfil__security-info p {
+    font-size: 0.95rem;
+    text-align: center;
+  }
+  
+  .perfil__warning {
+    padding: 12px;
+    border-radius: 6px;
+  }
+  
+  .perfil__warning strong {
+    font-size: 0.9rem;
+  }
+  
+  .perfil__warning li {
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+  }
+  
+  .perfil__deactivate-form {
+    padding: 14px;
+    border-radius: 6px;
+  }
+  
+  .perfil__form-row {
+    margin-bottom: 16px;
+  }
+  
+  .perfil__label {
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+  
+  .perfil__textarea {
+    min-height: 70px;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .perfil__field-note {
+    font-size: 0.8rem;
+    margin-top: 4px;
+  }
+  
+  .perfil__btn-danger,
+  .perfil__btn-secondary {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 400px) {
+  .perfil__security-item--danger {
+    padding: 12px;
+    margin: 0 -8px 16px -8px;
+  }
+  
+  .perfil__security-info h4 {
+    font-size: 1rem;
+  }
+  
+  .perfil__security-info p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  .perfil__warning {
+    padding: 10px;
+    margin-top: 10px;
+  }
+  
+  .perfil__warning strong {
+    font-size: 0.85rem;
+  }
+  
+  .perfil__warning li {
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+  
+  .perfil__deactivate-form {
+    padding: 12px;
+  }
+  
+  .perfil__textarea {
+    min-height: 60px;
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+  
+  .perfil__btn-danger,
+  .perfil__btn-secondary {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .perfil__edit-actions {
+    gap: 10px;
+  }
+}
+
+/* Móviles muy pequeños */
+@media (max-width: 320px) {
+  .perfil__security-item--danger {
+    padding: 10px;
+    margin: 0 -4px 12px -4px;
+  }
+  
+  .perfil__security-info h4 {
+    font-size: 0.95rem;
+  }
+  
+  .perfil__security-info p {
+    font-size: 0.85rem;
+  }
+  
+  .perfil__warning {
+    padding: 8px;
+  }
+  
+  .perfil__warning li {
+    font-size: 0.75rem;
+  }
+  
+  .perfil__deactivate-form {
+    padding: 10px;
+  }
+  
+  .perfil__textarea {
+    min-height: 50px;
+    padding: 6px;
+    font-size: 0.8rem;
+  }
+  
+  .perfil__btn-danger,
+  .perfil__btn-secondary {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .perfil__field-note {
+    font-size: 0.75rem;
   }
 }

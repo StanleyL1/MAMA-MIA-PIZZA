@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
    faHeart, faUser, faEdit, faShieldAlt, faPhone, faMapMarkerAlt, 
-   faCalendarAlt, faLock, faEnvelope, faCamera, faSpinner, faSync
+   faCalendarAlt, faLock, faEnvelope, faCamera, faSpinner, faSync,
+   faTrash, faExclamationTriangle
 } from "@fortawesome/free-solid-svg-icons";
 
 import './Perfil.css';
@@ -53,9 +54,21 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
   const [errorExperiencias, setErrorExperiencias] = useState(null);
 
   // Estado para modal de crear experiencia
-  const [isModalExperienciaOpen, setIsModalExperienciaOpen] = useState(false);  // Estados para cambiar contraseña
+  const [isModalExperienciaOpen, setIsModalExperienciaOpen] = useState(false);
+  
+  // Estados para cambiar contraseña
   const [passwordMode, setPasswordMode] = useState(false);
-  const [loadingPassword, setLoadingPassword] = useState(false);const [passwordData, setPasswordData] = useState({
+  const [loadingPassword, setLoadingPassword] = useState(false);
+  
+  // Estados para desactivar cuenta
+  const [deactivateMode, setDeactivateMode] = useState(false);
+  const [loadingDeactivate, setLoadingDeactivate] = useState(false);
+  const [deactivateData, setDeactivateData] = useState({
+    motivo: '',
+    confirmacion: ''
+  });
+  
+  const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -251,7 +264,18 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       ...prev,
       [name]: value
     }));
-  };  // Manejar selección de foto
+  };
+  
+  // Manejar cambios en el formulario de desactivación
+  const handleDeactivateChange = (e) => {
+    const { name, value } = e.target;
+    setDeactivateData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  // Manejar selección de foto
   const handlePhotoSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -598,6 +622,136 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     }
   };
 
+  // Desactivar cuenta
+  const handleDeactivateAccount = async () => {
+    if (!deactivateData.motivo.trim()) {
+      showProfileMessage('El motivo es requerido', 'error');
+      return;
+    }
+
+    if (deactivateData.confirmacion !== 'DESACTIVAR') {
+      showProfileMessage('Debes escribir "DESACTIVAR" para confirmar', 'error');
+      return;
+    }
+
+    if (!userInfo?.id_usuario) {
+      showProfileMessage('Error: No se pudo obtener la información del usuario', 'error');
+      return;
+    }
+
+    try {
+      setLoadingDeactivate(true);
+      
+      const payload = {
+        id_usuario: userInfo.id_usuario,
+        motivo: deactivateData.motivo
+      };
+      
+      console.log('Enviando payload para desactivar cuenta:', payload);
+      
+      const response = await fetch('https://api.mamamianpizza.com/api/account/deactivate', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      console.log('Response status:', response.status);
+
+      let result;
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        const textResult = await response.text();
+        console.log('Response text (no JSON):', textResult);
+        result = { message: textResult || 'Error del servidor' };
+      }
+
+      console.log('Response result:', result);      // Manejar respuestas del servidor
+      if (!response.ok) {
+        console.error('Error response:', {
+          status: response.status,
+          statusText: response.statusText,
+          result: result
+        });
+        
+        // Si la cuenta ya está desactivada, también cerrar sesión
+        if (result.message && result.message.includes('ya está desactivada')) {
+          console.log('La cuenta ya estaba desactivada, cerrando sesión...');
+          showProfileMessage('Tu cuenta ya estaba desactivada. Cerrando sesión...', 'info');
+          
+          // Cerrar sesión inmediatamente
+          setTimeout(() => {
+            localStorage.removeItem('mamamia_user');
+            localStorage.removeItem('mamamia_token');
+            navigate('/');
+            window.location.reload();
+          }, 1500);
+          
+          return; // Salir de la función
+        }
+        
+        let errorMessage = 'Error al desactivar la cuenta';
+        
+        if (response.status === 500) {
+          errorMessage = 'Error interno del servidor. Por favor, intenta más tarde.';
+        } else if (response.status === 404) {
+          errorMessage = 'Usuario no encontrado.';
+        } else if (response.status === 400) {
+          errorMessage = result.message || 'Datos inválidos. Verifica los campos.';
+        } else if (result.message) {
+          errorMessage = result.message;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      // Verificar si la respuesta es exitosa o si indica que ya estaba desactivada
+      if (result.success === true || (result.message && result.message.includes('ya está desactivada'))) {
+        console.log('Cuenta desactivada exitosamente o ya estaba desactivada:', result);
+        
+        const mensaje = result.success === true 
+          ? 'Cuenta desactivada exitosamente. Cerrando sesión...' 
+          : 'Tu cuenta ya estaba desactivada. Cerrando sesión...';
+          
+        showProfileMessage(mensaje, 'success');
+        
+        if (setToast && typeof setToast === 'function') {
+          setToast(mensaje, 'success', 'profile', 'top-right');
+        }
+
+        // Limpiar localStorage y redirigir después de 2 segundos
+        setTimeout(() => {
+          localStorage.removeItem('mamamia_user');
+          localStorage.removeItem('mamamia_token');
+          
+          // Disparar evento para notificar al resto de la aplicación
+          const logoutEvent = new CustomEvent('userLogout', {
+            detail: { reason: 'account_deactivated' }
+          });
+          window.dispatchEvent(logoutEvent);
+          
+          navigate('/');
+          window.location.reload(); // Forzar recarga para limpiar estado
+        }, 2000);
+      } else {
+        throw new Error(result.message || 'Error desconocido al desactivar la cuenta');
+      }
+      
+    } catch (error) {
+      console.error('Error al desactivar la cuenta:', error);
+      showProfileMessage(error.message || 'Error al desactivar la cuenta', 'error');
+      
+      if (setToast && typeof setToast === 'function') {
+        setToast(error.message || 'Error al desactivar la cuenta', 'error', 'profile', 'top-right');
+      }
+    } finally {
+      setLoadingDeactivate(false);
+    }
+  };
   // Si no hay usuario, no renderizar nada (se está redirigiendo)
   if (!user) {
     return null;
@@ -1256,6 +1410,102 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                           </>
                         ) : (
                           'Cambiar Contraseña'
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>              {/* Sección de desactivar cuenta */}
+              <div className="perfil__security-item perfil__security-item--danger">
+                <div className="perfil__security-info">
+                  <h4>
+                    <FontAwesomeIcon icon={faExclamationTriangle} />
+                    Desactivar Cuenta
+                  </h4>
+                  <p>Esta acción desactivará tu cuenta. Podrás reactivarla contactando al soporte.</p>
+                  <div className="perfil__warning">
+                    <strong>⚠️ Advertencia:</strong> Al desactivar tu cuenta:
+                    <ul>
+                      <li>No podrás iniciar sesión</li>
+                      <li>Tus pedidos anteriores se mantendrán en el historial</li>
+                      <li>Tus reseñas y experiencias permanecerán públicas</li>
+                      <li>Para reactivar deberás contactar al soporte</li>
+                    </ul>
+                  </div>
+                </div>
+                  {!deactivateMode ? (
+                  <button 
+                    className="perfil__btn-danger"
+                    onClick={() => setDeactivateMode(true)}
+                  >
+                    <FontAwesomeIcon icon={faTrash} />
+                    Desactivar Cuenta
+                  </button>
+                ) : (
+                  <div className="perfil__deactivate-form">
+                    <div className="perfil__form-row">
+                      <label className="perfil__label">Motivo de desactivación *</label>
+                      <textarea
+                        name="motivo"
+                        value={deactivateData.motivo}
+                        onChange={handleDeactivateChange}
+                        className="perfil__textarea"
+                        placeholder="Explica brevemente por qué deseas desactivar tu cuenta..."
+                        rows="4"
+                        maxLength="500"
+                      />
+                      <small className="perfil__field-note">
+                        {deactivateData.motivo.length}/500 caracteres
+                      </small>
+                    </div>
+
+                    <div className="perfil__form-row">
+                      <label className="perfil__label">
+                        Confirmación *
+                      </label>
+                      <input
+                        type="text"
+                        name="confirmacion"
+                        value={deactivateData.confirmacion}
+                        onChange={handleDeactivateChange}
+                        className="perfil__input"
+                        placeholder='Escribe "DESACTIVAR" para confirmar'
+                      />
+                      <small className="perfil__field-note">
+                        Debes escribir exactamente "DESACTIVAR" para confirmar la acción
+                      </small>
+                    </div>
+
+                    <div className="perfil__edit-actions">
+                      <button 
+                        className="perfil__btn-secondary"
+                        onClick={() => {
+                          setDeactivateMode(false);
+                          setDeactivateData({
+                            motivo: '',
+                            confirmacion: ''
+                          });
+                        }}
+                        disabled={loadingDeactivate}
+                      >
+                        Cancelar
+                      </button>
+
+                      <button 
+                        className="perfil__btn-danger"
+                        onClick={handleDeactivateAccount}
+                        disabled={loadingDeactivate || !deactivateData.motivo.trim() || deactivateData.confirmacion !== 'DESACTIVAR'}
+                      >
+                        {loadingDeactivate ? (
+                          <>
+                            <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                            Desactivando...
+                          </>
+                        ) : (
+                          <>
+                            <FontAwesomeIcon icon={faTrash} />
+                            Confirmar Desactivación
+                          </>
                         )}
                       </button>
                     </div>
