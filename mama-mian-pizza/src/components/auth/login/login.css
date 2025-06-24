@@ -68,15 +68,15 @@
 
 .login__btn{
     border-radius: 10px;
-    padding: 12px 20px; /* Aumentar padding */
+    padding: 10px 15px; /* Reducir padding */
     background-color: #feb248;
     border: none;
     font-size: 1.1rem;
-    width: 30%; /* Aumentar ancho */
+    width: 25%; /* Reducir ancho */
     color: #991B1B;
     font-weight: bold;
     cursor: pointer;
-    margin: 15px 0; /* Agregar margen */
+    margin: 10px 0; /* Reducir margen */
 }
 
 .login__btn:hover{
@@ -131,7 +131,7 @@
     }
     
     .login__btn {
-        width: 25%;
+        width: 20%; /* Reducir ancho */
     }
 }
 
@@ -145,7 +145,7 @@
     }
     
     .login__btn {
-        width: 40%;
+        width: 35%; /* Reducir ancho */
     }
     
     .login__footer {
@@ -170,10 +170,8 @@
         width: 100%;
         height: 40px;
         padding: 10px;
-    }
-
-    .login__btn {
-        width: 60%;
+    }    .login__btn {
+        width: 50%; /* Reducir ancho */
         font-size: 1rem;
         padding: 10px;
         margin: 10px 0;
@@ -209,9 +207,8 @@
         gap: 15px;
         min-height: 400px;
     }
-    
-    .login__btn {
-        width: 70%;
+      .login__btn {
+        width: 60%; /* Reducir ancho */
     }
     
     .login__footer {

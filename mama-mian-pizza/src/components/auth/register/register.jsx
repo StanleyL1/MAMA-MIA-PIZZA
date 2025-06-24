@@ -187,7 +187,7 @@ const Register = () => {
               className="register__input"
               disabled={loading}
               required
-            /><input
+            />            <input
               name="contrasena"
               onChange={handleInputChange}
               type="password"
@@ -196,6 +196,9 @@ const Register = () => {
               disabled={loading}
               required
             />
+            <p className="register__instructions">
+              Debe contener al menos 8 caracteres, 1 número y 1 carácter especial.
+            </p>
             <input
               value={confirmPassword}
               onChange={(e) => {
@@ -241,12 +244,8 @@ const Register = () => {
                 <option value="F">Femenino</option>
                 <option value="M">Masculino</option>
                 <option value="Otro">Otro</option>
-              </select>
-              <div className="register__select-arrow"></div>
+              </select>              <div className="register__select-arrow"></div>
             </div>
-            <p className="register__instructions">
-            Debe contener al menos 8 caracteres, 1 número y 1 carácter especial.
-            </p>
           </form>
         </main>        <button 
           onClick={handleSunmit} 

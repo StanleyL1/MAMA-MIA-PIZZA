@@ -373,10 +373,9 @@ const Login = ({ onLogin }) => {
 
     return(
   <div className='login'>
-        <div className='login__container'>
-            <header className='login__header'>
-                <h3>Iniciar Sesion</h3>
-            </header>            <main className='login__main'>
+        <div className='login__container'>            <header className='login__header'>
+                <h3>Iniciar Sesión</h3>
+            </header><main className='login__main'>
                 {error && (
                     <div className="login__error" style={{
                         backgroundColor: '#ffebee',
@@ -401,12 +400,11 @@ const Login = ({ onLogin }) => {
                         ¡Inicio de sesión exitoso!
                     </div>
                 )}
-                <form action="" className='login__form'>
-                    <input 
+                <form action="" className='login__form'>                    <input 
                         name='correo' 
                         onChange={handleInputChange} 
                         type="email" 
-                        placeholder='Correo Electronico'
+                        placeholder='Correo Electrónico'
                         disabled={loading}
                         required
                     />
