@@ -38,11 +38,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
   const [photoMode, setPhotoMode] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
-  const [savingPhoto, setSavingPhoto] = useState(false);
-  // Estados para pedidos
+  const [savingPhoto, setSavingPhoto] = useState(false);  // Estados para pedidos
   const [pedidos, setPedidos] = useState([]);
   const [loadingPedidos, setLoadingPedidos] = useState(false);
-  const [errorPedidos, setErrorPedidos] = useState(null);
   // Estados para reseñas
   const [resenas, setResenas] = useState([]);
   const [loadingResenas, setLoadingResenas] = useState(false);
@@ -109,7 +107,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     if (!user?.id) return;
     
     setLoadingPedidos(true);
-    setErrorPedidos(null);
     
     try {
       const response = await fetch(`https://api.mamamianpizza.com/api/orders/orders/user/${user.id}`);
@@ -130,7 +127,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       
     } catch (error) {
       console.error('Error fetching pedidos:', error);
-      setErrorPedidos('Error al cargar los pedidos');
       setPedidos([]);
     } finally {
       setLoadingPedidos(false);
@@ -858,27 +854,14 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                 </div>
                 <div className="perfil__estadistica-label">Calificación Promedio</div>
               </div>
-            </div>
-
-            {/* Estados de carga y error */}
+            </div>            {/* Estados de carga */}
             {loadingPedidos && (
               <div className="perfil__loading">
                 <FontAwesomeIcon icon={faUser} className="spinning" />
                 Cargando pedidos...
               </div>
-            )}
-
-            {errorPedidos && (
-              <div className="perfil__error">
-                <span>❌ {errorPedidos}</span>
-                <button className="perfil__retry-btn" onClick={fetchPedidos}>
-                  Reintentar
-                </button>
-              </div>
-            )}
-
-            {/* Lista de pedidos */}
-            {!loadingPedidos && !errorPedidos && pedidos.length > 0 && (
+            )}            {/* Lista de pedidos */}
+            {!loadingPedidos && pedidos.length > 0 && (
               pedidos.map((pedido) => (
                 <div key={pedido.id_pedido} className="perfil__pedido-card">
                   <div className="perfil__pedido-header">
@@ -925,10 +908,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                   )}
                 </div>
               ))
-            )}
-
-            {/* Estado vacío */}
-            {!loadingPedidos && !errorPedidos && pedidos.length === 0 && (
+            )}            {/* Estado vacío */}
+            {!loadingPedidos && pedidos.length === 0 && (
               <div className="perfil__empty">
                 <FontAwesomeIcon icon={faUser} />
                 <h3>No tienes pedidos aún</h3>

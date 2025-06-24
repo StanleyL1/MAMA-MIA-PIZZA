@@ -226,6 +226,107 @@
   max-width: 250px;
 }
 
+/* ESTADO VACÍO PARA PEDIDOS */
+.perfil__empty {
+  text-align: center;
+  padding: 50px 30px;
+  background: linear-gradient(135deg, #fff5f5, #fef7f7);
+  border: 2px dashed #ff9d2b;
+  border-radius: 20px;
+  margin: 30px 0;
+  box-shadow: 0 8px 25px rgba(255, 157, 43, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.perfil__empty::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 157, 43, 0.1), transparent);
+  animation: shimmerEmpty 3s infinite;
+}
+
+@keyframes shimmerEmpty {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.perfil__empty:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(255, 157, 43, 0.15);
+  border-color: #ab1319;
+}
+
+.perfil__empty svg {
+  font-size: 4rem;
+  color: #ff9d2b;
+  margin-bottom: 20px;
+  animation: bounce 2s infinite;
+  filter: drop-shadow(0 4px 8px rgba(255, 157, 43, 0.3));
+}
+
+.perfil__empty h3 {
+  color: #ab1319;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 20px 0 15px 0;
+  background: linear-gradient(135deg, #ab1319, #d32f2f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.perfil__empty p {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.perfil__empty-btn {
+  background: linear-gradient(135deg, #ab1319, #d32f2f);
+  color: white;
+  border: none;
+  padding: 15px 35px;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(171, 19, 25, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.perfil__empty-btn::before {
+  content: '🍕';
+  margin-right: 10px;
+  font-size: 1.2rem;
+  animation: pizzaSpin 3s infinite linear;
+}
+
+@keyframes pizzaSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.perfil__empty-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(171, 19, 25, 0.4);
+  background: linear-gradient(135deg, #d32f2f, #ab1319);
+}
+
+.perfil__empty-btn:active {
+  transform: translateY(-1px) scale(1.02);
+}
+
 /* DISEÑO MEJORADO PARA PEDIDOS */
 .perfil__pedido-card {
   background: linear-gradient(135deg, #ffffff, #fafbfc);
@@ -3125,8 +3226,7 @@
   
   .perfil__deactivate-form {
     padding: 10px;
-  }
-  
+  }  
   .perfil__textarea {
     min-height: 50px;
     padding: 6px;
@@ -3141,5 +3241,227 @@
   
   .perfil__field-note {
     font-size: 0.75rem;
+  }
+}
+
+/* ========================================= */
+/*   ESTADO VACÍO PARA RESEÑAS Y EXPERIENCIAS */
+/* ========================================= */
+
+.perfil__empty-state {
+  text-align: center;
+  padding: 60px 40px;
+  background: linear-gradient(135deg, #f8f4ff, #fff8f4);
+  border: 2px dashed #ab1319;
+  border-radius: 25px;
+  margin: 40px 0;
+  box-shadow: 0 10px 30px rgba(171, 19, 25, 0.1);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.perfil__empty-state::before {
+  content: '✨📝';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 2rem;
+  opacity: 0.3;
+  animation: floatEmoji 3s ease-in-out infinite;
+}
+
+@keyframes floatEmoji {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.perfil__empty-state::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(171, 19, 25, 0.05), transparent);
+  animation: shimmerReviews 4s infinite;
+}
+
+@keyframes shimmerReviews {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.perfil__empty-state:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(171, 19, 25, 0.15);
+  border-color: #ff9d2b;
+}
+
+.perfil__empty-state > p {
+  color: #666;
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  font-weight: 500;
+}
+
+.perfil__add-reseña {
+  background: linear-gradient(135deg, #fff, #fefefe);
+  border-radius: 20px;
+  padding: 40px 30px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 8px 25px rgba(171, 19, 25, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.perfil__add-reseña::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ab1319, #ff9d2b, #d32f2f);
+  border-radius: 20px 20px 0 0;
+}
+
+.perfil__add-reseña h4 {
+  color: #ab1319;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 15px 0;
+  background: linear-gradient(135deg, #ab1319, #d32f2f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+}
+
+.perfil__add-reseña h4::after {
+  content: '💭';
+  position: absolute;
+  right: -30px;
+  top: 0;
+  font-size: 1.2rem;
+  animation: thoughtBubble 2s ease-in-out infinite;
+}
+
+@keyframes thoughtBubble {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.7; }
+  50% { transform: scale(1.1) rotate(5deg); opacity: 1; }
+}
+
+.perfil__add-reseña p {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+.perfil__empty-actions {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.perfil__empty-actions .perfil__empty-btn {
+  background: linear-gradient(135deg, #ab1319, #d32f2f);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(171, 19, 25, 0.25);
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+  min-width: 180px;
+  flex: 1;
+  max-width: 250px;
+}
+
+.perfil__empty-actions .perfil__empty-btn:first-child::before {
+  content: '🍕';
+  margin-right: 8px;
+  font-size: 1.1rem;
+  animation: pizzaBounce 2s infinite;
+}
+
+@keyframes pizzaBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.perfil__empty-actions .perfil__empty-btn:last-child::before {
+  content: '✨';
+  margin-right: 8px;
+  font-size: 1.1rem;
+  animation: sparkle 1.5s infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.3); }
+}
+
+.perfil__empty-actions .perfil__empty-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(171, 19, 25, 0.35);
+  background: linear-gradient(135deg, #d32f2f, #ab1319);
+}
+
+.perfil__empty-actions .perfil__empty-btn:active {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.perfil__empty-actions .perfil__empty-btn:nth-child(1):hover {
+  background: linear-gradient(135deg, #ff9d2b, #ab1319);
+}
+
+.perfil__empty-actions .perfil__empty-btn:nth-child(2):hover {
+  background: linear-gradient(135deg, #ab1319, #ff9d2b);
+}
+
+/* Responsive para estado vacío de reseñas */
+@media (max-width: 768px) {
+  .perfil__empty-state {
+    padding: 40px 20px;
+    margin: 20px 0;
+  }
+  
+  .perfil__add-reseña {
+    padding: 30px 20px;
+  }
+  
+  .perfil__empty-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .perfil__empty-actions .perfil__empty-btn {
+    min-width: 100%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .perfil__empty-state {
+    padding: 30px 15px;
+  }
+  
+  .perfil__add-reseña h4 {
+    font-size: 1.4rem;
+  }
+  
+  .perfil__empty-actions .perfil__empty-btn {
+    padding: 12px 20px;
+    font-size: 0.9rem;
   }
 }
