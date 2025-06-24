@@ -11,6 +11,7 @@ import { obtenerResenasUsuario } from '../../services/resenasService';
 import { obtenerExperienciasUsuario } from '../../services/experienciasService';
 import { useUsuario } from '../../hooks/useUsuario';
 import ModalExperiencia from '../CrearExperiencia/ModalExperiencia';
+import Toast from '../Toast/Toast';
 
 export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, updateUser }) {
   const navigate = useNavigate();  // Hook para manejar información del usuario
@@ -58,7 +59,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
 
   // Estado para modal de crear experiencia
   const [isModalExperienciaOpen, setIsModalExperienciaOpen] = useState(false);
-
   // Estados para cambiar contraseña
   const [passwordMode, setPasswordMode] = useState(false);  const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -66,11 +66,17 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     confirmPassword: ''
   });
   
-  // Función helper para mostrar mensajes usando toast
+  // Estado local para el Toast del perfil
+  const [profileToast, setProfileToast] = useState({ show: false, message: '', type: 'success' });
+    // Función helper para mostrar mensajes usando toast
   const showProfileMessage = useCallback((message, type = 'success') => {
-    // Usar toast para mostrar el mensaje
+    // Usar toast local para mostrar el mensaje en el perfil
+    setProfileToast({ show: true, message, type });
+    setTimeout(() => setProfileToast({ show: false, message: '', type: 'success' }), 4000);
+    
+    // También usar el toast global como respaldo
     if (setToast && typeof setToast === 'function') {
-      setToast(message);
+      setToast(message, type, 'profile', 'top-right');
     }
   }, [setToast]);
   // Función para renderizar estrellas
@@ -180,10 +186,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     fetchExperiencias();
   };
   // Manejar creación de nueva experiencia
-  const handleExperienciaCreada = (nuevaExperiencia) => {
-    // Verificar que setToast existe y es una función antes de usarla
+  const handleExperienciaCreada = (nuevaExperiencia) => {    // Verificar que setToast existe y es una función antes de usarla
     if (setToast && typeof setToast === 'function') {
-      setToast('¡Experiencia creada exitosamente!');
+      showProfileMessage('¡Experiencia creada exitosamente!', 'success');
     }
     
     // Refrescar la lista de experiencias
@@ -363,25 +368,22 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         setPhotoMode(false);
         setSelectedPhoto(null);
         setPhotoPreview(null);
-        setPhotoError(''); // Limpiar errores
-          
-        // Verificar que setToast existe y es una función antes de usarla
+        setPhotoError(''); // Limpiar errores        // Verificar que setToast existe y es una función antes de usarla
         if (setToast && typeof setToast === 'function') {
-          setToast('Foto de perfil actualizada correctamente');
+          showProfileMessage('Foto de perfil actualizada correctamente', 'success');
         }
-      } catch (error) {
-        console.error('Error al actualizar la foto de perfil:', error);
-        setPhotoError('Error al actualizar la foto de perfil. Por favor intenta de nuevo.');
-          
-        // Verificar que setToast existe y es una función antes de usarla
+      } catch (error) {        console.error('Error al actualizar la foto de perfil:', error);
+        setPhotoError('Error al actualizar la foto de perfil. Por favor intenta de nuevo.');        // Verificar que setToast existe y es una función antes de usarla
         if (setToast && typeof setToast === 'function') {
-          setToast('Error al actualizar la foto de perfil');
+          showProfileMessage('Error al actualizar la foto de perfil', 'error');
         }
       } finally {
         setSavingPhoto(false);
       }
     }
-  };// Cancelar cambio de foto
+  };
+
+  // Cancelar cambio de foto
   const handleCancelPhoto = () => {
     setPhotoMode(false);
     setSelectedPhoto(null);
@@ -484,19 +486,15 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       // Solo agregar campos opcionales si tienen valor
       if (formData.dui) {
         updateData.dui = formData.dui;
-      }
-
-      console.log('Datos a enviar al servidor:', updateData);
+      }      console.log('Datos a enviar al servidor:', updateData);
       console.log('ID de usuario:', userInfo.id_usuario);
       
       const result = await updateUserInfo(userInfo.id_usuario, updateData);
       console.log('Resultado de la actualización:', result);
       
       setEditMode(false);
-      showProfileMessage('Perfil actualizado correctamente');
-      
-      if (setToast && typeof setToast === 'function') {
-        setToast('Perfil actualizado correctamente');
+      showProfileMessage('Perfil actualizado correctamente');      if (setToast && typeof setToast === 'function') {
+        showProfileMessage('Perfil actualizado correctamente', 'success');
       }
       
       console.log('=== GUARDADO EXITOSO ===');
@@ -505,13 +503,12 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       console.error('Error completo:', error);
       console.error('Mensaje del error:', error.message);
       
-      showProfileMessage('Error al actualizar el perfil', 'error');
-      
-      if (setToast && typeof setToast === 'function') {
-        setToast('Error al actualizar el perfil');
+      showProfileMessage('Error al actualizar el perfil', 'error');      if (setToast && typeof setToast === 'function') {
+        showProfileMessage('Error al actualizar el perfil', 'error');
       }
     }
-  };// Cambiar contraseña
+  };
+  // Cambiar contraseña
   const handleChangePassword = async () => {
     if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
       showProfileMessage('Todos los campos son requeridos', 'error');
@@ -533,14 +530,20 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     if (!/[A-Z]/.test(passwordData.newPassword)) {
       showProfileMessage('La contraseña debe contener al menos una letra mayúscula', 'error');
       return;
-    }    // Verificar que tenga al menos un carácter especial
+    }
+
+    // Verificar que tenga al menos un carácter especial
     if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(passwordData.newPassword)) {
       showProfileMessage('La contraseña debe contener al menos un carácter especial (!@#$%^&*)', 'error');
       return;
-    }if (!userInfo?.id_usuario) {
+    }
+
+    if (!userInfo?.id_usuario) {
       showProfileMessage('Error: No se pudo obtener la información del usuario', 'error');
       return;
-    }    try {      
+    }
+
+    try {
       const passwordUpdateData = {
         nombre: userInfo.nombre,
         correo: userInfo.correo,
@@ -566,12 +569,13 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         newPassword: '',
         confirmPassword: ''
       });
+      
       showProfileMessage('Contraseña cambiada correctamente');      if (setToast && typeof setToast === 'function') {
-        setToast('Contraseña cambiada correctamente');
+        showProfileMessage('Contraseña cambiada correctamente', 'success');
       }
     } catch (error) {
       showProfileMessage('Error al cambiar la contraseña', 'error');      if (setToast && typeof setToast === 'function') {
-        setToast('Error al cambiar la contraseña');
+        showProfileMessage('Error al cambiar la contraseña', 'error');
       }
     }
   };
@@ -918,11 +922,20 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
               </div>
             )}
           </div>
-        )}
-
-        {/* --- EDITAR PERFIL --- */}
+        )}        {/* --- EDITAR PERFIL --- */}
         {activeTab === 'editar' && (
-          <div className="perfil__editar-section">            <div className="perfil__titulo-editar">Editar Perfil</div>
+          <div className="perfil__editar-section">            <div className="perfil__titulo-editar-container">
+              <div className="perfil__titulo-editar">Editar Perfil</div>
+              {profileToast.show && (
+                <Toast
+                  message={profileToast.message}
+                  type={profileToast.type}
+                  category="profile"
+                  position="profile-card"
+                  onClose={() => setProfileToast({ show: false, message: '', type: 'success' })}
+                />
+              )}
+            </div>
             
             <div className="perfil__form-container">              {/* Sección de foto de perfil */}
               <div className="perfil__photo-section">

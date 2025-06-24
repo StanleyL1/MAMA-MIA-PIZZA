@@ -17,13 +17,12 @@ import Perfil from './components/Perfil/Perfil';
 import SocialMediaButton from './components/socialMediaButton/SocialMediaButton';
 import AdminExperiencias from './components/AdminExperiencias/AdminExperiencias';
 import TestExperiencias from './components/TestExperiencias/TestExperiencias';
+import Toast from './components/Toast/Toast';
 import { saveUserData, clearUserData } from './utils/userStorage';
 
-function App() {
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
-  // Estado para notificaciones tipo toast
-  const [toast, setToast] = useState({ show: false, message: '' });
+function App() {  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);  // Estado para notificaciones tipo toast mejoradas
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success', category: 'general', position: 'top-right' });
   const [user, setUser] = useState(null); // Estado del usuario
 
   const handleCartToggle = () => {
@@ -57,12 +56,19 @@ function App() {
     };
     
     // Agregar el producto al carrito
-    setCartItems(prev => [...prev, newItem]);
-    
+    setCartItems(prev => [...prev, newItem]);    
     // Abrir el carrito automáticamente cuando se añade un producto
-    setIsCartOpen(true);    // Mostrar notificación breve
-    setToast({ show: true, message: `✓ Agregado al carrito` });
-    setTimeout(() => setToast({ show: false, message: '' }), 2000);
+    setIsCartOpen(true);
+
+    // Mostrar notificación breve
+    setToast({ 
+      show: true, 
+      message: `✓ Agregado al carrito`, 
+      type: 'success', 
+      category: 'general',
+      position: 'top-right'
+    });
+    setTimeout(() => setToast({ show: false, message: '', type: 'success', category: 'general', position: 'top-right' }), 2000);
   };
   // Cargar usuario desde localStorage al iniciar la app
   useEffect(() => {
@@ -162,13 +168,11 @@ function App() {
     clearUserData();
     console.log('✅ APP - Usuario removido del estado y localStorage');
   };
-
-  // Función para mostrar toast desde componentes hijos
-  const showToast = (message) => {
-    setToast({ show: true, message });
-    setTimeout(() => setToast({ show: false, message: '' }), 3000);
+  //  // Función para mostrar toast desde componentes hijos - versión mejorada
+  const showToast = (message, type = 'success', category = 'general', position = 'top-right') => {
+    setToast({ show: true, message, type, category, position });
+    setTimeout(() => setToast({ show: false, message: '', type: 'success', category: 'general', position: 'top-right' }), 4000);
   };
-
   // Trigger para actualizaciones de pedidos
   const triggerOrderUpdate = () => {
     // Disparar evento para que el perfil se actualice
@@ -207,17 +211,22 @@ function App() {
             setToast={showToast}
           />
         } />        <Route path="/equipo-desarrollo" element={<Team />} />
-        <Route path="/informacion-legal" element={<InformacionLegal />} />
-        <Route path="/admin/experiencias" element={<AdminExperiencias />} />
+        <Route path="/informacion-legal" element={<InformacionLegal />} />        <Route path="/admin/experiencias" element={<AdminExperiencias />} />
         <Route path="/test/experiencias" element={<TestExperiencias />} />
       </Routes>
 
-      {/* Overlay de notificación tipo toast */}
+      {/* Overlay de notificación tipo toast mejorado */}
       {toast.show && (
-        <div className="toast-notification">
-          <p>{toast.message}</p>
-        </div>
-      )}      {/* Componente Cart - Solo se renderiza si isCartOpen es true */}
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          category={toast.category}
+          position={toast.position}
+          onClose={() => setToast({ show: false, message: '', type: 'success', category: 'general', position: 'top-right' })}
+        />
+      )}
+
+      {/* Componente Cart - Solo se renderiza si isCartOpen es true */}
       <Cart
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
