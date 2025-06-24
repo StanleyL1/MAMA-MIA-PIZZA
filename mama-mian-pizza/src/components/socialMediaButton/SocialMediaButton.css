@@ -148,4 +148,39 @@
       width: 44px;
       height: 44px;
     }
-  }
+  }  /* === OCULTAR BOTÓN EN PÁGINAS ESPECÍFICAS === */
+  
+/* Ocultar en página de PideAhora */
+body:has(.contenedor-pideahora) .social-media-container,
+.hide-chat-on-checkout .social-media-container {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  transform: translateY(200px) translateX(200px) !important;
+}
+
+/* Ocultar cuando el carrito está abierto */
+body:has(.cart__panel.cart__open) .social-media-container,
+body:has(.cart__overlay.cart__open) .social-media-container,
+.cart-open-hide-chat .social-media-container {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  transform: translateY(200px) translateX(200px) !important;
+}
+
+/* Fallback adicional para asegurar que no interfiera */
+body:has(.contenedor-pideahora) .social-media-button,
+body:has(.cart__panel.cart__open) .social-media-button,
+.hide-chat-on-checkout .social-media-button,
+.cart-open-hide-chat .social-media-button {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+}
