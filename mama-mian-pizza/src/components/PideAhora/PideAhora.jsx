@@ -825,19 +825,7 @@ const redirigirAWompi = () => {
                                       {addressInfo.locality}
                                       {addressInfo.administrativeArea && `, ${addressInfo.administrativeArea}`}
                                       {addressInfo.country && `, ${addressInfo.country}`}
-                                    </p>
-                                  )}
-                                  <div className="coordinates-box">
-                                    <p className="coordinates-text">
-                                      <span className="coordinates-label">Latitud:</span> {userLocation.lat.toFixed(6)}
-                                    </p>
-                                    <p className="coordinates-text">
-                                      <span className="coordinates-label">Longitud:</span> {userLocation.lng.toFixed(6)}
-                                    </p>
-                                    <p className="precision-text">
-                                      <span className="coordinates-label">Precisión:</span> ±{Math.round(userLocation.accuracy)} metros
-                                    </p>
-                                  </div>
+                                    </p>                                  )}
                                 </div>
                               ) : null}
                             </div>
