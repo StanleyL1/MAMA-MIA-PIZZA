@@ -618,3 +618,104 @@
   }
 }
 
+/* === OCULTAR BOTÓN DE CHAT CUANDO EL CARRITO ESTÁ ABIERTO === */
+
+/* Ocultar chat cuando el panel del carrito está visible */
+body:has(.cart__panel.cart__open) [class*="chat"],
+body:has(.cart__panel.cart__open) [id*="chat"],
+body:has(.cart__panel.cart__open) [class*="Chat"],
+body:has(.cart__panel.cart__open) [id*="Chat"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+}
+
+/* Ocultar botones de chat específicos cuando el carrito está abierto */
+body:has(.cart__panel.cart__open) .chat-bubble,
+body:has(.cart__panel.cart__open) .chat-fab,
+body:has(.cart__panel.cart__open) .chat-toggle,
+body:has(.cart__panel.cart__open) .whatsapp-chat,
+body:has(.cart__panel.cart__open) .messenger-chat,
+body:has(.cart__panel.cart__open) #chat-container,
+body:has(.cart__panel.cart__open) #chatbot,
+body:has(.cart__panel.cart__open) .chatbot,
+body:has(.cart__panel.cart__open) .live-chat,
+body:has(.cart__panel.cart__open) .crisp-client,
+body:has(.cart__panel.cart__open) .intercom-launcher,
+body:has(.cart__panel.cart__open) .zendesk-chat,
+body:has(.cart__panel.cart__open) .tawk-to,
+body:has(.cart__panel.cart__open) .drift-widget,
+body:has(.cart__panel.cart__open) .helpscout-beacon,
+body:has(.cart__panel.cart__open) [class*="chat-floating"],
+body:has(.cart__panel.cart__open) [id*="chat-floating"],
+body:has(.cart__panel.cart__open) [class*="floating-button"],
+body:has(.cart__panel.cart__open) [id*="floating-button"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  transform: translateY(200px) !important;
+}
+
+/* Ocultar elementos flotantes en la esquina inferior derecha cuando el carrito está abierto */
+body:has(.cart__panel.cart__open) [style*="position: fixed"][style*="bottom: 20px"],
+body:has(.cart__panel.cart__open) [style*="position: fixed"][style*="bottom:20px"],
+body:has(.cart__panel.cart__open) [style*="position:fixed"][style*="bottom: 20px"],
+body:has(.cart__panel.cart__open) [style*="position:fixed"][style*="bottom:20px"],
+body:has(.cart__panel.cart__open) [style*="position: fixed"][style*="right: 20px"],
+body:has(.cart__panel.cart__open) [style*="position: fixed"][style*="right:20px"],
+body:has(.cart__panel.cart__open) [style*="position:fixed"][style*="right: 20px"],
+body:has(.cart__panel.cart__open) [style*="position:fixed"][style*="right:20px"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  bottom: -200px !important;
+  right: -200px !important;
+}
+
+/* Fallback para navegadores que no soportan :has() - usando clase en body */
+.cart-open-hide-chat [class*="chat"],
+.cart-open-hide-chat [id*="chat"],
+.cart-open-hide-chat .chat-bubble,
+.cart-open-hide-chat .chat-fab,
+.cart-open-hide-chat .chat-toggle,
+.cart-open-hide-chat .whatsapp-chat,
+.cart-open-hide-chat .messenger-chat,
+.cart-open-hide-chat #chat-container,
+.cart-open-hide-chat #chatbot,
+.cart-open-hide-chat .chatbot,
+.cart-open-hide-chat .live-chat,
+.cart-open-hide-chat .crisp-client,
+.cart-open-hide-chat .intercom-launcher,
+.cart-open-hide-chat .zendesk-chat,
+.cart-open-hide-chat .tawk-to,
+.cart-open-hide-chat .drift-widget,
+.cart-open-hide-chat .helpscout-beacon,
+.cart-open-hide-chat [class*="chat-floating"],
+.cart-open-hide-chat [id*="chat-floating"],
+.cart-open-hide-chat [class*="floating-button"],
+.cart-open-hide-chat [id*="floating-button"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  transform: translateY(200px) !important;
+}
+
+/* Selectores específicos para el Home.css que menciona el chat flotante */
+body:has(.cart__panel.cart__open) .chat-floating-button,
+.cart-open-hide-chat .chat-floating-button {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  transform: translateY(200px) !important;
+}
+

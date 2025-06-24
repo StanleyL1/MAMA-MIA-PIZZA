@@ -1118,11 +1118,12 @@
   border: 2px solid var(--primary-color);
   border-radius: 16px;
   box-shadow: 0 10px 20px rgba(0,0,0,0.12);
-  padding: 25px;
+  padding: 25px 25px 80px 25px; /* Aumentar padding inferior */
   position: sticky;
   top: 20px;
   max-height: calc(100vh - 40px);
   overflow-y: auto;
+  margin-bottom: 80px; /* Agregar margen inferior */
 }
 
 .card-resumen.wider {
@@ -1215,27 +1216,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0 10px 0;
+  padding: 20px 0 15px 0; /* Aumentar padding inferior */
   border-top: 2px dashed #ddd;
   margin-top: 20px;
+  margin-bottom: 20px; /* Agregar margen inferior */
   font-size: 1.3rem;
   font-weight: bold;
-}
-
-.resumen-total span:first-child {
-  color: #333;
-  font-size: 1.25rem;
-}
-
-.resumen-total span:last-child {
-  color: var(--primary-color);
-  background-color: #fee;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 1.4rem;
-  font-weight: 800;
-  text-align: right;
-  min-width: 100px;
+  position: relative;
+  z-index: 100; /* Asegurar que esté por encima de otros elementos */
 }
 
 /* Mensaje para cuando no hay productos */
@@ -1246,122 +1234,685 @@
   padding: 40px 0;
 }
 
-/* Responsive para pantallas más pequeñas */
-@media (max-width: 1200px) {
+/* === MEJORAS DE ALINEACIÓN RESPONSIVA PARA TODOS LOS COMPONENTES === */
+
+/* === TABLETS GRANDES (max-width: 1200px) === */
+@media screen and (max-width: 1200px) {
+  .contenedor-pideahora {
+    padding: 30px 20px;
+    max-width: 100%;
+  }
+  
   .layout {
-    flex-direction: column;
+    gap: 30px;
+    align-items: flex-start;
+  }
+  
+  .col-izquierda {
+    flex: 1 1 65%;
+    width: 100%;
+  }
+  
+  .col-derecha {
+    flex: 0 0 30%;
+    width: 100%;
+  }
+  
+  /* Alineación de la barra de progreso */
+  .barra-progreso {
+    margin-bottom: 30px;
+    padding: 10px 0;
+    justify-content: space-around;
+  }
+  
+  .paso {
+    width: 22%;
+    min-width: 120px;
+  }
+  
+  .paso .circulo {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+  
+  .texto-paso {
+    font-size: 0.95rem;
+    text-align: center;
+  }
+  
+  /* Alineación de las cards principales */
+  .card-cuenta, .card-direccion, .card-pago, .card-confirmar {
+    margin-top: 25px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .titulo-compra {
+    font-size: 1.3rem;
+    margin: 25px 25px 15px 25px;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  
+  .descripcion-compra {
+    margin: 0 25px 25px 25px;
+    text-align: left;
+  }
+  
+  /* Alineación de toggle buttons */
+  .toggle-compra, 
+  .toggle-direccion, 
+  .toggle-pago {
+    margin: 0 25px 30px 25px;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .toggle-btn, 
+  .toggle-dir-btn {
+    padding: 15px 12px;
+    min-height: 120px;
+    justify-content: center;
+  }
+  
+  /* Alineación de formularios */
+  .formulario-invitado,
+  .formulario-cuenta,
+  .contenido-direccion {
+    padding: 0 25px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .campos-dobles {
+    gap: 15px;
+    align-items: stretch;
+  }
+  
+  .campos-tres {
+    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  /* Alineación de botones */
+  .botones,
+  .botones-confirmar {
+    padding: 0 25px;
+    margin-top: 30px;
+    gap: 15px;
+    align-items: center;
+  }
+  
+  .btn-volver-cuenta,
+  .btn-volver-Direccion,
+  .btn-volver-pedido,
+  .btn-continuar-cuenta,
+  .btn-continuar-Direccion,
+  .btn-continuar-pago,
+  .btn-continuar-pedido {
+    padding: 14px 28px;
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+}
+
+/* === TABLETS MEDIANOS (max-width: 1024px) === */
+@media screen and (max-width: 1024px) {
+  .layout {
+    gap: 25px;
+  }
+  
+  .col-izquierda {
+    flex: 1 1 100%;
   }
   
   .col-derecha {
     flex: 0 0 100%;
+    order: -1; /* Mover resumen al top en tablets */
   }
   
-  .card-resumen {
-    position: relative;
-    top: 0;
-    margin-top: 30px;
+  /* Centrar barra de progreso */
+  .barra-progreso {
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
   }
   
-  /* Mantener alineación de precios en tablets */
-  .resumen-item {
+  .paso {
+    width: auto;
+    min-width: 100px;
+    margin: 0 10px;
+  }
+  
+  /* Cards con mejor alineación */
+  .titulo-compra {
+    margin: 20px 20px 12px 20px;
+    text-align: center;
+  }
+  
+  .descripcion-compra {
+    margin: 0 20px 20px 20px;
+    text-align: center;
+  }
+  
+  .toggle-compra, 
+  .toggle-direccion, 
+  .toggle-pago {
+    margin: 0 20px 25px 20px;
+    justify-content: center;
+  }
+  
+  .formulario-invitado,
+  .formulario-cuenta,
+  .contenido-direccion {
+    padding: 0 20px;
+  }
+  
+  .botones,
+  .botones-confirmar {
+    padding: 0 20px;
+    justify-content: space-around;
+  }
+}
+
+/* === TABLETS PEQUEÑOS Y MÓVILES (max-width: 768px) === */
+@media screen and (max-width: 768px) {
+  .contenedor-pideahora {
+    padding: 20px 15px;
+  }
+  
+  .layout {
+    gap: 20px;
+    flex-direction: column;
+  }
+  
+  .col-izquierda,
+  .col-derecha {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  
+  /* Barra de progreso más compacta */
+  .barra-progreso {
+    padding: 15px 0;
+    margin-bottom: 20px;
+  }
+  
+  .paso {
+    width: 20%;
+    min-width: 80px;
+  }
+  
+  .paso .circulo {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+  
+  .texto-paso {
+    font-size: 0.8rem;
+    line-height: 1.2;
+  }
+  
+  /* Cards responsivas */
+  .card-cuenta, .card-direccion, .card-pago, .card-confirmar {
+    border-radius: 12px;
+    margin-top: 15px;
+  }
+  
+  .titulo-compra {
+    font-size: 1.2rem;
+    margin: 15px 15px 10px 15px;
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+  
+  .icono-pizza {
+    width: 25px;
+    height: 25px;
+    margin-left: 0;
+  }
+  
+  .descripcion-compra {
+    margin: 0 15px 15px 15px;
+    font-size: 1rem;
+    text-align: center;
+  }
+  
+  /* Toggle buttons responsivos */
+  .toggle-compra, 
+  .toggle-direccion, 
+  .toggle-pago {
+    margin: 0 15px 20px 15px;
+    flex-direction: column;
     gap: 12px;
   }
   
-  .resumen-img {
-    width: 50px;
-    height: 50px;
+  .toggle-btn, 
+  .toggle-dir-btn {
+    width: 100%;
+    padding: 15px;
+    min-height: 80px;
   }
   
-  .precio {
-    font-size: 1.1rem;
-    min-width: 70px;
+  .toggle-titulo {
+    font-size: 1rem;
   }
   
-  .resumen-total span:last-child {
-    font-size: 1.3rem;
-    min-width: 90px;
-  }
-}
-
-/* Estilos responsivos para móviles */
-@media (max-width: 768px) {
-  .card-resumen {
-    padding: 20px;
-    margin-top: 20px;
+  .toggle-desc {
+    font-size: 0.85rem;
   }
   
-  .resumen-titulo {
-    font-size: 1.2rem;
+  /* Formularios responsivos */
+  .formulario-invitado,
+  .formulario-cuenta,
+  .contenido-direccion {
+    padding: 0 15px;
+  }
+  
+  .campos-dobles {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .campos-tres {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .campo {
     margin-bottom: 15px;
   }
   
-  .resumen-item {
-    gap: 10px;
-    padding: 12px 0;
+  .campo label {
+    font-size: 1rem;
+    margin-bottom: 8px;
   }
   
-  .resumen-img {
-    width: 45px;
-    height: 45px;
+  .input-small,
+  .input-full,
+  .input-telefono,
+  .select-departamento,
+  .input-pais,
+  .input-municipio {
+    padding: 12px 15px;
+    font-size: 1rem;
+    border-radius: 8px;
   }
   
-  .resumen-detalle h4 {
+  .telefono-prefix {
+    padding: 12px 15px;
+    font-size: 1rem;
+  }
+  
+  /* Botones responsivos */
+  .botones,
+  .botones-confirmar {
+    padding: 0 15px;
+    margin-top: 20px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .btn-volver-cuenta,
+  .btn-volver-Direccion,
+  .btn-volver-pedido,
+  .btn-continuar-cuenta,
+  .btn-continuar-Direccion,
+  .btn-continuar-pago,
+  .btn-continuar-pedido {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    text-align: center;
+  }
+  
+  /* Método de entrega responsivo */
+  .toggle-metodo-entrega {
+    margin: 15px 0 20px;
+    padding: 15px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .toggle-metodo-btn {
+    width: 100%;
+    padding: 15px;
+  }
+  
+  /* Ubicación en tiempo real */
+  .contenido-tiempo-real {
+    padding: 0 15px;
+  }
+  
+  .instruccion {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    padding: 0 10px;
+  }
+  
+  .btn-ubicacion {
+    max-width: 100%;
+    padding: 15px 20px;
+    font-size: 1rem;
+  }
+  
+  .real-map {
+    height: 250px;
+    border-radius: 10px;
+  }
+  
+  .direccion-info {
+    padding: 15px;
+    margin: 10px 0;
+  }
+  
+  /* Secciones de confirmación */
+  .titulo-confirmar {
+    font-size: 1.3rem;
+    margin: 20px 15px 10px 15px;
+    text-align: center;
+  }
+  
+  .descripcion-confirmar {
+    margin: 0 15px 20px 15px;
+    text-align: center;
+    font-size: 1rem;
+  }
+  
+  .seccion-linea {
+    margin: 0 15px 15px 15px;
+    padding: 15px;
+  }
+  
+  .subtitulo-seccion {
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .seccion-linea p {
+    font-size: 1rem;
+    text-align: center;
+    margin: 8px 0;
+  }
+}
+
+/* === MÓVILES PEQUEÑOS (max-width: 480px) === */
+@media screen and (max-width: 480px) {
+  .contenedor-pideahora {
+    padding: 15px 10px;
+  }
+  
+  /* Barra de progreso ultra compacta */
+  .barra-progreso {
+    padding: 10px 0;
+    margin-bottom: 15px;
+    gap: 8px;
+  }
+  
+  .paso {
+    width: 18%;
+    min-width: 70px;
+  }
+  
+  .paso .circulo {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+  }
+  
+  .texto-paso {
+    font-size: 0.7rem;
+    line-height: 1.1;
+  }
+  
+  /* Cards ultra responsivas */
+  .titulo-compra {
+    font-size: 1.1rem;
+    margin: 10px 10px 8px 10px;
+  }
+  
+  .icono-pizza {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .descripcion-compra {
+    margin: 0 10px 10px 10px;
     font-size: 0.9rem;
   }
   
-  .resumen-detalle p {
+  .toggle-compra, 
+  .toggle-direccion, 
+  .toggle-pago {
+    margin: 0 10px 15px 10px;
+    gap: 10px;
+  }
+  
+  .toggle-btn, 
+  .toggle-dir-btn {
+    padding: 12px;
+    min-height: 70px;
+  }
+  
+  .toggle-titulo {
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+  }
+  
+  .toggle-desc {
     font-size: 0.8rem;
   }
   
-  .precio {
+  /* Formularios ultra compactos */
+  .formulario-invitado,
+  .formulario-cuenta,
+  .contenido-direccion {
+    padding: 0 10px;
+  }
+  
+  .campo {
+    margin-bottom: 12px;
+  }
+  
+  .campo label {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+  }
+  
+  .input-small,
+  .input-full,
+  .input-telefono,
+  .select-departamento {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .telefono-prefix {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+  
+  /* Botones ultra responsivos */
+  .botones,
+  .botones-confirmar {
+    padding: 0 10px;
+    margin-top: 15px;
+    gap: 10px;
+  }
+  
+  .btn-volver-cuenta,
+  .btn-volver-Direccion,
+  .btn-volver-pedido,
+  .btn-continuar-cuenta,
+  .btn-continuar-Direccion,
+  .btn-continuar-pago,
+  .btn-continuar-pedido {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+  
+  /* Método de entrega ultra compacto */
+  .toggle-metodo-entrega {
+    margin: 10px 0 15px;
+    padding: 10px;
+    gap: 10px;
+  }
+  
+  .toggle-metodo-btn {
+    padding: 12px;
+  }
+  
+  .icono-metodo {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+  
+  /* Ubicación ultra responsiva */
+  .contenido-tiempo-real {
+    padding: 0 10px;
+  }
+  
+  .instruccion {
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    padding: 0 5px;
+  }
+  
+  .btn-ubicacion {
+    padding: 12px 15px;
+    font-size: 0.9rem;
+  }
+  
+  .real-map {
+    height: 200px;
+  }
+  
+  .direccion-info {
+    padding: 12px;
+    margin: 8px 0;
+  }
+  
+  .address-details h4 {
     font-size: 1rem;
-    padding: 3px 6px;
-    min-width: 65px;
   }
   
-  .resumen-total {
-    padding: 15px 0 8px 0;
-    font-size: 1.1rem;
+  .direccion-completa {
+    font-size: 0.85rem;
+    line-height: 1.4;
   }
   
-  .resumen-total span:first-child {
-    font-size: 1.1rem;
+  .coordinates-box {
+    padding: 10px 12px;
   }
   
-  .resumen-total span:last-child {
+  .coordinates-text, .precision-text {
+    font-size: 0.8rem;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .coordinates-label {
+    font-weight: 600;
+  }
+  
+  /* Secciones de confirmación ultra compactas */
+  .titulo-confirmar {
     font-size: 1.2rem;
-    padding: 6px 10px;
-    min-width: 80px;
+    margin: 15px 10px 8px 10px;
+  }
+  
+  .descripcion-confirmar {
+    margin: 0 10px 15px 10px;
+    font-size: 0.9rem;
+  }
+  
+  .seccion-linea {
+    margin: 0 10px 12px 10px;
+    padding: 12px;
+  }
+  
+  .subtitulo-seccion {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  
+  .seccion-linea p {
+    font-size: 0.9rem;
+    margin: 6px 0;
   }
 }
 
-/* Para móviles muy pequeños */
-@media (max-width: 480px) {
-  .resumen-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+/* === AJUSTES FINALES PARA ALINEACIÓN PERFECTA === */
+@media screen and (max-width: 320px) {
+  .contenedor-pideahora {
+    padding: 10px 5px;
   }
   
-  .resumen-footer {
-    justify-content: flex-start;
-    width: 100%;
+  .paso {
+    min-width: 60px;
   }
   
-  .precio {
-    margin-left: auto;
+  .paso .circulo {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
   }
   
-  .resumen-total {
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-end;
+  .texto-paso {
+    font-size: 0.6rem;
   }
   
-  .resumen-total span:last-child {
-    width: 100%;
-    text-align: center;
+  .titulo-compra {
+    font-size: 1rem;
+    margin: 8px 8px 6px 8px;
+  }
+  
+  .toggle-btn, 
+  .toggle-dir-btn {
+    padding: 10px;
+    min-height: 60px;
+  }
+  
+  .formulario-invitado,
+  .formulario-cuenta,
+  .contenido-direccion {
+    padding: 0 8px;
+  }
+  
+  .botones,
+  .botones-confirmar {
+    padding: 0 8px;
   }
 }
 
-/* ...existing code... */
+/* === REGLAS ESPECÍFICAS PARA EL BOTÓN DE REDES SOCIALES (CHAT) === */
+
+/* Ocultar completamente el componente SocialMediaButton en PideAhora */
+body:has(.contenedor-pideahora) .social-media-container,
+body:has(.contenedor-pideahora) .social-media-button,
+body:has(.contenedor-pideahora) .toggle-button {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  transform: translateY(200px) translateX(200px) !important;
+}
+
+/* Fallback usando clase en body para PideAhora */
+.hide-chat-on-checkout .social-media-container,
+.hide-chat-on-checkout .social-media-button,
+.hide-chat-on-checkout .toggle-button {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  transform: translateY(200px) translateX(200px) !important;
+}
