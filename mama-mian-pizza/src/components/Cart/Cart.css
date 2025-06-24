@@ -716,6 +716,34 @@ body:has(.cart__panel.cart__open) .chat-floating-button,
   opacity: 0 !important;
   pointer-events: none !important;
   z-index: -9999 !important;
-  transform: translateY(200px) !important;
+}
+
+/* === REGLAS ESPECÍFICAS PARA EL BOTÓN DE REDES SOCIALES (CHAT) EN CARRITO === */
+
+/* Ocultar completamente el componente SocialMediaButton cuando el carrito está abierto */
+body:has(.cart__panel.cart__open) .social-media-container,
+body:has(.cart__panel.cart__open) .social-media-button,
+body:has(.cart__panel.cart__open) .toggle-button,
+body:has(.cart__overlay.cart__open) .social-media-container,
+body:has(.cart__overlay.cart__open) .social-media-button,
+body:has(.cart__overlay.cart__open) .toggle-button {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  transform: translateY(200px) translateX(200px) !important;
+}
+
+/* Fallback usando clase en body para carrito */
+.cart-open-hide-chat .social-media-container,
+.cart-open-hide-chat .social-media-button,
+.cart-open-hide-chat .toggle-button {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  transform: translateY(200px) translateX(200px) !important;
 }
 
