@@ -30,14 +30,10 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
   // Estados para errores específicos de edición
   const [photoError, setPhotoError] = useState('');
   // Estados para editar perfil
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({
+  const [editMode, setEditMode] = useState(false);  const [formData, setFormData] = useState({
     nombre: '',
-    celular: '',
-    fecha_nacimiento: '',
-    sexo: '',
-    dui: ''
-  });  // Estados para información del usuario desde API se manejan en el hook useUsuario
+    celular: ''
+  });// Estados para información del usuario desde API se manejan en el hook useUsuario
   // Estados para cambiar foto
   const [photoMode, setPhotoMode] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
@@ -218,14 +214,10 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       // Cargar información del usuario desde la API real
       fetchUserInfo(user.id)
         .then((userData) => {
-          console.log('Información del usuario cargada exitosamente:', userData);
-            // Inicializar formData con los datos reales del usuario desde la API
+          console.log('Información del usuario cargada exitosamente:', userData);            // Inicializar formData con los datos reales del usuario desde la API
           const newFormData = {
             nombre: userData.nombre || '',
-            celular: userData.celular || '',
-            fecha_nacimiento: formatearFechaNacimiento(userData.fecha_nacimiento) || '',
-            sexo: userData.sexo || '',
-            dui: userData.dui || ''
+            celular: userData.celular || ''
           };
           
           console.log('Inicializando formulario con datos:', newFormData);
@@ -403,24 +395,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       minute: '2-digit'
     });
   };
-
-  // Función para formatear fecha de nacimiento
-  const formatearFechaNacimiento = (fechaISO) => {
-    if (!fechaISO) return null;
-    
-    try {
-      const fecha = new Date(fechaISO);
-      // Verificar que la fecha es válida
-      if (isNaN(fecha.getTime())) return null;
-      
-      // Formatear como YYYY-MM-DD para el input de tipo date
-      return fecha.toISOString().split('T')[0];
-    } catch (error) {
-      console.error('Error al formatear fecha de nacimiento:', error);
-      return null;
-    }
-  };
-
   // Función para formatear fecha para mostrar al usuario
   const formatearFechaParaMostrar = (fechaISO) => {
     if (!fechaISO) return 'Fecha de nacimiento no registrada';
@@ -479,14 +453,14 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         nombre: formData.nombre,
         correo: userInfo.correo, // Mantener el correo existente
         telefono: formData.celular,
-        fecha_nacimiento: formData.fecha_nacimiento || null,
-        sexo: formData.sexo || null
+        fecha_nacimiento: userInfo.fecha_nacimiento || null, // Mantener fecha existente
+        sexo: userInfo.sexo || null // Mantener sexo existente
       };
 
-      // Solo agregar campos opcionales si tienen valor
-      if (formData.dui) {
-        updateData.dui = formData.dui;
-      }      console.log('Datos a enviar al servidor:', updateData);
+      // Mantener DUI existente si lo hay
+      if (userInfo.dui) {
+        updateData.dui = userInfo.dui;
+      }console.log('Datos a enviar al servidor:', updateData);
       console.log('ID de usuario:', userInfo.id_usuario);
       
       const result = await updateUserInfo(userInfo.id_usuario, updateData);
@@ -1016,9 +990,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                     <p><strong>Recomendación:</strong> Imagen cuadrada para mejor resultado</p>
                   </div>
                 )}
-              </div>
-
-              <div className="perfil__form-row">
+              </div>              <div className="perfil__form-row">
                 <label className="perfil__label">
                   <FontAwesomeIcon icon={faUser} />
                   Nombre completo
@@ -1030,16 +1002,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                   onChange={handleFormChange}
                   disabled={!editMode}
                   className={`perfil__input ${!editMode ? 'disabled' : ''}`}
-                />
-              </div>              <div className="perfil__form-row">
-                <label className="perfil__label">
-                  <FontAwesomeIcon icon={faEnvelope} />
-                  Email
-                </label>                <input
-                  type="email"
-                  value={loadingUserInfo ? 'Cargando...' : (userInfo?.correo || 'No disponible')}
-                  disabled
-                  className="perfil__input disabled"
+                  placeholder="Ingresa tu nombre completo"
                 />
               </div>
 
@@ -1061,53 +1024,52 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
 
               <div className="perfil__form-row">
                 <label className="perfil__label">
-                  <FontAwesomeIcon icon={faCalendarAlt} />
-                  Fecha de Nacimiento
+                  <FontAwesomeIcon icon={faEnvelope} />
+                  Email (Bloqueado)
                 </label>
                 <input
-                  type="date"
-                  name="fecha_nacimiento"
-                  value={formData.fecha_nacimiento}
-                  onChange={handleFormChange}
-                  disabled={!editMode}
-                  className={`perfil__input ${!editMode ? 'disabled' : ''}`}
+                  type="email"
+                  value={loadingUserInfo ? 'Cargando...' : (userInfo?.correo || 'No disponible')}
+                  disabled
+                  className="perfil__input disabled"
+                  title="El correo electrónico no puede ser modificado por seguridad"
                 />
-              </div>
-
-              <div className="perfil__form-row">
+                <small className="perfil__field-note">
+                  El correo electrónico no puede ser modificado por razones de seguridad
+                </small>
+              </div>              <div className="perfil__form-row">
                 <label className="perfil__label">
                   <FontAwesomeIcon icon={faUser} />
-                  Sexo
-                </label>
-                <select
-                  name="sexo"
-                  value={formData.sexo}
-                  onChange={handleFormChange}
-                  disabled={!editMode}
-                  className={`perfil__input ${!editMode ? 'disabled' : ''}`}
-                >
-                  <option value="">Seleccionar</option>
-                  <option value="M">Masculino</option>
-                  <option value="F">Femenino</option>
-                  <option value="Otro">Otro</option>
-                </select>
-              </div>
-
-              <div className="perfil__form-row">
-                <label className="perfil__label">
-                  <FontAwesomeIcon icon={faUser} />
-                  DUI
+                  DUI (Bloqueado)
                 </label>
                 <input
                   type="text"
-                  name="dui"
-                  value={formData.dui}
-                  onChange={handleFormChange}
-                  disabled={!editMode}
-                  className={`perfil__input ${!editMode ? 'disabled' : ''}`}
+                  value={loadingUserInfo ? 'Cargando...' : (userInfo?.dui || 'No disponible')}
+                  disabled
+                  className="perfil__input disabled"
                   placeholder="00000000-0"
-                  maxLength="10"
+                  title="El DUI no puede ser modificado por seguridad"
                 />
+                <small className="perfil__field-note">
+                  El DUI no puede ser modificado por razones de seguridad
+                </small>
+              </div>
+
+              <div className="perfil__form-row">
+                <label className="perfil__label">
+                  <FontAwesomeIcon icon={faCalendarAlt} />
+                  Fecha de Nacimiento (Bloqueado)
+                </label>
+                <input
+                  type="text"
+                  value={loadingUserInfo ? 'Cargando...' : (userInfo?.fecha_nacimiento ? formatearFechaParaMostrar(userInfo.fecha_nacimiento) : 'No disponible')}
+                  disabled
+                  className="perfil__input disabled"
+                  title="La fecha de nacimiento no puede ser modificada por seguridad"
+                />
+                <small className="perfil__field-note">
+                  La fecha de nacimiento no puede ser modificada por razones de seguridad
+                </small>
               </div>
 
               <div className="perfil__form-actions">
@@ -1126,10 +1088,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                         if (userInfo) {
                           setFormData({
                             nombre: userInfo.nombre || '',
-                            celular: userInfo.celular || '',
-                            fecha_nacimiento: formatearFechaNacimiento(userInfo.fecha_nacimiento) || '',
-                            sexo: userInfo.sexo || '',
-                            dui: userInfo.dui || ''
+                            celular: userInfo.celular || ''
                           });
                         }
                       }}
