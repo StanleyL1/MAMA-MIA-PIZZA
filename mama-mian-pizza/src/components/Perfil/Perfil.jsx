@@ -21,8 +21,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     error: errorUserInfo,
     fetchUserInfo,
     updateUserInfo,
-    updateProfilePhoto,
-    changePassword
+    updateProfilePhoto
   } = useUsuario();
     // Tabs: pedidos | reseñas | editar | seguridad
   const [activeTab, setActiveTab] = useState('pedidos');
@@ -54,9 +53,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
   const [errorExperiencias, setErrorExperiencias] = useState(null);
 
   // Estado para modal de crear experiencia
-  const [isModalExperienciaOpen, setIsModalExperienciaOpen] = useState(false);
-  // Estados para cambiar contraseña
-  const [passwordMode, setPasswordMode] = useState(false);  const [passwordData, setPasswordData] = useState({
+  const [isModalExperienciaOpen, setIsModalExperienciaOpen] = useState(false);  // Estados para cambiar contraseña
+  const [passwordMode, setPasswordMode] = useState(false);
+  const [loadingPassword, setLoadingPassword] = useState(false);const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -481,8 +480,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         showProfileMessage('Error al actualizar el perfil', 'error');
       }
     }
-  };
-  // Cambiar contraseña
+  };  // Cambiar contraseña
   const handleChangePassword = async () => {
     if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
       showProfileMessage('Todos los campos son requeridos', 'error');
@@ -515,27 +513,66 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     if (!userInfo?.id_usuario) {
       showProfileMessage('Error: No se pudo obtener la información del usuario', 'error');
       return;
-    }
-
-    try {
-      const passwordUpdateData = {
-        nombre: userInfo.nombre,
-        correo: userInfo.correo,
-        telefono: userInfo.celular || '',
-        fecha_nacimiento: userInfo.fecha_nacimiento || null,
-        sexo: userInfo.sexo || null,
-        current_password: passwordData.currentPassword,
-        new_password: passwordData.newPassword
+    }    try {
+      setLoadingPassword(true);
+      
+      const payload = {
+        id_usuario: userInfo.id_usuario,
+        contrasenaActual: passwordData.currentPassword,
+        nuevaContrasena: passwordData.newPassword
       };
+      
+      console.log('Enviando payload para cambio de contraseña:', payload);
+      
+      // Usar el nuevo endpoint para cambiar contraseña
+      const response = await fetch('https://api.mamamianpizza.com/api/auth/change-password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
 
-      // Solo agregar DUI si existe
-      if (userInfo.dui) {
-        passwordUpdateData.dui = userInfo.dui;
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
+      let result;
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        const textResult = await response.text();
+        console.log('Response text (no JSON):', textResult);
+        result = { message: textResult || 'Error del servidor' };
       }
 
-      console.log('Datos para cambio de contraseña:', passwordUpdateData);
+      console.log('Response result:', result);
 
-      await changePassword(userInfo.id_usuario, passwordUpdateData);
+      if (!response.ok) {
+        console.error('Error response:', {
+          status: response.status,
+          statusText: response.statusText,
+          result: result
+        });
+        
+        // Proporcionar mensajes de error más específicos
+        let errorMessage = 'Error al cambiar la contraseña';
+        
+        if (response.status === 500) {
+          errorMessage = 'Error interno del servidor. Por favor, intenta más tarde.';
+        } else if (response.status === 401) {
+          errorMessage = 'La contraseña actual es incorrecta.';
+        } else if (response.status === 400) {
+          errorMessage = result.message || 'Datos inválidos. Verifica los campos.';
+        } else if (result.message) {
+          errorMessage = result.message;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      console.log('Contraseña cambiada exitosamente:', result);
       
       setPasswordMode(false);
       setPasswordData({
@@ -544,13 +581,20 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         confirmPassword: ''
       });
       
-      showProfileMessage('Contraseña cambiada correctamente');      if (setToast && typeof setToast === 'function') {
-        showProfileMessage('Contraseña cambiada correctamente', 'success');
+      showProfileMessage('Contraseña cambiada correctamente', 'success');
+      
+      if (setToast && typeof setToast === 'function') {
+        setToast('Contraseña cambiada correctamente', 'success', 'profile', 'top-right');
       }
     } catch (error) {
-      showProfileMessage('Error al cambiar la contraseña', 'error');      if (setToast && typeof setToast === 'function') {
-        showProfileMessage('Error al cambiar la contraseña', 'error');
+      console.error('Error al cambiar la contraseña:', error);
+      showProfileMessage(error.message || 'Error al cambiar la contraseña', 'error');
+      
+      if (setToast && typeof setToast === 'function') {
+        setToast(error.message || 'Error al cambiar la contraseña', 'error', 'profile', 'top-right');
       }
+    } finally {
+      setLoadingPassword(false);
     }
   };
 
@@ -1107,12 +1151,21 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
               </div>
             </div>
           </div>
-        )}
-
-        {/* --- SEGURIDAD --- */}
+        )}        {/* --- SEGURIDAD --- */}
         {activeTab === 'seguridad' && (
           <div className="perfil__seguridad-section">
-            <div className="perfil__titulo-seguridad">Seguridad</div>
+            <div className="perfil__titulo-seguridad-container">
+              <div className="perfil__titulo-seguridad">Seguridad</div>
+              {profileToast.show && (
+                <Toast
+                  message={profileToast.message}
+                  type={profileToast.type}
+                  category="security"
+                  position="security-section"
+                  onClose={() => setProfileToast({ show: false, message: '', type: 'success' })}
+                />
+              )}
+            </div>
             
             <div className="perfil__form-container">
               <div className="perfil__security-item">
@@ -1130,7 +1183,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                     Cambiar Contraseña
                   </button>
                 ) : (
-                  <div className="perfil__password-form">                    <div className="perfil__form-row">
+                  <div className="perfil__password-form">
+                    <div className="perfil__form-row">
                       <label className="perfil__label">Contraseña actual</label>
                       <input
                         type="password"
@@ -1139,7 +1193,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                         onChange={handlePasswordChange}
                         className="perfil__input"
                       />
-                    </div>                    <div className="perfil__form-row">
+                    </div>
+
+                    <div className="perfil__form-row">
                       <label className="perfil__label">Nueva contraseña</label>
                       <input
                         type="password"
@@ -1159,7 +1215,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                           </ul>
                         </small>
                       </div>
-                    </div><div className="perfil__form-row">
+                    </div>
+
+                    <div className="perfil__form-row">
                       <label className="perfil__label">Confirmar nueva contraseña</label>
                       <input
                         type="password"
@@ -1181,19 +1239,30 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                             confirmPassword: ''
                           });
                         }}
+                        disabled={loadingPassword}
                       >
                         Cancelar
-                      </button>                      <button 
+                      </button>
+
+                      <button 
                         className="perfil__btn-primary"
                         onClick={handleChangePassword}
-                        disabled={loadingUserInfo}
+                        disabled={loadingPassword}
                       >
-                        {loadingUserInfo ? 'Cambiando...' : 'Cambiar Contraseña'}
+                        {loadingPassword ? (
+                          <>
+                            <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                            Cambiando...
+                          </>
+                        ) : (
+                          'Cambiar Contraseña'
+                        )}
                       </button>
                     </div>
                   </div>
                 )}
-              </div>            </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

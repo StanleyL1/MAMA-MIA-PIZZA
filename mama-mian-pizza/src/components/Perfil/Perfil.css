@@ -138,6 +138,19 @@
   flex: 1;
 }
 
+/* Contenedor del título de seguridad */
+.perfil__titulo-seguridad-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.perfil__titulo-seguridad-container .perfil__titulo-seguridad {
+  margin: 0;
+}
+
 /* HISTORIAL DE PEDIDOS */
 .perfil__titulo-historial,
 .perfil__titulo-favoritos,
@@ -1088,50 +1101,11 @@
     max-width: 95%;
   }
   
-  .perfil__titulo-historial,
-  .perfil__titulo-favoritos,
-  .perfil__titulo-editar,
-  .perfil__titulo-seguridad {
-    font-size: 1.7rem;
+  /* Contenedor del título de seguridad */
+  .perfil__titulo-seguridad-container {
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    justify-content: center;
-  }
-  
-  .perfil__pedido-card {
-    padding: 20px 15px;
-    margin-bottom: 20px;
-  }
-  
-  .perfil__pedido-id {
-    font-size: 1.1rem;
-    padding: 6px 12px;
-  }
-  
-  .perfil__estado-entregado {
-    font-size: 0.8rem;
-    padding: 6px 14px;
-    margin-left: 8px;
-  }
-  
-  .perfil__pedido-total {
-    font-size: 1.2rem;
-  }
-  
-  .perfil__estadisticas {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  
-  .perfil__estadistica-card {
-    padding: 16px;
-  }
-  
-  .perfil__estadistica-numero {
-    font-size: 1.4rem;
-  }
-  
-  .perfil__estadistica-label {
-    font-size: 0.85rem;
   }
 }
 
@@ -1189,6 +1163,7 @@
   .perfil__titulo-seguridad {
     font-size: 1.5rem;
     margin-bottom: 20px;
+    text-align: center;
   }
   
   .perfil__pedido-card {
