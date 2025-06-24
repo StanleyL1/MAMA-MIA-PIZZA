@@ -59,21 +59,18 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   const [orderSuccess, setOrderSuccess] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [orderCode, setOrderCode] = useState('');
-  
-  const [invitadoData, setInvitadoData] = useState({
-    nombre: '',
-    apellido: '',
+    const [invitadoData, setInvitadoData] = useState({
+    nombreCompleto: '',
     telefono: '',
-  });
-    const [cuentaData, setCuentaData] = useState({
-    nombre: '',
+  });const [cuentaData, setCuentaData] = useState({
+    nombreCompleto: '',
     telefono: '',
     email: '',
     password: '',
   });
-  
-  const [direccionData, setDireccionData] = useState({
+    const [direccionData, setDireccionData] = useState({
     direccionExacta: '',
+    referencias: '',
     pais: '',
     departamento: '',
     municipio: '',
@@ -264,10 +261,21 @@ const redirigirAWompi = () => {
       getAddressFromCoordinates(userLocation.lat, userLocation.lng);
     }
   }, [userLocation, getAddressFromCoordinates]);
-
   // Función para avanzar al siguiente paso
   const handleContinuar = () => {
     if (step === 'Cuenta') {
+      // Validar campos de invitado
+      if (modo === 'invitado') {
+        if (!invitadoData.nombreCompleto || !invitadoData.telefono) {
+          alert('Por favor completa todos los campos requeridos.');
+          return;
+        }      } else {
+        // Validar campos de cuenta registrada
+        if (!cuentaData.nombreCompleto || !cuentaData.telefono || !cuentaData.email || !cuentaData.password) {
+          alert('Por favor completa todos los campos requeridos.');
+          return;
+        }
+      }
       setStep('Dirección');
     } else if (step === 'Dirección') {
       setStep('Pago');
@@ -279,7 +287,6 @@ const redirigirAWompi = () => {
       setStep('Confirmar');
     }
   };
-
   // Función para enviar el pedido al servidor adaptada para el nuevo backend
   const enviarPedido = async () => {
     console.log('Función enviarPedido ejecutada');
@@ -293,70 +300,68 @@ const redirigirAWompi = () => {
     console.log('Preparando datos para enviar a la API...');
     setIsSubmitting(true);
     setOrderError('');
-      try {
-      // Construir objeto con la estructura esperada por el backend
+    
+    try {
+      // Construir objeto con la estructura exacta esperada por el backend
       const pedidoData = {
-        // Datos del cliente según el modo seleccionado
-        tipo_cliente: modo === 'invitado' ? 'invitado' : 'registrado',
+        // Tipo de cliente: registrado o invitado
+        tipo_cliente: modo === 'invitado' ? 'invitado' : 'registrado',        // Datos del cliente según el payload exacto
         cliente: modo === 'invitado'
           ? { 
-              nombre: invitadoData.nombre,
-              apellido: invitadoData.apellido,
-              telefono: invitadoData.telefono,
-              email: null 
-            }
-          : {
-              nombre: cuentaData.nombre,
+              nombre: invitadoData.nombreCompleto,
+              telefono: invitadoData.telefono
+            }          : {
+              nombre: cuentaData.nombreCompleto,
               telefono: cuentaData.telefono,
               email: cuentaData.email,
               password: cuentaData.password 
             },
         
-        // Tipo de entrega: 1 para recoger en local, 0 para entrega a domicilio
-        tipo_entrega: metodoEntrega === 'recoger' ? 1 : 0,
-              
-        // Datos de la dirección - siempre incluimos información para evitar errores
+        // Dirección según el tipo seleccionado
         direccion: metodoEntrega === 'domicilio'
-          ? {
-              tipo_direccion: modoDireccion === 'tiempoReal' ? 'tiempo_real' : 'formulario',
-              // Si es dirección por formulario
-              ...(modoDireccion === 'formulario' && {
-                direccion: direccionData.direccionExacta,
-                pais: direccionData.pais,
-                departamento: direccionData.departamento,
-                municipio: direccionData.municipio
-              }),
-              // Si es ubicación en tiempo real
-              ...(modoDireccion === 'tiempoReal' && userLocation && {
-                latitud: userLocation.lat,
-                longitud: userLocation.lng,
-                precision_ubicacion: Math.round(userLocation.accuracy),
-                direccion_formateada: addressInfo?.formattedAddress || "Ubicación compartida en tiempo real"
-              })
-            }          : {
-              // Información de dirección del local cuando se recoge en local
+          ? (modoDireccion === 'formulario' 
+              ? {
+                  tipo_direccion: 'formulario',
+                  direccion: direccionData.direccionExacta,
+                  referencias: direccionData.referencias,
+                  pais: direccionData.pais,
+                  departamento: direccionData.departamento,
+                  municipio: direccionData.municipio
+                }
+              : {
+                  tipo_direccion: 'tiempo_real',
+                  latitud: userLocation.lat,
+                  longitud: userLocation.lng,
+                  precision_ubicacion: Math.round(userLocation.accuracy),
+                  direccion_formateada: addressInfo?.formattedAddress || "Ubicación compartida en tiempo real"
+                })
+          : {
+              // Para recoger en local - usar dirección del local
               tipo_direccion: 'formulario',
               direccion: "CP #3417, Puerto El Triunfo, EL salvador",
+              referencias: "Local principal",
               pais: "El Salvador",
               departamento: "Usulután",
-              municipio: "Jiquilisco"            },
+              municipio: "Jiquilisco"
+            },
         
-        // Datos de pago
-        metodo_pago: pagoMetodo,
-              
-        // Detalles del pedido - adaptado para la estructura esperada por el backend
+        // Productos con la estructura exacta del payload
         productos: cartItems.map(item => ({
           id_producto: item.id,
           nombre_producto: item.nombre,
-          precio_unitario: parseFloat(item.precio),
           cantidad: parseInt(item.cantidad),
+          precio_unitario: parseFloat(item.precio),
           subtotal: parseFloat(item.precio * item.cantidad),
           masa: item.masa || null,
           tamano: item.tamano || null,
-          instrucciones_especiales: item.instrucciones || null
+          instrucciones_especiales: item.instrucciones || null,
+          metodo_entrega: metodoEntrega === 'recoger' ? 1 : 0
         })),
-              
-        // Datos financieros
+        
+        // Método de pago
+        metodo_pago: pagoMetodo,
+        
+        // Cálculos financieros exactos
         subtotal: parseFloat(cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0).toFixed(2)),
         costo_envio: metodoEntrega === 'domicilio' ? 2.50 : 0.00,
         impuestos: parseFloat((cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) * 0.13).toFixed(2)),
@@ -365,10 +370,10 @@ const redirigirAWompi = () => {
           (metodoEntrega === 'domicilio' ? 2.50 : 0.00) + 
           (cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) * 0.13)
         ).toFixed(2)),
-              
-        // Datos adicionales
+        
+        // Términos y tiempo estimado
         aceptado_terminos: true,
-        tiempo_estimado_entrega: metodoEntrega === 'domicilio' ? 45 : 25 // En minutos
+        tiempo_estimado_entrega: metodoEntrega === 'domicilio' ? 30 : 25
       };
       
       console.log('Datos del pedido preparados:', pedidoData);
@@ -405,7 +410,7 @@ const redirigirAWompi = () => {
           titulo: "Nuevo Pedido",
           mensaje: `Pedido ${codigoPedido} por $${total.toFixed(2)}`,
           tipo: "pedido",
-          estado: "no leida"  // Corresponde a 'no leida' en el enum de la BD
+          estado: "no leida"
         };
         
         try {
@@ -426,7 +431,6 @@ const redirigirAWompi = () => {
           }
         } catch (notificationError) {
           console.error('Error al enviar notificación:', notificationError);
-          // No interrumpimos el flujo principal por un error en la notificación
         }
         
         // Continuar con el flujo normal después de un pedido exitoso
@@ -541,34 +545,19 @@ const redirigirAWompi = () => {
                     Guarda tu historial
                   </span>
                 </button>
-              </div>
-
-              {/* Formulario de Invitado */}
+              </div>              {/* Formulario de Invitado */}
               {modo === 'invitado' && (
                 <div className="formulario-invitado">
-                  <div className="campos-dobles">
-                    <div className="campo">
-                      <label htmlFor="nombre">Nombre</label>
-                      <input
-                        name="nombre"
-                        id="nombre"
-                        type="text"
-                        className="input-small"
-                        value={invitadoData.nombre}
-                        onChange={handleInputInvitado}
-                      />
-                    </div>
-                    <div className="campo">
-                      <label htmlFor="apellido">Apellido</label>
-                      <input
-                        name="apellido"
-                        id="apellido"
-                        type="text"
-                        className="input-small"
-                        value={invitadoData.apellido}
-                        onChange={handleInputInvitado}
-                      />
-                    </div>
+                  <div className="campo">
+                    <label htmlFor="nombreCompleto">Nombre completo</label>
+                    <input
+                      name="nombreCompleto"
+                      id="nombreCompleto"
+                      type="text"
+                      className="input-small"
+                      value={invitadoData.nombreCompleto}
+                      onChange={handleInputInvitado}
+                    />
                   </div>
                   <div className="campo">
                     <label htmlFor="telefono">Número de teléfono</label>
@@ -590,18 +579,18 @@ const redirigirAWompi = () => {
               )}              {/* Formulario de Cuenta */}
               {modo === 'cuenta' && (
                 <div className="formulario-cuenta">
+                  <div className="campo">
+                    <label htmlFor="nombreCompletoCuenta">Nombre completo</label>
+                    <input
+                      name="nombreCompleto"
+                      id="nombreCompletoCuenta"
+                      type="text"
+                      className="input-small"
+                      value={cuentaData.nombreCompleto}
+                      onChange={handleInputCuenta}
+                    />
+                  </div>
                   <div className="campos-dobles">
-                    <div className="campo">
-                      <label htmlFor="nombreCuenta">Nombre</label>
-                      <input
-                        name="nombre"
-                        id="nombreCuenta"
-                        type="text"
-                        className="input-small"
-                        value={cuentaData.nombre}
-                        onChange={handleInputCuenta}
-                      />
-                    </div>
                     <div className="campo">
                       <label htmlFor="telefonoCuenta">Teléfono</label>
                       <div className="telefono-container">
@@ -618,17 +607,17 @@ const redirigirAWompi = () => {
                         />
                       </div>
                     </div>
-                  </div>
-                  <div className="campo">
-                    <label htmlFor="email">Correo electrónico</label>
-                    <input
-                      name="email"
-                      id="email"
-                      type="email"
-                      className="input-full"
-                      value={cuentaData.email}
-                      onChange={handleInputCuenta}
-                    />
+                    <div className="campo">
+                      <label htmlFor="email">Correo electrónico</label>
+                      <input
+                        name="email"
+                        id="email"
+                        type="email"
+                        className="input-small"
+                        value={cuentaData.email}
+                        onChange={handleInputCuenta}
+                      />
+                    </div>
                   </div>
                   <div className="campo password-campo">
                     <label htmlFor="password">Contraseña</label>
@@ -700,9 +689,7 @@ const redirigirAWompi = () => {
                     >
                       Ubicación de tiempo real
                     </button>
-                  </div>
-
-                  {modoDireccion === 'formulario' && (
+                  </div>                  {modoDireccion === 'formulario' && (
                     <div className="contenido-direccion">
                       {/* Dirección exacta */}
                       <div className="campo">
@@ -714,6 +701,19 @@ const redirigirAWompi = () => {
                           value={direccionData.direccionExacta}
                           onChange={handleInputDireccion}
                           className="input-full"
+                        />
+                      </div>
+                      {/* Referencias */}
+                      <div className="campo">
+                        <label htmlFor="referencias">Referencias (opcional)</label>
+                        <input
+                          type="text"
+                          name="referencias"
+                          id="referencias"
+                          value={direccionData.referencias}
+                          onChange={handleInputDireccion}
+                          className="input-full"
+                          placeholder="Ej: Casa azul, portón negro, frente al parque"
                         />
                       </div>
                       <div className="campos-tres">
@@ -738,7 +738,7 @@ const redirigirAWompi = () => {
                             className="select-departamento"
                           >
                             <option value="">Seleccionar...</option>
-                            <option value="San Salvador">Usulutan</option>
+                            <option value="Usulután">Usulután</option>
                           </select>
                         </div>
                         <div className="campo">
@@ -949,23 +949,21 @@ const redirigirAWompi = () => {
     <p className="descripcion-confirmar">
       Revisa los detalles de tu pedido antes de confirmar
     </p>
-    
-    {/* Sección de Información Personal */}
+      {/* Sección de Información Personal */}
     <div className="seccion-linea">
-      <h4 className="subtitulo-seccion">Información personal</h4>      {modo === 'invitado' ? (
+      <h4 className="subtitulo-seccion">Información personal</h4>
+      {modo === 'invitado' ? (
         <>
-          <p>{invitadoData.nombre} {invitadoData.apellido}</p>
+          <p>{invitadoData.nombreCompleto}</p>
           <p>Teléfono: +503 {invitadoData.telefono}</p>
-        </>
-      ) : (
+        </>      ) : (
         <>
-          <p>{cuentaData.nombre}</p>
+          <p>{cuentaData.nombreCompleto}</p>
           <p>Email: {cuentaData.email}</p>
           <p>Teléfono: +503 {cuentaData.telefono}</p>
         </>
       )}
     </div>
-
     {/* Sección de Método de entrega y dirección */}
     <div className="seccion-linea">
       <h4 className="subtitulo-seccion">
@@ -990,10 +988,12 @@ const redirigirAWompi = () => {
               <FaMotorcycle className="metodo-icon" />
             </div>
             <div className="metodo-details">
-              <p className="metodo-tipo">Entrega a domicilio</p>
-              {modoDireccion === 'formulario' ? (
+              <p className="metodo-tipo">Entrega a domicilio</p>              {modoDireccion === 'formulario' ? (
                 <>
                   <p>{direccionData.direccionExacta}</p>
+                  {direccionData.referencias && (
+                    <p><small>Referencias: {direccionData.referencias}</small></p>
+                  )}
                   <p>{direccionData.pais} – {direccionData.departamento} – {direccionData.municipio}</p>
                 </>
               ) : (

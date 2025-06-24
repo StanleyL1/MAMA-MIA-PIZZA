@@ -4,14 +4,12 @@ import './PizzaModal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping, faCommentDots, faStar } from '@fortawesome/free-solid-svg-icons';
 
-function PizzaModal({ pizza, onClose, onAddToCart, user }) {
+function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = false }) {
   const [masa, setMasa] = useState('Tradicional');
   const [tamano, setTamano] = useState('Personal');
   const [instrucciones, setInstrucciones] = useState('');
   const [personalizarIngredientes, setPersonalizarIngredientes] = useState(false);
-  const [showNotification, setShowNotification] = useState(false);
-  const [activeTab, setActiveTab] = useState('pedido');  const [reseñas, setReseñas] = useState([]);
-  const [estadisticasReseñas, setEstadisticasReseñas] = useState(null);
+  const [showNotification, setShowNotification] = useState(false);  const [activeTab, setActiveTab] = useState('pedido');  const [reseñas, setReseñas] = useState([]);
   const [mostrarFormularioResena, setMostrarFormularioResena] = useState(false);
   const [nuevaResena, setNuevaResena] = useState({ rating: 0, comentario: '' });
   const [tamanos, setTamanos] = useState([]);
@@ -92,15 +90,10 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
           nombre: r.nombre, 
           foto: r.foto,
           fechaOriginal: r.fecha,
-          valoracion: r.rating 
-        })));
-        
-        // Guardar estadísticas generales
-        setEstadisticasReseñas(data.estadisticas);
+          valoracion: r.rating        })));
         
         // Log para debugging
         console.log(`📊 Reseñas encontradas para producto ${productId}:`, reseñasFormateadas.length);
-        console.log(`📈 Estadísticas generales:`, data.estadisticas);
       } else {
         console.log('No se pudieron cargar las reseñas:', response.status);
         setReseñas([]);
@@ -523,9 +516,8 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
 
         {activeTab === 'pedido' ? (
           // Vista de pedido
-          <div className="modal__pedido-container">
-            {/* Imagen de la pizza */}
-            <div className="modal__image-section">
+          <div className="modal__pedido-container">            {/* Imagen de la pizza */}
+            <div className={`modal__image-section ${isRecommendation ? 'modal__image-section--recommendation' : ''}`}>
               <img src={pizza.imagen} alt={pizza.titulo} className="modal__pizza-image" />
             </div>
 
@@ -681,88 +673,12 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
                   Reseñas
                 </button>
               </div>
-            </div>
-              <div className="reseñas__container">
-              {/* Encabezado: estrellas y promedio */}
-              <div className="reseñas__header">
-                <div className="reseñas__header-stars">
-                  {(() => {
-                    // Calcular promedio
-                    const avg = reseñas.length
-                      ? reseñas.reduce((s, r) => s + r.rating, 0) / reseñas.length
-                      : 0;
-                    // Mostrar estrellas promedio
-                    return [1,2,3,4,5].map(star => (
-                      <FontAwesomeIcon
-                        key={star}
-                        icon={faStar}
-                        className="reseñas__star"
-                        style={{
-                          color: avg >= star - 0.5 ? "#eab308" : "#d1d5db",
-                          fontSize: 22
-                        }}
-                      />
-                    ));
-                  })()}
-                </div>
-                <div className="reseñas__header-rating">
-                  <span className="reseñas__average">
-                    {reseñas.length ? (reseñas.reduce((s, r) => s + r.rating, 0) / reseñas.length).toFixed(1) : "0.0"} de 5
-                  </span>
-                  <span className="reseñas__count">{reseñas.length} reseñas</span>
-                </div>
-              </div>              {/* Estado de carga */}
+            </div>              <div className="reseñas__container">
+              {/* Estado de carga */}
               {cargandoReseñas && (
                 <div style={{ textAlign: 'center', padding: '20px' }}>
                   <p>Cargando reseñas...</p>
-                </div>
-              )}
-
-              {/* Estadísticas de reseñas (solo si hay datos) */}
-              {!cargandoReseñas && estadisticasReseñas && (
-                <div style={{ 
-                  backgroundColor: '#f8fafc', 
-                  padding: '16px', 
-                  borderRadius: '8px', 
-                  marginBottom: '20px',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#334155', fontSize: '16px' }}>
-                    📊 Estadísticas de Reseñas
-                  </h4>
-                  <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', 
-                    gap: '12px',
-                    fontSize: '14px'
-                  }}>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontWeight: '600', color: '#059669' }}>
-                        {estadisticasReseñas.resenas_aprobadas}
-                      </div>
-                      <div style={{ color: '#64748b' }}>Aprobadas</div>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontWeight: '600', color: '#dc2626' }}>
-                        {estadisticasReseñas.resenas_pendientes}
-                      </div>
-                      <div style={{ color: '#64748b' }}>Pendientes</div>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontWeight: '600', color: '#7c3aed' }}>
-                        {estadisticasReseñas.valoracion_promedio}
-                      </div>
-                      <div style={{ color: '#64748b' }}>Promedio</div>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontWeight: '600', color: '#0891b2' }}>
-                        {estadisticasReseñas.total_resenas}
-                      </div>
-                      <div style={{ color: '#64748b' }}>Total</div>
-                    </div>
-                  </div>
-                </div>
-              )}
+                </div>              )}
 
               {/* Formulario o botón */}
               {mostrarFormularioResena ? (
@@ -931,31 +847,20 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
                           }}
                         />
                       </div>
-                      
-                      {/* Contenido de la reseña */}
+                        {/* Contenido de la reseña */}
                       <div className="reseñas__review-content" style={{ flex: 1, marginLeft: 15 }}>
                         {/* Header con nombre y fecha */}
-                        <div className="reseñas__review-header" style={{ 
-                          display: "flex", 
-                          justifyContent: "space-between", 
-                          alignItems: "center", 
-                          marginBottom: 8 
-                        }}>
-                          <div style={{ fontWeight: 600, fontSize: 16, color: "#333" }}>
+                        <div className="reseñas__review-header">
+                          <div className="reviewer-name">
                             {resena.nombre}
                           </div>
-                          <div style={{ fontSize: 14, color: "#7c7c7c" }}>
+                          <div className="review-date">
                             {resena.fecha}
                           </div>
                         </div>
                         
                         {/* Estrellas de calificación */}
-                        <div className="reseñas__rating" style={{ 
-                          display: "flex", 
-                          alignItems: "center", 
-                          gap: 4, 
-                          marginBottom: 10 
-                        }}>
+                        <div className="reseñas__rating">
                           {[1,2,3,4,5].map(star => (
                             <FontAwesomeIcon
                               key={star}
@@ -963,28 +868,18 @@ function PizzaModal({ pizza, onClose, onAddToCart, user }) {
                               className="reseñas__review-star"
                               style={{ 
                                 color: resena.rating >= star ? "#eab308" : "#d1d5db", 
-                                fontSize: 18,
-                                filter: resena.rating >= star ? "drop-shadow(0 1px 2px rgba(234, 179, 8, 0.3))" : "none"
+                                fontSize: 16
                               }}
                             />
                           ))}
-                          <span style={{ marginLeft: 8, fontSize: 14, color: "#666", fontWeight: 500 }}>
-                            ({resena.rating}/5)
+                          <span className="reseñas__rating-text">
+                            {resena.rating}/5
                           </span>
                         </div>
                         
                         {/* Comentario */}
-                        <div className="reseñas__review-comment" style={{ 
-                          fontSize: 15, 
-                          lineHeight: 1.5, 
-                          color: "#444",
-                          backgroundColor: "#f8f9fa",
-                          padding: "12px 16px",
-                          borderRadius: "12px",
-                          border: "1px solid #e9ecef",
-                          fontStyle: "italic"
-                        }}>
-                          "{resena.comentario}"
+                        <div className="reseñas__review-comment">
+                          {resena.comentario}
                         </div>
                       </div>
                     </div>

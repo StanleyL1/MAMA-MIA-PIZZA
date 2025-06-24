@@ -2,543 +2,937 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-   faHeart, faUser, faEdit, faShieldAlt, faCamera,
-  faArrowLeft, faPhone, faEnvelope, faEye, faEyeSlash,
-  faRefresh, faSpinner, faExclamationTriangle, faShoppingBag,
-  faClock, faCreditCard, faTruck
+   faHeart, faUser, faEdit, faShieldAlt, faPhone, faMapMarkerAlt, 
+   faCalendarAlt, faLock, faEnvelope, faCamera, faSpinner, faSync,
+   faTrash, faExclamationTriangle
 } from "@fortawesome/free-solid-svg-icons";
 
-import perfilFoto from '../../assets/perfilfoto.png';
 import './Perfil.css';
-
-const API_BASE_URL = 'https://api.mamamianpizza.com/api';
+import { obtenerResenasUsuario } from '../../services/resenasService';
+import { obtenerExperienciasUsuario } from '../../services/experienciasService';
+import { useUsuario } from '../../hooks/useUsuario';
+import ModalExperiencia from '../CrearExperiencia/ModalExperiencia';
+import Toast from '../Toast/Toast';
 
 export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, updateUser }) {
-  const navigate = useNavigate();
-  
-  // Tabs: pedidos | reseñas | editar | seguridad
+  const navigate = useNavigate();  // Hook para manejar información del usuario
+  const {
+    userInfo,
+    loading: loadingUserInfo,
+    error: errorUserInfo,
+    fetchUserInfo,
+    updateUserInfo,
+    updateProfilePhoto
+  } = useUsuario();
+    // Tabs: pedidos | reseñas | editar | seguridad
   const [activeTab, setActiveTab] = useState('pedidos');
-  const [showCambiarContra, setShowCambiarContra] = useState(false);
   
-  // Estados para datos de la API
-  const [userOrders, setUserOrders] = useState([]);
-  const [userStats, setUserStats] = useState({
-    totalOrders: 0,
-    totalSpent: 0,
-    averageOrderValue: 0,
-    favoriteProducts: 0
-  });
-  const [loadingOrders, setLoadingOrders] = useState(false);  const [errorOrders, setErrorOrders] = useState(null);  const [updateMessage, setUpdateMessage] = useState('');
-  const [profileMessage, setProfileMessage] = useState(''); // Mensaje local para mostrar abajo de la foto
-  const [profileMessageType, setProfileMessageType] = useState('success'); // 'success' o 'error'
-    // Estado de perfil del usuario - usar datos reales si están disponibles
-  const [userPerfil, setUserPerfil] = useState({
-    nombre: user?.nombre || 'Usuario',
-    email: user?.correo || user?.email || 'usuario@email.com',
-    telefono: user?.telefono || user?.celular || '+503 0000-0000',
-    foto: user?.foto_perfil || user?.foto || perfilFoto,
-    miembroDesde: user?.fecha_registro ? new Date(user.fecha_registro).getFullYear() : 2023,
-    fecha_nacimiento: user?.fecha_nacimiento || 'No especificado',
-    dui: user?.dui || user?.numero_dui || 'No especificado',
-  });
-  console.log('👤 PERFIL - Usuario recibido:', user);
-  console.log('👤 PERFIL - Estado userPerfil:', userPerfil);
+  // Estados para errores específicos de edición
+  const [photoError, setPhotoError] = useState('');
+  // Estados para editar perfil
+  const [editMode, setEditMode] = useState(false);  const [formData, setFormData] = useState({
+    nombre: '',
+    celular: ''
+  });// Estados para información del usuario desde API se manejan en el hook useUsuario
+  // Estados para cambiar foto
+  const [photoMode, setPhotoMode] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const [savingPhoto, setSavingPhoto] = useState(false);
+  // Estados para pedidos
+  const [pedidos, setPedidos] = useState([]);
+  const [loadingPedidos, setLoadingPedidos] = useState(false);
+  const [errorPedidos, setErrorPedidos] = useState(null);
+  // Estados para reseñas
+  const [resenas, setResenas] = useState([]);
+  const [loadingResenas, setLoadingResenas] = useState(false);
+  const [errorResenas, setErrorResenas] = useState(null);
+  const [userResenasInfo, setUserResenasInfo] = useState(null);
+  // Estados para experiencias
+  const [experiencias, setExperiencias] = useState([]);
+  const [loadingExperiencias, setLoadingExperiencias] = useState(false);
+  const [errorExperiencias, setErrorExperiencias] = useState(null);
+
+  // Estado para modal de crear experiencia
+  const [isModalExperienciaOpen, setIsModalExperienciaOpen] = useState(false);
   
-  // Función helper para mostrar mensajes locales
-  const showProfileMessage = (message, type = 'success') => {
-    setProfileMessage(message);
-    setProfileMessageType(type);
-    setTimeout(() => setProfileMessage(''), 3000);
-  };
-  // Formulario de edición
-  const [formData, setFormData] = useState({
-    nombre: userPerfil.nombre,
-    email: userPerfil.email,
-    telefono: userPerfil.telefono,
-  });
-  const [editSuccess, setEditSuccess] = useState(false);
+  // Estados para cambiar contraseña
+  const [passwordMode, setPasswordMode] = useState(false);
+  const [loadingPassword, setLoadingPassword] = useState(false);
   
-  // Estados para manejo de foto de perfil
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [uploadingImage, setUploadingImage] = useState(false);// Función para obtener pedidos del usuario desde la API
-  const fetchUserOrders = useCallback(async () => {
-    if (!user?.id) {
-      console.log('❌ No hay ID de usuario para obtener pedidos');
-      return;
+  // Estados para desactivar cuenta
+  const [deactivateMode, setDeactivateMode] = useState(false);
+  const [loadingDeactivate, setLoadingDeactivate] = useState(false);
+  const [deactivateData, setDeactivateData] = useState({
+    motivo: '',
+    confirmacion: ''
+  });
+  
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  
+  // Estado local para el Toast del perfil
+  const [profileToast, setProfileToast] = useState({ show: false, message: '', type: 'success' });
+    // Función helper para mostrar mensajes usando toast
+  const showProfileMessage = useCallback((message, type = 'success') => {
+    // Usar toast local para mostrar el mensaje en el perfil
+    setProfileToast({ show: true, message, type });
+    setTimeout(() => setProfileToast({ show: false, message: '', type: 'success' }), 4000);
+    
+    // También usar el toast global como respaldo
+    if (setToast && typeof setToast === 'function') {
+      setToast(message, type, 'profile', 'top-right');
     }
-
-    setLoadingOrders(true);
-    setErrorOrders(null);
-
-    try {
-      const userId = user.id;
-      console.log('🔍 Obteniendo pedidos para usuario ID:', userId);
-      
-      const response = await fetch(`${API_BASE_URL}/customers/${userId}/orders`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error al obtener pedidos: ${response.status}`);
+  }, [setToast]);
+  // Función para renderizar estrellas
+  const renderEstrellas = (valoracion) => {
+    const estrellas = [];
+    for (let i = 1; i <= 5; i++) {
+      if (i <= valoracion) {
+        estrellas.push(<span key={i} className="perfil__estrella">⭐</span>);
+      } else {
+        estrellas.push(<span key={i} className="perfil__estrella-vacia">☆</span>);
       }
+    }
+    return estrellas;
+  };
+  // Función para obtener el estado de experiencia
+  const getEstadoExperiencia = (estado) => {
+    return estado === 1 ? 'aprobada' : 'pendiente';
+  };
 
+  // Obtener pedidos del usuario
+  const fetchPedidos = useCallback(async () => {
+    if (!user?.id) return;
+    
+    setLoadingPedidos(true);
+    setErrorPedidos(null);
+    
+    try {
+      const response = await fetch(`https://api.mamamianpizza.com/api/orders/orders/user/${user.id}`);
+      
+      if (!response.ok) {
+        throw new Error('Error al obtener los pedidos');
+      }
+      
       const data = await response.json();
-      console.log('📦 Respuesta completa de la API:', data);
-
-      // Extraer pedidos y estadísticas de la respuesta
-      const pedidos = data.pedidos || [];
-      const estadisticas = data.estadisticas || {};
-
-      // Procesar los datos de pedidos
-      const processedOrders = pedidos.map(order => ({
-        id: order.id || order.order_id,
-        fecha: order.fecha_pedido || order.created_at || order.fecha,
-        productos: order.productos || order.items || order.detalles || [],
-        total: parseFloat(order.total) || 0,
-        estado: order.estado || order.status || 'Pendiente',
-        metodo_pago: order.metodo_pago || order.payment_method || 'No especificado',
-        tipo_entrega: order.tipo_entrega || order.delivery_type || 'No especificado',
-        tiempo_entrega: order.tiempo_entrega || order.delivery_time || null,
-        direccion: order.direccion || order.address || null,
-        telefono: order.telefono || order.phone || null,
-        observaciones: order.observaciones || order.notes || null,
-      }));
-
-      setUserOrders(processedOrders);
-
-      // Usar estadísticas de la API si están disponibles, sino calcular
-      const stats = {
-        totalOrders: parseInt(estadisticas.totalPedidos) || processedOrders.length,
-        totalSpent: parseFloat(estadisticas.totalGastado) || processedOrders.reduce((sum, order) => sum + order.total, 0),
-        averageOrderValue: parseFloat(estadisticas.promedioPedido) || (
-          processedOrders.length > 0 
-            ? processedOrders.reduce((sum, order) => sum + order.total, 0) / processedOrders.length 
-            : 0
-        ),
-        favoriteProducts: processedOrders.reduce((count, order) => 
-          count + (Array.isArray(order.productos) ? order.productos.length : 0), 0
-        ),
-        primerPedido: estadisticas.primerPedido,
-        ultimoPedido: estadisticas.ultimoPedido,
-        pedidoMinimo: parseFloat(estadisticas.pedidoMinimo) || 0,
-        pedidoMaximo: parseFloat(estadisticas.pedidoMaximo) || 0,
-      };
-
-      setUserStats(stats);
-
-      console.log('✅ Pedidos procesados:', processedOrders);
-      console.log('📊 Estadísticas calculadas:', stats);
-
+      
+      // Extraer el array de pedidos del payload
+      if (data.message && data.pedidos && Array.isArray(data.pedidos)) {
+        setPedidos(data.pedidos);
+      } else {
+        // Fallback si la estructura es diferente
+        setPedidos([]);
+      }
+      
     } catch (error) {
-      console.error('❌ Error al obtener pedidos:', error);
-      setErrorOrders('Error al cargar los pedidos. Por favor, intenta de nuevo.');
+      console.error('Error fetching pedidos:', error);
+      setErrorPedidos('Error al cargar los pedidos');
+      setPedidos([]);
     } finally {
-      setLoadingOrders(false);
+      setLoadingPedidos(false);
     }
-  }, [user?.id]);  // Función para actualizar perfil en la API
-  const updateUserProfile = async (updatedData) => {
-    if (!user?.id) {
-      console.log('❌ No hay ID de usuario para actualizar perfil');
-      return false;
-    }
+  }, [user?.id]);
 
+  // Obtener reseñas del usuario
+  const fetchResenas = useCallback(async () => {
+    if (!user?.id) return;
+    
+    setLoadingResenas(true);
+    setErrorResenas(null);
+    
     try {
-      console.log('🔄 Actualizando perfil para usuario ID:', user.id);
-      console.log('📝 Datos a actualizar:', updatedData);
+      const data = await obtenerResenasUsuario(user.id);
       
-      const response = await fetch(`${API_BASE_URL}/users/${user.id}/profile`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          nombre: updatedData.nombre,
-          correo: updatedData.email,
-          telefono: updatedData.telefono,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('❌ Error del servidor:', errorData);
-        throw new Error(`Error al actualizar perfil: ${response.status} - ${errorData.message || 'Error desconocido'}`);
+      if (data.message && data.resenas && Array.isArray(data.resenas)) {
+        setResenas(data.resenas);
+        setUserResenasInfo(data.usuario);
+      } else {
+        setResenas([]);
+        setUserResenasInfo(null);
       }
-
-      const result = await response.json();
-      console.log('✅ Perfil actualizado:', result);
-      return true;
-
+      
     } catch (error) {
-      console.error('❌ Error al actualizar perfil:', error);
-      return false;
+      console.error('Error fetching reseñas:', error);
+      setErrorResenas('Error al cargar las reseñas');
+      setResenas([]);
+      setUserResenasInfo(null);
+    } finally {      setLoadingResenas(false);
     }
+  }, [user?.id]);
+
+  // Obtener experiencias del usuario
+  const fetchExperiencias = useCallback(async () => {
+    if (!user?.id) return;
+    
+    setLoadingExperiencias(true);
+    setErrorExperiencias(null);
+    
+    try {
+      const data = await obtenerExperienciasUsuario(user.id);
+      
+      if (data.message && data.experiencias && Array.isArray(data.experiencias)) {
+        setExperiencias(data.experiencias);
+      } else {
+        setExperiencias([]);
+      }
+      
+    } catch (error) {
+      console.error('Error fetching experiencias:', error);
+      setErrorExperiencias('Error al cargar las experiencias');
+      setExperiencias([]);
+    } finally {
+      setLoadingExperiencias(false);
+    }
+  }, [user?.id]);
+  // Función para refrescar tanto reseñas como experiencias
+  const refreshResenasYExperiencias = () => {
+    fetchResenas();
+    fetchExperiencias();
   };
-  // Función para manejar la selección de imagen
-  const handleImageSelect = (event) => {
-    const file = event.target.files[0];
-    if (file) {      // Validar que sea una imagen
+  // Manejar creación de nueva experiencia
+  const handleExperienciaCreada = (nuevaExperiencia) => {    // Verificar que setToast existe y es una función antes de usarla
+    if (setToast && typeof setToast === 'function') {
+      showProfileMessage('¡Experiencia creada exitosamente!', 'success');
+    }
+    
+    // Refrescar la lista de experiencias
+    fetchExperiencias();
+    
+    // Cerrar modal
+    setIsModalExperienciaOpen(false);
+  };
+
+  // Abrir modal de crear experiencia
+  const handleAbrirModalExperiencia = () => {
+    setIsModalExperienciaOpen(true);
+  };
+
+  // Cerrar modal de crear experiencia
+  const handleCerrarModalExperiencia = () => {
+    setIsModalExperienciaOpen(false);
+  };  // Redirigir al login si no hay usuario logueado
+  useEffect(() => {
+    if (!user) {
+      console.log('No hay usuario logueado, redirigiendo al login');
+      navigate('/login');
+    } else {
+      console.log('Usuario logueado detectado:', user);
+      console.log('Iniciando carga de información del usuario con ID:', user.id);
+      
+      // Cargar información del usuario desde la API real
+      fetchUserInfo(user.id)
+        .then((userData) => {
+          console.log('Información del usuario cargada exitosamente:', userData);            // Inicializar formData con los datos reales del usuario desde la API
+          const newFormData = {
+            nombre: userData.nombre || '',
+            celular: userData.celular || ''
+          };
+          
+          console.log('Inicializando formulario con datos:', newFormData);
+          setFormData(newFormData);
+        })
+        .catch(error => {
+          console.error('Error al cargar información del usuario:', error);
+          // Mostrar mensaje de error al usuario
+          showProfileMessage('Error al cargar la información del usuario. Por favor, inténtalo de nuevo.', 'error');
+        });
+      
+      // Cargar pedidos, reseñas y experiencias del usuario
+      console.log('Cargando datos adicionales del usuario...');
+      fetchPedidos();
+      fetchResenas();
+      fetchExperiencias();
+    }
+  }, [user, navigate, fetchUserInfo, fetchPedidos, fetchResenas, fetchExperiencias, showProfileMessage]);
+
+  // Manejar cambios en el formulario de perfil
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  // Manejar cambios en el formulario de contraseña
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  // Manejar cambios en el formulario de desactivación
+  const handleDeactivateChange = (e) => {
+    const { name, value } = e.target;
+    setDeactivateData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  // Manejar selección de foto
+  const handlePhotoSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validar tipo de archivo
       if (!file.type.startsWith('image/')) {
-        showProfileMessage('Por favor selecciona un archivo de imagen válido.', 'error');
+        setPhotoError('Por favor selecciona un archivo de imagen válido (JPG, PNG, GIF)');
         return;
       }
 
-      // Validar tamaño (máximo 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        showProfileMessage('La imagen debe ser menor a 5MB.', 'error');
+      // Validar tamaño del archivo (5MB máximo)
+      const maxSize = 5 * 1024 * 1024; // 5MB en bytes
+      if (file.size > maxSize) {
+        setPhotoError('El archivo es demasiado grande. El tamaño máximo permitido es 5MB');
         return;
-      }setSelectedImage(file);
+      }
+
+      setSelectedPhoto(file);
+      setPhotoError(''); // Limpiar errores previos
       
-      // Crear preview de la imagen inmediatamente
       const reader = new FileReader();
       reader.onload = (e) => {
-        const previewUrl = e.target.result;
-        setImagePreview(previewUrl);
-          // Actualizar también la foto en userPerfil inmediatamente para mostrar en tiempo real
-        setUserPerfil(prev => ({
-          ...prev,
-          foto: previewUrl
-        }));
-        
-        // Actualizar el usuario en App.jsx inmediatamente para sincronizar con navbar
-        if (updateUser) {
-          updateUser({
-            foto_perfil: previewUrl,
-            foto: previewUrl
-          });
-        }
-        
-        // Disparar evento para actualizar navbar inmediatamente con la vista previa
-        const profileUpdateEvent = new CustomEvent('profilePhotoUpdated', {
-          detail: {
-            newPhoto: previewUrl,
-            userId: user.id
-          }
-        });
-        window.dispatchEvent(profileUpdateEvent);
-        
-        // Subir automáticamente la foto después de mostrar la vista previa
-        setTimeout(() => {
-          uploadProfilePhoto(file);
-        }, 100);
+        setPhotoPreview(e.target.result);
+      };
+      reader.onerror = () => {
+        setPhotoError('Error al leer el archivo. Por favor intenta de nuevo.');
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  // Función para subir la foto de perfil
-  const uploadProfilePhoto = async (file = selectedImage) => {
-    if (!file || !user?.id) {
-      return false;
-    }
-
-    setUploadingImage(true);
-
-    try {
-      const formData = new FormData();
-      formData.append('foto_perfil', file);
-
-      console.log('📸 Subiendo foto de perfil para usuario ID:', user.id);
-
-      const response = await fetch(`${API_BASE_URL}/users/${user.id}/profile`, {
-        method: 'PUT',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('❌ Error del servidor al subir foto:', errorData);
-        throw new Error(`Error al subir foto: ${response.status} - ${errorData.message || 'Error desconocido'}`);
-      }      const result = await response.json();
-      console.log('✅ Foto de perfil actualizada:', result);      // Actualizar la foto en el estado local con la URL real de la API
-      const newPhotoUrl = result.foto_perfil || result.foto;
-      if (newPhotoUrl) {
-        setUserPerfil(prev => ({
-          ...prev,
-          foto: newPhotoUrl
-        }));
-
-        // Actualizar el usuario en App.jsx para sincronizar con navbar
-        if (updateUser) {
-          updateUser({
-            foto_perfil: newPhotoUrl,
-            foto: newPhotoUrl
-          });
-        }
-
-        // Disparar evento para actualizar navbar con la URL real
-        const profileUpdateEvent = new CustomEvent('profilePhotoUpdated', {
-          detail: {
-            newPhoto: newPhotoUrl,
-            userId: user.id
-          }
-        });
-        window.dispatchEvent(profileUpdateEvent);
-      }// Limpiar estados de imagen
-      setImagePreview(null);
-      
-      // Reset del input file
-      const fileInput = document.getElementById('profile-photo-input');
-      if (fileInput) {
-        fileInput.value = '';      }
-
-      showProfileMessage('¡Foto de perfil actualizada correctamente!');
-
-      return true;
-
-    } catch (error) {
-      console.error('❌ Error al subir foto de perfil:', error);
-      showProfileMessage('Error al subir la foto. Intenta de nuevo.', 'error');
-      return false;
-    } finally {
-      setUploadingImage(false);
-    }
-  };
-  // Efecto para cargar datos cuando se monta el componente o cambia el usuario
-  useEffect(() => {
-    if (user?.id) {
-      console.log('🔄 Cargando datos del perfil para usuario ID:', user.id);
-      fetchUserOrders();
-    }
-  }, [user?.id, fetchUserOrders]);
-
-  // Escuchar actualizaciones de pedidos desde el componente padre
-  useEffect(() => {
-    if (onOrderUpdate) {
-      const handleOrderUpdate = () => {
-        console.log('🔄 Actualizando pedidos después de nueva orden...');
-        setUpdateMessage('Actualizando historial de pedidos...');
+  };  // Guardar nueva foto
+  const handleSavePhoto = async () => {
+    if (selectedPhoto && userInfo?.id_usuario) {
+      setSavingPhoto(true);
+      try {
+        const result = await updateProfilePhoto(userInfo.id_usuario, selectedPhoto);
+        console.log('📸 PERFIL - Foto actualizada exitosamente:', result);
         
-        setTimeout(() => {
-          fetchUserOrders();
-          setUpdateMessage('');
-          if (setToast) {
-            setToast('¡Historial de pedidos actualizado!');
+        // Obtener la URL de la nueva foto
+        let newPhotoUrl = null;
+        if (result && result.foto_perfil) {
+          newPhotoUrl = result.foto_perfil;
+        } else {
+          // Si no viene en el resultado, obtener datos actualizados del usuario
+          try {
+            const updatedUserData = await fetchUserInfo(userInfo.id_usuario);
+            newPhotoUrl = updatedUserData.foto_perfil;
+          } catch (fetchError) {
+            console.error('Error al obtener datos actualizados:', fetchError);
           }
-        }, 1000);
-      };
-
-      window.addEventListener('orderCompleted', handleOrderUpdate);
-      return () => window.removeEventListener('orderCompleted', handleOrderUpdate);
-    }
-  }, [onOrderUpdate, fetchUserOrders, setToast]);
-  // Actualizar userPerfil cuando cambie el prop user
-  useEffect(() => {
-    if (user) {
-      console.log('👤 PERFIL - Actualizando perfil con datos de usuario:', user);
-      setUserPerfil(prev => ({
-        ...prev,
-        nombre: user.nombre || prev.nombre,
-        email: user.correo || user.email || prev.email,
-        telefono: user.telefono || user.celular || prev.telefono,
-        foto: user.foto_perfil || user.foto || prev.foto,
-        miembroDesde: user.fecha_registro ? new Date(user.fecha_registro).getFullYear() : prev.miembroDesde,
-        fecha_nacimiento: user.fecha_nacimiento || prev.fecha_nacimiento,
-        dui: user.dui || user.numero_dui || prev.dui,
-      }));
-    }
-  }, [user]);// Sincroniza los datos del formulario cuando el tab o usuario cambian
-  useEffect(() => {
-    if (activeTab === 'editar') {
-      setFormData({
-        nombre: userPerfil.nombre,
-        email: userPerfil.email,
-        telefono: userPerfil.telefono,
-      });
-    } else {
-      // Limpiar estados de imagen cuando se cambie de tab
-      setImagePreview(null);
-      const fileInput = document.getElementById('profile-photo-input');
-      if (fileInput) {
-        fileInput.value = '';
+        }
+          if (newPhotoUrl) {
+          console.log('📸 PERFIL - Nueva URL de foto obtenida:', newPhotoUrl);
+          
+          // FASE 1: Disparar evento inmediato para actualización instantánea
+          const immediateEvent = new CustomEvent('immediatePhotoUpdate', {
+            detail: { photo: newPhotoUrl }
+          });
+          window.dispatchEvent(immediateEvent);
+          console.log('⚡ PERFIL - Evento immediatePhotoUpdate disparado');
+          
+          // FASE 2: Disparar evento estándar con más información
+          const photoEvent = new CustomEvent('profilePhotoUpdated', {
+            detail: { 
+              newPhoto: newPhotoUrl,
+              userId: userInfo.id_usuario,
+              timestamp: Date.now()
+            }
+          });
+          window.dispatchEvent(photoEvent);
+          console.log('📸 PERFIL - Evento profilePhotoUpdated disparado');
+          
+          // FASE 3: Actualizar localStorage inmediatamente
+          try {
+            const savedUser = localStorage.getItem('mamamia_user');
+            if (savedUser) {
+              const parsedUser = JSON.parse(savedUser);
+              const updatedUser = { 
+                ...parsedUser, 
+                foto_perfil: newPhotoUrl, 
+                foto: newPhotoUrl 
+              };
+              localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+              console.log('💾 PERFIL - localStorage actualizado con nueva foto');
+              
+              // Disparar evento de storage manualmente para asegurar sincronización
+              const storageEvent = new CustomEvent('storage', {
+                detail: { key: 'mamamia_user', newValue: JSON.stringify(updatedUser) }
+              });
+              window.dispatchEvent(storageEvent);
+              console.log('📦 PERFIL - Evento storage disparado manualmente');
+            }
+          } catch (storageError) {
+            console.error('❌ Error al actualizar localStorage:', storageError);
+          }
+          
+          // FASE 4: Llamar updateUser si está disponible
+          if (updateUser && typeof updateUser === 'function') {
+            updateUser({ foto_perfil: newPhotoUrl, foto: newPhotoUrl });
+            console.log('🔄 PERFIL - updateUser llamado con nueva foto');
+          }
+            // FASE 5: El estado visual del perfil se actualiza automáticamente
+          // a través del refetch de userInfo que ya se hace en updateProfilePhoto
+          console.log('🔄 PERFIL - Estado se actualizará automáticamente');
+        }
+        
+        setPhotoMode(false);
+        setSelectedPhoto(null);
+        setPhotoPreview(null);
+        setPhotoError(''); // Limpiar errores        // Verificar que setToast existe y es una función antes de usarla
+        if (setToast && typeof setToast === 'function') {
+          showProfileMessage('Foto de perfil actualizada correctamente', 'success');
+        }
+      } catch (error) {        console.error('Error al actualizar la foto de perfil:', error);
+        setPhotoError('Error al actualizar la foto de perfil. Por favor intenta de nuevo.');        // Verificar que setToast existe y es una función antes de usarla
+        if (setToast && typeof setToast === 'function') {
+          showProfileMessage('Error al actualizar la foto de perfil', 'error');
+        }
+      } finally {
+        setSavingPhoto(false);
       }
     }
-  }, [activeTab, userPerfil]);
-
-  // Redirigir al login si no hay usuario logueado
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-    }
-  }, [user, navigate]);
-
-  // Función para manejar la actualización manual de pedidos
-  const handleRefreshOrders = async () => {
-    await fetchUserOrders();
   };
+
+  // Cancelar cambio de foto
+  const handleCancelPhoto = () => {
+    setPhotoMode(false);
+    setSelectedPhoto(null);
+    setPhotoPreview(null);
+    setPhotoError(''); // Limpiar errores
+    setSavingPhoto(false); // Resetear estado de guardado
+  };
+
   // Función para formatear fecha
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch (error) {
-      return 'Fecha no disponible';
-    }
+  const formatearFecha = (fechaISO) => {
+    const fecha = new Date(fechaISO);
+    return fecha.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
-
-  // Función para formatear fecha de nacimiento
-  const formatBirthDate = (dateString) => {
-    if (!dateString || dateString === 'No especificado') {
-      return 'No especificado';
-    }
+  // Función para formatear fecha para mostrar al usuario
+  const formatearFechaParaMostrar = (fechaISO) => {
+    if (!fechaISO) return 'Fecha de nacimiento no registrada';
+    
     try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+      const fecha = new Date(fechaISO);
+      // Verificar que la fecha es válida
+      if (isNaN(fecha.getTime())) return 'Fecha inválida';
+      
+      // Formatear como DD/MM/YYYY
+      return fecha.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
       });
     } catch (error) {
-      return 'No especificado';
+      console.error('Error al formatear fecha para mostrar:', error);
+      return 'Fecha inválida';
     }
   };
 
   // Función para obtener el color del estado
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
+  const getEstadoClass = (estado) => {
+    switch (estado.toLowerCase()) {
       case 'entregado':
-      case 'completed':
-        return '#4caf50';
-      case 'en preparacion':
-      case 'preparing':
-        return '#ff9800';
+        return 'perfil__estado-entregado';
+      case 'preparando':
+        return 'perfil__estado-preparando';
       case 'enviado':
-      case 'shipped':
-        return '#2196f3';
+        return 'perfil__estado-enviado';
+      case 'pendiente':
+        return 'perfil__estado-preparando';
       case 'cancelado':
-      case 'cancelled':
-        return '#f44336';
+        return 'perfil__estado-cancelado';
       default:
-        return '#9e9e9e';
+        return 'perfil__estado-preparando';
+    }
+  };  // Guardar cambios en el perfil
+  const handleSaveProfile = async () => {
+    console.log('=== INICIANDO GUARDADO DE PERFIL ===');
+    console.log('formData:', formData);
+    console.log('userInfo:', userInfo);
+    
+    if (!formData.nombre.trim()) {
+      console.log('Error: Nombre vacío');
+      showProfileMessage('El nombre es requerido', 'error');
+      return;
+    }
+    
+    if (!userInfo?.id_usuario) {
+      console.log('Error: No hay id_usuario en userInfo');
+      showProfileMessage('Error: No se pudo obtener la información del usuario', 'error');
+      return;
+    }    try {      
+      const updateData = {
+        nombre: formData.nombre,
+        correo: userInfo.correo, // Mantener el correo existente
+        telefono: formData.celular,
+        fecha_nacimiento: userInfo.fecha_nacimiento || null, // Mantener fecha existente
+        sexo: userInfo.sexo || null // Mantener sexo existente
+      };
+
+      // Mantener DUI existente si lo hay
+      if (userInfo.dui) {
+        updateData.dui = userInfo.dui;
+      }console.log('Datos a enviar al servidor:', updateData);
+      console.log('ID de usuario:', userInfo.id_usuario);
+      
+      const result = await updateUserInfo(userInfo.id_usuario, updateData);
+      console.log('Resultado de la actualización:', result);
+      
+      setEditMode(false);
+      showProfileMessage('Perfil actualizado correctamente');      if (setToast && typeof setToast === 'function') {
+        showProfileMessage('Perfil actualizado correctamente', 'success');
+      }
+      
+      console.log('=== GUARDADO EXITOSO ===');
+    } catch (error) {
+      console.error('=== ERROR AL GUARDAR PERFIL ===');
+      console.error('Error completo:', error);
+      console.error('Mensaje del error:', error.message);
+      
+      showProfileMessage('Error al actualizar el perfil', 'error');      if (setToast && typeof setToast === 'function') {
+        showProfileMessage('Error al actualizar el perfil', 'error');
+      }
+    }
+  };  // Cambiar contraseña
+  const handleChangePassword = async () => {
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      showProfileMessage('Todos los campos son requeridos', 'error');
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      showProfileMessage('Las contraseñas no coinciden', 'error');
+      return;
+    }
+
+    // Validaciones de seguridad para la nueva contraseña
+    if (passwordData.newPassword.length < 8) {
+      showProfileMessage('La contraseña debe tener al menos 8 caracteres', 'error');
+      return;
+    }
+
+    // Verificar que tenga al menos una letra mayúscula
+    if (!/[A-Z]/.test(passwordData.newPassword)) {
+      showProfileMessage('La contraseña debe contener al menos una letra mayúscula', 'error');
+      return;
+    }
+
+    // Verificar que tenga al menos un carácter especial
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(passwordData.newPassword)) {
+      showProfileMessage('La contraseña debe contener al menos un carácter especial (!@#$%^&*)', 'error');
+      return;
+    }
+
+    if (!userInfo?.id_usuario) {
+      showProfileMessage('Error: No se pudo obtener la información del usuario', 'error');
+      return;
+    }    try {
+      setLoadingPassword(true);
+      
+      const payload = {
+        id_usuario: userInfo.id_usuario,
+        contrasenaActual: passwordData.currentPassword,
+        nuevaContrasena: passwordData.newPassword
+      };
+      
+      console.log('Enviando payload para cambio de contraseña:', payload);
+      
+      // Usar el nuevo endpoint para cambiar contraseña
+      const response = await fetch('https://api.mamamianpizza.com/api/auth/change-password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
+      let result;
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        const textResult = await response.text();
+        console.log('Response text (no JSON):', textResult);
+        result = { message: textResult || 'Error del servidor' };
+      }
+
+      console.log('Response result:', result);
+
+      if (!response.ok) {
+        console.error('Error response:', {
+          status: response.status,
+          statusText: response.statusText,
+          result: result
+        });
+        
+        // Proporcionar mensajes de error más específicos
+        let errorMessage = 'Error al cambiar la contraseña';
+        
+        if (response.status === 500) {
+          errorMessage = 'Error interno del servidor. Por favor, intenta más tarde.';
+        } else if (response.status === 401) {
+          errorMessage = 'La contraseña actual es incorrecta.';
+        } else if (response.status === 400) {
+          errorMessage = result.message || 'Datos inválidos. Verifica los campos.';
+        } else if (result.message) {
+          errorMessage = result.message;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      console.log('Contraseña cambiada exitosamente:', result);
+      
+      setPasswordMode(false);
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      
+      showProfileMessage('Contraseña cambiada correctamente', 'success');
+      
+      if (setToast && typeof setToast === 'function') {
+        setToast('Contraseña cambiada correctamente', 'success', 'profile', 'top-right');
+      }
+    } catch (error) {
+      console.error('Error al cambiar la contraseña:', error);
+      showProfileMessage(error.message || 'Error al cambiar la contraseña', 'error');
+      
+      if (setToast && typeof setToast === 'function') {
+        setToast(error.message || 'Error al cambiar la contraseña', 'error', 'profile', 'top-right');
+      }
+    } finally {
+      setLoadingPassword(false);
     }
   };
 
+  // Desactivar cuenta
+  const handleDeactivateAccount = async () => {
+    if (!deactivateData.motivo.trim()) {
+      showProfileMessage('El motivo es requerido', 'error');
+      return;
+    }
+
+    if (deactivateData.confirmacion !== 'DESACTIVAR') {
+      showProfileMessage('Debes escribir "DESACTIVAR" para confirmar', 'error');
+      return;
+    }
+
+    if (!userInfo?.id_usuario) {
+      showProfileMessage('Error: No se pudo obtener la información del usuario', 'error');
+      return;
+    }
+
+    try {
+      setLoadingDeactivate(true);
+      
+      const payload = {
+        id_usuario: userInfo.id_usuario,
+        motivo: deactivateData.motivo
+      };
+      
+      console.log('Enviando payload para desactivar cuenta:', payload);
+      
+      const response = await fetch('https://api.mamamianpizza.com/api/account/deactivate', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      console.log('Response status:', response.status);
+
+      let result;
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        const textResult = await response.text();
+        console.log('Response text (no JSON):', textResult);
+        result = { message: textResult || 'Error del servidor' };
+      }
+
+      console.log('Response result:', result);      // Manejar respuestas del servidor
+      if (!response.ok) {
+        console.error('Error response:', {
+          status: response.status,
+          statusText: response.statusText,
+          result: result
+        });
+        
+        // Si la cuenta ya está desactivada, también cerrar sesión
+        if (result.message && result.message.includes('ya está desactivada')) {
+          console.log('La cuenta ya estaba desactivada, cerrando sesión...');
+          showProfileMessage('Tu cuenta ya estaba desactivada. Cerrando sesión...', 'info');
+          
+          // Cerrar sesión inmediatamente
+          setTimeout(() => {
+            localStorage.removeItem('mamamia_user');
+            localStorage.removeItem('mamamia_token');
+            navigate('/');
+            window.location.reload();
+          }, 1500);
+          
+          return; // Salir de la función
+        }
+        
+        let errorMessage = 'Error al desactivar la cuenta';
+        
+        if (response.status === 500) {
+          errorMessage = 'Error interno del servidor. Por favor, intenta más tarde.';
+        } else if (response.status === 404) {
+          errorMessage = 'Usuario no encontrado.';
+        } else if (response.status === 400) {
+          errorMessage = result.message || 'Datos inválidos. Verifica los campos.';
+        } else if (result.message) {
+          errorMessage = result.message;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      // Verificar si la respuesta es exitosa o si indica que ya estaba desactivada
+      if (result.success === true || (result.message && result.message.includes('ya está desactivada'))) {
+        console.log('Cuenta desactivada exitosamente o ya estaba desactivada:', result);
+        
+        const mensaje = result.success === true 
+          ? 'Cuenta desactivada exitosamente. Cerrando sesión...' 
+          : 'Tu cuenta ya estaba desactivada. Cerrando sesión...';
+          
+        showProfileMessage(mensaje, 'success');
+        
+        if (setToast && typeof setToast === 'function') {
+          setToast(mensaje, 'success', 'profile', 'top-right');
+        }
+
+        // Limpiar localStorage y redirigir después de 2 segundos
+        setTimeout(() => {
+          localStorage.removeItem('mamamia_user');
+          localStorage.removeItem('mamamia_token');
+          
+          // Disparar evento para notificar al resto de la aplicación
+          const logoutEvent = new CustomEvent('userLogout', {
+            detail: { reason: 'account_deactivated' }
+          });
+          window.dispatchEvent(logoutEvent);
+          
+          navigate('/');
+          window.location.reload(); // Forzar recarga para limpiar estado
+        }, 2000);
+      } else {
+        throw new Error(result.message || 'Error desconocido al desactivar la cuenta');
+      }
+      
+    } catch (error) {
+      console.error('Error al desactivar la cuenta:', error);
+      showProfileMessage(error.message || 'Error al desactivar la cuenta', 'error');
+      
+      if (setToast && typeof setToast === 'function') {
+        setToast(error.message || 'Error al desactivar la cuenta', 'error', 'profile', 'top-right');
+      }
+    } finally {
+      setLoadingDeactivate(false);
+    }
+  };
   // Si no hay usuario, no renderizar nada (se está redirigiendo)
   if (!user) {
     return null;
   }
 
   return (
-    <div className="perfil__main">
-      {/* CARD DE PERFIL */}
+    <div className="perfil__main">      {/* CARD DE PERFIL */}
       <div className="perfil__card">        <div className="perfil__foto-wrapper">
-          <img src={userPerfil.foto} alt="Perfil" className="perfil__foto" />
-          <div className="perfil__foto-edit">
-            <FontAwesomeIcon icon={faCamera} />
-          </div>
-        </div>        {/* Mensaje local debajo de la foto */}
-        {profileMessage && (
-          <div className={`perfil__local-message ${profileMessageType === 'error' ? 'error' : ''}`}>
-            {profileMessage}
-          </div>
-        )}<div className="perfil__info">
-          <div className="perfil__nombre">{userPerfil.nombre}</div>
-          <div className="perfil__email">{userPerfil.email}</div>
+          <img 
+            src={userInfo?.foto_perfil || "/assets/Usuario.png"} 
+            alt="Foto de perfil" 
+            className="perfil__foto"
+          />
+          {loadingUserInfo && (
+            <div className="perfil__loading-overlay">
+              <FontAwesomeIcon icon={faUser} className="spinning" />
+            </div>
+          )}
+        </div>          <div className="perfil__info">
+          <h2 className="perfil__nombre">
+            {loadingUserInfo ? 'Cargando...' : (userInfo?.nombre || user?.nombre || 'Usuario')}
+          </h2>
+          <p className="perfil__email">
+            {loadingUserInfo ? 'Cargando...' : (userInfo?.correo || user?.email || 'No disponible')}
+          </p>
+          
           <div className="perfil__datos">
             <span>
-              <FontAwesomeIcon icon={faShoppingBag} /> {userStats.totalOrders} pedidos realizados
+              <FontAwesomeIcon icon={faPhone} />
+              {loadingUserInfo ? 'Cargando...' : (userInfo?.celular || 'No disponible')}
             </span>
-            <span>
-              <FontAwesomeIcon icon={faHeart} style={{ color: '#ab1319' }} /> ${userStats.totalSpent.toFixed(2)} gastado total
-            </span>
-            <span>
-              <FontAwesomeIcon icon={faUser} /> Miembro desde {userPerfil.miembroDesde}
-            </span>
-          </div>
+            {userInfo?.dui && (
+              <span>
+                <FontAwesomeIcon icon={faMapMarkerAlt} />
+                DUI: {userInfo.dui}
+              </span>
+            )}
+            {userInfo?.fecha_nacimiento && (
+              <span>
+                <FontAwesomeIcon icon={faCalendarAlt} />
+                Nacimiento: {formatearFechaParaMostrar(userInfo.fecha_nacimiento)}
+              </span>
+            )}
+            {userInfo?.sexo && (
+              <span>
+                <FontAwesomeIcon icon={faUser} />
+                {userInfo.sexo === 'M' ? 'Masculino' : userInfo.sexo === 'F' ? 'Femenino' : userInfo.sexo}
+              </span>
+            )}
+          </div>          {/* Error de carga de usuario */}
+          {errorUserInfo && (
+            <div className="perfil__message error">
+              {errorUserInfo}
+            </div>
+          )}
         </div>
-      </div>      {/* TABS */}
+      </div>
+
+      {/* TABS */}
       <div className="perfil__tabs">
         <button className={`perfil__tab-btn${activeTab === 'pedidos' ? ' active' : ''}`} onClick={() => setActiveTab('pedidos')}>
           <FontAwesomeIcon icon={faUser} /> <span className="perfil__tab-text">Mis Pedidos</span>
-        </button>        <button className={`perfil__tab-btn${activeTab === 'reseñas' ? ' active' : ''}`} onClick={() => setActiveTab('reseñas')}>
-          <FontAwesomeIcon icon={faHeart} /> <span className="perfil__tab-text">Mis reseñas</span>
+        </button>          <button className={`perfil__tab-btn${activeTab === 'reseñas' ? ' active' : ''}`} onClick={() => setActiveTab('reseñas')}>
+          <FontAwesomeIcon icon={faHeart} /> <span className="perfil__tab-text">Mis reseñas y experiencias</span>
         </button>
         <button className={`perfil__tab-btn${activeTab === 'editar' ? ' active' : ''}`} onClick={() => setActiveTab('editar')}>
-          <FontAwesomeIcon icon={faEdit} /> <span className="perfil__tab-text">Editar Perfil</span>
+          <FontAwesomeIcon icon={faEdit} /> <span className="perfil__tab-text">Perfil</span>
         </button>
         <button className={`perfil__tab-btn${activeTab === 'seguridad' ? ' active' : ''}`} onClick={() => setActiveTab('seguridad')}>
           <FontAwesomeIcon icon={faShieldAlt} /> <span className="perfil__tab-text">Seguridad</span>
         </button>
-      </div>{/* CONTENIDO SEGÚN TAB */}
-      <div className="perfil__contenido">
-        {/* --- HISTORIAL DE PEDIDOS --- */}
+      </div>
+
+      {/* CONTENIDO SEGÚN TAB */}
+      <div className="perfil__contenido">        {/* --- HISTORIAL DE PEDIDOS --- */}
         {activeTab === 'pedidos' && (
-          <>
-            <div className="perfil__titulo-historial">
-              Mis Pedidos
+          <div className="perfil__pedidos-section">            <div className="perfil__titulo-historial">
+              Historial de Pedidos
               <button 
-                className="perfil__refresh-btn" 
-                onClick={handleRefreshOrders}
-                disabled={loadingOrders}
+                className="perfil__refresh-btn"
+                onClick={fetchPedidos}
+                disabled={loadingPedidos}
               >
-                <FontAwesomeIcon 
-                  icon={faRefresh} 
-                  className={loadingOrders ? 'spinning' : ''} 
-                />
-                {loadingOrders ? 'Actualizando...' : 'Actualizar'}
+                <FontAwesomeIcon icon={faSync} className={loadingPedidos ? 'spinning' : ''} />
+                {loadingPedidos ? 'Cargando...' : 'Actualizar'}
               </button>
             </div>
-
-            {/* Mensaje de actualización */}
-            {updateMessage && (
-              <div className="perfil__update-message">
-                <FontAwesomeIcon icon={faSpinner} className="spinning" />
-                {updateMessage}
-              </div>
-            )}            {/* Estadísticas */}
+            
+            {/* Estadísticas */}
             <div className="perfil__estadisticas">
               <div className="perfil__estadistica-card">
-                <div className="perfil__estadistica-numero">{userStats.totalOrders}</div>
+                <div className="perfil__estadistica-numero">{pedidos.length}</div>
                 <div className="perfil__estadistica-label">Pedidos Totales</div>
               </div>
               <div className="perfil__estadistica-card">
-                <div className="perfil__estadistica-numero">${userStats.totalSpent.toFixed(2)}</div>
+                <div className="perfil__estadistica-numero">
+                  ${pedidos.reduce((total, pedido) => total + parseFloat(pedido.total || 0), 0).toFixed(2)}
+                </div>
                 <div className="perfil__estadistica-label">Total Gastado</div>
               </div>
               <div className="perfil__estadistica-card">
-                <div className="perfil__estadistica-numero">${userStats.averageOrderValue.toFixed(2)}</div>
-                <div className="perfil__estadistica-label">Promedio por Pedido</div>
-              </div>
-              {userStats.pedidoMaximo > 0 && (
-                <div className="perfil__estadistica-card">
-                  <div className="perfil__estadistica-numero">${userStats.pedidoMaximo.toFixed(2)}</div>
-                  <div className="perfil__estadistica-label">Pedido Más Alto</div>
+                <div className="perfil__estadistica-numero">
+                  {pedidos.filter(p => p.estado === 'entregado').length > 0 ? '5★' : '-'}
                 </div>
-              )}
+                <div className="perfil__estadistica-label">Calificación Promedio</div>
+              </div>
             </div>
 
-            {/* Estados de carga, error y contenido */}
-            {loadingOrders && (
+            {/* Estados de carga y error */}
+            {loadingPedidos && (
               <div className="perfil__loading">
-                <FontAwesomeIcon icon={faSpinner} className="spinning" />
-                Cargando tus pedidos...
+                <FontAwesomeIcon icon={faUser} className="spinning" />
+                Cargando pedidos...
               </div>
             )}
 
-            {errorOrders && (
+            {errorPedidos && (
               <div className="perfil__error">
-                <FontAwesomeIcon icon={faExclamationTriangle} />
-                {errorOrders}
-                <button className="perfil__retry-btn" onClick={handleRefreshOrders}>
+                <span>❌ {errorPedidos}</span>
+                <button className="perfil__retry-btn" onClick={fetchPedidos}>
                   Reintentar
                 </button>
               </div>
             )}
 
-            {!loadingOrders && !errorOrders && userOrders.length === 0 && (
+            {/* Lista de pedidos */}
+            {!loadingPedidos && !errorPedidos && pedidos.length > 0 && (
+              pedidos.map((pedido) => (
+                <div key={pedido.id_pedido} className="perfil__pedido-card">
+                  <div className="perfil__pedido-header">
+                    <div className="perfil__pedido-id">{pedido.codigo_pedido}</div>
+                    <div className={getEstadoClass(pedido.estado)}>
+                      {pedido.estado.charAt(0).toUpperCase() + pedido.estado.slice(1)}
+                    </div>
+                  </div>
+                  <div className="perfil__pedido-total">${parseFloat(pedido.total).toFixed(2)}</div>
+                  <div className="perfil__pedido-fecha">
+                    {formatearFecha(pedido.fecha_pedido)}
+                  </div>
+                  
+                  <div className="perfil__pedido-info">
+                    <div className="perfil__pedido-cliente">
+                      <strong>Cliente:</strong> {pedido.nombre_cliente}
+                    </div>
+                    <div className="perfil__pedido-direccion">
+                      <strong>Dirección:</strong> {pedido.direccion}
+                    </div>
+                    <div className="perfil__pedido-pago">
+                      <strong>Método de pago:</strong> {pedido.metodo_pago}
+                    </div>
+                    {pedido.tiempo_estimado_entrega && (
+                      <div className="perfil__pedido-tiempo">
+                        <strong>Tiempo estimado:</strong> {pedido.tiempo_estimado_entrega} minutos
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="perfil__pedido-resumen">
+                    <div className="perfil__pedido-resumen-left">
+                      <div className="perfil__pedido-subtotal">Subtotal: ${parseFloat(pedido.subtotal).toFixed(2)}</div>
+                      <div className="perfil__pedido-envio">Envío: ${parseFloat(pedido.costo_envio).toFixed(2)}</div>
+                      <div className="perfil__pedido-impuestos">Impuestos: ${parseFloat(pedido.impuestos).toFixed(2)}</div>
+                    </div>
+                    <div className="perfil__pedido-total-final">${parseFloat(pedido.total).toFixed(2)}</div>
+                  </div>
+
+                  {pedido.notas_adicionales && (
+                    <div className="perfil__pedido-notas">
+                      <strong>Notas:</strong> {pedido.notas_adicionales}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+
+            {/* Estado vacío */}
+            {!loadingPedidos && !errorPedidos && pedidos.length === 0 && (
               <div className="perfil__empty">
-                <FontAwesomeIcon icon={faShoppingBag} />
+                <FontAwesomeIcon icon={faUser} />
                 <h3>No tienes pedidos aún</h3>
-                <p>¡Explora nuestro menú y realiza tu primer pedido!</p>
+                <p>¡Realiza tu primer pedido y disfruta de nuestras deliciosas pizzas!</p>
                 <button 
                   className="perfil__empty-btn"
                   onClick={() => navigate('/menu')}
@@ -547,516 +941,590 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                 </button>
               </div>
             )}
+          </div>        )}{/* --- MIS RESEÑAS Y EXPERIENCIAS --- */}
+        {activeTab === 'reseñas' && (
+          <div className="perfil__reseñas-section">
+            <div className="perfil__titulo-historial">
+              Mis Reseñas y Experiencias              <button
+                className="perfil__refresh-btn"
+                onClick={refreshResenasYExperiencias}
+                disabled={loadingResenas || loadingExperiencias}
+                title="Actualizar reseñas y experiencias"
+              >
+                <FontAwesomeIcon icon={faSync} />
+              </button>
+            </div>              {/* Información del usuario sobre reseñas y experiencias */}
+            <div className="perfil__resenas-stats">
+              <div className="perfil__stat-item">
+                <span className="perfil__stat-number">
+                  {userResenasInfo ? userResenasInfo.total_resenas : resenas.length}
+                </span>
+                <span className="perfil__stat-label">Total reseñas</span>
+              </div>
+              <div className="perfil__stat-item">
+                <span className="perfil__stat-number">
+                  {userResenasInfo ? userResenasInfo.resenas_aprobadas : resenas.filter(r => r.aprobada || r.estado === 'aprobada').length}
+                </span>
+                <span className="perfil__stat-label">Reseñas aprobadas</span>
+              </div>
+              <div className="perfil__stat-item">
+                <span className="perfil__stat-number">
+                  {userResenasInfo ? userResenasInfo.resenas_pendientes : resenas.filter(r => !r.aprobada && r.estado !== 'aprobada').length}
+                </span>
+                <span className="perfil__stat-label">Reseñas pendientes</span>
+              </div>
+              <div className="perfil__stat-item">
+                <span className="perfil__stat-number">{experiencias.length}</span>
+                <span className="perfil__stat-label">Total experiencias</span>
+              </div>
+              <div className="perfil__stat-item">
+                <span className="perfil__stat-number">
+                  {experiencias.filter(exp => exp.estado === 1).length}
+                </span>
+                <span className="perfil__stat-label">Experiencias aprobadas</span>
+              </div>
+              <div className="perfil__stat-item">
+                <span className="perfil__stat-number">
+                  {experiencias.filter(exp => exp.estado === 0).length}
+                </span>
+                <span className="perfil__stat-label">Experiencias pendientes</span>
+              </div>
+            </div>{/* Estado de carga */}
+            {(loadingResenas || loadingExperiencias) && (
+              <div className="perfil__loading">
+                <p>Cargando reseñas y experiencias...</p>
+              </div>
+            )}
 
-            {!loadingOrders && !errorOrders && userOrders.length > 0 && 
-              userOrders.map(pedido => (
-                <div className="perfil__pedido-card" key={pedido.id}>
-                  <div className="perfil__pedido-header">
-                    <div>
-                      <span className="perfil__pedido-id">Pedido #{pedido.id}</span>
-                      <span 
-                        className="perfil__estado-badge"
-                        style={{ backgroundColor: getStatusColor(pedido.estado) }}
-                      >
-                        {pedido.estado}
-                      </span>
-                    </div>
-                    <div className="perfil__pedido-total">${pedido.total.toFixed(2)}</div>
-                  </div>
-
-                  <div className="perfil__pedido-fecha">
-                    {formatDate(pedido.fecha)}
-                  </div>
-
-                  <div className="perfil__pedido-info">
-                    <div className="perfil__pedido-metodo">
-                      <FontAwesomeIcon icon={faCreditCard} />
-                      {pedido.metodo_pago}
-                    </div>
-                    <div className="perfil__pedido-entrega">
-                      <FontAwesomeIcon icon={faTruck} />
-                      {pedido.tipo_entrega}
-                    </div>
-                    {pedido.tiempo_entrega && (
-                      <div className="perfil__pedido-tiempo">
-                        <FontAwesomeIcon icon={faClock} />
-                        {pedido.tiempo_entrega} min
-                      </div>
-                    )}
-                  </div>                  {/* Productos del pedido */}
-                  {Array.isArray(pedido.productos) && pedido.productos.length > 0 && (
-                    <div className="perfil__pedido-productos">
-                      <div className="perfil__productos-titulo">
-                        Productos ({pedido.productos.length})
-                      </div>
-                      {pedido.productos.map((producto, index) => (
-                        <div className="perfil__producto-item" key={index}>
-                          {/* Imagen del producto */}
-                          {(producto.imagen || producto.image || producto.img) && (
-                            <div className="perfil__producto-imagen-wrapper">
-                              <img 
-                                src={producto.imagen || producto.image || producto.img} 
-                                alt={producto.titulo || producto.nombre || producto.name || 'Producto'}
-                                className="perfil__producto-imagen"
-                              /> {console.log(pedido.productos)}
+            {/* Error */}
+            {(errorResenas || errorExperiencias) && (
+              <div className="perfil__error">
+                {errorResenas && <p>{errorResenas}</p>}
+                {errorExperiencias && <p>{errorExperiencias}</p>}
+                <button 
+                  className="perfil__retry-btn"
+                  onClick={refreshResenasYExperiencias}
+                >
+                  Reintentar
+                </button>
+              </div>
+            )}            {/* Lista de reseñas y experiencias */}
+            {!loadingResenas && !loadingExperiencias && !errorResenas && !errorExperiencias && (resenas.length > 0 || experiencias.length > 0) && (
+              <div className="perfil__contenido-container">
+                
+                {/* Sección de Reseñas */}
+                {resenas.length > 0 && (
+                  <div className="perfil__seccion">
+                    <h3 className="perfil__seccion-titulo">🍕 Mis Reseñas de Productos</h3>
+                    <div className="perfil__resenas-list">
+                      {resenas.map((resena) => (
+                        <div key={`resena-${resena.id_resena}`} className="perfil__reseña-card">
+                          <div className="perfil__reseña-header">
+                            <div className="perfil__reseña-producto">{resena.nombre_producto}</div>
+                            <div className="perfil__reseña-estrellas">
+                              {renderEstrellas(resena.valoracion)}
                             </div>
-                          )}
-                          
-                          <div className="perfil__producto-info">
-                            {/* Título del producto */}
-                            <div className="perfil__producto-nombre">
-                              { producto.nombre_producto}
+                          </div>
+                          <div className="perfil__reseña-meta">
+                            <div className="perfil__reseña-fecha">
+                              {formatearFecha(resena.fecha_creacion)}
                             </div>
-                            
-                            {/* Descripción del producto */}
-                            {(producto.descripcion || producto.detalles || producto.description) && (
-                              <div className="perfil__producto-descripcion">
-                                {producto.descripcion || producto.detalles || producto.description}
-                              </div>
-                            )}
-                            
-                            {/* Cantidad */}
-                            {producto.cantidad && (
-                              <div className="perfil__producto-detalle">
-                                Cantidad: {producto.cantidad}
-                              </div>
-                            )}
-                            
-                            {/* Masa y Tamaño */}
-                            {(producto.masa || producto.tamano) && (
-                              <div className="perfil__producto-detalle">
-                                {producto.masa && `Masa: ${producto.masa}`}
-                                {producto.masa && producto.tamano && ' • '}
-                                {producto.tamano && `Tamaño: ${producto.tamano}`}
-                              </div>
-                            )}
-                            
-                            {/* Ingredientes */}
-                            {producto.ingredientes && Array.isArray(producto.ingredientes) && (
-                              <div className="perfil__producto-detalle">
-                                Ingredientes: {producto.ingredientes.join(', ')}
-                              </div>
-                            )}
-                            
-                            {/* Instrucciones */}
-                            {producto.instrucciones && (
-                              <div className="perfil__producto-detalle">
-                                Instrucciones: {producto.instrucciones}
-                              </div>
-                            )}
+                            <div className={`perfil__reseña-estado ${resena.aprobada ? 'aprobada' : 'pendiente'}`}>
+                              {resena.estado}
+                            </div>
                           </div>
-                          
-                          <div className="perfil__producto-precio">
-                            ${producto.subtotal || 0}
-                          </div>
+                          <p className="perfil__reseña-comentario">
+                            "{resena.comentario}"
+                          </p>
                         </div>
                       ))}
                     </div>
-                  )}
-
-                  {/* Información adicional del pedido */}
-                  {(pedido.direccion || pedido.telefono || pedido.observaciones) && (
-                    <div className="perfil__pedido-extra">
-                      {pedido.direccion && (
-                        <div className="perfil__pedido-detalle">
-                          <strong>Dirección:</strong> {pedido.direccion}
+                  </div>
+                )}                {/* Sección de Experiencias */}
+                {experiencias.length > 0 && (
+                  <div className="perfil__seccion">
+                    <h3 className="perfil__seccion-titulo">✨ Mis Experiencias</h3>
+                    <div className="perfil__experiencias-list">
+                      {experiencias.map((experiencia) => (
+                        <div key={`experiencia-${experiencia.id}`} className="perfil__experiencia-card">
+                          <div className="perfil__experiencia-header">
+                            <div className="perfil__experiencia-titulo">{experiencia.titulo}</div>
+                            <div className="perfil__experiencia-estrellas">
+                              {renderEstrellas(experiencia.valoracion)}
+                            </div>
+                          </div>
+                          <div className="perfil__experiencia-meta">
+                            <div className="perfil__experiencia-fecha">
+                              {formatearFecha(experiencia.fecha_creacion)}
+                            </div>
+                            <div className={`perfil__experiencia-estado ${getEstadoExperiencia(experiencia.estado)}`}>
+                              {experiencia.estado === 1 ? 'aprobada' : 'pendiente'}
+                            </div>
+                          </div>
+                          <p className="perfil__experiencia-contenido">
+                            "{experiencia.contenido}"
+                          </p>
                         </div>
-                      )}
-                      {pedido.telefono && (
-                        <div className="perfil__pedido-detalle">
-                          <strong>Teléfono:</strong> {pedido.telefono}
-                        </div>
-                      )}
-                      {pedido.observaciones && (
-                        <div className="perfil__pedido-detalle">
-                          <strong>Observaciones:</strong> {pedido.observaciones}
-                        </div>
-                      )}
+                      ))}
                     </div>
-                  )}
-
-                  <button className="perfil__pedido-detalles-btn">
-                    Ver Detalles Completos
-                  </button>
+                  </div>
+                )}
+              </div>
+            )}            {/* Sin reseñas ni experiencias */}
+            {!loadingResenas && !loadingExperiencias && !errorResenas && !errorExperiencias && resenas.length === 0 && experiencias.length === 0 && (
+              <div className="perfil__empty-state">
+                <p>Aún no has dejado ninguna reseña ni experiencia.</p>
+                <div className="perfil__add-reseña">
+                  <h4>¿Quieres compartir tu experiencia?</h4>
+                  <p>Comparte tus reseñas de productos y experiencias con otros usuarios</p>
+                  <div className="perfil__empty-actions">
+                    <button 
+                      className="perfil__empty-btn"
+                      onClick={() => navigate('/menu')}
+                    >
+                      Ver Menú para Reseñar
+                    </button>                    <button 
+                      className="perfil__empty-btn"
+                      onClick={handleAbrirModalExperiencia}
+                    >
+                      Compartir Experiencia
+                    </button>
+                  </div>
                 </div>
-              ))
-            }
-          </>
-        )}        {/* --- MIS RESEÑAS --- */}
-        {activeTab === 'reseñas' && (
-          <div>
-            <div className="perfil__titulo-favoritos">Mis reseñas</div>
-            <div className="perfil__empty">
-              <FontAwesomeIcon icon={faHeart} />
-              <h3>Función en desarrollo</h3>
-              <p>Próximamente podrás ver y gestionar tus reseñas de productos aquí</p>
-              <button 
-                className="perfil__empty-btn"
-                onClick={() => navigate('/menu')}
-              >
-                Explorar Menú
-              </button>
-            </div>
+              </div>
+            )}
           </div>
         )}        {/* --- EDITAR PERFIL --- */}
         {activeTab === 'editar' && (
-          <div>
-            <div className="perfil__titulo-editar">Editar Perfil</div>
-              {/* Sección de foto de perfil */}
-            <div className="perfil__foto-section">
-              <div className="perfil__foto-title">Foto de perfil</div>
-              <div className="perfil__foto-container">
-                <div className="perfil__foto-preview">
-                  <img 
-                    src={imagePreview || userPerfil.foto} 
-                    alt="Vista previa" 
-                    className="perfil__foto-preview-img"
-                  />
-                </div>
-                <div className="perfil__foto-controls">
-                  <input
-                    type="file"
-                    id="profile-photo-input"
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                    style={{ display: 'none' }}
-                    disabled={uploadingImage}
-                  />
-                  <label 
-                    htmlFor="profile-photo-input" 
-                    className={`perfil__foto-select-btn ${uploadingImage ? 'disabled' : ''}`}
-                    style={{ 
-                      pointerEvents: uploadingImage ? 'none' : 'auto',
-                      opacity: uploadingImage ? 0.6 : 1 
-                    }}
-                  >
-                    <FontAwesomeIcon icon={uploadingImage ? faSpinner : faCamera} className={uploadingImage ? 'spinning' : ''} />
-                    {uploadingImage ? 'Subiendo...' : 'Seleccionar foto'}
-                  </label>
-                  {uploadingImage && (
-                    <div className="perfil__foto-uploading">
-                      <FontAwesomeIcon icon={faSpinner} className="spinning" />
-                      Actualizando foto de perfil...
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="perfil__foto-info">
-                Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 5MB
-                {!uploadingImage && <br />}
-                {!uploadingImage && <span style={{ color: '#ab1319', fontWeight: '500' }}>La foto se actualiza automáticamente al seleccionarla</span>}
-              </div>
-            </div>
-
-            <form
-              className="perfil__form-editar"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const success = await updateUserProfile(formData);
-                  if (success) {                  setUserPerfil(prev => ({
-                    ...prev,
-                    nombre: formData.nombre,
-                    email: formData.email,
-                    telefono: formData.telefono,
-                  }));
-                  
-                  // Actualizar el usuario en App.jsx para sincronizar con navbar
-                  if (updateUser) {
-                    updateUser({
-                      nombre: formData.nombre,
-                      correo: formData.email,
-                      telefono: formData.telefono
-                    });
-                  }
-                  
-                  // Disparar evento para actualizar navbar con los nuevos datos
-                  const profileDataUpdateEvent = new CustomEvent('profileDataUpdated', {
-                    detail: {
-                      nombre: formData.nombre,
-                      email: formData.email,
-                      telefono: formData.telefono,
-                      userId: user.id
-                    }
-                  });
-                  window.dispatchEvent(profileDataUpdateEvent);setEditSuccess(true);
-                  setTimeout(() => setEditSuccess(false), 3000);
-                } else {
-                  showProfileMessage('Error al actualizar el perfil. Intenta de nuevo.', 'error');
-                }
-              }}
-            >
-              <div className="perfil__form-row">
-                <div className="perfil__form-group">
-                  <label>Nombre completo</label>
-                  <input
-                    type="text"
-                    value={formData.nombre}
-                    onChange={e => setFormData({ ...formData, nombre: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="perfil__form-group">
-                  <label>Correo electrónico</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>              <div className="perfil__form-row">
-                <div className="perfil__form-group">
-                  <label>Teléfono</label>
-                  <input
-                    type="text"
-                    value={formData.telefono}
-                    onChange={e => setFormData({ ...formData, telefono: e.target.value })}
-                    placeholder="+503 7123-4567"
-                    required
-                  />
-                </div>
-              </div>
-              
-              {/* Campos de solo lectura */}
-              <div className="perfil__form-row">
-                <div className="perfil__form-group">
-                  <label>Fecha de nacimiento</label>
-                  <input
-                    type="text"
-                    value={formatBirthDate(userPerfil.fecha_nacimiento)}
-                    readOnly
-                    style={{ 
-                      backgroundColor: '#f8f9fa', 
-                      color: '#6c757d',
-                      cursor: 'not-allowed',
-                      border: '1.3px solid #e9ecef'
-                    }}
-                  />
-                </div>
-                <div className="perfil__form-group">
-                  <label>Número de DUI</label>
-                  <input
-                    type="text"
-                    value={userPerfil.dui}
-                    readOnly
-                    style={{ 
-                      backgroundColor: '#f8f9fa', 
-                      color: '#6c757d',
-                      cursor: 'not-allowed',
-                      border: '1.3px solid #e9ecef'
-                    }}
-                  />
-                </div>
-              </div>
-              <button type="submit" className="perfil__guardar-btn">
-                Guardar cambios
-              </button>
-              {editSuccess && (
-                <div className="perfil__edit-success">¡Perfil actualizado correctamente!</div>
+          <div className="perfil__editar-section">            <div className="perfil__titulo-editar-container">
+              <div className="perfil__titulo-editar">Editar Perfil</div>
+              {profileToast.show && (
+                <Toast
+                  message={profileToast.message}
+                  type={profileToast.type}
+                  category="profile"
+                  position="profile-card"
+                  onClose={() => setProfileToast({ show: false, message: '', type: 'success' })}
+                />
               )}
-            </form>
-          </div>
-        )}
+            </div>
+            
+            <div className="perfil__form-container">              {/* Sección de foto de perfil */}
+              <div className="perfil__photo-section">
+                <h4 className="perfil__section-title">
+                  <FontAwesomeIcon icon={faCamera} />
+                  Foto de Perfil
+                </h4>
+                <div className="perfil__photo-container">                  <div className="perfil__photo-preview">
+                    <img 
+                      src={photoPreview || userInfo?.foto_perfil || "/assets/Usuario.png"} 
+                      alt="Vista previa"
+                      className="perfil__photo-preview-img"
+                    />                    {/* Estado de carga */}
+                    {savingPhoto && (
+                      <div className="perfil__photo-loading">
+                        <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="perfil__photo-controls">
+                    {!photoMode ? (
+                      <button 
+                        className="perfil__photo-change-btn"
+                        onClick={() => setPhotoMode(true)}
+                      >
+                        <FontAwesomeIcon icon={faCamera} />
+                        Cambiar Foto
+                      </button>
+                    ) : (
+                      <>
+                        <input
+                          type="file"
+                          id="photo-upload"
+                          accept="image/*"
+                          onChange={handlePhotoSelect}
+                          style={{ display: 'none' }}
+                        />
+                        <label htmlFor="photo-upload">
+                          <FontAwesomeIcon icon={faCamera} />
+                          {selectedPhoto ? 'Cambiar Imagen' : 'Seleccionar Imagen'}
+                        </label>
+                          {selectedPhoto && (
+                          <div className="perfil__photo-actions">                            <button 
+                              className="perfil__photo-action-btn perfil__photo-action-btn--save"
+                              onClick={handleSavePhoto}
+                              disabled={!selectedPhoto || savingPhoto}
+                            >
+                              <FontAwesomeIcon icon={savingPhoto ? faSpinner : faCamera} className={savingPhoto ? 'spinning' : ''} />
+                              {savingPhoto ? 'Guardando...' : 'Guardar'}
+                            </button>
+                            <button 
+                              className="perfil__photo-action-btn perfil__photo-action-btn--cancel"
+                              onClick={handleCancelPhoto}
+                              disabled={savingPhoto}
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Error de foto */}
+                {photoError && (
+                  <div className="perfil__message error">
+                    {photoError}
+                  </div>
+                )}
 
-        {/* --- SEGURIDAD --- */}
+                {/* Información adicional */}
+                {photoMode && !selectedPhoto && (
+                  <div className="perfil__photo-info">
+                    <p><strong>Formatos aceptados:</strong> JPG, PNG, GIF</p>
+                    <p><strong>Tamaño máximo:</strong> 5MB</p>
+                    <p><strong>Recomendación:</strong> Imagen cuadrada para mejor resultado</p>
+                  </div>
+                )}
+              </div>              <div className="perfil__form-row">
+                <label className="perfil__label">
+                  <FontAwesomeIcon icon={faUser} />
+                  Nombre completo
+                </label>
+                <input
+                  type="text"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleFormChange}
+                  disabled={!editMode}
+                  className={`perfil__input ${!editMode ? 'disabled' : ''}`}
+                  placeholder="Ingresa tu nombre completo"
+                />
+              </div>
+
+              <div className="perfil__form-row">
+                <label className="perfil__label">
+                  <FontAwesomeIcon icon={faPhone} />
+                  Teléfono/Celular
+                </label>
+                <input
+                  type="tel"
+                  name="celular"
+                  value={formData.celular}
+                  onChange={handleFormChange}
+                  disabled={!editMode}
+                  className={`perfil__input ${!editMode ? 'disabled' : ''}`}
+                  placeholder="Número de teléfono"
+                />
+              </div>
+
+              <div className="perfil__form-row">
+                <label className="perfil__label">
+                  <FontAwesomeIcon icon={faEnvelope} />
+                  Email (Bloqueado)
+                </label>
+                <input
+                  type="email"
+                  value={loadingUserInfo ? 'Cargando...' : (userInfo?.correo || 'No disponible')}
+                  disabled
+                  className="perfil__input disabled"
+                  title="El correo electrónico no puede ser modificado por seguridad"
+                />
+                <small className="perfil__field-note">
+                  El correo electrónico no puede ser modificado por razones de seguridad
+                </small>
+              </div>              <div className="perfil__form-row">
+                <label className="perfil__label">
+                  <FontAwesomeIcon icon={faUser} />
+                  DUI (Bloqueado)
+                </label>
+                <input
+                  type="text"
+                  value={loadingUserInfo ? 'Cargando...' : (userInfo?.dui || 'No disponible')}
+                  disabled
+                  className="perfil__input disabled"
+                  placeholder="00000000-0"
+                  title="El DUI no puede ser modificado por seguridad"
+                />
+                <small className="perfil__field-note">
+                  El DUI no puede ser modificado por razones de seguridad
+                </small>
+              </div>
+
+              <div className="perfil__form-row">
+                <label className="perfil__label">
+                  <FontAwesomeIcon icon={faCalendarAlt} />
+                  Fecha de Nacimiento (Bloqueado)
+                </label>
+                <input
+                  type="text"
+                  value={loadingUserInfo ? 'Cargando...' : (userInfo?.fecha_nacimiento ? formatearFechaParaMostrar(userInfo.fecha_nacimiento) : 'No disponible')}
+                  disabled
+                  className="perfil__input disabled"
+                  title="La fecha de nacimiento no puede ser modificada por seguridad"
+                />
+                <small className="perfil__field-note">
+                  La fecha de nacimiento no puede ser modificada por razones de seguridad
+                </small>
+              </div>
+
+              <div className="perfil__form-actions">
+                {!editMode ? (
+                  <button 
+                    className="perfil__btn-primary"
+                    onClick={() => setEditMode(true)}
+                  >
+                    <FontAwesomeIcon icon={faEdit} />
+                    Editar Información
+                  </button>
+                ) : (
+                  <div className="perfil__edit-actions">                    <button 
+                      className="perfil__btn-secondary"                      onClick={() => {
+                        setEditMode(false);                        // Resetear formData con la información actual del usuario
+                        if (userInfo) {
+                          setFormData({
+                            nombre: userInfo.nombre || '',
+                            celular: userInfo.celular || ''
+                          });
+                        }
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                    <button 
+                      className="perfil__btn-primary"
+                      onClick={handleSaveProfile}
+                      disabled={loadingUserInfo}
+                    >
+                      {loadingUserInfo ? 'Guardando...' : 'Guardar Cambios'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}        {/* --- SEGURIDAD --- */}
         {activeTab === 'seguridad' && (
-          <div>
-            <div className="perfil__titulo-seguridad">Configuración de Seguridad</div>
-            {/* Contraseña */}
-            <div className="perfil__security-card">
-              <div className="perfil__security-title">
-                <FontAwesomeIcon icon={faShieldAlt} style={{ marginRight: 7, color: "#a81818" }} />
-                Contraseña
-              </div>
-              <div className="perfil__security-desc">
-                Mantén tu cuenta segura con una contraseña fuerte
-              </div>
-              <button className="perfil__security-btn" onClick={() => setShowCambiarContra(true)}>
-                Cambiar contraseña
-              </button>
+          <div className="perfil__seguridad-section">
+            <div className="perfil__titulo-seguridad-container">
+              <div className="perfil__titulo-seguridad">Seguridad</div>
+              {profileToast.show && (
+                <Toast
+                  message={profileToast.message}
+                  type={profileToast.type}
+                  category="security"
+                  position="security-section"
+                  onClose={() => setProfileToast({ show: false, message: '', type: 'success' })}
+                />
+              )}
             </div>
-            {/* Información de contacto */}
-            <div className="perfil__contacto-titulo">
-              Información de contacto
-            </div>
-            <div className="perfil__contacto-cards">
-              <div className="perfil__contacto-card">
-                <div className="perfil__contacto-row">
-                  <FontAwesomeIcon icon={faPhone} style={{ marginRight: 10, color: "#a81818" }} />
-                  <div>
-                    <div className="perfil__contacto-label">Teléfono</div>
-                    <div className="perfil__contacto-value">{userPerfil.telefono}</div>
-                  </div>
-                  <button className="perfil__verificar-btn">Verificar</button>
+            
+            <div className="perfil__form-container">
+              <div className="perfil__security-item">
+                <div className="perfil__security-info">
+                  <h4>Cambiar Contraseña</h4>
+                  <p>Actualiza tu contraseña para mantener tu cuenta segura</p>
                 </div>
-              </div>
-              <div className="perfil__contacto-card">
-                <div className="perfil__contacto-row">
-                  <FontAwesomeIcon icon={faEnvelope} style={{ marginRight: 10, color: "#a81818" }} />
-                  <div>
-                    <div className="perfil__contacto-label">Email</div>
-                    <div className="perfil__contacto-value">{userPerfil.email}</div>
+                
+                {!passwordMode ? (
+                  <button 
+                    className="perfil__btn-primary"
+                    onClick={() => setPasswordMode(true)}
+                  >
+                    <FontAwesomeIcon icon={faLock} />
+                    Cambiar Contraseña
+                  </button>
+                ) : (
+                  <div className="perfil__password-form">
+                    <div className="perfil__form-row">
+                      <label className="perfil__label">Contraseña actual</label>
+                      <input
+                        type="password"
+                        name="currentPassword"
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordChange}
+                        className="perfil__input"
+                      />
+                    </div>
+
+                    <div className="perfil__form-row">
+                      <label className="perfil__label">Nueva contraseña</label>
+                      <input
+                        type="password"
+                        name="newPassword"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange}
+                        className="perfil__input"
+                        placeholder="Ingresa tu nueva contraseña"
+                      />
+                      <div className="perfil__password-requirements">
+                        <small>
+                          <strong>Requisitos de contraseña:</strong>
+                          <ul>
+                            <li>Mínimo 8 caracteres</li>
+                            <li>Al menos una letra mayúscula</li>
+                            <li>Al menos un carácter especial (!@#$%^&*)</li>
+                          </ul>
+                        </small>
+                      </div>
+                    </div>
+
+                    <div className="perfil__form-row">
+                      <label className="perfil__label">Confirmar nueva contraseña</label>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordChange}
+                        className="perfil__input"
+                      />
+                    </div>
+
+                    <div className="perfil__edit-actions">
+                      <button 
+                        className="perfil__btn-secondary"
+                        onClick={() => {
+                          setPasswordMode(false);
+                          setPasswordData({
+                            currentPassword: '',
+                            newPassword: '',
+                            confirmPassword: ''
+                          });
+                        }}
+                        disabled={loadingPassword}
+                      >
+                        Cancelar
+                      </button>
+
+                      <button 
+                        className="perfil__btn-primary"
+                        onClick={handleChangePassword}
+                        disabled={loadingPassword}
+                      >
+                        {loadingPassword ? (
+                          <>
+                            <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                            Cambiando...
+                          </>
+                        ) : (
+                          'Cambiar Contraseña'
+                        )}
+                      </button>
+                    </div>
                   </div>
-                  <span className="perfil__verificado-label">Verificado</span>
+                )}
+              </div>              {/* Sección de desactivar cuenta */}
+              <div className="perfil__security-item perfil__security-item--danger">
+                <div className="perfil__security-info">
+                  <h4>
+                    <FontAwesomeIcon icon={faExclamationTriangle} />
+                    Desactivar Cuenta
+                  </h4>
+                  <p>Esta acción desactivará tu cuenta. Podrás reactivarla contactando al soporte.</p>
+                  <div className="perfil__warning">
+                    <strong>⚠️ Advertencia:</strong> Al desactivar tu cuenta:
+                    <ul>
+                      <li>No podrás iniciar sesión</li>
+                      <li>Tus pedidos anteriores se mantendrán en el historial</li>
+                      <li>Tus reseñas y experiencias permanecerán públicas</li>
+                      <li>Para reactivar deberás contactar al soporte</li>
+                    </ul>
+                  </div>
                 </div>
+                  {!deactivateMode ? (
+                  <button 
+                    className="perfil__btn-danger"
+                    onClick={() => setDeactivateMode(true)}
+                  >
+                    <FontAwesomeIcon icon={faTrash} />
+                    Desactivar Cuenta
+                  </button>
+                ) : (
+                  <div className="perfil__deactivate-form">
+                    <div className="perfil__form-row">
+                      <label className="perfil__label">Motivo de desactivación *</label>
+                      <textarea
+                        name="motivo"
+                        value={deactivateData.motivo}
+                        onChange={handleDeactivateChange}
+                        className="perfil__textarea"
+                        placeholder="Explica brevemente por qué deseas desactivar tu cuenta..."
+                        rows="4"
+                        maxLength="500"
+                      />
+                      <small className="perfil__field-note">
+                        {deactivateData.motivo.length}/500 caracteres
+                      </small>
+                    </div>
+
+                    <div className="perfil__form-row">
+                      <label className="perfil__label">
+                        Confirmación *
+                      </label>
+                      <input
+                        type="text"
+                        name="confirmacion"
+                        value={deactivateData.confirmacion}
+                        onChange={handleDeactivateChange}
+                        className="perfil__input"
+                        placeholder='Escribe "DESACTIVAR" para confirmar'
+                      />
+                      <small className="perfil__field-note">
+                        Debes escribir exactamente "DESACTIVAR" para confirmar la acción
+                      </small>
+                    </div>
+
+                    <div className="perfil__edit-actions">
+                      <button 
+                        className="perfil__btn-secondary"
+                        onClick={() => {
+                          setDeactivateMode(false);
+                          setDeactivateData({
+                            motivo: '',
+                            confirmacion: ''
+                          });
+                        }}
+                        disabled={loadingDeactivate}
+                      >
+                        Cancelar
+                      </button>
+
+                      <button 
+                        className="perfil__btn-danger"
+                        onClick={handleDeactivateAccount}
+                        disabled={loadingDeactivate || !deactivateData.motivo.trim() || deactivateData.confirmacion !== 'DESACTIVAR'}
+                      >
+                        {loadingDeactivate ? (
+                          <>
+                            <FontAwesomeIcon icon={faSpinner} className="spinning" />
+                            Desactivando...
+                          </>
+                        ) : (
+                          <>
+                            <FontAwesomeIcon icon={faTrash} />
+                            Confirmar Desactivación
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         )}
-
-      </div>      {/* MODAL CAMBIAR CONTRASEÑA */}
-      {showCambiarContra && (
-        <CambiarContraseñaModal
-          email={userPerfil.email}
-          onClose={() => setShowCambiarContra(false)}
-        />
-      )}
-    </div>
-  );
-}
-
-
-// --- MODAL CAMBIAR CONTRASEÑA ---
-function CambiarContraseñaModal({ email, onClose, onSuccess }) {
-  const [step, setStep] = useState("select");
-  const [codigo, setCodigo] = useState("");
-  const [newPass, setNewPass] = useState("");
-  const [showPass, setShowPass] = useState(false);
-  const [confirmPass, setConfirmPass] = useState("");
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [changing, setChanging] = useState(false);
-  const maskEmail = (mail) => {
-    if (!mail) return "";
-    const [user, domain] = mail.split('@');
-    return user[0] + '.p***@' + domain;
-  };
-  const requisitos = [
-    { msg: "Debe tener al menos 8 caracteres", valid: newPass.length >= 8 },
-    { msg: "Debe contener al menos una letra mayúscula", valid: /[A-Z]/.test(newPass) },
-    { msg: "Debe contener al menos un número", valid: /\d/.test(newPass) },
-    { msg: "Debe contener al menos un carácter especial", valid: /[!@#$%^&*()_+{}[\]:;<>,.?~\\/-]/.test(newPass) },
-  ];
-
-  const handleChangePass = (e) => {
-    e.preventDefault();
-    setChanging(true);
-    setTimeout(() => {
-      setChanging(false);
-      if (onSuccess) onSuccess();
-      onClose();
-    }, 1200);
-  };
- return (
-    <div className="modal__overlay" style={{ zIndex: 99999 }}>
-      <div className="modal__content modal__full-white" style={{ maxWidth: 650, padding: 0 }}>
-        {/* Header */}
-        <button className="modal__back-btn" onClick={onClose} style={{ margin: 20 }}>
-          <FontAwesomeIcon icon={faArrowLeft} /> Volver
-        </button>
-        <div className="cambiar__titulo">Cambiar Contraseña</div>
-        <div className="cambiar__box">
-          <div className="cambiar__verif-title">
-            <FontAwesomeIcon icon={faShieldAlt} style={{ marginRight: 7, color: "#c42f2f" }} />
-            Verificación de Identidad
-          </div>          {/* Paso 1 */}
-          {step === "select" && (
-            <>
-              <div className="cambiar__verif-sub">Se enviará un código de verificación a tu email</div>
-              {/* Email */}
-              <div className="cambiar__verif-card cambiar__verif-card--selected">
-                <FontAwesomeIcon icon={faEnvelope} style={{ fontSize: 24, color: "#b7262b", marginRight: 16 }} />
-                <div style={{ flex: 1 }}>
-                  <div className="cambiar__verif-label">Email</div>
-                  <div className="cambiar__verif-value">{maskEmail(email)}</div>
-                </div>
-                <button className="cambiar__verif-btn cambiar__verif-btn--orange" onClick={() => setStep("codigo")}>
-                  Enviar Email
-                </button>
-              </div>
-            </>
-          )}
-
-          {/* Paso 2: Código */}
-          {step === "codigo" && (
-            <form className="cambiar__codigo-form" onSubmit={e => { e.preventDefault(); setStep("nueva"); }}>
-              <div className="cambiar__verif-sub" style={{ marginBottom: 16 }}>Código de verificación</div>
-              <input
-                className="cambiar__codigo-input"
-                type="text"
-                value={codigo}
-                onChange={e => setCodigo(e.target.value)}
-                placeholder="123456"
-                maxLength={6}
-                style={{
-                  textAlign: 'center',
-                  fontSize: '1.5rem',
-                  letterSpacing: '0.5em',
-                  width: '100%',
-                  marginBottom: 18
-                }}
-                autoFocus
-                required
-              />
-              <button className="cambiar__verif-btn cambiar__verif-btn--orange" style={{ width: '100%', fontWeight: 500 }} type="submit">
-                Verificar código
-              </button>
-            </form>
-          )}
-
-          {/* Paso 3: Nueva contraseña */}
-          {step === "nueva" && (
-            <form className="cambiar__pass-form" onSubmit={handleChangePass}>
-              <div className="cambiar__pass-label">Nueva contraseña</div>
-              <div className="cambiar__pass-input-group">
-                <input
-                  type={showPass ? "text" : "password"}
-                  value={newPass}
-                  onChange={e => setNewPass(e.target.value)}
-                  className="cambiar__pass-input"
-                  required
-                  autoFocus
-                />
-                <button type="button" tabIndex={-1} className="cambiar__show-btn" onClick={() => setShowPass(p => !p)}>
-                  <FontAwesomeIcon icon={showPass ? faEye : faEyeSlash} />
-                </button>
-              </div>
-              <div className="cambiar__pass-requisitos">
-                <div>Requisitos de seguridad:</div>
-                <ul>
-                  {requisitos.map((r, i) => (
-                    <li key={i} style={{ color: r.valid ? "green" : "#c82c2c", fontWeight: 400 }}>
-                      {r.msg}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="cambiar__pass-label">Confirmar contraseña</div>
-              <div className="cambiar__pass-input-group">
-                <input
-                  type={showConfirm ? "text" : "password"}
-                  value={confirmPass}
-                  onChange={e => setConfirmPass(e.target.value)}
-                  className="cambiar__pass-input"
-                  required
-                />
-                <button type="button" tabIndex={-1} className="cambiar__show-btn" onClick={() => setShowConfirm(p => !p)}>
-                  <FontAwesomeIcon icon={showConfirm ? faEye : faEyeSlash} />
-                </button>
-              </div>
-              <button
-                className="cambiar__verif-btn cambiar__verif-btn--orange"
-                style={{ width: '100%', fontWeight: 500, marginTop: 18, opacity: (newPass && confirmPass && newPass === confirmPass && requisitos.every(r => r.valid)) ? 1 : 0.5 }}
-                type="submit"
-                disabled={!(newPass && confirmPass && newPass === confirmPass && requisitos.every(r => r.valid)) || changing}
-              >
-                Cambiar contraseña
-              </button>
-            </form>
-          )}
-
-         
-        </div>
       </div>
+
+      {/* Modal para crear experiencia */}
+      <ModalExperiencia 
+        isOpen={isModalExperienciaOpen}
+        onClose={handleCerrarModalExperiencia}
+        user={user}
+        onExperienciaCreada={handleExperienciaCreada}
+        setToast={setToast}
+      />
     </div>
   );
 }

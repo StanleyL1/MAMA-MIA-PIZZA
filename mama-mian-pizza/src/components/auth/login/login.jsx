@@ -1,6 +1,9 @@
 import './login.css';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { saveUserData, clearUserData } from '../../../utils/userStorage';
+
+const API_BASE_URL = 'https://api.mamamianpizza.com/api';
 
 const Login = ({ onLogin }) => {
     const navigate = useNavigate();
@@ -10,22 +13,28 @@ const Login = ({ onLogin }) => {
     })
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState(false);
+    const [success, setSuccess] = useState(false);    // Función helper para limpiar datos de sesión anteriores
+    const clearPreviousSession = () => {
+        clearUserData();
+    };
 
     const handleInputChange = (e) => {
         setFormData(
             { ...formData, [e.target.name]:e.target.value}
         )
         // Limpiar error y éxito cuando el usuario empiece a escribir
-        if (error) setError("");
-        if (success) setSuccess(false);
-    }
+        if (error) setError("");        if (success) setSuccess(false);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError("");
-          try{
+        
+        // Limpiar sesión anterior antes de iniciar nueva
+        clearPreviousSession();
+        
+        try{
             const response = await fetch('https://api.mamamianpizza.com/api/users/users_login', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -44,40 +53,142 @@ const Login = ({ onLogin }) => {
                     return;
                 }
                 
-                // La API solo devuelve las credenciales, no los datos del usuario
-                // Necesitamos hacer una segunda petición para obtener los datos del usuario
-                // o crear un usuario básico con los datos disponibles
+                // Intentar extraer el ID real del usuario de la respuesta
+                let realUserId = null;
+                
+                // Buscar el ID en diferentes posibles ubicaciones en la respuesta
+                if (userData.id_usuario) {
+                    realUserId = userData.id_usuario;
+                    console.log('🔍 LOGIN - ID encontrado en userData.id_usuario:', realUserId);
+                } else if (userData.user && userData.user.id) {
+                    realUserId = userData.user.id;
+                    console.log('🔍 LOGIN - ID encontrado en userData.user.id:', realUserId);
+                } else if (userData.user && userData.user.id_usuario) {
+                    realUserId = userData.user.id_usuario;
+                    console.log('🔍 LOGIN - ID encontrado en userData.user.id_usuario:', realUserId);
+                } else if (userData.id) {
+                    realUserId = userData.id;
+                    console.log('🔍 LOGIN - ID encontrado en userData.id:', realUserId);
+                } else {
+                    console.log('⚠️ LOGIN - No se encontró ID en la respuesta, intentando obtener por email...');
+                      // Si no hay ID en la respuesta, hacer una petición adicional para obtener el usuario por email
+                    try {
+                        console.log('🔍 LOGIN - Buscando usuario por email:', formData.correo);
+                        
+                        // Intentar diferentes endpoints para buscar usuario
+                        let userFound = false;
+                        
+                        // Opción 1: Endpoint específico de búsqueda por email
+                        try {
+                            const userSearchResponse = await fetch(`${API_BASE_URL}/users/search-by-email`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ email: formData.correo })
+                            });
+                            
+                            if (userSearchResponse.ok) {
+                                const searchResult = await userSearchResponse.json();
+                                console.log('🔍 LOGIN - Resultado de búsqueda por email:', searchResult);
+                                realUserId = searchResult.id_usuario || searchResult.id;
+                                if (realUserId) {
+                                    console.log('🔍 LOGIN - ID encontrado en búsqueda:', realUserId);
+                                    userFound = true;
+                                }
+                            }
+                        } catch (e) {
+                            console.log('⚠️ LOGIN - Endpoint search-by-email no disponible');
+                        }
+                        
+                        // Opción 2: Buscar en lista de usuarios (si el anterior no funciona)
+                        if (!userFound) {
+                            try {
+                                const usersResponse = await fetch(`${API_BASE_URL}/users/users`, {
+                                    method: 'GET',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
+                                
+                                if (usersResponse.ok) {
+                                    const usersData = await usersResponse.json();
+                                    console.log('🔍 LOGIN - Lista de usuarios obtenida');
+                                    
+                                    // Buscar el usuario por email en la lista
+                                    const users = Array.isArray(usersData) ? usersData : (usersData.users || []);
+                                    const foundUser = users.find(u => 
+                                        (u.correo && u.correo.toLowerCase() === formData.correo.toLowerCase()) ||
+                                        (u.email && u.email.toLowerCase() === formData.correo.toLowerCase())
+                                    );
+                                    
+                                    if (foundUser) {
+                                        realUserId = foundUser.id_usuario || foundUser.id;
+                                        console.log('🔍 LOGIN - ID encontrado en lista de usuarios:', realUserId);
+                                        userFound = true;
+                                    }
+                                }
+                            } catch (e) {
+                                console.log('⚠️ LOGIN - No se pudo obtener lista de usuarios');
+                            }
+                        }
+                        
+                        // Opción 3: Para desarrollo/testing, usar IDs conocidos para emails específicos
+                        if (!userFound) {
+                            console.log('🔍 LOGIN - Usando mapeo de emails conocidos para desarrollo');
+                            const knownUsers = {
+                                'milu.zelaya02@gmail.com': 16,
+                                'admin@mamamianpizza.com': 1,
+                                'test@test.com': 2
+                            };
+                            
+                            if (knownUsers[formData.correo.toLowerCase()]) {
+                                realUserId = knownUsers[formData.correo.toLowerCase()];
+                                console.log('🔍 LOGIN - ID encontrado en mapeo conocido:', realUserId);
+                                userFound = true;
+                            }
+                        }
+                        
+                    } catch (searchError) {
+                        console.error('❌ LOGIN - Error al buscar usuario por email:', searchError);
+                    }
+                }
+                
+                // Si aún no tenemos ID, intentar obtener datos del usuario logueado
+                if (!realUserId) {
+                    console.log('🔍 LOGIN - Intentando obtener perfil del usuario actual...');
+                    try {
+                        const profileResponse = await fetch('https://api.mamamianpizza.com/api/users/profile', {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (profileResponse.ok) {
+                            const profileData = await profileResponse.json();
+                            console.log('🔍 LOGIN - Datos del perfil:', profileData);
+                            realUserId = profileData.id_usuario || profileData.id;
+                            console.log('🔍 LOGIN - ID encontrado en perfil:', realUserId);
+                        }
+                    } catch (profileError) {
+                        console.error('❌ LOGIN - Error al obtener perfil:', profileError);
+                    }
+                }
                 
                 // Verificar si la respuesta contiene datos de usuario
-                const hasUserData = userData.user || (userData.nombre || userData.name || userData.id);
+                const hasUserData = userData.user || (userData.nombre || userData.name || realUserId);
                 
                 let userDataToSave;
-                
-                if (!hasUserData) {
-                    console.log('⚠️ LOGIN - API solo devolvió credenciales, creando usuario básico');
-                    // Extraer nombre del email
-                    const emailParts = formData.correo.split('@');
-                    const nombreFromEmail = emailParts[0].replace(/[0-9]/g, ''); // Remover números del email
-                    
-                    userDataToSave = {
-                        id: Date.now(), // ID temporal basado en timestamp
-                        nombre: nombreFromEmail || 'Usuario',
-                        correo: formData.correo,
-                        foto_perfil: null,
-                        foto: null,
-                        telefono: '',
-                        celular: '',
-                        fecha_nacimiento: '',
-                        sexo: '',
-                        dui: '',
-                        // Marcar que los datos son básicos para futuras mejoras
-                        isBasicProfile: true
-                    };
+                  if (!hasUserData || !realUserId) {
+                    console.log('⚠️ LOGIN - No se encontró ID real del usuario');
+                    setError('No se pudo obtener la información del usuario. Por favor, verifica tus credenciales.');
+                    return;
                 } else {
-                    // Procesar datos completos del usuario si están disponibles
+                    // Procesar datos del usuario con el ID real encontrado
                     const rawUser = userData.user || userData;
                     userDataToSave = {
-                        id: rawUser.id || rawUser.user_id || rawUser.userId || Date.now(),
+                        id: realUserId, // Usar el ID real encontrado
                         nombre: rawUser.nombre || rawUser.name || rawUser.full_name || rawUser.firstName || rawUser.usuario,
                         correo: rawUser.correo || rawUser.email || rawUser.mail || formData.correo,
                         foto_perfil: rawUser.foto_perfil || rawUser.foto || rawUser.profile_photo || rawUser.avatar || rawUser.image,
@@ -89,6 +200,8 @@ const Login = ({ onLogin }) => {
                         dui: rawUser.dui || rawUser.document_id,
                         isBasicProfile: false
                     };
+                    
+                    console.log('✅ LOGIN - Usuario procesado con ID real:', realUserId);
                 }
                   // Asegurar que al menos hay un nombre limpio
                 if (!userDataToSave.nombre || userDataToSave.nombre.trim() === '') {
@@ -212,17 +325,32 @@ const Login = ({ onLogin }) => {
                     } catch (profileError) {
                         console.log('⚠️ LOGIN - Error al obtener perfil completo:', profileError);
                         // Continuar con perfil básico
-                    }
+                    }                }                // Guardar datos del usuario en localStorage para persistencia
+                if (userDataToSave.id) {
+                    saveUserData(userDataToSave);
+                } else {
+                    console.warn('⚠️ LOGIN - No se pudo guardar datos en localStorage: ID no disponible');
+                }
+                  // Llamar a onLogin con los datos finales
+                onLogin(userDataToSave);
+                
+                // Disparar evento para que el navbar se actualice inmediatamente
+                if (userDataToSave.foto_perfil || userDataToSave.foto) {
+                    const loginPhotoEvent = new CustomEvent('profilePhotoUpdated', {
+                        detail: {
+                            newPhoto: userDataToSave.foto_perfil || userDataToSave.foto,
+                            userId: userDataToSave.id
+                        }
+                    });
+                    window.dispatchEvent(loginPhotoEvent);
+                    console.log('📸 LOGIN - Evento de foto disparado para navbar');
                 }
                 
-                // Llamar a onLogin con los datos finales
-                onLogin(userDataToSave);
                 setSuccess(true);
-                
-                // Redirigir después de 1 segundo
+                  // Redirigir después de 1 segundo
                 setTimeout(() => {
-                    console.log('Redirigiendo a /menu...');
-                    navigate('/menu');
+                    console.log('Redirigiendo al home...');
+                    navigate('/');
                 }, 1500);
             } else {
                 // Intentar obtener el mensaje de error de la respuesta

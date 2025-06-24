@@ -22,40 +22,206 @@ const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
 // Estado local para la foto de perfil para actualizaciones en tiempo real
-const [currentProfilePhoto, setCurrentProfilePhoto] = useState(
-  user?.foto_perfil || user?.foto || require('../../assets/perfilfoto.png')
-);
+const [currentProfilePhoto, setCurrentProfilePhoto] = useState(() => {
+  // Inicializar con datos del usuario o desde localStorage como fallback
+  if (user?.foto_perfil || user?.foto) {
+    console.log('🎯 NAVBAR - Inicializando con foto del usuario:', user.foto_perfil || user.foto);
+    return user.foto_perfil || user.foto;
+  }
+  
+  // Intentar cargar desde localStorage si no hay usuario todavía
+  try {
+    const savedUser = localStorage.getItem('mamamia_user');
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      if (parsedUser.foto_perfil || parsedUser.foto) {
+        console.log('🎯 NAVBAR - Inicializando con foto de localStorage:', parsedUser.foto_perfil || parsedUser.foto);
+        return parsedUser.foto_perfil || parsedUser.foto;
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error al cargar foto desde localStorage:', error);
+  }
+  
+  console.log('🎯 NAVBAR - Sin foto disponible, inicializando como null');
+  return null;
+});
+
+// Cargar foto de perfil desde localStorage al montar el componente
+useEffect(() => {
+  const loadPhotoFromStorage = async () => {
+    try {
+      const savedUser = localStorage.getItem('mamamia_user');
+      if (savedUser) {
+        const parsedUser = JSON.parse(savedUser);
+        if (parsedUser && (parsedUser.foto_perfil || parsedUser.foto)) {
+          const photoUrl = parsedUser.foto_perfil || parsedUser.foto;
+          setCurrentProfilePhoto(photoUrl);
+          console.log('🔄 NAVBAR - Foto cargada desde localStorage al montar:', photoUrl);
+        } else if (parsedUser && parsedUser.id) {
+          // Si hay usuario en localStorage pero sin foto, buscar en API
+          console.log('🔍 NAVBAR - Usuario en localStorage sin foto, buscando en API...');
+          try {
+            const response = await fetch(`https://api.mamamianpizza.com/api/users/${parsedUser.id}`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              },
+            });
+            
+            if (response.ok) {
+              const userData = await response.json();
+              if (userData.foto_perfil) {
+                setCurrentProfilePhoto(userData.foto_perfil);
+                console.log('✅ NAVBAR - Foto cargada desde API al montar:', userData.foto_perfil);
+                
+                // Actualizar localStorage con la foto
+                const updatedUser = { ...parsedUser, foto_perfil: userData.foto_perfil };
+                localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+              }
+            }
+          } catch (apiError) {
+            console.error('❌ NAVBAR - Error al cargar foto desde API:', apiError);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ NAVBAR - Error al cargar foto desde localStorage:', error);
+    }
+  };
+
+  // Ejecutar inmediatamente al montar
+  loadPhotoFromStorage();
+}, []); // Solo ejecutar una vez al montar
 
 // Actualizar foto cuando cambie el usuario
 useEffect(() => {
-  setCurrentProfilePhoto(
-    user?.foto_perfil || user?.foto || require('../../assets/perfilfoto.png')
-  );
-}, [user]);
+  const fetchUserPhotoIfNeeded = async () => {
+    // Si hay usuario pero no tiene foto, buscar datos completos
+    if (user?.id && !user?.foto_perfil && !user?.foto) {
+      console.log('🔍 NAVBAR - Usuario sin foto, buscando datos completos...');
+      try {
+        const response = await fetch(`https://api.mamamianpizza.com/api/users/${user.id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          console.log('📸 NAVBAR - Datos completos obtenidos:', userData);
+          
+          if (userData.foto_perfil) {
+            setCurrentProfilePhoto(userData.foto_perfil);
+            console.log('✅ NAVBAR - Foto actualizada desde API:', userData.foto_perfil);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('❌ NAVBAR - Error al obtener datos del usuario:', error);
+      }
+    }
+    
+    // Lógica normal para cuando ya hay foto o no hay usuario
+    const newPhoto = user?.foto_perfil || user?.foto || null;
+    if (newPhoto !== currentProfilePhoto) {
+      console.log('🔄 NAVBAR - Actualizando foto por cambio de usuario:', {
+        oldPhoto: currentProfilePhoto,
+        newPhoto: newPhoto,
+        user: user ? { id: user.id, nombre: user.nombre } : null
+      });
+      setCurrentProfilePhoto(newPhoto);
+    }
+  };
+  fetchUserPhotoIfNeeded();
+}, [user, currentProfilePhoto]); // Incluir user completo para acceso a todas las propiedades
+
+// Debug: Observar cambios en currentProfilePhoto
+useEffect(() => {
+  console.log('🔍 NAVBAR - currentProfilePhoto cambió a:', currentProfilePhoto);
+}, [currentProfilePhoto]);
 
 // Escuchar eventos de actualización de foto de perfil
 useEffect(() => {
   const handleProfilePhotoUpdate = (event) => {
-    console.log('📸 NAVBAR - Evento de actualización de foto recibido:', event.detail);
+    console.log('📸 NAVBAR - Evento profilePhotoUpdated recibido:', event.detail);
     if (event.detail && event.detail.newPhoto) {
+      console.log('📸 NAVBAR - Actualizando foto desde evento profilePhotoUpdated:', event.detail.newPhoto);
       setCurrentProfilePhoto(event.detail.newPhoto);
+      
+      // También actualizar localStorage inmediatamente
+      try {
+        const savedUser = localStorage.getItem('mamamia_user');
+        if (savedUser) {
+          const parsedUser = JSON.parse(savedUser);
+          const updatedUser = { ...parsedUser, foto_perfil: event.detail.newPhoto, foto: event.detail.newPhoto };
+          localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+          console.log('💾 NAVBAR - localStorage actualizado con nueva foto');
+        }
+      } catch (error) {
+        console.error('❌ Error al actualizar localStorage:', error);
+      }
     }
   };
-
-  const handleProfileDataUpdate = (event) => {
-    console.log('📝 NAVBAR - Evento de actualización de datos recibido:', event.detail);
-    // La actualización de datos se maneja a través del prop user
-    // Este evento se puede usar para hacer refresh si es necesario
+  
+  // Evento personalizado para actualización inmediata de foto
+  const handleImmediatePhotoUpdate = (event) => {
+    console.log('⚡ NAVBAR - Evento immediatePhotoUpdate recibido:', event.detail);
+    if (event.detail && event.detail.photo) {
+      console.log('⚡ NAVBAR - Actualizando foto inmediatamente:', event.detail.photo);
+      setCurrentProfilePhoto(event.detail.photo);
+    }
   };
-
+  
+  const handleProfileDataUpdate = (event) => {
+    console.log('📝 NAVBAR - Evento profileDataUpdated recibido:', event.detail);
+    if (event.detail && user) {
+      // Si viene una foto en los datos actualizados, usarla
+      if (event.detail.foto_perfil || event.detail.foto) {
+        const newPhoto = event.detail.foto_perfil || event.detail.foto;
+        console.log('📸 NAVBAR - Actualizando foto desde profileDataUpdated:', newPhoto);
+        setCurrentProfilePhoto(newPhoto);
+      }
+    }
+  };
+  
+  // También escuchar cambios en localStorage para sincronización
+  const handleStorageChange = (event) => {
+    // Solo procesar si el cambio es en mamamia_user
+    if (event.key === 'mamamia_user' || !event.key) {
+      console.log('📦 NAVBAR - Cambio detectado en localStorage mamamia_user');
+      const savedUser = localStorage.getItem('mamamia_user');
+      if (savedUser) {
+        try {
+          const parsedUser = JSON.parse(savedUser);
+          const newPhoto = parsedUser.foto_perfil || parsedUser.foto || null;
+          if (newPhoto !== currentProfilePhoto) {
+            console.log('📦 NAVBAR - Sincronizando foto desde localStorage:', newPhoto);
+            setCurrentProfilePhoto(newPhoto);
+          }
+        } catch (error) {
+          console.error('❌ Error al sincronizar desde localStorage:', error);
+        }
+      }
+    }
+  };
+  
+  // Agregar todos los event listeners
   window.addEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
-  window.addEventListener('profileDataUpdated', handleProfileDataUpdate);
+  window.addEventListener('immediatePhotoUpdate', handleImmediatePhotoUpdate);
+  window.addEventListener('profileDataUpdated', handleProfileDataUpdate);  window.addEventListener('storage', handleStorageChange);
 
+  // Cleanup
   return () => {
     window.removeEventListener('profilePhotoUpdated', handleProfilePhotoUpdate);
+    window.removeEventListener('immediatePhotoUpdate', handleImmediatePhotoUpdate);
     window.removeEventListener('profileDataUpdated', handleProfileDataUpdate);
+    window.removeEventListener('storage', handleStorageChange);
   };
-}, []);
+}, [user, currentProfilePhoto]); // Incluir currentProfilePhoto para evitar stale closures
 
 
 const toggleMobileMenu = () => {
@@ -90,7 +256,27 @@ useEffect(() => {
   return () => document.removeEventListener('click', handleClickOutside);
 }, []);
 
-
+// Debug: Mostrar información en consola sobre el estado actual
+useEffect(() => {
+  console.log('🔍 NAVBAR DEBUG - Estado actual:', {
+    user: user ? {
+      id: user.id,
+      nombre: user.nombre,
+      foto_perfil: user.foto_perfil,
+      foto: user.foto
+    } : 'NO USER',
+    currentProfilePhoto,
+    localStorage: (() => {
+      try {
+        const saved = localStorage.getItem('mamamia_user');
+        return saved ? JSON.parse(saved) : null;
+      } catch {
+        return 'ERROR';
+      }
+    })()
+  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [user, currentProfilePhoto]); // Incluir ambas dependencias pero con disable para evitar renders excesivos
 
 
 
@@ -147,25 +333,49 @@ useEffect(() => {
                   transition: 'background-color 0.2s'
                 }}
                 onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-              >        
-                <img 
-                  alt='Foto de perfil'
-                  src={currentProfilePhoto}
-                  className="navbar__profile-photo"
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    marginRight: '8px',
-                    objectFit: 'cover',
-                    border: '2px solid rgba(255,255,255,0.3)'
-                  }}                  onError={(e) => {
-                    console.log('❌ Error cargando imagen de perfil, usando por defecto');
-                    e.target.src = require('../../assets/perfilfoto.png');
-                    setCurrentProfilePhoto(require('../../assets/perfilfoto.png'));
-                  }}
-                />                <span className="navbar__profile-name" style={{ fontWeight: '500' }}>
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}              >                {currentProfilePhoto ? (
+                  <img 
+                    alt='Foto de perfil'
+                    src={`${currentProfilePhoto}${currentProfilePhoto.includes('?') ? '&' : '?'}t=${Date.now()}`}
+                    className="navbar__profile-photo"
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      marginRight: '8px',
+                      objectFit: 'cover',
+                      border: '2px solid rgba(255,255,255,0.3)'
+                    }}
+                    onLoad={() => {
+                      console.log('✅ NAVBAR - Imagen cargada exitosamente:', currentProfilePhoto);
+                    }}
+                    onError={(e) => {
+                      console.log('❌ NAVBAR - Error cargando imagen de perfil:', currentProfilePhoto);
+                      console.log('❌ NAVBAR - Ocultando imagen y mostrando placeholder');
+                      setCurrentProfilePhoto(null);
+                    }}
+                  />
+                ) : (
+                  <div 
+                    className="navbar__profile-placeholder"
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      marginRight: '8px',
+                      backgroundColor: 'rgba(255,255,255,0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      color: 'white'
+                    }}
+                  >
+                    {(user.nombre || user.name || 'U').charAt(0).toUpperCase()}
+                  </div>
+                )}<span className="navbar__profile-name" style={{ fontWeight: '500' }}>
                   {user.nombre || user.name || 'Usuario'}
                 </span>
                 <span style={{ 
@@ -231,9 +441,10 @@ useEffect(() => {
                           fontSize: '16px' 
                         }} 
                       />
-                      Ver Perfil
-                    </Link>
-                  </li><li style={{ borderTop: '1px solid #f0f0f0', margin: '8px 0 0 0' }}>
+                      Ver Perfil                    </Link>
+                  </li>
+
+                  <li style={{ borderTop: '1px solid #f0f0f0', margin: '8px 0 0 0' }}>
                     <button 
                       onClick={() => {
                         console.log('🚪 Cerrando sesión');

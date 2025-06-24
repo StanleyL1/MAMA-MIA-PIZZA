@@ -226,8 +226,7 @@ const Menu = ({ onAddToCart, user }) => {
                 <span>🔄</span> Reintentar
               </button>
             </div>
-          ) : filteredMenu.length > 0 ? (
-            <div className="menu-grid">
+          ) : filteredMenu.length > 0 ? (            <div className="menu-grid">
               {filteredMenu.map((item, index) => (
                 <ProductsCards 
                   data={{
@@ -238,6 +237,7 @@ const Menu = ({ onAddToCart, user }) => {
                   }} 
                   key={item.id || index} 
                   onCardClick={(productData) => handleOpenModal(productData)} 
+                  isRecommendation={true}
                 />
               ))}
             </div>
@@ -274,14 +274,14 @@ const Menu = ({ onAddToCart, user }) => {
       </section>
 
       <Footer noImage={true} />
-      
-      {/* Modal del Producto */}
+        {/* Modal del Producto */}
       {selectedProduct && (
         <PizzaModal 
           pizza={selectedProduct}
           onClose={handleCloseModal}
           onAddToCart={handleAddToCart}
           user={user}
+          isRecommendation={true}
         />
       )}
     </div>

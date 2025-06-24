@@ -15,12 +15,14 @@ import Team from './components/Team/Team';
 import InformacionLegal from './components/InformacionLegal/InformacionLegal';
 import Perfil from './components/Perfil/Perfil';
 import SocialMediaButton from './components/socialMediaButton/SocialMediaButton';
+import AdminExperiencias from './components/AdminExperiencias/AdminExperiencias';
+import TestExperiencias from './components/TestExperiencias/TestExperiencias';
+import Toast from './components/Toast/Toast';
+import { saveUserData, clearUserData } from './utils/userStorage';
 
-function App() {
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
-  // Estado para notificaciones tipo toast
-  const [toast, setToast] = useState({ show: false, message: '' });
+function App() {  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);  // Estado para notificaciones tipo toast mejoradas
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success', category: 'general', position: 'top-right' });
   const [user, setUser] = useState(null); // Estado del usuario
 
   const handleCartToggle = () => {
@@ -54,26 +56,51 @@ function App() {
     };
     
     // Agregar el producto al carrito
-    setCartItems(prev => [...prev, newItem]);
-    
+    setCartItems(prev => [...prev, newItem]);    
     // Abrir el carrito automáticamente cuando se añade un producto
-    setIsCartOpen(true);    // Mostrar notificación breve
-    setToast({ show: true, message: `✓ Agregado al carrito` });
-    setTimeout(() => setToast({ show: false, message: '' }), 2000);
-  };
+    setIsCartOpen(true);
 
+    // Mostrar notificación breve
+    setToast({ 
+      show: true, 
+      message: `✓ Agregado al carrito`, 
+      type: 'success', 
+      category: 'general',
+      position: 'top-right'
+    });
+    setTimeout(() => setToast({ show: false, message: '', type: 'success', category: 'general', position: 'top-right' }), 2000);
+  };
   // Cargar usuario desde localStorage al iniciar la app
   useEffect(() => {
     const savedUser = localStorage.getItem('mamamia_user');
+    const fallbackUser = localStorage.getItem('userData');
+    
+    let userToLoad = null;
+    
     if (savedUser) {
       try {
-        const parsedUser = JSON.parse(savedUser);
-        console.log('👤 APP - Usuario cargado desde localStorage:', parsedUser);
-        setUser(parsedUser);
+        userToLoad = JSON.parse(savedUser);
+        console.log('👤 APP - Usuario cargado desde mamamia_user:', userToLoad);
       } catch (error) {
-        console.error('❌ Error al cargar usuario desde localStorage:', error);
+        console.error('❌ Error al cargar usuario desde mamamia_user:', error);
         localStorage.removeItem('mamamia_user');
       }
+    } else if (fallbackUser) {
+      try {
+        userToLoad = JSON.parse(fallbackUser);
+        console.log('👤 APP - Usuario cargado desde userData (fallback):', userToLoad);
+        // Sincronizar con la clave principal
+        localStorage.setItem('mamamia_user', fallbackUser);
+      } catch (error) {
+        console.error('❌ Error al cargar usuario desde userData:', error);
+        localStorage.removeItem('userData');
+      }
+    }
+    
+    if (userToLoad) {
+      setUser(userToLoad);
+      // Asegurar que ambas claves estén sincronizadas
+      saveUserData(userToLoad);
     }
   }, []);
 
@@ -114,12 +141,11 @@ function App() {
       window.removeEventListener('profilePhotoUpdated', handlePhotoUpdate);
     };
   }, [user]);
-
   const handleLogin = (userData) => {
     console.log('🔑 APP - Datos recibidos en handleLogin:', userData);
     setUser(userData);
-    // Guardar en localStorage para persistencia
-    localStorage.setItem('mamamia_user', JSON.stringify(userData));
+    // Guardar en localStorage usando las utilidades mejoradas
+    saveUserData(userData);
     console.log('✅ APP - Usuario guardado en estado y localStorage');
   };
 
@@ -129,24 +155,24 @@ function App() {
     if (user) {
       const updatedUser = { ...user, ...updates };
       setUser(updatedUser);
-      localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
-      console.log('✅ APP - Usuario actualizado:', updatedUser);
+      // Usar la función mejorada de userStorage
+      saveUserData(updatedUser);
+      console.log('✅ APP - Usuario actualizado en estado y localStorage:', updatedUser);
     }
   };
 
   const handleLogout = () => {
     console.log('🚪 APP - Cerrando sesión');
     setUser(null);
-    localStorage.removeItem('mamamia_user');
+    // Usar la función mejorada para limpiar datos
+    clearUserData();
     console.log('✅ APP - Usuario removido del estado y localStorage');
   };
-
-  // Función para mostrar toast desde componentes hijos
-  const showToast = (message) => {
-    setToast({ show: true, message });
-    setTimeout(() => setToast({ show: false, message: '' }), 3000);
+  //  // Función para mostrar toast desde componentes hijos - versión mejorada
+  const showToast = (message, type = 'success', category = 'general', position = 'top-right') => {
+    setToast({ show: true, message, type, category, position });
+    setTimeout(() => setToast({ show: false, message: '', type: 'success', category: 'general', position: 'top-right' }), 4000);
   };
-
   // Trigger para actualizaciones de pedidos
   const triggerOrderUpdate = () => {
     // Disparar evento para que el perfil se actualice
@@ -184,17 +210,23 @@ function App() {
             onOrderComplete={triggerOrderUpdate}
             setToast={showToast}
           />
-        } />
-        <Route path="/equipo-desarrollo" element={<Team />} />
-        <Route path="/informacion-legal" element={<InformacionLegal />} />
+        } />        <Route path="/equipo-desarrollo" element={<Team />} />
+        <Route path="/informacion-legal" element={<InformacionLegal />} />        <Route path="/admin/experiencias" element={<AdminExperiencias />} />
+        <Route path="/test/experiencias" element={<TestExperiencias />} />
       </Routes>
 
-      {/* Overlay de notificación tipo toast */}
+      {/* Overlay de notificación tipo toast mejorado */}
       {toast.show && (
-        <div className="toast-notification">
-          <p>{toast.message}</p>
-        </div>
-      )}      {/* Componente Cart - Solo se renderiza si isCartOpen es true */}
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          category={toast.category}
+          position={toast.position}
+          onClose={() => setToast({ show: false, message: '', type: 'success', category: 'general', position: 'top-right' })}
+        />
+      )}
+
+      {/* Componente Cart - Solo se renderiza si isCartOpen es true */}
       <Cart
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}

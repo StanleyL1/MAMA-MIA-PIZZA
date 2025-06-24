@@ -1,0 +1,316 @@
+.toast {
+  position: fixed;
+  z-index: 1000;
+  min-width: 360px;
+  max-width: 480px;
+  border-radius: 16px;
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.toast--show {
+  opacity: 1;
+}
+
+.toast--hide {
+  opacity: 0;
+}
+
+.toast--success {
+  background: linear-gradient(135deg, 
+    rgba(16, 185, 129, 0.95) 0%, 
+    rgba(5, 150, 105, 0.95) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.toast--error {
+  background: linear-gradient(135deg, 
+    rgba(239, 68, 68, 0.95) 0%, 
+    rgba(220, 38, 38, 0.95) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.toast--info {
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.95) 0%, 
+    rgba(37, 99, 235, 0.95) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.toast--warning {
+  background: linear-gradient(135deg, 
+    rgba(245, 158, 11, 0.95) 0%, 
+    rgba(217, 119, 6, 0.95) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Estilos especiales para categoría perfil */
+.toast--profile.toast--success {
+  background: linear-gradient(135deg, 
+    rgba(34, 197, 94, 0.95) 0%, 
+    rgba(22, 163, 74, 0.95) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.toast__progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.7);
+  transition: width 0.1s linear;
+  border-radius: 16px 16px 0 0;
+}
+
+.toast__content {
+  display: flex;
+  align-items: flex-start;
+  padding: 20px;
+  color: white;
+  gap: 16px;
+}
+
+.toast__icon-wrapper {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toast__icon {
+  font-size: 1.5rem;
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.toast__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast__title {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.toast__message {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.toast__close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+}
+
+.toast__close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.toast__close:active {
+  transform: scale(0.95);
+}
+
+/* Posición por defecto - esquina superior derecha */
+.toast--top-right {
+  top: 24px;
+  right: 24px;
+  transform: translateX(100%) scale(0.95);
+}
+
+.toast--top-right.toast--show {
+  transform: translateX(0) scale(1);
+}
+
+.toast--top-right.toast--hide {
+  transform: translateX(100%) scale(0.95);
+}
+
+/* Posición unificada para todas las acciones de perfil */
+.toast--profile-left {
+  top: 120px;
+  left: 24px;
+  right: auto;
+  transform: translateX(-100%) scale(0.95);
+}
+
+.toast--profile-left.toast--show {
+  transform: translateX(0) scale(1);
+}
+
+.toast--profile-left.toast--hide {
+  transform: translateX(-100%) scale(0.95);
+}
+
+/* Posición específica para el área de perfil - junto al título */
+.toast--profile-card {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateY(-100%) scale(0.95);
+  z-index: 1001;
+  max-width: 300px;
+  min-width: 280px;
+  margin-left: 20px;
+}
+
+.toast--profile-card.toast--show {
+  transform: translateY(0) scale(1);
+}
+
+.toast--profile-card.toast--hide {
+  transform: translateY(-100%) scale(0.95);
+}
+
+/* Estilos especiales para perfil con mejor contraste */
+.toast--profile.toast--success {
+  background: linear-gradient(135deg, 
+    rgba(34, 197, 94, 0.95) 0%, 
+    rgba(22, 163, 74, 0.95) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  box-shadow: 
+    0 20px 25px -5px rgba(34, 197, 94, 0.15),
+    0 10px 10px -5px rgba(34, 197, 94, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.toast--profile.toast--error {
+  background: linear-gradient(135deg, 
+    rgba(239, 68, 68, 0.95) 0%, 
+    rgba(220, 38, 38, 0.95) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 
+    0 20px 25px -5px rgba(239, 68, 68, 0.15),
+    0 10px 10px -5px rgba(239, 68, 68, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .toast--top-right {
+    right: 16px;
+    left: 16px;
+    min-width: auto;
+    max-width: none;
+    transform: translateY(-100%) scale(0.95);
+    top: 16px;
+  }
+  
+  .toast--top-right.toast--show {
+    transform: translateY(0) scale(1);
+  }
+  
+  .toast--top-right.toast--hide {
+    transform: translateY(-100%) scale(0.95);
+  }
+
+  .toast--profile-left {
+    left: 16px;
+    right: 16px;
+    min-width: auto;
+    max-width: none;
+    transform: translateX(0) scale(0.95);
+    top: 100px;
+  }
+
+  .toast--profile-left.toast--show {
+    transform: translateX(0) scale(1);
+  }
+
+  .toast--profile-card {
+    top: 220px;
+    left: 16px;
+    right: 16px;
+    min-width: auto;
+    max-width: none;
+    transform: translateX(0) translateY(-100%) scale(0.95);
+  }
+
+  .toast--profile-card.toast--show {
+    transform: translateX(0) translateY(0) scale(1);
+  }
+
+  .toast--profile-card.toast--hide {
+    transform: translateX(0) translateY(-100%) scale(0.95);
+  }
+
+  .toast__content {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .toast__icon-wrapper {
+    width: 40px;
+    height: 40px;
+  }
+
+  .toast__icon {
+    font-size: 1.25rem;
+  }
+
+  .toast__title {
+    font-size: 0.9rem;
+  }
+
+  .toast__message {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .toast--top-right,
+  .toast--profile-left,
+  .toast--profile-card {
+    left: 12px;
+    right: 12px;
+  }
+
+  .toast--top-right {
+    top: 12px;
+  }
+
+  .toast--profile-left {
+    top: 80px;
+  }
+
+  .toast--profile-card {
+    top: 180px;
+  }
+
+  .toast__content {
+    padding: 14px;
+  }
+}
