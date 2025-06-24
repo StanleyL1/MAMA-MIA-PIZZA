@@ -118,13 +118,13 @@
 }
 
 /* === Mejoras para los Toggle Buttons === */
-.toggle-compra, .toggle-direccion, .toggle-pago {
+.toggle-compra, .toggle-direccion, .toggle-pago, .toggle-metodo-entrega {
   display: flex;
   gap: 20px;
   margin: 0 30px 35px 30px;
 }
 
-.toggle-btn, .toggle-dir-btn {
+.toggle-btn, .toggle-dir-btn, .toggle-metodo-btn {
   flex: 1;
   background-color: #fff;
   border: 2px solid var(--primary-color);
@@ -139,23 +139,25 @@
   box-shadow: 0 5px 10px rgba(0,0,0,0.07);
 }
 
-.toggle-btn:hover, .toggle-dir-btn:hover {
+.toggle-btn:hover, .toggle-dir-btn:hover, .toggle-metodo-btn:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 15px rgba(0,0,0,0.15);
   border-color: var(--primary-color);
 }
 
 .toggle-btn:hover .icono-usuario,
-.toggle-btn:hover .icono-metodo {
+.toggle-btn:hover .icono-metodo,
+.toggle-metodo-btn:hover .icono-metodo {
   transform: scale(1.15);
   color: var(--primary-color);
 }
 
-.toggle-btn:hover .toggle-titulo {
+.toggle-btn:hover .toggle-titulo,
+.toggle-metodo-btn:hover span {
   color: var(--primary-color);
 }
 
-.toggle-btn.activo, .toggle-dir-btn.activo {
+.toggle-btn.activo, .toggle-dir-btn.activo, .toggle-metodo-btn.activo {
   background: var(--primary-color);
   color: white;
   transform: translateY(-8px);
@@ -163,7 +165,8 @@
   border-color: var(--primary-color);
 }
 
-.toggle-btn.activo::after {
+.toggle-btn.activo::after,
+.toggle-metodo-btn.activo::after {
   content: "✓";
   position: absolute;
   top: -10px;
@@ -182,7 +185,8 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-.toggle-btn.activo .toggle-titulo {
+.toggle-btn.activo .toggle-titulo,
+.toggle-metodo-btn.activo span {
   color: var(--text-color);
   font-weight: 700;
   transform: scale(1.05);
@@ -193,28 +197,37 @@
 }
 
 .toggle-btn:active, 
-.toggle-dir-btn:active {
+.toggle-dir-btn:active,
+.toggle-metodo-btn:active {
   transform: scale(0.97);
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.icono-usuario {
-  width: 36px;
-  height: 36px;
-  margin-bottom: 10px;
-  transition: all 0.3s ease;
+/* Estilos específicos para método de entrega */
+.toggle-metodo-btn {
+  position: relative;
 }
 
-.toggle-titulo {
+.toggle-metodo-btn span {
   font-size: 1.15rem;
   font-weight: 600;
   color: var(--primary-color);
-  margin-bottom: 6px;
+  margin-top: 8px;
+  transition: all 0.3s ease;
 }
 
-.toggle-desc {
-  font-size: 0.95rem;
-  color: #777;
+.toggle-metodo-btn.activo .icono-metodo {
+  color: white;
+  transform: scale(1.2);
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+}
+
+/* Subtítulo para direcciones */
+.subtitulo-direccion {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  margin: 25px 30px 15px 30px;
+  font-weight: 600;
 }
 
 /* === Mejoras para los Formularios === */
@@ -1582,8 +1595,7 @@
     width: 100%;
     padding: 15px;
   }
-  
-  /* Ubicación en tiempo real */
+    /* Ubicación en tiempo real */
   .contenido-tiempo-real {
     padding: 0 15px;
   }
@@ -1592,6 +1604,44 @@
     font-size: 1rem;
     margin-bottom: 15px;
     padding: 0 10px;
+  }
+  
+  /* Recoger en local responsivo */
+  .contenido-recoger-local {
+    padding: 0 15px;
+  }
+  
+  .info-local {
+    padding: 20px;
+  }
+  
+  .info-local h4 {
+    font-size: 1.2rem;
+  }
+  
+  .info-local p {
+    font-size: 1rem;
+  }
+  
+  .nota-importante {
+    padding: 12px 15px;
+    margin-top: 15px;
+  }
+  
+  .metodo-entrega-info {
+    padding: 15px;
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .metodo-icon-container {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .metodo-icon {
+    font-size: 1.3rem;
   }
   
   .btn-ubicacion {
@@ -1772,8 +1822,7 @@
     font-size: 20px;
     margin-bottom: 6px;
   }
-  
-  /* Ubicación ultra responsiva */
+    /* Ubicación ultra responsiva */
   .contenido-tiempo-real {
     padding: 0 10px;
   }
@@ -1782,6 +1831,63 @@
     font-size: 0.9rem;
     margin-bottom: 12px;
     padding: 0 5px;
+  }
+  
+  /* Recoger en local ultra responsivo */
+  .contenido-recoger-local {
+    padding: 0 10px;
+  }
+  
+  .info-local {
+    padding: 15px;
+  }
+  
+  .info-local h4 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+  }
+  
+  .info-local p {
+    font-size: 0.9rem;
+    margin: 10px 0;
+  }
+  
+  .nota-importante {
+    padding: 10px 12px;
+    margin-top: 12px;
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+  
+  .nota-importante .warning-icon {
+    font-size: 1.1rem;
+  }
+  
+  .nota-importante p {
+    font-size: 0.85rem;
+  }
+  
+  .metodo-entrega-info {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .metodo-icon-container {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .metodo-icon {
+    font-size: 1.1rem;
+  }
+  
+  .metodo-tipo {
+    font-size: 1rem;
+  }
+  
+  .metodo-tiempo {
+    font-size: 0.85rem;
   }
   
   .btn-ubicacion {
@@ -1915,4 +2021,140 @@ body:has(.contenedor-pideahora) .toggle-button {
   pointer-events: none !important;
   z-index: -9999 !important;
   transform: translateY(200px) translateX(200px) !important;
+}
+
+/* Subtítulo para direcciones */
+.subtitulo-direccion {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  margin: 25px 30px 15px 30px;
+  font-weight: 600;
+}
+
+/* === Estilos para Recoger en Local === */
+.contenido-recoger-local {
+  padding: 0 30px;
+  margin-bottom: 30px;
+}
+
+.info-local {
+  background-color: #fff;
+  border: 2px solid var(--primary-color);
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.info-local h4 {
+  font-size: 1.3rem;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  font-weight: 700;
+  text-align: center;
+  border-bottom: 2px solid #fee;
+  padding-bottom: 12px;
+}
+
+.info-local p {
+  margin: 12px 0;
+  font-size: 1.05rem;
+  color: #444;
+  line-height: 1.6;
+}
+
+.info-local p strong {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.nota-importante {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #fff3e0;
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  border-left: 5px solid #ff9800;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+.nota-importante .warning-icon {
+  font-size: 1.3rem;
+  color: #ff9800;
+  flex-shrink: 0;
+}
+
+.nota-importante p {
+  font-size: 1rem;
+  color: #e65100;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* === Estilos para confirmación de método de entrega === */
+.metodo-entrega-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background-color: #f8f9fa;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  margin-bottom: 15px;
+}
+
+.metodo-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background-color: var(--primary-color);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.metodo-icon {
+  font-size: 1.5rem;
+  color: white;
+}
+
+.metodo-details {
+  flex: 1;
+}
+
+.metodo-tipo {
+  font-size: 1.15rem;
+  color: var(--primary-color);
+  font-weight: 700;
+  margin: 0 0 5px 0;
+}
+
+.metodo-tiempo {
+  font-size: 0.95rem;
+  color: #28a745;
+  font-weight: 600;
+  margin: 8px 0 0 0;
+}
+
+.metodo-details p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.metodo-details p small {
+  color: #666;
+  font-style: italic;
+}
+
+/* === Estilos para método de pago en confirmación === */
+.metodo-pago-info {
+  margin-top: 10px;
+}
+
+.pago-icon {
+  background-color: #28a745;
 }
