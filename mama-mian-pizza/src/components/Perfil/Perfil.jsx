@@ -469,10 +469,52 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         updateData.dui = userInfo.dui;
       }console.log('Datos a enviar al servidor:', updateData);
       console.log('ID de usuario:', userInfo.id_usuario);
-      
-      const result = await updateUserInfo(userInfo.id_usuario, updateData);
+        const result = await updateUserInfo(userInfo.id_usuario, updateData);
       console.log('Resultado de la actualización:', result);
-        setEditMode(false);
+      
+      // Disparar evento para actualizar el nombre en el navbar en tiempo real
+      const profileUpdateEvent = new CustomEvent('profileDataUpdated', {
+        detail: {
+          nombre: updateData.nombre,
+          email: updateData.correo,
+          telefono: updateData.telefono,
+          timestamp: Date.now()
+        }
+      });
+      window.dispatchEvent(profileUpdateEvent);
+      console.log('📝 PERFIL - Evento profileDataUpdated disparado con nombre:', updateData.nombre);
+      
+      // También actualizar localStorage inmediatamente para sincronización
+      try {
+        const savedUser = localStorage.getItem('mamamia_user');
+        if (savedUser) {
+          const parsedUser = JSON.parse(savedUser);
+          const updatedUser = { 
+            ...parsedUser, 
+            nombre: updateData.nombre,
+            correo: updateData.correo,
+            telefono: updateData.telefono,
+            celular: updateData.telefono
+          };
+          localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+          console.log('💾 PERFIL - localStorage actualizado con nuevos datos');
+        }
+      } catch (storageError) {
+        console.error('❌ Error al actualizar localStorage:', storageError);
+      }
+      
+      // Llamar updateUser si está disponible para actualizar el estado del App
+      if (updateUser && typeof updateUser === 'function') {
+        updateUser({ 
+          nombre: updateData.nombre,
+          correo: updateData.correo,
+          telefono: updateData.telefono,
+          celular: updateData.telefono
+        });
+        console.log('🔄 PERFIL - updateUser llamado con nuevos datos');
+      }
+      
+      setEditMode(false);
       showProfileMessage('Perfil actualizado correctamente');
       
       console.log('=== GUARDADO EXITOSO ===');

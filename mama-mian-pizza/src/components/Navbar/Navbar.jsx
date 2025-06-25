@@ -21,6 +21,32 @@ const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
+// Estado local para el nombre del usuario para actualizaciones en tiempo real
+const [currentUserName, setCurrentUserName] = useState(() => {
+  // Inicializar con datos del usuario o desde localStorage como fallback
+  if (user?.nombre) {
+    console.log('🎯 NAVBAR - Inicializando con nombre del usuario:', user.nombre);
+    return user.nombre;
+  }
+  
+  // Intentar cargar desde localStorage si no hay usuario todavía
+  try {
+    const savedUser = localStorage.getItem('mamamia_user');
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      if (parsedUser.nombre) {
+        console.log('🎯 NAVBAR - Inicializando con nombre de localStorage:', parsedUser.nombre);
+        return parsedUser.nombre;
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error al cargar nombre desde localStorage:', error);
+  }
+  
+  console.log('🎯 NAVBAR - Sin nombre disponible, usando "Usuario"');
+  return 'Usuario';
+});
+
 // Estado local para la foto de perfil para actualizaciones en tiempo real
 const [currentProfilePhoto, setCurrentProfilePhoto] = useState(() => {
   // Inicializar con datos del usuario o desde localStorage como fallback
@@ -47,20 +73,30 @@ const [currentProfilePhoto, setCurrentProfilePhoto] = useState(() => {
   return null;
 });
 
-// Cargar foto de perfil desde localStorage al montar el componente
+// Cargar datos del usuario desde localStorage al montar el componente
 useEffect(() => {
-  const loadPhotoFromStorage = async () => {
+  const loadUserDataFromStorage = async () => {
     try {
       const savedUser = localStorage.getItem('mamamia_user');
       if (savedUser) {
         const parsedUser = JSON.parse(savedUser);
+        
+        // Cargar foto de perfil
         if (parsedUser && (parsedUser.foto_perfil || parsedUser.foto)) {
           const photoUrl = parsedUser.foto_perfil || parsedUser.foto;
           setCurrentProfilePhoto(photoUrl);
           console.log('🔄 NAVBAR - Foto cargada desde localStorage al montar:', photoUrl);
-        } else if (parsedUser && parsedUser.id) {
-          // Si hay usuario en localStorage pero sin foto, buscar en API
-          console.log('🔍 NAVBAR - Usuario en localStorage sin foto, buscando en API...');
+        }
+        
+        // Cargar nombre de usuario
+        if (parsedUser && parsedUser.nombre) {
+          setCurrentUserName(parsedUser.nombre);
+          console.log('🔄 NAVBAR - Nombre cargado desde localStorage al montar:', parsedUser.nombre);
+        }
+        
+        // Si hay usuario en localStorage pero sin datos completos, buscar en API
+        if (parsedUser && parsedUser.id && (!parsedUser.foto_perfil && !parsedUser.foto)) {
+          console.log('🔍 NAVBAR - Usuario en localStorage sin datos completos, buscando en API...');
           try {
             const response = await fetch(`https://api.mamamianpizza.com/api/users/${parsedUser.id}`, {
               method: 'GET',
@@ -69,8 +105,7 @@ useEffect(() => {
                 'Accept': 'application/json',
               },
             });
-            
-            if (response.ok) {
+              if (response.ok) {
               const userData = await response.json();
               if (userData.foto_perfil) {
                 setCurrentProfilePhoto(userData.foto_perfil);
@@ -80,24 +115,32 @@ useEffect(() => {
                 const updatedUser = { ...parsedUser, foto_perfil: userData.foto_perfil };
                 localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
               }
-            }
-          } catch (apiError) {
-            console.error('❌ NAVBAR - Error al cargar foto desde API:', apiError);
+              
+              if (userData.nombre) {
+                setCurrentUserName(userData.nombre);
+                console.log('✅ NAVBAR - Nombre cargado desde API al montar:', userData.nombre);
+                
+                // Actualizar localStorage con el nombre
+                const updatedUser = { ...parsedUser, nombre: userData.nombre };
+                localStorage.setItem('mamamia_user', JSON.stringify(updatedUser));
+              }
+            }          } catch (apiError) {
+            console.error('❌ NAVBAR - Error al cargar datos desde API:', apiError);
           }
         }
       }
     } catch (error) {
-      console.error('❌ NAVBAR - Error al cargar foto desde localStorage:', error);
+      console.error('❌ NAVBAR - Error al cargar datos desde localStorage:', error);
     }
   };
 
   // Ejecutar inmediatamente al montar
-  loadPhotoFromStorage();
+  loadUserDataFromStorage();
 }, []); // Solo ejecutar una vez al montar
 
-// Actualizar foto cuando cambie el usuario
+// Actualizar foto y nombre cuando cambie el usuario
 useEffect(() => {
-  const fetchUserPhotoIfNeeded = async () => {
+  const fetchUserDataIfNeeded = async () => {
     // Si hay usuario pero no tiene foto, buscar datos completos
     if (user?.id && !user?.foto_perfil && !user?.foto) {
       console.log('🔍 NAVBAR - Usuario sin foto, buscando datos completos...');
@@ -117,16 +160,23 @@ useEffect(() => {
           if (userData.foto_perfil) {
             setCurrentProfilePhoto(userData.foto_perfil);
             console.log('✅ NAVBAR - Foto actualizada desde API:', userData.foto_perfil);
-            return;
           }
+          
+          if (userData.nombre) {
+            setCurrentUserName(userData.nombre);
+            console.log('✅ NAVBAR - Nombre actualizado desde API:', userData.nombre);
+          }
+          return;
         }
       } catch (error) {
         console.error('❌ NAVBAR - Error al obtener datos del usuario:', error);
       }
     }
     
-    // Lógica normal para cuando ya hay foto o no hay usuario
+    // Lógica normal para cuando ya hay datos o no hay usuario
     const newPhoto = user?.foto_perfil || user?.foto || null;
+    const newName = user?.nombre || user?.name || 'Usuario';
+    
     if (newPhoto !== currentProfilePhoto) {
       console.log('🔄 NAVBAR - Actualizando foto por cambio de usuario:', {
         oldPhoto: currentProfilePhoto,
@@ -135,14 +185,28 @@ useEffect(() => {
       });
       setCurrentProfilePhoto(newPhoto);
     }
+    
+    if (newName !== currentUserName) {
+      console.log('🔄 NAVBAR - Actualizando nombre por cambio de usuario:', {
+        oldName: currentUserName,
+        newName: newName,
+        user: user ? { id: user.id, nombre: user.nombre } : null
+      });
+      setCurrentUserName(newName);
+    }
   };
-  fetchUserPhotoIfNeeded();
-}, [user, currentProfilePhoto]); // Incluir user completo para acceso a todas las propiedades
+  fetchUserDataIfNeeded();
+}, [user, currentProfilePhoto, currentUserName]); // Incluir user completo para acceso a todas las propiedades
 
 // Debug: Observar cambios en currentProfilePhoto
 useEffect(() => {
   console.log('🔍 NAVBAR - currentProfilePhoto cambió a:', currentProfilePhoto);
 }, [currentProfilePhoto]);
+
+// Debug: Observar cambios en currentUserName
+useEffect(() => {
+  console.log('🔍 NAVBAR - currentUserName cambió a:', currentUserName);
+}, [currentUserName]);
 
 // Escuchar eventos de actualización de foto de perfil
 useEffect(() => {
@@ -175,10 +239,15 @@ useEffect(() => {
       setCurrentProfilePhoto(event.detail.photo);
     }
   };
-  
-  const handleProfileDataUpdate = (event) => {
+    const handleProfileDataUpdate = (event) => {
     console.log('📝 NAVBAR - Evento profileDataUpdated recibido:', event.detail);
     if (event.detail && user) {
+      // Si viene un nombre en los datos actualizados, usarlo
+      if (event.detail.nombre) {
+        console.log('📝 NAVBAR - Actualizando nombre desde profileDataUpdated:', event.detail.nombre);
+        setCurrentUserName(event.detail.nombre);
+      }
+      
       // Si viene una foto en los datos actualizados, usarla
       if (event.detail.foto_perfil || event.detail.foto) {
         const newPhoto = event.detail.foto_perfil || event.detail.foto;
@@ -187,8 +256,7 @@ useEffect(() => {
       }
     }
   };
-  
-  // También escuchar cambios en localStorage para sincronización
+    // También escuchar cambios en localStorage para sincronización
   const handleStorageChange = (event) => {
     // Solo procesar si el cambio es en mamamia_user
     if (event.key === 'mamamia_user' || !event.key) {
@@ -197,10 +265,19 @@ useEffect(() => {
       if (savedUser) {
         try {
           const parsedUser = JSON.parse(savedUser);
+          
+          // Sincronizar foto
           const newPhoto = parsedUser.foto_perfil || parsedUser.foto || null;
           if (newPhoto !== currentProfilePhoto) {
             console.log('📦 NAVBAR - Sincronizando foto desde localStorage:', newPhoto);
             setCurrentProfilePhoto(newPhoto);
+          }
+          
+          // Sincronizar nombre
+          const newName = parsedUser.nombre || 'Usuario';
+          if (newName !== currentUserName) {
+            console.log('📦 NAVBAR - Sincronizando nombre desde localStorage:', newName);
+            setCurrentUserName(newName);
           }
         } catch (error) {
           console.error('❌ Error al sincronizar desde localStorage:', error);
@@ -221,7 +298,7 @@ useEffect(() => {
     window.removeEventListener('profileDataUpdated', handleProfileDataUpdate);
     window.removeEventListener('storage', handleStorageChange);
   };
-}, [user, currentProfilePhoto]); // Incluir currentProfilePhoto para evitar stale closures
+}, [user, currentProfilePhoto, currentUserName]); // Incluir currentUserName para evitar stale closures
 
 
 const toggleMobileMenu = () => {
@@ -266,6 +343,7 @@ useEffect(() => {
       foto: user.foto
     } : 'NO USER',
     currentProfilePhoto,
+    currentUserName,
     localStorage: (() => {
       try {
         const saved = localStorage.getItem('mamamia_user');
@@ -276,7 +354,7 @@ useEffect(() => {
     })()
   });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [user, currentProfilePhoto]); // Incluir ambas dependencias pero con disable para evitar renders excesivos
+}, [user, currentProfilePhoto, currentUserName]); // Incluir todas las dependencias pero con disable para evitar renders excesivos
 
 
 
@@ -373,10 +451,10 @@ useEffect(() => {
                       color: 'white'
                     }}
                   >
-                    {(user.nombre || user.name || 'U').charAt(0).toUpperCase()}
+                    {(currentUserName || 'U').charAt(0).toUpperCase()}
                   </div>
-                )}<span className="navbar__profile-name" style={{ fontWeight: '500' }}>
-                  {user.nombre || user.name || 'Usuario'}
+                )}                <span className="navbar__profile-name" style={{ fontWeight: '500' }}>
+                  {currentUserName}
                 </span>
                 <span style={{ 
                   marginLeft: '6px', 
@@ -411,7 +489,7 @@ useEffect(() => {
                       color: '#666',
                       fontWeight: '500' 
                     }}>
-                      {user.nombre || user.name || 'Usuario'}
+                      {currentUserName}
                     </div>
                   </li>                  <li>
                     <Link 
