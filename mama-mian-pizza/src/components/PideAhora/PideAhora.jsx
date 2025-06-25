@@ -533,6 +533,7 @@ const redirigirAWompi = () => {
 
   // Función para prellenar datos del usuario logueado
   const fillUserData = (user) => {
+    console.log("USUARIOS ACTUALLLLLL", user)
     if (user) {
       setCuentaData({
         nombreCompleto: user.nombre || '',
@@ -706,6 +707,7 @@ const redirigirAWompi = () => {
                       <div className="telefono-container">
                         <span className="telefono-prefix">+503</span>
                         <span className="separador"></span>
+                        {console.log(cuentaData)}
                         <input
                           name="telefono"
                           id="telefonoCuenta"

@@ -229,7 +229,8 @@ const Login = ({ onLogin }) => {
                     correo: userDataToSave.correo,
                     foto_perfil: userDataToSave.foto_perfil,
                     foto: userDataToSave.foto,
-                    isBasicProfile: userDataToSave.isBasicProfile
+                    isBasicProfile: userDataToSave.isBasicProfile,
+                    celular: userDataToSave.celular || userDataToSave.telefono
                 });
                   // Si tenemos un perfil básico, intentar obtener datos completos
                 if (userDataToSave.isBasicProfile) {
@@ -330,7 +331,8 @@ const Login = ({ onLogin }) => {
                     saveUserData(userDataToSave);
                 } else {
                     console.warn('⚠️ LOGIN - No se pudo guardar datos en localStorage: ID no disponible');
-                }                // Llamar a onLogin con los datos finales
+                }
+                  // Llamar a onLogin con los datos finales
                 onLogin(userDataToSave);
                 
                 // Disparar evento para que el navbar se actualice inmediatamente
@@ -344,30 +346,12 @@ const Login = ({ onLogin }) => {
                     window.dispatchEvent(loginPhotoEvent);
                     console.log('📸 LOGIN - Evento de foto disparado para navbar');
                 }
-
-                // Disparar evento personalizado para informar que el usuario se logueó
-                const userLoginEvent = new CustomEvent('userLoggedIn', {
-                    detail: {
-                        userData: userDataToSave
-                    }
-                });
-                window.dispatchEvent(userLoginEvent);
-                console.log('🔔 LOGIN - Evento userLoggedIn disparado');
                 
                 setSuccess(true);
-                  
-                // Verificar si el usuario venía de la página de compra
-                const pendingPurchaseMode = localStorage.getItem('pendingPurchaseMode');
-                
-                // Redirigir después de 1 segundo
+                  // Redirigir después de 1 segundo
                 setTimeout(() => {
-                    if (pendingPurchaseMode === 'cuenta') {
-                        console.log('Redirigiendo de vuelta a PideAhora...');
-                        navigate('/pide-ahora');
-                    } else {
-                        console.log('Redirigiendo al home...');
-                        navigate('/');
-                    }
+                    console.log('Redirigiendo al home...');
+                    navigate('/');
                 }, 1500);
             } else {
                 // Intentar obtener el mensaje de error de la respuesta

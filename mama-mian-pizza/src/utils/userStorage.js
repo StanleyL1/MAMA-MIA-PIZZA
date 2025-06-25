@@ -45,12 +45,16 @@ export const getUserData = () => {
  * @param {object} userData - Datos del usuario
  */
 export const saveUserData = (userData) => {
+  console.log('📝 STORAGE - Guardando datos del usuario:', userData);
   try {
     if (userData.id) {
       localStorage.setItem('userId', userData.id.toString());
     }
     if (userData.correo || userData.email) {
       localStorage.setItem('userEmail', userData.correo || userData.email);
+    }
+    if (userData.celular || userData.telefono) {
+      localStorage.setItem('celular', userData.celular || userData.correo);
     }
     localStorage.setItem('userData', JSON.stringify(userData));
     // También guardar en la clave que usa App.jsx para mejor compatibilidad
