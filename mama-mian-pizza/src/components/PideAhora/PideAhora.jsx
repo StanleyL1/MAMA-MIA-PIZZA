@@ -7,8 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { 
   FaCheck, 
   FaFilePdf, 
-  FaEye, 
-  FaEyeSlash, 
   FaMapMarkerAlt, 
   FaSpinner, 
   FaUser, 
@@ -33,10 +31,8 @@ const mapContainerStyle = {
 };
 
 const PideAhora = ({ cartItems = [], setCartItems }) => {
-  const navigate = useNavigate();
-  const [step, setStep] = useState('Cuenta');
+  const navigate = useNavigate();  const [step, setStep] = useState('Cuenta');
   const [modo, setModo] = useState('invitado');
-  const [showPassword, setShowPassword] = useState(false);
   const [modoDireccion, setModoDireccion] = useState('formulario');
   const [pagoMetodo, setPagoMetodo] = useState('');
 
@@ -62,11 +58,10 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     const [invitadoData, setInvitadoData] = useState({
     nombreCompleto: '',
     telefono: '',
-  });const [cuentaData, setCuentaData] = useState({
+  });  const [cuentaData, setCuentaData] = useState({
     nombreCompleto: '',
     telefono: '',
     email: '',
-    password: '',
   });
     const [direccionData, setDireccionData] = useState({
     direccionExacta: '',
@@ -271,7 +266,7 @@ const redirigirAWompi = () => {
           return;
         }      } else {
         // Validar campos de cuenta registrada
-        if (!cuentaData.nombreCompleto || !cuentaData.telefono || !cuentaData.email || !cuentaData.password) {
+        if (!cuentaData.nombreCompleto || !cuentaData.telefono || !cuentaData.email) {
           alert('Por favor completa todos los campos requeridos.');
           return;
         }
@@ -313,8 +308,7 @@ const redirigirAWompi = () => {
             }          : {
               nombre: cuentaData.nombreCompleto,
               telefono: cuentaData.telefono,
-              email: cuentaData.email,
-              password: cuentaData.password 
+              email: cuentaData.email
             },
         
         // Dirección según el tipo seleccionado
@@ -616,27 +610,7 @@ const redirigirAWompi = () => {
                         className="input-small"
                         value={cuentaData.email}
                         onChange={handleInputCuenta}
-                      />
-                    </div>
-                  </div>
-                  <div className="campo password-campo">
-                    <label htmlFor="password">Contraseña</label>
-                    <div className="input-with-icon">
-                      <input
-                        name="password"
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        className="input-full"
-                        value={cuentaData.password}
-                        onChange={handleInputCuenta}
-                      />
-                      <span 
-                        className="toggle-password"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                      </span>
-                    </div>
+                      />                    </div>
                   </div>
                 </div>
               )}
