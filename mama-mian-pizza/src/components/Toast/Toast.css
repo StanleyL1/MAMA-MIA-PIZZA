@@ -159,6 +159,82 @@
   transform: translateX(100%) scale(0.95);
 }
 
+/* Posición superior izquierda */
+.toast--top-left {
+  top: 24px;
+  left: 24px;
+  transform: translateX(-100%) scale(0.95);
+}
+
+.toast--top-left.toast--show {
+  transform: translateX(0) scale(1);
+}
+
+.toast--top-left.toast--hide {
+  transform: translateX(-100%) scale(0.95);
+}
+
+/* Posición centro superior */
+.toast--top-center {
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%) scale(0.95);
+}
+
+.toast--top-center.toast--show {
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.toast--top-center.toast--hide {
+  transform: translateX(-50%) translateY(-100%) scale(0.95);
+}
+
+/* Posición inferior derecha */
+.toast--bottom-right {
+  bottom: 44px;
+  right: 24px;
+  transform: translateX(100%) scale(0.95);
+  z-index: 10000;
+}
+
+.toast--bottom-right.toast--show {
+  transform: translateX(0) scale(1);
+}
+
+.toast--bottom-right.toast--hide {
+  transform: translateX(100%) scale(0.95);
+}
+
+/* Posición inferior izquierda */
+.toast--bottom-left {
+  bottom: 24px;
+  left: 24px;
+  transform: translateX(-100%) scale(0.95);
+}
+
+.toast--bottom-left.toast--show {
+  transform: translateX(0) scale(1);
+}
+
+.toast--bottom-left.toast--hide {
+  transform: translateX(-100%) scale(0.95);
+}
+
+/* Posición centro inferior */
+.toast--bottom-center {
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%) scale(0.95);
+}
+
+.toast--bottom-center.toast--show {
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.toast--bottom-center.toast--hide {
+  transform: translateX(-50%) translateY(100%) scale(0.95);
+}
+
 /* Posición unificada para todas las acciones de perfil */
 .toast--profile-left {
   top: 120px;
@@ -220,7 +296,8 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .toast--top-right {
+  .toast--top-right,
+  .toast--top-left {
     right: 16px;
     left: 16px;
     min-width: auto;
@@ -229,14 +306,69 @@
     top: 16px;
   }
   
-  .toast--top-right.toast--show {
+  .toast--top-right.toast--show,
+  .toast--top-left.toast--show {
     transform: translateY(0) scale(1);
   }
   
-  .toast--top-right.toast--hide {
+  .toast--top-right.toast--hide,
+  .toast--top-left.toast--hide {
     transform: translateY(-100%) scale(0.95);
   }
-
+  
+  .toast--bottom-right,
+  .toast--bottom-left {
+    right: 16px;
+    left: 16px;
+    min-width: auto;
+    max-width: none;
+    transform: translateY(100%) scale(0.95);
+    bottom: 16px;
+  }
+  
+  .toast--bottom-right.toast--show,
+  .toast--bottom-left.toast--show {
+    transform: translateY(0) scale(1);
+  }
+  
+  .toast--bottom-right.toast--hide,
+  .toast--bottom-left.toast--hide {
+    transform: translateY(100%) scale(0.95);
+  }
+  
+  .toast--top-center,
+  .toast--bottom-center {
+    left: 16px;
+    right: 16px;
+    min-width: auto;
+    max-width: none;
+  }
+  
+  .toast--top-center {
+    top: 16px;
+    transform: translateY(-100%) scale(0.95);
+  }
+  
+  .toast--top-center.toast--show {
+    transform: translateY(0) scale(1);
+  }
+  
+  .toast--top-center.toast--hide {
+    transform: translateY(-100%) scale(0.95);
+  }
+  
+  .toast--bottom-center {
+    bottom: 16px;
+    transform: translateY(100%) scale(0.95);
+  }
+  
+  .toast--bottom-center.toast--show {
+    transform: translateY(0) scale(1);
+  }
+  
+  .toast--bottom-center.toast--hide {
+    transform: translateY(100%) scale(0.95);
+  }
   .toast--profile-left {
     left: 16px;
     right: 16px;
@@ -292,14 +424,34 @@
 
 @media (max-width: 480px) {
   .toast--top-right,
+  .toast--top-left,
+  .toast--top-center,
+  .toast--bottom-left,
+  .toast--bottom-center,
   .toast--profile-left,
   .toast--profile-card {
     left: 12px;
     right: 12px;
   }
 
-  .toast--top-right {
+  /* Mantener bottom-right en la esquina derecha en móviles */
+  .toast--bottom-right {
+    bottom: 12px;
+    right: 12px;
+    left: auto;
+    min-width: 280px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .toast--top-right,
+  .toast--top-left,
+  .toast--top-center {
     top: 12px;
+  }
+  
+  .toast--bottom-left,
+  .toast--bottom-center {
+    bottom: 12px;
   }
 
   .toast--profile-left {

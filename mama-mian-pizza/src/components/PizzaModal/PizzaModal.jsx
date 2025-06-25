@@ -6,10 +6,10 @@ import { faCartShopping, faCommentDots, faStar } from '@fortawesome/free-solid-s
 
 function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = false }) {
   const [masa, setMasa] = useState('Tradicional');
-  const [tamano, setTamano] = useState('Personal');
-  const [instrucciones, setInstrucciones] = useState('');
+  const [tamano, setTamano] = useState('Personal');  const [instrucciones, setInstrucciones] = useState('');
   const [personalizarIngredientes, setPersonalizarIngredientes] = useState(false);
-  const [showNotification, setShowNotification] = useState(false);  const [activeTab, setActiveTab] = useState('pedido');  const [reseñas, setReseñas] = useState([]);
+
+  const [activeTab, setActiveTab] = useState('pedido');const [reseñas, setReseñas] = useState([]);
   const [mostrarFormularioResena, setMostrarFormularioResena] = useState(false);
   const [nuevaResena, setNuevaResena] = useState({ rating: 0, comentario: '' });
   const [tamanos, setTamanos] = useState([]);
@@ -307,17 +307,10 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
     const tamanosSeleccionado = tamanos.find(t => t.nombre === tamano);
     const precioFinal = tamanosSeleccionado ? tamanosSeleccionado.precio : 
                        (pizza.opciones && pizza.opciones.length > 0 ? pizza.opciones[0].precio : pizza.precio);
-    
-    onAddToCart({...pizza, precio: precioFinal}, null, tamanosSeleccionado, instrucciones);
+      onAddToCart({...pizza, precio: precioFinal}, null, tamanosSeleccionado, instrucciones);
   }
-    // Mostrar la notificación de éxito
-  setShowNotification(true);
-  
-  // Ocultar la notificación después de 2 segundos
-  setTimeout(() => {
-    setShowNotification(false);
-    onClose();
-  }, 2000);
+    // Cerrar el modal inmediatamente
+  onClose();
 };
 
   const handleToggleMasa = (tipo) => setMasa(tipo);
@@ -504,15 +497,7 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
       <div
         className={`modal__content ${activeTab === 'resenas' ? 'modal__full-white' : ''}`}
         onClick={(e) => e.stopPropagation()}
-      >
-        <button className="modal__close-button" onClick={onClose}>×</button>
-
-        {/* Notificación */}
-        {showNotification && (
-          <div className="modal__notification">
-            <p>✓ Agregado al carrito</p>
-          </div>
-        )}
+      >        <button className="modal__close-button" onClick={onClose}>×</button>
 
         {activeTab === 'pedido' ? (
           // Vista de pedido

@@ -74,17 +74,12 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
   
   // Estado local para el Toast del perfil
   const [profileToast, setProfileToast] = useState({ show: false, message: '', type: 'success' });
-    // Función helper para mostrar mensajes usando toast
+  // Función helper para mostrar mensajes usando toast
   const showProfileMessage = useCallback((message, type = 'success') => {
-    // Usar toast local para mostrar el mensaje en el perfil
+    // Usar solo el toast local para mostrar el mensaje en el perfil
     setProfileToast({ show: true, message, type });
     setTimeout(() => setProfileToast({ show: false, message: '', type: 'success' }), 4000);
-    
-    // También usar el toast global como respaldo
-    if (setToast && typeof setToast === 'function') {
-      setToast(message, type, 'profile', 'top-right');
-    }
-  }, [setToast]);
+  }, []);
   // Función para renderizar estrellas
   const renderEstrellas = (valoracion) => {
     const estrellas = [];
@@ -188,12 +183,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
   const refreshResenasYExperiencias = () => {
     fetchResenas();
     fetchExperiencias();
-  };
-  // Manejar creación de nueva experiencia
-  const handleExperienciaCreada = (nuevaExperiencia) => {    // Verificar que setToast existe y es una función antes de usarla
-    if (setToast && typeof setToast === 'function') {
-      showProfileMessage('¡Experiencia creada exitosamente!', 'success');
-    }
+  };  // Manejar creación de nueva experiencia
+  const handleExperienciaCreada = (nuevaExperiencia) => {
+    showProfileMessage('¡Experiencia creada exitosamente!', 'success');
     
     // Refrescar la lista de experiencias
     fetchExperiencias();
@@ -375,19 +367,15 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
           // a través del refetch de userInfo que ya se hace en updateProfilePhoto
           console.log('🔄 PERFIL - Estado se actualizará automáticamente');
         }
-        
-        setPhotoMode(false);
+          setPhotoMode(false);
         setSelectedPhoto(null);
         setPhotoPreview(null);
-        setPhotoError(''); // Limpiar errores        // Verificar que setToast existe y es una función antes de usarla
-        if (setToast && typeof setToast === 'function') {
-          showProfileMessage('Foto de perfil actualizada correctamente', 'success');
-        }
-      } catch (error) {        console.error('Error al actualizar la foto de perfil:', error);
-        setPhotoError('Error al actualizar la foto de perfil. Por favor intenta de nuevo.');        // Verificar que setToast existe y es una función antes de usarla
-        if (setToast && typeof setToast === 'function') {
-          showProfileMessage('Error al actualizar la foto de perfil', 'error');
-        }
+        setPhotoError(''); // Limpiar errores
+        
+        showProfileMessage('Foto de perfil actualizada correctamente', 'success');      } catch (error) {        console.error('Error al actualizar la foto de perfil:', error);
+        setPhotoError('Error al actualizar la foto de perfil. Por favor intenta de nuevo.');
+        
+        showProfileMessage('Error al actualizar la foto de perfil', 'error');
       } finally {
         setSavingPhoto(false);
       }
@@ -484,21 +472,15 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       
       const result = await updateUserInfo(userInfo.id_usuario, updateData);
       console.log('Resultado de la actualización:', result);
-      
-      setEditMode(false);
-      showProfileMessage('Perfil actualizado correctamente');      if (setToast && typeof setToast === 'function') {
-        showProfileMessage('Perfil actualizado correctamente', 'success');
-      }
+        setEditMode(false);
+      showProfileMessage('Perfil actualizado correctamente');
       
       console.log('=== GUARDADO EXITOSO ===');
     } catch (error) {
       console.error('=== ERROR AL GUARDAR PERFIL ===');
-      console.error('Error completo:', error);
-      console.error('Mensaje del error:', error.message);
+      console.error('Error completo:', error);      console.error('Mensaje del error:', error.message);
       
-      showProfileMessage('Error al actualizar el perfil', 'error');      if (setToast && typeof setToast === 'function') {
-        showProfileMessage('Error al actualizar el perfil', 'error');
-      }
+      showProfileMessage('Error al actualizar el perfil', 'error');
     }
   };  // Cambiar contraseña
   const handleChangePassword = async () => {
@@ -598,21 +580,11 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       setPasswordData({
         currentPassword: '',
         newPassword: '',
-        confirmPassword: ''
-      });
+        confirmPassword: ''      });
       
-      showProfileMessage('Contraseña cambiada correctamente', 'success');
-      
-      if (setToast && typeof setToast === 'function') {
-        setToast('Contraseña cambiada correctamente', 'success', 'profile', 'top-right');
-      }
-    } catch (error) {
+      showProfileMessage('Contraseña cambiada correctamente', 'success');    } catch (error) {
       console.error('Error al cambiar la contraseña:', error);
       showProfileMessage(error.message || 'Error al cambiar la contraseña', 'error');
-      
-      if (setToast && typeof setToast === 'function') {
-        setToast(error.message || 'Error al cambiar la contraseña', 'error', 'profile', 'top-right');
-      }
     } finally {
       setLoadingPassword(false);
     }
@@ -712,12 +684,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         const mensaje = result.success === true 
           ? 'Cuenta desactivada exitosamente. Cerrando sesión...' 
           : 'Tu cuenta ya estaba desactivada. Cerrando sesión...';
-          
-        showProfileMessage(mensaje, 'success');
-        
-        if (setToast && typeof setToast === 'function') {
-          setToast(mensaje, 'success', 'profile', 'top-right');
-        }
+            showProfileMessage(mensaje, 'success');
 
         // Limpiar localStorage y redirigir después de 2 segundos
         setTimeout(() => {
@@ -736,14 +703,9 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
       } else {
         throw new Error(result.message || 'Error desconocido al desactivar la cuenta');
       }
-      
-    } catch (error) {
+        } catch (error) {
       console.error('Error al desactivar la cuenta:', error);
       showProfileMessage(error.message || 'Error al desactivar la cuenta', 'error');
-      
-      if (setToast && typeof setToast === 'function') {
-        setToast(error.message || 'Error al desactivar la cuenta', 'error', 'profile', 'top-right');
-      }
     } finally {
       setLoadingDeactivate(false);
     }
@@ -819,7 +781,16 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         <button className={`perfil__tab-btn${activeTab === 'seguridad' ? ' active' : ''}`} onClick={() => setActiveTab('seguridad')}>
           <FontAwesomeIcon icon={faShieldAlt} /> <span className="perfil__tab-text">Seguridad</span>
         </button>
-      </div>
+      </div>      {/* Notificaciones generales */}
+      {profileToast.show && (
+        <Toast
+          message={profileToast.message}
+          type={profileToast.type}
+          category="profile"
+          position="top-left"
+          onClose={() => setProfileToast({ show: false, message: '', type: 'success' })}
+        />
+      )}
 
       {/* CONTENIDO SEGÚN TAB */}
       <div className="perfil__contenido">        {/* --- HISTORIAL DE PEDIDOS --- */}
@@ -1079,15 +1050,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
         {activeTab === 'editar' && (
           <div className="perfil__editar-section">            <div className="perfil__titulo-editar-container">
               <div className="perfil__titulo-editar">Editar Perfil</div>
-              {profileToast.show && (
-                <Toast
-                  message={profileToast.message}
-                  type={profileToast.type}
-                  category="profile"
-                  position="profile-card"
-                  onClose={() => setProfileToast({ show: false, message: '', type: 'success' })}
-                />
-              )}
             </div>
             
             <div className="perfil__form-container">              {/* Sección de foto de perfil */}
@@ -1288,18 +1250,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
           </div>
         )}        {/* --- SEGURIDAD --- */}
         {activeTab === 'seguridad' && (
-          <div className="perfil__seguridad-section">
-            <div className="perfil__titulo-seguridad-container">
+          <div className="perfil__seguridad-section">            <div className="perfil__titulo-seguridad-container">
               <div className="perfil__titulo-seguridad">Seguridad</div>
-              {profileToast.show && (
-                <Toast
-                  message={profileToast.message}
-                  type={profileToast.type}
-                  category="security"
-                  position="security-section"
-                  onClose={() => setProfileToast({ show: false, message: '', type: 'success' })}
-                />
-              )}
             </div>
             
             <div className="perfil__form-container">

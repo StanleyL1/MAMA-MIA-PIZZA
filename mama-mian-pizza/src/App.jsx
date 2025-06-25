@@ -22,7 +22,7 @@ import { saveUserData, clearUserData } from './utils/userStorage';
 
 function App() {  const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);  // Estado para notificaciones tipo toast mejoradas
-  const [toast, setToast] = useState({ show: false, message: '', type: 'success', category: 'general', position: 'top-right' });
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success', category: 'general', position: 'bottom-right' });
   const [user, setUser] = useState(null); // Estado del usuario
 
   const handleCartToggle = () => {
@@ -54,21 +54,10 @@ function App() {  const [isCartOpen, setIsCartOpen] = useState(false);
       ingredientes,
       disponible: true
     };
-    
-    // Agregar el producto al carrito
+      // Agregar el producto al carrito
     setCartItems(prev => [...prev, newItem]);    
     // Abrir el carrito automáticamente cuando se añade un producto
     setIsCartOpen(true);
-
-    // Mostrar notificación breve
-    setToast({ 
-      show: true, 
-      message: `✓ Agregado al carrito`, 
-      type: 'success', 
-      category: 'general',
-      position: 'top-right'
-    });
-    setTimeout(() => setToast({ show: false, message: '', type: 'success', category: 'general', position: 'top-right' }), 2000);
   };
   // Cargar usuario desde localStorage al iniciar la app
   useEffect(() => {
@@ -167,11 +156,10 @@ function App() {  const [isCartOpen, setIsCartOpen] = useState(false);
     // Usar la función mejorada para limpiar datos
     clearUserData();
     console.log('✅ APP - Usuario removido del estado y localStorage');
-  };
-  //  // Función para mostrar toast desde componentes hijos - versión mejorada
-  const showToast = (message, type = 'success', category = 'general', position = 'top-right') => {
+  };  //  // Función para mostrar toast desde componentes hijos - versión mejorada
+  const showToast = (message, type = 'success', category = 'general', position = 'bottom-right') => {
     setToast({ show: true, message, type, category, position });
-    setTimeout(() => setToast({ show: false, message: '', type: 'success', category: 'general', position: 'top-right' }), 4000);
+    setTimeout(() => setToast({ show: false, message: '', type: 'success', category: 'general', position: 'bottom-right' }), 4000);
   };
   // Trigger para actualizaciones de pedidos
   const triggerOrderUpdate = () => {
@@ -222,7 +210,7 @@ function App() {  const [isCartOpen, setIsCartOpen] = useState(false);
           type={toast.type}
           category={toast.category}
           position={toast.position}
-          onClose={() => setToast({ show: false, message: '', type: 'success', category: 'general', position: 'top-right' })}
+          onClose={() => setToast({ show: false, message: '', type: 'success', category: 'general', position: 'bottom-right' })}
         />
       )}
 
