@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './PideAhora.css';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { useNavigate } from 'react-router-dom';
+import { getUserData } from '../../utils/userStorage';
 
 /* IMPORTA TUS ASSETS: íconos, imágenes, etc. Ajusta las rutas según tu proyecto */
 import { 
@@ -78,6 +79,10 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   const [showTerms, setShowTerms] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [aceptoTerminos, setAceptoTerminos] = useState(false);
+
+  // Estados para manejo de usuario logueado
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   // Handlers para los formularios
   const handleInputInvitado = (e) => {
@@ -486,6 +491,111 @@ const redirigirAWompi = () => {
     // Redirigir a la tienda (menu)
     navigate('/menu');
   };
+  
+  // useEffect para verificar si el usuario está logueado
+  useEffect(() => {
+    const checkUserLogin = () => {
+      const storedUserData = getUserData();
+      if (storedUserData && storedUserData.id) {
+        setIsUserLoggedIn(true);
+        setUserData(storedUserData);
+        console.log('Usuario logueado detectado:', storedUserData);
+      } else {
+        setIsUserLoggedIn(false);
+        setUserData(null);
+      }
+    };
+
+    checkUserLogin();
+
+    // Escuchar cambios en el localStorage (por si el usuario se logea en otra pestaña)
+    window.addEventListener('storage', checkUserLogin);
+    
+    // Escuchar evento personalizado cuando el usuario se logea
+    const handleLogin = (event) => {
+      if (event.detail && event.detail.userData) {
+        setIsUserLoggedIn(true);
+        setUserData(event.detail.userData);
+        // Si estamos en modo cuenta, prellenar datos
+        if (modo === 'cuenta') {
+          fillUserData(event.detail.userData);
+        }
+      }
+    };
+
+    window.addEventListener('userLoggedIn', handleLogin);
+
+    return () => {
+      window.removeEventListener('storage', checkUserLogin);
+      window.removeEventListener('userLoggedIn', handleLogin);
+    };
+  }, [modo]);
+
+  // Función para prellenar datos del usuario logueado
+  const fillUserData = (user) => {
+    if (user) {
+      setCuentaData({
+        nombreCompleto: user.nombre || '',
+        telefono: user.telefono || user.celular || '',
+        email: user.correo || user.email || '',
+      });
+      console.log('Datos del usuario prellenados:', {
+        nombre: user.nombre,
+        telefono: user.telefono || user.celular,
+        email: user.correo || user.email
+      });
+    }
+  };
+
+  // Función para manejar el cambio a modo "cuenta"
+  const handleModoChange = (newModo) => {
+    if (newModo === 'cuenta') {
+      if (isUserLoggedIn && userData) {
+        // Si está logueado, prellenar datos
+        fillUserData(userData);
+        setModo(newModo);
+      } else {
+        // Si no está logueado, redirigir al login
+        console.log('Usuario no logueado, redirigiendo al login...');
+        // Guardar en localStorage que el usuario quería comprar con cuenta
+        localStorage.setItem('pendingPurchaseMode', 'cuenta');
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+        navigate('/login');
+        return;
+      }
+    } else {
+      setModo(newModo);
+    }
+  };
+
+  // useEffect para manejar el regreso del login
+  useEffect(() => {
+    const pendingMode = localStorage.getItem('pendingPurchaseMode');
+    const savedCartItems = localStorage.getItem('cartItems');
+    
+    if (pendingMode === 'cuenta' && isUserLoggedIn && userData) {
+      // Restaurar items del carrito si es necesario
+      if (savedCartItems && !cartItems.length) {
+        try {
+          const parsedCart = JSON.parse(savedCartItems);
+          setCartItems(parsedCart);
+        } catch (error) {
+          console.error('Error al restaurar carrito:', error);
+        }
+      }
+      
+      // Establecer modo cuenta y prellenar datos
+      setModo('cuenta');
+      fillUserData(userData);
+      
+      // Limpiar localStorage
+      localStorage.removeItem('pendingPurchaseMode');
+      localStorage.removeItem('cartItems');
+      
+      console.log('Usuario regresó del login, datos prellenados');
+    }
+  }, [isUserLoggedIn, userData, cartItems, setCartItems]);
+
   return (
     <div className="contenedor-pideahora">
       <div className="layout">
@@ -511,13 +621,11 @@ const redirigirAWompi = () => {
               </h3>
               <p className="descripcion-compra">
                 Elige cómo quieres continuar
-              </p>
-
-              {/* Toggle: Invitado / Cuenta */}
+              </p>              {/* Toggle: Invitado / Cuenta */}
               <div className="toggle-compra">
                 <button
                   className={`toggle-btn ${modo === 'invitado' ? 'activo' : ''}`}
-                  onClick={() => setModo('invitado')}
+                  onClick={() => handleModoChange('invitado')}
                 >
                   <FaUser 
                     className={`icono-usuario ${modo === 'invitado' ? 'active-icon' : ''}`}
@@ -529,17 +637,17 @@ const redirigirAWompi = () => {
                 </button>
                 <button
                   className={`toggle-btn ${modo === 'cuenta' ? 'activo' : ''}`}
-                  onClick={() => setModo('cuenta')}
+                  onClick={() => handleModoChange('cuenta')}
                 >
                   <FaUserTie 
                     className={`icono-usuario ${modo === 'cuenta' ? 'active-icon' : ''}`}
                   />
                   <span className="toggle-titulo">Con una cuenta</span>
                   <span className="toggle-desc">
-                    Guarda tu historial
+                    {isUserLoggedIn ? 'Datos automáticos' : 'Inicia sesión primero'}
                   </span>
                 </button>
-              </div>              {/* Formulario de Invitado */}
+              </div>{/* Formulario de Invitado */}
               {modo === 'invitado' && (
                 <div className="formulario-invitado">
                   <div className="campo">
@@ -573,15 +681,23 @@ const redirigirAWompi = () => {
               )}              {/* Formulario de Cuenta */}
               {modo === 'cuenta' && (
                 <div className="formulario-cuenta">
+                  {isUserLoggedIn && userData && (
+                    <div className="cuenta-logueada-info">
+                      <FaCheck className="icono-check" />
+                      <span>Datos obtenidos de tu cuenta</span>
+                    </div>
+                  )}
                   <div className="campo">
                     <label htmlFor="nombreCompletoCuenta">Nombre completo</label>
                     <input
                       name="nombreCompleto"
                       id="nombreCompletoCuenta"
                       type="text"
-                      className="input-small"
+                      className={`input-small ${isUserLoggedIn && userData ? 'input-readonly' : ''}`}
                       value={cuentaData.nombreCompleto}
                       onChange={handleInputCuenta}
+                      readOnly={isUserLoggedIn && userData}
+                      placeholder={!isUserLoggedIn ? "Inicia sesión para autocompletar" : ""}
                     />
                   </div>
                   <div className="campos-dobles">
@@ -594,10 +710,11 @@ const redirigirAWompi = () => {
                           name="telefono"
                           id="telefonoCuenta"
                           type="tel"
-                          className="input-telefono"
-                          placeholder="000-0000"
+                          className={`input-telefono ${isUserLoggedIn && userData ? 'input-readonly' : ''}`}
+                          placeholder={!isUserLoggedIn ? "Inicia sesión primero" : "000-0000"}
                           value={cuentaData.telefono}
                           onChange={handleInputCuenta}
+                          readOnly={isUserLoggedIn && userData}
                         />
                       </div>
                     </div>
@@ -607,9 +724,11 @@ const redirigirAWompi = () => {
                         name="email"
                         id="email"
                         type="email"
-                        className="input-small"
+                        className={`input-small ${isUserLoggedIn && userData ? 'input-readonly' : ''}`}
                         value={cuentaData.email}
                         onChange={handleInputCuenta}
+                        readOnly={isUserLoggedIn && userData}
+                        placeholder={!isUserLoggedIn ? "Inicia sesión para autocompletar" : ""}
                       />                    </div>
                   </div>
                 </div>
