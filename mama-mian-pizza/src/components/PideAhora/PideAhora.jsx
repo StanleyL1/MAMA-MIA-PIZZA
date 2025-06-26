@@ -166,7 +166,6 @@ const redirigirAWompi = () => {
             setLoadingAddress(false);
           })
           .catch(error => {
-            console.error('Error al obtener la dirección:', error);
             setAddressInfo({
               formattedAddress: 'No se pudo obtener la dirección'
             });
@@ -240,13 +239,11 @@ const redirigirAWompi = () => {
         });
       } else {
         // Si hay un error en la respuesta de la API
-        console.error('Error en geocodificación inversa:', data.status);
         setAddressInfo({
           formattedAddress: 'Ubicación sin dirección disponible'
         });
       }
     } catch (error) {
-      console.error('Error al obtener la dirección:', error);
       setAddressInfo({
         formattedAddress: 'Error al obtener la dirección'
       });
@@ -289,15 +286,12 @@ const redirigirAWompi = () => {
   };
   // Función para enviar el pedido al servidor adaptada para el nuevo backend
   const enviarPedido = async () => {
-    console.log('Función enviarPedido ejecutada');
     
     if (!pagoMetodo) {
-      console.log('No se seleccionó método de pago');
       alert('Por favor selecciona un método de pago.');
       return;
     }
     
-    console.log('Preparando datos para enviar a la API...');
     setIsSubmitting(true);
     setOrderError('');
     
@@ -375,9 +369,6 @@ const redirigirAWompi = () => {
         tiempo_estimado_entrega: metodoEntrega === 'domicilio' ? 30 : 25
       };
       
-      console.log('Datos del pedido preparados:', pedidoData);
-      console.log('Enviando pedido a https://api.mamamianpizza.com/api/orders/neworder');
-      
       // Enviar los datos al servidor
       const response = await fetch('https://api.mamamianpizza.com/api/orders/neworder', {
         method: 'POST',
@@ -387,50 +378,12 @@ const redirigirAWompi = () => {
         body: JSON.stringify(pedidoData)
       });
       
-      console.log('Respuesta recibida:', response);
-      
       // Analizar el resultado
       if (response.ok) {
         const result = await response.json();
-        console.log('Pedido creado exitosamente:', result);
-        
-        // Calcular el total para mostrar en la notificación
-        const total = parseFloat((
-          cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) + 
-          (metodoEntrega === 'domicilio' ? 2.50 : 0.00) + 
-          (cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) * 0.13)
-        ).toFixed(2));
         
         // Obtener código de pedido de la respuesta o usar un valor por defecto
         const codigoPedido = result.codigo_pedido || '#78657';
-        
-        // Crear notificación
-        const notificacionData = {
-          titulo: "Nuevo Pedido",
-          mensaje: `Pedido ${codigoPedido} por $${total.toFixed(2)}`,
-          tipo: "pedido",
-          estado: "no leida"
-        };
-        
-        try {
-          // Enviar notificación al servidor
-          console.log('Enviando notificación:', notificacionData);
-          const notificationResponse = await fetch('https://api.mamamianpizza.com/api/notifications/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(notificacionData)
-          });
-          
-          if (notificationResponse.ok) {
-            console.log('Notificación creada exitosamente');
-          } else {
-            console.error('Error al crear notificación:', await notificationResponse.json());
-          }
-        } catch (notificationError) {
-          console.error('Error al enviar notificación:', notificationError);
-        }
         
         // Continuar con el flujo normal después de un pedido exitoso
         setOrderSuccess(true);
@@ -439,13 +392,11 @@ const redirigirAWompi = () => {
         setShowSuccess(true);
       } else {
         const errorResult = await response.json();
-        console.error('Error al procesar el pedido:', errorResult);
         setOrderError(errorResult.message || 'Error al procesar el pedido');
         setShowTerms(false);
         alert(`Error al procesar el pedido: ${errorResult.message || 'Intenta nuevamente'}`);
       }
     } catch (error) {
-      console.error('Error en la solicitud:', error);
       setOrderError('Error de conexión al procesar el pedido');
       setShowTerms(false);
       alert('Hubo un problema al procesar el pedido. Por favor intenta nuevamente más tarde.');
@@ -460,10 +411,8 @@ const redirigirAWompi = () => {
     console.log('Estado aceptoTerminos:', aceptoTerminos);
     
     if (aceptoTerminos) {
-      console.log('Términos aceptados, intentando enviar pedido...');
       enviarPedido();
     } else {
-      console.log('Términos no aceptados');
       alert('Debes aceptar los términos y condiciones para continuar');
     }
   };
@@ -499,7 +448,6 @@ const redirigirAWompi = () => {
       if (storedUserData && storedUserData.id) {
         setIsUserLoggedIn(true);
         setUserData(storedUserData);
-        console.log('Usuario logueado detectado:', storedUserData);
       } else {
         setIsUserLoggedIn(false);
         setUserData(null);
@@ -533,17 +481,11 @@ const redirigirAWompi = () => {
 
   // Función para prellenar datos del usuario logueado
   const fillUserData = (user) => {
-    console.log("USUARIOS ACTUALLLLLL", user)
     if (user) {
       setCuentaData({
         nombreCompleto: user.nombre || '',
         telefono: user.telefono || user.celular || '',
         email: user.correo || user.email || '',
-      });
-      console.log('Datos del usuario prellenados:', {
-        nombre: user.nombre,
-        telefono: user.telefono || user.celular,
-        email: user.correo || user.email
       });
     }
   };
@@ -557,7 +499,6 @@ const redirigirAWompi = () => {
         setModo(newModo);
       } else {
         // Si no está logueado, redirigir al login
-        console.log('Usuario no logueado, redirigiendo al login...');
         // Guardar en localStorage que el usuario quería comprar con cuenta
         localStorage.setItem('pendingPurchaseMode', 'cuenta');
         localStorage.setItem('cartItems', JSON.stringify(cartItems));
@@ -581,7 +522,7 @@ const redirigirAWompi = () => {
           const parsedCart = JSON.parse(savedCartItems);
           setCartItems(parsedCart);
         } catch (error) {
-          console.error('Error al restaurar carrito:', error);
+          // Error al restaurar carrito
         }
       }
       
@@ -592,8 +533,6 @@ const redirigirAWompi = () => {
       // Limpiar localStorage
       localStorage.removeItem('pendingPurchaseMode');
       localStorage.removeItem('cartItems');
-      
-      console.log('Usuario regresó del login, datos prellenados');
     }
   }, [isUserLoggedIn, userData, cartItems, setCartItems]);
 
