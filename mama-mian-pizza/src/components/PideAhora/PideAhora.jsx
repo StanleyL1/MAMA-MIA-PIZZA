@@ -39,7 +39,6 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   const { 
     isProcessing: isProcessingWompi, 
     error: wompiError, 
-    transactionId,
     createTransaction,
     clearError: clearWompiError
   } = useWompi();  const [step, setStep] = useState('Cuenta');
@@ -60,7 +59,6 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   // Estados adicionales para manejo del pedido
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderError, setOrderError] = useState('');
-  const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderCode, setOrderCode] = useState('');
     const [invitadoData, setInvitadoData] = useState({
     nombreCompleto: '',
@@ -160,7 +158,6 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
         const codigoPedido = result.codigo_pedido || '#78657';
         
         // Continuar con el flujo normal después de un pedido exitoso
-        setOrderSuccess(true);
         setOrderCode(codigoPedido);
         setShowTerms(false);
         setShowSuccess(true);
@@ -1188,16 +1185,30 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
               />
               <label htmlFor="aceptoTerminos"> He leído y acepto los términos y condiciones</label>
             </div>
+            
+            {orderError && (
+              <div className="error-message">
+                <p>{orderError}</p>
+              </div>
+            )}
+            
             <button
               className="btn-aceptar"
               onClick={handleAceptarTerminos}
-              disabled={!aceptoTerminos}
+              disabled={!aceptoTerminos || isSubmitting || isProcessingWompi}
               style={{
-                opacity: aceptoTerminos ? 1 : 0.5,
-                cursor: aceptoTerminos ? 'pointer' : 'not-allowed'
+                opacity: (aceptoTerminos && !isSubmitting && !isProcessingWompi) ? 1 : 0.5,
+                cursor: (aceptoTerminos && !isSubmitting && !isProcessingWompi) ? 'pointer' : 'not-allowed'
               }}
             >
-              Aceptar y realizar pedido
+              {isSubmitting || isProcessingWompi ? (
+                <>
+                  <FaSpinner className="spinner-icon" />
+                  Procesando...
+                </>
+              ) : (
+                'Aceptar y realizar pedido'
+              )}
             </button>
           </div>
         </div>
@@ -1213,7 +1224,7 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
         <FaCheck aria-hidden="true" />
       </div>
       <h1>¡Pedido realizado con éxito!</h1>
-      <p>Tu pedido #78657 ha sido recibido y está siendo procesado.</p>
+      <p>Tu pedido #{orderCode || '78657'} ha sido recibido y está siendo procesado.</p>
       <h3>
         Recibirás una confirmación por correo electrónico con los detalles de tu pedido.
       </h3>
