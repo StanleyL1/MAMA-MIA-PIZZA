@@ -1746,8 +1746,8 @@
   
   .toggle-btn, 
   .toggle-dir-btn {
-    padding: 12px;
-    min-height: 70px;
+    padding: 10px;
+    min-height: 60px;
   }
   
   .toggle-titulo {
@@ -2150,11 +2150,56 @@ body:has(.contenedor-pideahora) .toggle-button {
   font-style: italic;
 }
 
-/* === Estilos para método de pago en confirmación === */
-.metodo-pago-info {
-  margin-top: 10px;
+/* === Estilos para opciones de pago === */
+.opciones-pago {
+  margin: 15px 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
 }
 
-.pago-icon {
-  background-color: #28a745;
+.opcion-pago {
+  margin: 8px 0;
+  padding: 8px 0;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.opcion-pago strong {
+  color: #343a40;
+}
+
+.nota-importante {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  color: #856404;
+}
+
+.nota-importante .warning-icon {
+  color: #f39c12;
+  font-size: 1rem;
+}
+
+.detalle-pagos {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.detalle-pagos p {
+  margin: 8px 0;
+}
+
+.detalle-pagos strong {
+  color: #343a40;
 }

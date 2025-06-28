@@ -107,8 +107,91 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     });
   };
 
-// Función para redirigir a Wompi con enlace predefinido (solución CORS)
-const redirigirAWompi = () => {
+// Función para manejar el pago (temporal hasta configurar Wompi correctamente)
+const procesarPago = () => {
+  try {
+    // Calcular totales del pedido
+    const subtotal = cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+    const impuestos = subtotal * 0.13;
+    const costoEnvio = metodoEntrega === 'domicilio' ? 2.50 : 0.00;
+    const total = subtotal + impuestos + costoEnvio;
+
+    // Obtener nombre del cliente
+    const nombreCliente = modo === 'invitado' 
+      ? invitadoData.nombreCompleto 
+      : cuentaData.nombreCompleto;
+
+    // Crear descripción del pedido
+    const descripcionProductos = cartItems.map(item => 
+      `${item.nombre} (x${item.cantidad})`
+    ).join(', ');
+
+    // Crear identificador único para el pedido
+    const identificadorUnico = `mama-mia-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    // Mostrar información del pedido antes de procesar
+    const confirmacion = window.confirm(
+      `🍕 CONFIRMAR PEDIDO MAMA MÍA PIZZA 🍕\n\n` +
+      `Cliente: ${nombreCliente}\n` +
+      `Productos: ${descripcionProductos}\n\n` +
+      `💰 RESUMEN DE COSTOS:\n` +
+      `Subtotal: $${subtotal.toFixed(2)}\n` +
+      `Impuestos (13%): $${impuestos.toFixed(2)}\n` +
+      `Envío: $${costoEnvio.toFixed(2)}\n` +
+      `TOTAL: $${total.toFixed(2)}\n\n` +
+      `📍 Entrega: ${metodoEntrega === 'domicilio' ? 'A domicilio' : 'Recoger en local'}\n` +
+      `⏱️ Tiempo estimado: ${metodoEntrega === 'domicilio' ? '45-60' : '25-30'} minutos\n\n` +
+      `¿Confirmas tu pedido?`
+    );
+
+    if (confirmacion) {
+      // Guardar información del pedido en localStorage
+      const pedidoInfo = {
+        identificador: identificadorUnico,
+        cliente: nombreCliente,
+        productos: cartItems,
+        total: total,
+        metodoEntrega: metodoEntrega,
+        fecha: new Date().toISOString(),
+        subtotal: subtotal,
+        impuestos: impuestos,
+        costoEnvio: costoEnvio,
+        metodoPago: 'Pago en línea',
+        estado: 'procesando'
+      };
+      localStorage.setItem('pedido_actual', JSON.stringify(pedidoInfo));
+
+      console.log('🔄 Procesando pedido:', pedidoInfo);
+
+      // Simular procesamiento de pago (en desarrollo)
+      setTimeout(() => {
+        // Simular éxito del pago
+        const pagoExitoso = Math.random() > 0.1; // 90% de éxito para pruebas
+        
+        if (pagoExitoso) {
+          console.log('✅ Pago procesado exitosamente');
+          // Redirigir a página de éxito
+          window.location.href = `/pago-exitoso?pedido=${identificadorUnico}&monto=${total.toFixed(2)}&estado=exitoso`;
+        } else {
+          console.log('❌ Pago rechazado');
+          alert('El pago fue rechazado. Por favor intenta con otro método de pago.');
+          localStorage.removeItem('pedido_actual');
+        }
+      }, 2000);
+
+      // Mostrar mensaje de procesamiento
+      alert('🔄 Tu pago se está procesando...\n\nSerás redirigido automáticamente cuando se complete.');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error al procesar pago:', error);
+    alert('Error al procesar el pago. Por favor intenta nuevamente.');
+    throw error;
+  }
+};
+
+// Función para redirigir a Wompi (cuando esté configurado correctamente)
+const redirigirAWompiReal = () => {
   try {
     // Calcular totales del pedido
     const subtotal = cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
@@ -138,44 +221,25 @@ const redirigirAWompi = () => {
     };
     localStorage.setItem('pedido_actual', JSON.stringify(pedidoInfo));
 
-    // Crear descripción del pedido para mostrar al usuario
-    const descripcionProductos = cartItems.map(item => 
-      `${item.nombre} (x${item.cantidad})`
-    ).join(', ');
-
-    console.log('🏪 Redirigiendo a Wompi con información del pedido:', {
-      cliente: nombreCliente,
-      total: total,
-      productos: descripcionProductos,
-      identificador: identificadorUnico
-    });
-
-    // Mostrar información del pedido antes de redirigir
-    const confirmacion = window.confirm(
-      `¿Confirmas el pago de $${total.toFixed(2)} para el pedido:\n\n` +
-      `Cliente: ${nombreCliente}\n` +
-      `Productos: ${descripcionProductos}\n` +
-      `Subtotal: $${subtotal.toFixed(2)}\n` +
-      `Impuestos: $${impuestos.toFixed(2)}\n` +
-      `Envío: $${costoEnvio.toFixed(2)}\n` +
-      `Total: $${total.toFixed(2)}\n\n` +
-      `Serás redirigido a la plataforma de pago de Wompi.`
-    );
-
-    if (confirmacion) {
-      // Usar el enlace predefinido de Wompi con parámetros
-      const urlWompi = `https://u.wompi.sv/398524Auq?amount=${total.toFixed(2)}&reference=${identificadorUnico}&customer_name=${encodeURIComponent(nombreCliente)}`;
-      
-      console.log('🔗 Redirigiendo a URL de Wompi:', urlWompi);
-      
-      // Redirigir a Wompi
-      window.open(urlWompi, '_self');
-    }
+    console.log('🔗 Intentando redirigir a Wompi...');
+    
+    // Intentar diferentes URLs de Wompi
+    const urlsWompi = [
+      `https://u.wompi.sv/398524Auq?amount=${total.toFixed(2)}&reference=${identificadorUnico}`,
+      `https://checkout.wompi.sv/p/${identificadorUnico}?amount=${total.toFixed(2)}`,
+      `https://pay.wompi.sv/checkout/${identificadorUnico}`
+    ];
+    
+    // Usar la primera URL por defecto (puedes cambiar según instrucciones de Wompi)
+    const urlFinal = urlsWompi[0];
+    
+    console.log('🌐 Redirigiendo a:', urlFinal);
+    window.open(urlFinal, '_self');
     
   } catch (error) {
-    console.error('❌ Error al preparar pago con Wompi:', error);
-    alert('Error al preparar el pago. Por favor intenta nuevamente.');
-    throw error;
+    console.error('❌ Error al redirigir a Wompi:', error);
+    // Si falla, usar el sistema de simulación
+    procesarPago();
   }
 };
 
@@ -355,9 +419,23 @@ const redirigirAWompi = () => {
       if (pagoMetodo === 'transferencia') {
         try {
           setIsProcessingPayment(true);
-          redirigirAWompi(); // Usar la nueva función sin CORS
+          
+          // Preguntar si quiere usar Wompi real o simulación
+          const usarWompiReal = window.confirm(
+            "🏪 MÉTODO DE PAGO\n\n" +
+            "¿Cómo quieres proceder?\n\n" +
+            "✅ OK = Intentar Wompi real (puede fallar si no está configurado)\n" +
+            "❌ Cancelar = Usar simulación de pago (para pruebas)\n\n" +
+            "Recomendación: Usa simulación hasta configurar Wompi correctamente"
+          );
+          
+          if (usarWompiReal) {
+            redirigirAWompiReal(); // Intentar Wompi real
+          } else {
+            procesarPago(); // Usar simulación
+          }
         } catch (error) {
-          // Error ya manejado en redirigirAWompi
+          // Error ya manejado en las funciones
         } finally {
           setIsProcessingPayment(false);
         }
@@ -1024,14 +1102,22 @@ const redirigirAWompi = () => {
     {pagoMetodo === 'transferencia' && (
       <div className="detalle-pagos">
         <p>
-          Serás redirigido a la plataforma segura de Wompi para completar tu pago.
+          <strong>Opciones de pago en línea disponibles:</strong>
         </p>
+        <div className="opciones-pago">
+          <div className="opcion-pago">
+            <strong>🏪 Wompi Real:</strong> Redirige a la plataforma de Wompi (requiere configuración)
+          </div>
+          <div className="opcion-pago">
+            <strong>🧪 Simulación:</strong> Procesa el pedido de forma simulada (para desarrollo)
+          </div>
+        </div>
         <p>
-          Acepta tarjetas de crédito, débito y Punto Agrícola.
+          <small>Se te preguntará qué opción usar al proceder con el pago.</small>
         </p>
         <div className="nota-importante">
           <FaExclamationTriangle className="warning-icon" />
-          <small>Se mostrará una confirmación con los detalles del pedido antes de redirigir.</small>
+          <small>Recomendación: Usa simulación hasta que Wompi esté correctamente configurado.</small>
         </div>
       </div>
     )}
