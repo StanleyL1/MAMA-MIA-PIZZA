@@ -18,6 +18,8 @@ import SocialMediaButton from './components/socialMediaButton/SocialMediaButton'
 import AdminExperiencias from './components/AdminExperiencias/AdminExperiencias';
 import TestExperiencias from './components/TestExperiencias/TestExperiencias';
 import Toast from './components/Toast/Toast';
+import PaymentSuccess from './components/PaymentSuccess/PaymentSuccess';
+import PaymentFailure from './components/PaymentFailure/PaymentFailure';
 import { saveUserData, clearUserData } from './utils/userStorage';
 
 function App() {  const [isCartOpen, setIsCartOpen] = useState(false);
@@ -198,8 +200,24 @@ function App() {  const [isCartOpen, setIsCartOpen] = useState(false);
             onOrderComplete={triggerOrderUpdate}
             setToast={showToast}
           />
+        } />
+        
+        {/* Ruta alternativa para checkout */}
+        <Route path="/checkout" element={
+          <PideAhora 
+            cartItems={cartItems} 
+            setCartItems={setCartItems}
+            user={user}
+            onOrderComplete={triggerOrderUpdate}
+            setToast={showToast}
+          />
         } />        <Route path="/equipo-desarrollo" element={<Team />} />
-        <Route path="/informacion-legal" element={<InformacionLegal />} />        <Route path="/admin/experiencias" element={<AdminExperiencias />} />
+        <Route path="/informacion-legal" element={<InformacionLegal />} />        
+        {/* Rutas para Wompi - páginas de resultado de pago */}
+        <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/payment/failure" element={<PaymentFailure />} />
+        
+        <Route path="/admin/experiencias" element={<AdminExperiencias />} />
         <Route path="/test/experiencias" element={<TestExperiencias />} />
       </Routes>
 

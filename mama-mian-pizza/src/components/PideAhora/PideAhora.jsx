@@ -3,6 +3,7 @@ import './PideAhora.css';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { useNavigate } from 'react-router-dom';
 import { getUserData } from '../../utils/userStorage';
+import useWompi from '../../hooks/useWompi';
 
 /* IMPORTA TUS ASSETS: íconos, imágenes, etc. Ajusta las rutas según tu proyecto */
 import { 
@@ -32,7 +33,16 @@ const mapContainerStyle = {
 };
 
 const PideAhora = ({ cartItems = [], setCartItems }) => {
-  const navigate = useNavigate();  const [step, setStep] = useState('Cuenta');
+  const navigate = useNavigate();
+  
+  // Hook personalizado para Wompi
+  const { 
+    isProcessing: isProcessingWompi, 
+    error: wompiError, 
+    transactionId,
+    createTransaction,
+    clearError: clearWompiError
+  } = useWompi();  const [step, setStep] = useState('Cuenta');
   const [modo, setModo] = useState('invitado');
   const [modoDireccion, setModoDireccion] = useState('formulario');
   const [pagoMetodo, setPagoMetodo] = useState('');
@@ -48,13 +58,9 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   const [loadingAddress, setLoadingAddress] = useState(false);
   
   // Estados adicionales para manejo del pedido
-  // eslint-disable-next-line no-unused-vars
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [orderError, setOrderError] = useState('');
-  // eslint-disable-next-line no-unused-vars
   const [orderSuccess, setOrderSuccess] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [orderCode, setOrderCode] = useState('');
     const [invitadoData, setInvitadoData] = useState({
     nombreCompleto: '',
@@ -106,9 +112,71 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     });
   };
 
-const redirigirAWompi = () => {
-  window.open("https://u.wompi.sv/398524Auq", "_blank");
-};
+  // Función para procesar pago con Wompi
+  const procesarPagoWompi = async (pedidoData) => {
+    try {
+      // Limpiar errores anteriores
+      clearWompiError();
+      
+      // Obtener datos del cliente
+      const customerData = {
+        name: modo === 'invitado' ? invitadoData.nombreCompleto : cuentaData.nombreCompleto,
+        email: modo === 'cuenta' ? cuentaData.email : undefined,
+        phone: modo === 'invitado' ? invitadoData.telefono : cuentaData.telefono
+      };
+
+      // Crear transacción usando el hook
+      const result = await createTransaction(pedidoData, customerData);
+      
+      if (result.success) {
+        // Redirigir a Wompi
+        window.location.href = result.redirectUrl;
+      } else {
+        throw new Error(result.error || 'Error al crear transacción Wompi');
+      }
+    } catch (error) {
+      console.error('Error procesando pago Wompi:', error);
+      alert(`Error al procesar el pago: ${error.message}`);
+    }
+  };
+
+  // Función para procesar pedido normal (efectivo)
+  const procesarPedidoNormal = async (pedidoData) => {
+    try {
+      // Enviar los datos al servidor
+      const response = await fetch('https://api.mamamianpizza.com/api/orders/neworder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(pedidoData)
+      });
+      
+      // Analizar el resultado
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Obtener código de pedido de la respuesta o usar un valor por defecto
+        const codigoPedido = result.codigo_pedido || '#78657';
+        
+        // Continuar con el flujo normal después de un pedido exitoso
+        setOrderSuccess(true);
+        setOrderCode(codigoPedido);
+        setShowTerms(false);
+        setShowSuccess(true);
+      } else {
+        const errorResult = await response.json();
+        setOrderError(errorResult.message || 'Error al procesar el pedido');
+        setShowTerms(false);
+        alert(`Error al procesar el pedido: ${errorResult.message || 'Intenta nuevamente'}`);
+      }
+    } catch (error) {
+      setOrderError('Error de conexión al procesar el pedido');
+      setShowTerms(false);
+      alert('Hubo un problema al procesar el pedido. Por favor intenta nuevamente más tarde.');
+      throw error;
+    }
+  };
 
 
 
@@ -369,37 +437,18 @@ const redirigirAWompi = () => {
         tiempo_estimado_entrega: metodoEntrega === 'domicilio' ? 30 : 25
       };
       
-      // Enviar los datos al servidor
-      const response = await fetch('https://api.mamamianpizza.com/api/orders/neworder', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(pedidoData)
-      });
-      
-      // Analizar el resultado
-      if (response.ok) {
-        const result = await response.json();
-        
-        // Obtener código de pedido de la respuesta o usar un valor por defecto
-        const codigoPedido = result.codigo_pedido || '#78657';
-        
-        // Continuar con el flujo normal después de un pedido exitoso
-        setOrderSuccess(true);
-        setOrderCode(codigoPedido);
-        setShowTerms(false);
-        setShowSuccess(true);
+      // Procesar según el método de pago
+      if (pagoMetodo === 'tarjeta') {
+        // Usar Wompi para pagos con tarjeta
+        await procesarPagoWompi(pedidoData);
       } else {
-        const errorResult = await response.json();
-        setOrderError(errorResult.message || 'Error al procesar el pedido');
-        setShowTerms(false);
-        alert(`Error al procesar el pedido: ${errorResult.message || 'Intenta nuevamente'}`);
+        // Usar flujo normal para pagos en efectivo
+        await procesarPedidoNormal(pedidoData);
       }
+      
     } catch (error) {
-      setOrderError('Error de conexión al procesar el pedido');
-      setShowTerms(false);
-      alert('Hubo un problema al procesar el pedido. Por favor intenta nuevamente más tarde.');
+      console.error('Error en enviarPedido:', error);
+      // El manejo de errores específicos ya se hace en las funciones individuales
     } finally {
       setIsSubmitting(false);
     }
@@ -917,29 +966,50 @@ const redirigirAWompi = () => {
   <div className="card-pago">
     <h3 className="titulo-compra">Método de Pago</h3>
     <p className="descripcion-pago">Elige cómo quieres pagar tu pedido</p>
+    
+    {wompiError && (
+      <div className="error-wompi">
+        <FaExclamationTriangle className="error-icon" />
+        <p>{wompiError}</p>
+      </div>
+    )}
+    
     <div className="toggle-pago">
-  <button
-    className={`toggle-btn ${pagoMetodo === 'transferencia' ? 'activo' : ''}`}
-    onClick={() => {
-      setPagoMetodo('transferencia');
-      redirigirAWompi();
-    }}
-  >
-    <FaCreditCard className={`icono-metodo ${pagoMetodo === 'transferencia' ? 'active-icon' : ''}`} />
-    <span>Transferencia bancaria</span>
-  </button>
+      <button
+        className={`toggle-btn ${pagoMetodo === 'tarjeta' ? 'activo' : ''}`}
+        onClick={() => setPagoMetodo('tarjeta')}
+        disabled={isProcessingWompi}
+      >
+        <FaCreditCard className={`icono-metodo ${pagoMetodo === 'tarjeta' ? 'active-icon' : ''}`} />
+        <span>Pago con tarjeta (Wompi)</span>
+        {isProcessingWompi && <FaSpinner className="spinner-icon" />}
+      </button>
 
-  <button
-    className={`toggle-btn ${pagoMetodo === 'efectivo' ? 'activo' : ''}`}
-    onClick={() => setPagoMetodo('efectivo')}
-  >
-    <FaMoneyBillWave className={`icono-metodo ${pagoMetodo === 'efectivo' ? 'active-icon' : ''}`} />
-    <span>Efectivo</span>
-  </button>
-</div>
+      <button
+        className={`toggle-btn ${pagoMetodo === 'efectivo' ? 'activo' : ''}`}
+        onClick={() => setPagoMetodo('efectivo')}
+        disabled={isProcessingWompi}
+      >
+        <FaMoneyBillWave className={`icono-metodo ${pagoMetodo === 'efectivo' ? 'active-icon' : ''}`} />
+        <span>Efectivo</span>
+      </button>
+    </div>
 
-
-
+    {pagoMetodo === 'tarjeta' && (
+      <div className="detalle-pagos">
+        <p>
+          <FaCreditCard className="info-icon" />
+          Procesado de forma segura por Wompi.
+        </p>
+        <p>
+          Serás redirigido a la plataforma de pago para completar tu transacción.
+        </p>
+        <div className="wompi-info">
+          <small>✓ Pagos seguros con 3D Secure</small><br />
+          <small>✓ Aceptamos todas las tarjetas principales</small>
+        </div>
+      </div>
+    )}
 
     {pagoMetodo === 'efectivo' && (
       <div className="detalle-pagos">
@@ -947,18 +1017,32 @@ const redirigirAWompi = () => {
           Pagarás en efectivo al momento de la entrega. 
         </p>
         <p>
-
           Por favor, ten el monto exacto para facilitar la entrega.
         </p>
       </div>
     )}
 
     <div className="botones">
-      <button className="btn-volver-Direccion" onClick={() => setStep('Dirección')}>
+      <button 
+        className="btn-volver-Direccion" 
+        onClick={() => setStep('Dirección')}
+        disabled={isProcessingWompi}
+      >
         Atrás
       </button>
-      <button className="btn-continuar-pago" onClick={handleContinuar}>
-        Continuar
+      <button 
+        className="btn-continuar-pago" 
+        onClick={handleContinuar}
+        disabled={isProcessingWompi || !pagoMetodo}
+      >
+        {isProcessingWompi ? (
+          <>
+            <FaSpinner className="spinner-icon" />
+            Procesando...
+          </>
+        ) : (
+          'Continuar'
+        )}
       </button>
     </div>
   </div>
@@ -1047,13 +1131,23 @@ const redirigirAWompi = () => {
               <p className="metodo-tipo">Efectivo al momento de {metodoEntrega === 'recoger' ? 'recoger' : 'la entrega'}</p>
             </div>
           </div>
+        ) : pagoMetodo === 'tarjeta' ? (
+          <div className="metodo-entrega-info">
+            <div className="metodo-icon-container">
+              <FaCreditCard className="metodo-icon pago-icon" />
+            </div>
+            <div className="metodo-details">
+              <p className="metodo-tipo">Pago con tarjeta (Wompi)</p>
+              <p><small>Procesamiento seguro 3D Secure</small></p>
+            </div>
+          </div>
         ) : (
           <div className="metodo-entrega-info">
             <div className="metodo-icon-container">
               <FaCreditCard className="metodo-icon pago-icon" />
             </div>
             <div className="metodo-details">
-            
+              <p className="metodo-tipo">Método de pago no especificado</p>
             </div>
           </div>
         )}
