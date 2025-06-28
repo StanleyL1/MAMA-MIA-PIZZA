@@ -56,7 +56,6 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   const [orderSuccess, setOrderSuccess] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [orderCode, setOrderCode] = useState('');
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
     const [invitadoData, setInvitadoData] = useState({
     nombreCompleto: '',
     telefono: '',
@@ -107,140 +106,8 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     });
   };
 
-// Función para manejar el pago (temporal hasta configurar Wompi correctamente)
-const procesarPago = () => {
-  try {
-    // Calcular totales del pedido
-    const subtotal = cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-    const impuestos = subtotal * 0.13;
-    const costoEnvio = metodoEntrega === 'domicilio' ? 2.50 : 0.00;
-    const total = subtotal + impuestos + costoEnvio;
-
-    // Obtener nombre del cliente
-    const nombreCliente = modo === 'invitado' 
-      ? invitadoData.nombreCompleto 
-      : cuentaData.nombreCompleto;
-
-    // Crear descripción del pedido
-    const descripcionProductos = cartItems.map(item => 
-      `${item.nombre} (x${item.cantidad})`
-    ).join(', ');
-
-    // Crear identificador único para el pedido
-    const identificadorUnico = `mama-mia-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-    // Mostrar información del pedido antes de procesar
-    const confirmacion = window.confirm(
-      `🍕 CONFIRMAR PEDIDO MAMA MÍA PIZZA 🍕\n\n` +
-      `Cliente: ${nombreCliente}\n` +
-      `Productos: ${descripcionProductos}\n\n` +
-      `💰 RESUMEN DE COSTOS:\n` +
-      `Subtotal: $${subtotal.toFixed(2)}\n` +
-      `Impuestos (13%): $${impuestos.toFixed(2)}\n` +
-      `Envío: $${costoEnvio.toFixed(2)}\n` +
-      `TOTAL: $${total.toFixed(2)}\n\n` +
-      `📍 Entrega: ${metodoEntrega === 'domicilio' ? 'A domicilio' : 'Recoger en local'}\n` +
-      `⏱️ Tiempo estimado: ${metodoEntrega === 'domicilio' ? '45-60' : '25-30'} minutos\n\n` +
-      `¿Confirmas tu pedido?`
-    );
-
-    if (confirmacion) {
-      // Guardar información del pedido en localStorage
-      const pedidoInfo = {
-        identificador: identificadorUnico,
-        cliente: nombreCliente,
-        productos: cartItems,
-        total: total,
-        metodoEntrega: metodoEntrega,
-        fecha: new Date().toISOString(),
-        subtotal: subtotal,
-        impuestos: impuestos,
-        costoEnvio: costoEnvio,
-        metodoPago: 'Pago en línea',
-        estado: 'procesando'
-      };
-      localStorage.setItem('pedido_actual', JSON.stringify(pedidoInfo));
-
-      console.log('🔄 Procesando pedido:', pedidoInfo);
-
-      // Simular procesamiento de pago (en desarrollo)
-      setTimeout(() => {
-        // Simular éxito del pago
-        const pagoExitoso = Math.random() > 0.1; // 90% de éxito para pruebas
-        
-        if (pagoExitoso) {
-          console.log('✅ Pago procesado exitosamente');
-          // Redirigir a página de éxito
-          window.location.href = `/pago-exitoso?pedido=${identificadorUnico}&monto=${total.toFixed(2)}&estado=exitoso`;
-        } else {
-          console.log('❌ Pago rechazado');
-          alert('El pago fue rechazado. Por favor intenta con otro método de pago.');
-          localStorage.removeItem('pedido_actual');
-        }
-      }, 2000);
-
-      // Mostrar mensaje de procesamiento
-      alert('🔄 Tu pago se está procesando...\n\nSerás redirigido automáticamente cuando se complete.');
-    }
-    
-  } catch (error) {
-    console.error('❌ Error al procesar pago:', error);
-    alert('Error al procesar el pago. Por favor intenta nuevamente.');
-    throw error;
-  }
-};
-
-// Función para redirigir a Wompi (cuando esté configurado correctamente)
-const redirigirAWompiReal = () => {
-  try {
-    // Calcular totales del pedido
-    const subtotal = cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-    const impuestos = subtotal * 0.13;
-    const costoEnvio = metodoEntrega === 'domicilio' ? 2.50 : 0.00;
-    const total = subtotal + impuestos + costoEnvio;
-
-    // Obtener nombre del cliente
-    const nombreCliente = modo === 'invitado' 
-      ? invitadoData.nombreCompleto 
-      : cuentaData.nombreCompleto;
-
-    // Crear identificador único para el pedido
-    const identificadorUnico = `mama-mia-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-    // Guardar información del pedido en localStorage para el retorno
-    const pedidoInfo = {
-      identificador: identificadorUnico,
-      cliente: nombreCliente,
-      productos: cartItems,
-      total: total,
-      metodoEntrega: metodoEntrega,
-      fecha: new Date().toISOString(),
-      subtotal: subtotal,
-      impuestos: impuestos,
-      costoEnvio: costoEnvio
-    };
-    localStorage.setItem('pedido_actual', JSON.stringify(pedidoInfo));
-
-    console.log('🔗 Intentando redirigir a Wompi...');
-    
-    // Intentar diferentes URLs de Wompi
-    const urlsWompi = [
-      `https://u.wompi.sv/398524Auq?amount=${total.toFixed(2)}&reference=${identificadorUnico}`,
-      `https://checkout.wompi.sv/p/${identificadorUnico}?amount=${total.toFixed(2)}`,
-      `https://pay.wompi.sv/checkout/${identificadorUnico}`
-    ];
-    
-    // Usar la primera URL por defecto (puedes cambiar según instrucciones de Wompi)
-    const urlFinal = urlsWompi[0];
-    
-    console.log('🌐 Redirigiendo a:', urlFinal);
-    window.open(urlFinal, '_self');
-    
-  } catch (error) {
-    console.error('❌ Error al redirigir a Wompi:', error);
-    // Si falla, usar el sistema de simulación
-    procesarPago();
-  }
+const redirigirAWompi = () => {
+  window.open("https://u.wompi.sv/398524Auq", "_blank");
 };
 
 
@@ -392,7 +259,7 @@ const redirigirAWompiReal = () => {
     }
   }, [userLocation, getAddressFromCoordinates]);
   // Función para avanzar al siguiente paso
-  const handleContinuar = async () => {
+  const handleContinuar = () => {
     if (step === 'Cuenta') {
       // Validar campos de invitado
       if (modo === 'invitado') {
@@ -414,35 +281,7 @@ const redirigirAWompiReal = () => {
         alert('Por favor selecciona un método de pago.');
         return;
       }
-      
-      // Si el método de pago es transferencia (pago en línea), procesar inmediatamente
-      if (pagoMetodo === 'transferencia') {
-        try {
-          setIsProcessingPayment(true);
-          
-          // Preguntar si quiere usar Wompi real o simulación
-          const usarWompiReal = window.confirm(
-            "🏪 MÉTODO DE PAGO\n\n" +
-            "¿Cómo quieres proceder?\n\n" +
-            "✅ OK = Intentar Wompi real (puede fallar si no está configurado)\n" +
-            "❌ Cancelar = Usar simulación de pago (para pruebas)\n\n" +
-            "Recomendación: Usa simulación hasta configurar Wompi correctamente"
-          );
-          
-          if (usarWompiReal) {
-            redirigirAWompiReal(); // Intentar Wompi real
-          } else {
-            procesarPago(); // Usar simulación
-          }
-        } catch (error) {
-          // Error ya manejado en las funciones
-        } finally {
-          setIsProcessingPayment(false);
-        }
-      } else {
-        // Para pago en efectivo, continuar al paso de confirmación
-        setStep('Confirmar');
-      }
+      setStep('Confirmar');
     }
   };
   // Función para enviar el pedido al servidor adaptada para el nuevo backend
@@ -1081,10 +920,13 @@ const redirigirAWompiReal = () => {
     <div className="toggle-pago">
   <button
     className={`toggle-btn ${pagoMetodo === 'transferencia' ? 'activo' : ''}`}
-    onClick={() => setPagoMetodo('transferencia')}
+    onClick={() => {
+      setPagoMetodo('transferencia');
+      redirigirAWompi();
+    }}
   >
     <FaCreditCard className={`icono-metodo ${pagoMetodo === 'transferencia' ? 'active-icon' : ''}`} />
-    <span>Pago en línea</span>
+    <span>Transferencia bancaria</span>
   </button>
 
   <button
@@ -1099,35 +941,13 @@ const redirigirAWompiReal = () => {
 
 
 
-    {pagoMetodo === 'transferencia' && (
-      <div className="detalle-pagos">
-        <p>
-          <strong>Opciones de pago en línea disponibles:</strong>
-        </p>
-        <div className="opciones-pago">
-          <div className="opcion-pago">
-            <strong>🏪 Wompi Real:</strong> Redirige a la plataforma de Wompi (requiere configuración)
-          </div>
-          <div className="opcion-pago">
-            <strong>🧪 Simulación:</strong> Procesa el pedido de forma simulada (para desarrollo)
-          </div>
-        </div>
-        <p>
-          <small>Se te preguntará qué opción usar al proceder con el pago.</small>
-        </p>
-        <div className="nota-importante">
-          <FaExclamationTriangle className="warning-icon" />
-          <small>Recomendación: Usa simulación hasta que Wompi esté correctamente configurado.</small>
-        </div>
-      </div>
-    )}
-
     {pagoMetodo === 'efectivo' && (
       <div className="detalle-pagos">
         <p>
           Pagarás en efectivo al momento de la entrega. 
         </p>
         <p>
+
           Por favor, ten el monto exacto para facilitar la entrega.
         </p>
       </div>
@@ -1137,19 +957,8 @@ const redirigirAWompiReal = () => {
       <button className="btn-volver-Direccion" onClick={() => setStep('Dirección')}>
         Atrás
       </button>
-      <button 
-        className="btn-continuar-pago" 
-        onClick={handleContinuar}
-        disabled={isProcessingPayment}
-      >
-        {isProcessingPayment ? (
-          <>
-            <FaSpinner className="icono-spinner" />
-            Procesando pago...
-          </>
-        ) : (
-          pagoMetodo === 'transferencia' ? 'Pagar ahora' : 'Continuar'
-        )}
+      <button className="btn-continuar-pago" onClick={handleContinuar}>
+        Continuar
       </button>
     </div>
   </div>
@@ -1244,8 +1053,7 @@ const redirigirAWompiReal = () => {
               <FaCreditCard className="metodo-icon pago-icon" />
             </div>
             <div className="metodo-details">
-              <p className="metodo-tipo">Pago en línea con Wompi</p>
-              <p><small>Tarjetas de crédito/débito y Punto Agrícola</small></p>
+            
             </div>
           </div>
         )}

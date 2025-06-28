@@ -17,7 +17,6 @@ import Perfil from './components/Perfil/Perfil';
 import SocialMediaButton from './components/socialMediaButton/SocialMediaButton';
 import AdminExperiencias from './components/AdminExperiencias/AdminExperiencias';
 import TestExperiencias from './components/TestExperiencias/TestExperiencias';
-import PagoExitoso from './components/PagoExitoso/PagoExitoso';
 import Toast from './components/Toast/Toast';
 import { saveUserData, clearUserData } from './utils/userStorage';
 
@@ -199,9 +198,7 @@ function App() {  const [isCartOpen, setIsCartOpen] = useState(false);
             onOrderComplete={triggerOrderUpdate}
             setToast={showToast}
           />
-        } />        
-        <Route path="/pago-exitoso" element={<PagoExitoso />} />
-        <Route path="/equipo-desarrollo" element={<Team />} />
+        } />        <Route path="/equipo-desarrollo" element={<Team />} />
         <Route path="/informacion-legal" element={<InformacionLegal />} />        <Route path="/admin/experiencias" element={<AdminExperiencias />} />
         <Route path="/test/experiencias" element={<TestExperiencias />} />
       </Routes>
