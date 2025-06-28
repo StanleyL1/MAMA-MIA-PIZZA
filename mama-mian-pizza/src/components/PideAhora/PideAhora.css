@@ -2311,3 +2311,144 @@ body:has(.contenedor-pideahora) .toggle-button {
   transform: none !important;
   box-shadow: none !important;
 }
+
+/* === Estilos para formulario de tarjeta === */
+.formulario-tarjeta {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 15px 0;
+  border: 1px solid #e9ecef;
+}
+
+.formulario-tarjeta h4 {
+  color: #333;
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.formulario-tarjeta .campo {
+  margin-bottom: 15px;
+}
+
+.formulario-tarjeta .campo:last-child {
+  margin-bottom: 0;
+}
+
+.formulario-tarjeta label {
+  display: block;
+  margin-bottom: 5px;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.input-tarjeta {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.input-tarjeta:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+
+.campos-tarjeta {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.input-cvv,
+.input-mes,
+.input-anio {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.input-cvv:focus,
+.input-mes:focus,
+.input-anio:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+
+.campo-cvv {
+  position: relative;
+}
+
+.campo-cvv::after {
+  content: "?";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #666;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: help;
+  margin-top: 12px;
+}
+
+.campo-cvv:hover::after {
+  background: var(--primary-color);
+}
+
+/* Indicador de tipo de tarjeta */
+.card-type-indicator {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  color: #666;
+  margin-top: 12px;
+}
+
+.formulario-tarjeta .campo {
+  position: relative;
+}
+
+.card-type-indicator.visa {
+  color: #1a1f71;
+  border-color: #1a1f71;
+}
+
+.card-type-indicator.mastercard {
+  color: #eb001b;
+  border-color: #eb001b;
+}
+
+.card-type-indicator.amex {
+  color: #006fcf;
+  border-color: #006fcf;
+}

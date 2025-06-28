@@ -39,7 +39,6 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   const { 
     isProcessing: isProcessingWompi, 
     error: wompiError, 
-    createTransaction,
     clearError: clearWompiError
   } = useWompi();  const [step, setStep] = useState('Cuenta');
   const [modo, setModo] = useState('invitado');
@@ -60,6 +59,14 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderError, setOrderError] = useState('');
   const [orderCode, setOrderCode] = useState('');
+
+  // Estados para datos de tarjeta
+  const [tarjetaData, setTarjetaData] = useState({
+    numeroTarjeta: '',
+    cvv: '',
+    mesVencimiento: '',
+    anioVencimiento: ''
+  });
     const [invitadoData, setInvitadoData] = useState({
     nombreCompleto: '',
     telefono: '',
@@ -110,27 +117,156 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     });
   };
 
+  const handleInputTarjeta = (e) => {
+    const { name, value } = e.target;
+    
+    // Formatear número de tarjeta (agregar espacios cada 4 dígitos)
+    if (name === 'numeroTarjeta') {
+      const formattedValue = value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
+      if (formattedValue.replace(/\s/g, '').length <= 16) {
+        setTarjetaData({
+          ...tarjetaData,
+          [name]: formattedValue,
+        });
+      }
+    }
+    // Formatear CVV (máximo 4 dígitos)
+    else if (name === 'cvv') {
+      if (value.length <= 4 && /^\d*$/.test(value)) {
+        setTarjetaData({
+          ...tarjetaData,
+          [name]: value,
+        });
+      }
+    }
+    // Formatear mes (máximo 2 dígitos, 01-12)
+    else if (name === 'mesVencimiento') {
+      if (value.length <= 2 && /^\d*$/.test(value)) {
+        const monthValue = parseInt(value);
+        if (value === '' || (monthValue >= 1 && monthValue <= 12)) {
+          setTarjetaData({
+            ...tarjetaData,
+            [name]: value,
+          });
+        }
+      }
+    }
+    // Formatear año (4 dígitos)
+    else if (name === 'anioVencimiento') {
+      if (value.length <= 4 && /^\d*$/.test(value)) {
+        setTarjetaData({
+          ...tarjetaData,
+          [name]: value,
+        });
+      }
+    }
+    else {
+      setTarjetaData({
+        ...tarjetaData,
+        [name]: value,
+      });
+    }
+  };
+
+  // Función para detectar tipo de tarjeta
+  const detectCardType = (number) => {
+    const cleanNumber = number.replace(/\s/g, '');
+    
+    if (/^4/.test(cleanNumber)) {
+      return 'visa';
+    } else if (/^5[1-5]/.test(cleanNumber) || /^2[2-7]/.test(cleanNumber)) {
+      return 'mastercard';
+    } else if (/^3[47]/.test(cleanNumber)) {
+      return 'amex';
+    }
+    
+    return '';
+  };
+
   // Función para procesar pago con Wompi
   const procesarPagoWompi = async (pedidoData) => {
     try {
       // Limpiar errores anteriores
       clearWompiError();
       
+      // Validar datos de tarjeta
+      if (!tarjetaData.numeroTarjeta || !tarjetaData.cvv || !tarjetaData.mesVencimiento || !tarjetaData.anioVencimiento) {
+        alert('Por favor completa todos los datos de la tarjeta');
+        return;
+      }
+      
       // Obtener datos del cliente
-      const customerData = {
-        name: modo === 'invitado' ? invitadoData.nombreCompleto : cuentaData.nombreCompleto,
-        email: modo === 'cuenta' ? cuentaData.email : undefined,
-        phone: modo === 'invitado' ? invitadoData.telefono : cuentaData.telefono
+      const customerName = modo === 'invitado' ? invitadoData.nombreCompleto : cuentaData.nombreCompleto;
+      const customerEmail = modo === 'cuenta' ? cuentaData.email : `temp_${Date.now()}@mamamianpizza.com`;
+      const customerPhone = modo === 'invitado' ? invitadoData.telefono : cuentaData.telefono;
+      
+      // Separar nombre y apellido
+      const nameParts = customerName.split(' ');
+      const nombre = nameParts[0] || '';
+      const apellido = nameParts.slice(1).join(' ') || '';
+      
+      // Obtener dirección según el método seleccionado
+      let direccionCompleta = '';
+      let ciudad = '';
+      
+      if (metodoEntrega === 'domicilio') {
+        if (modoDireccion === 'formulario') {
+          direccionCompleta = direccionData.direccionExacta;
+          ciudad = direccionData.municipio || 'Puerto El Triunfo';
+        } else {
+          direccionCompleta = addressInfo?.formattedAddress || 'Ubicación compartida en tiempo real';
+          ciudad = 'Puerto El Triunfo';
+        }
+      } else {
+        direccionCompleta = 'CP #3417, Puerto El Triunfo';
+        ciudad = 'Puerto El Triunfo';
+      }
+      
+      // Generar referencia única
+      const transactionRef = `MAMA-${Date.now()}-${Math.random().toString(36).substr(2, 11).toUpperCase()}`;
+      
+      // Construir payload según el formato requerido
+      const wompiPayload = {
+        tarjetaCreditoDebido: {
+          numeroTarjeta: tarjetaData.numeroTarjeta.replace(/\s/g, ''), // Remover espacios
+          cvv: tarjetaData.cvv,
+          mesVencimiento: parseInt(tarjetaData.mesVencimiento),
+          anioVencimiento: parseInt(tarjetaData.anioVencimiento)
+        },
+        monto: pedidoData.total,
+        urlRedirect: `https://mamamianpizza.com/payment/success?ref=${transactionRef}`,
+        nombre: nombre,
+        apellido: apellido,
+        email: customerEmail,
+        ciudad: ciudad,
+        direccion: direccionCompleta,
+        idPais: "SV",
+        idRegion: "SV-US",
+        codigoPostal: "01101",
+        telefono: customerPhone
       };
 
-      // Crear transacción usando el hook
-      const result = await createTransaction(pedidoData, customerData);
-      
-      if (result.success) {
-        // Redirigir a Wompi
-        window.location.href = result.redirectUrl;
+      // Enviar directamente al endpoint de Wompi
+      const response = await fetch('https://api.mamamianpizza.com/api/payments/create-transaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(wompiPayload)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        if (result.success && result.redirectUrl) {
+          // Redirigir a Wompi
+          window.location.href = result.redirectUrl;
+        } else {
+          throw new Error(result.message || 'Error al crear transacción Wompi');
+        }
       } else {
-        throw new Error(result.error || 'Error al crear transacción Wompi');
+        const errorResult = await response.json();
+        throw new Error(errorResult.message || 'Error de servidor al crear transacción');
       }
     } catch (error) {
       console.error('Error procesando pago Wompi:', error);
@@ -346,6 +482,48 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
         alert('Por favor selecciona un método de pago.');
         return;
       }
+      
+      // Validar datos de tarjeta si es pago con tarjeta
+      if (pagoMetodo === 'tarjeta') {
+        if (!tarjetaData.numeroTarjeta || !tarjetaData.cvv || !tarjetaData.mesVencimiento || !tarjetaData.anioVencimiento) {
+          alert('Por favor completa todos los datos de la tarjeta.');
+          return;
+        }
+        
+        // Validaciones adicionales
+        const numeroTarjeta = tarjetaData.numeroTarjeta.replace(/\s/g, '');
+        if (numeroTarjeta.length < 15 || numeroTarjeta.length > 16) {
+          alert('El número de tarjeta debe tener entre 15 y 16 dígitos.');
+          return;
+        }
+        
+        if (tarjetaData.cvv.length < 3 || tarjetaData.cvv.length > 4) {
+          alert('El CVV debe tener entre 3 y 4 dígitos.');
+          return;
+        }
+        
+        const mes = parseInt(tarjetaData.mesVencimiento);
+        const anio = parseInt(tarjetaData.anioVencimiento);
+        const fechaActual = new Date();
+        const anioActual = fechaActual.getFullYear();
+        const mesActual = fechaActual.getMonth() + 1;
+        
+        if (mes < 1 || mes > 12) {
+          alert('El mes de vencimiento debe estar entre 01 y 12.');
+          return;
+        }
+        
+        if (anio < anioActual || (anio === anioActual && mes < mesActual)) {
+          alert('La tarjeta está vencida.');
+          return;
+        }
+        
+        if (anio < 2024 || anio > 2040) {
+          alert('El año de vencimiento no es válido.');
+          return;
+        }
+      }
+      
       setStep('Confirmar');
     }
   };
@@ -998,12 +1176,79 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
           <FaCreditCard className="info-icon" />
           Procesado de forma segura por Wompi.
         </p>
-        <p>
-          Serás redirigido a la plataforma de pago para completar tu transacción.
-        </p>
+        
+        {/* Formulario de datos de tarjeta */}
+        <div className="formulario-tarjeta">
+          <h4>Datos de la tarjeta</h4>
+          
+          <div className="campo">
+            <label htmlFor="numeroTarjeta">Número de tarjeta</label>
+            <input
+              type="text"
+              name="numeroTarjeta"
+              id="numeroTarjeta"
+              placeholder="1234 5678 9012 3456"
+              value={tarjetaData.numeroTarjeta}
+              onChange={handleInputTarjeta}
+              className={`input-tarjeta ${detectCardType(tarjetaData.numeroTarjeta)}`}
+              maxLength="19"
+            />
+            {detectCardType(tarjetaData.numeroTarjeta) && (
+              <div className="card-type-indicator">
+                {detectCardType(tarjetaData.numeroTarjeta).toUpperCase()}
+              </div>
+            )}
+          </div>
+          
+          <div className="campos-tarjeta">
+            <div className="campo campo-cvv">
+              <label htmlFor="cvv">CVV</label>
+              <input
+                type="text"
+                name="cvv"
+                id="cvv"
+                placeholder="123"
+                value={tarjetaData.cvv}
+                onChange={handleInputTarjeta}
+                className="input-cvv"
+                maxLength="4"
+              />
+            </div>
+            
+            <div className="campo campo-vencimiento">
+              <label htmlFor="mesVencimiento">Mes</label>
+              <input
+                type="text"
+                name="mesVencimiento"
+                id="mesVencimiento"
+                placeholder="12"
+                value={tarjetaData.mesVencimiento}
+                onChange={handleInputTarjeta}
+                className="input-mes"
+                maxLength="2"
+              />
+            </div>
+            
+            <div className="campo campo-vencimiento">
+              <label htmlFor="anioVencimiento">Año</label>
+              <input
+                type="text"
+                name="anioVencimiento"
+                id="anioVencimiento"
+                placeholder="2025"
+                value={tarjetaData.anioVencimiento}
+                onChange={handleInputTarjeta}
+                className="input-anio"
+                maxLength="4"
+              />
+            </div>
+          </div>
+        </div>
+        
         <div className="wompi-info">
           <small>✓ Pagos seguros con 3D Secure</small><br />
-          <small>✓ Aceptamos todas las tarjetas principales</small>
+          <small>✓ Aceptamos todas las tarjetas principales</small><br />
+          <small>✓ Tus datos están protegidos con encriptación SSL</small>
         </div>
       </div>
     )}
@@ -1030,7 +1275,16 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
       <button 
         className="btn-continuar-pago" 
         onClick={handleContinuar}
-        disabled={isProcessingWompi || !pagoMetodo}
+        disabled={
+          isProcessingWompi || 
+          !pagoMetodo || 
+          (pagoMetodo === 'tarjeta' && (
+            !tarjetaData.numeroTarjeta || 
+            !tarjetaData.cvv || 
+            !tarjetaData.mesVencimiento || 
+            !tarjetaData.anioVencimiento
+          ))
+        }
       >
         {isProcessingWompi ? (
           <>
