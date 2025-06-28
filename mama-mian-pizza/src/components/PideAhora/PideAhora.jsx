@@ -200,50 +200,46 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
       const customerEmail = modo === 'cuenta' ? cuentaData.email : `temp_${Date.now()}@mamamianpizza.com`;
       const customerPhone = modo === 'invitado' ? invitadoData.telefono : cuentaData.telefono;
       
-      // Separar nombre y apellido
-      const nameParts = customerName.split(' ');
-      const nombre = nameParts[0] || '';
-      const apellido = nameParts.slice(1).join(' ') || '';
-      
       // Obtener dirección según el método seleccionado
       let direccionCompleta = '';
-      let ciudad = '';
       
       if (metodoEntrega === 'domicilio') {
         if (modoDireccion === 'formulario') {
           direccionCompleta = direccionData.direccionExacta;
-          ciudad = direccionData.municipio || 'Puerto El Triunfo';
         } else {
           direccionCompleta = addressInfo?.formattedAddress || 'Ubicación compartida en tiempo real';
-          ciudad = 'Puerto El Triunfo';
         }
       } else {
         direccionCompleta = 'CP #3417, Puerto El Triunfo';
-        ciudad = 'Puerto El Triunfo';
       }
       
-      // Generar referencia única
-      const transactionRef = `MAMA-${Date.now()}-${Math.random().toString(36).substr(2, 11).toUpperCase()}`;
-      
-      // Construir payload según el formato requerido
+      // Construir payload según el formato exacto requerido
       const wompiPayload = {
-        tarjetaCreditoDebido: {
+        amount: pedidoData.total,
+        customer: {
+          name: customerName,
+          email: customerEmail,
+          phone: customerPhone
+        },
+        cardData: {
           numeroTarjeta: tarjetaData.numeroTarjeta.replace(/\s/g, ''), // Remover espacios
           cvv: tarjetaData.cvv,
           mesVencimiento: parseInt(tarjetaData.mesVencimiento),
           anioVencimiento: parseInt(tarjetaData.anioVencimiento)
         },
-        monto: pedidoData.total,
-        urlRedirect: `https://mamamianpizza.com/payment/success?ref=${transactionRef}`,
-        nombre: nombre,
-        apellido: apellido,
-        email: customerEmail,
-        ciudad: ciudad,
-        direccion: direccionCompleta,
-        idPais: "SV",
-        idRegion: "SV-US",
-        codigoPostal: "01101",
-        telefono: customerPhone
+        orderData: {
+          tipo_cliente: modo,
+          direccion: direccionCompleta,
+          metodo_entrega: metodoEntrega,
+          items: cartItems,
+          subtotal: pedidoData.subtotal,
+          impuestos: pedidoData.impuestos,
+          total: pedidoData.total,
+          referencias: direccionData.referencias || '',
+          pais: direccionData.pais || 'El Salvador',
+          departamento: direccionData.departamento || 'Usulután',
+          municipio: direccionData.municipio || 'Puerto El Triunfo'
+        }
       };
 
       // Enviar directamente al endpoint de Wompi
