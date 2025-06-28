@@ -10,11 +10,16 @@ const PagoExitoso = () => {
   const [detallesPago, setDetallesPago] = useState(null);
 
   useEffect(() => {
-    // Obtener parámetros de la URL
-    const pedidoId = searchParams.get('pedido');
-    const monto = searchParams.get('monto');
-    const estado = searchParams.get('estado');
-    const idTransaccion = searchParams.get('id');
+    // Obtener parámetros de la URL (pueden venir de Wompi o de nuestra app)
+    const pedidoId = searchParams.get('pedido') || searchParams.get('reference');
+    const monto = searchParams.get('monto') || searchParams.get('amount');
+    const estado = searchParams.get('estado') || searchParams.get('status');
+    const idTransaccion = searchParams.get('id') || searchParams.get('transaction_id');
+    
+    // Parámetros específicos de Wompi
+    const wompiStatus = searchParams.get('wompi_status');
+    const wompiReference = searchParams.get('wompi_reference');
+    const wompiTransactionId = searchParams.get('wompi_transaction_id');
 
     // Obtener información del pedido desde localStorage
     const pedidoInfo = localStorage.getItem('pedido_actual');
@@ -28,18 +33,35 @@ const PagoExitoso = () => {
       }
     }
 
+    console.log('🔍 Parámetros de URL recibidos:', {
+      pedidoId, monto, estado, idTransaccion,
+      wompiStatus, wompiReference, wompiTransactionId
+    });
+
+    console.log('📦 Información del pedido desde localStorage:', infoPedido);
+
     // Simular validación del pago (en producción deberías validar con tu backend)
     setTimeout(() => {
-      // Por defecto asumir éxito si no hay estado específico de error
-      if (!estado || estado === 'exitoso' || estado === 'aprobado' || estado === 'success') {
+      // Determinar si el pago fue exitoso
+      const pagoExitoso = !estado || 
+                         estado === 'exitoso' || 
+                         estado === 'aprobado' || 
+                         estado === 'success' ||
+                         wompiStatus === 'approved' ||
+                         wompiStatus === 'success';
+
+      if (pagoExitoso) {
         setDetallesPago({
-          idTransaccion: idTransaccion || pedidoId || `#MAMA-${Date.now()}`,
+          idTransaccion: idTransaccion || wompiTransactionId || pedidoId || wompiReference || `#MAMA-${Date.now()}`,
           monto: monto || (infoPedido ? infoPedido.total.toFixed(2) : '0.00'),
           fecha: new Date().toLocaleDateString('es-ES'),
           metodoPago: 'Pago en línea - Wompi',
           cliente: infoPedido ? infoPedido.cliente : 'Cliente',
           productos: infoPedido ? infoPedido.productos : [],
-          metodoEntrega: infoPedido ? infoPedido.metodoEntrega : 'domicilio'
+          metodoEntrega: infoPedido ? infoPedido.metodoEntrega : 'domicilio',
+          subtotal: infoPedido ? infoPedido.subtotal : 0,
+          impuestos: infoPedido ? infoPedido.impuestos : 0,
+          costoEnvio: infoPedido ? infoPedido.costoEnvio : 0
         });
         setEstado('exitoso');
         
@@ -145,6 +167,28 @@ const PagoExitoso = () => {
                       <span>${(producto.precio * producto.cantidad).toFixed(2)}</span>
                     </div>
                   ))}
+                  
+                  {/* Mostrar desglose de costos si está disponible */}
+                  {(detallesPago.subtotal || detallesPago.impuestos || detallesPago.costoEnvio) && (
+                    <div className="desglose-costos">
+                      <div className="costo-item">
+                        <span>Subtotal:</span>
+                        <span>${(detallesPago.subtotal || 0).toFixed(2)}</span>
+                      </div>
+                      <div className="costo-item">
+                        <span>Impuestos (13%):</span>
+                        <span>${(detallesPago.impuestos || 0).toFixed(2)}</span>
+                      </div>
+                      <div className="costo-item">
+                        <span>Costo de envío:</span>
+                        <span>${(detallesPago.costoEnvio || 0).toFixed(2)}</span>
+                      </div>
+                      <div className="costo-item total-final">
+                        <span><strong>Total:</strong></span>
+                        <span><strong>${detallesPago.monto}</strong></span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

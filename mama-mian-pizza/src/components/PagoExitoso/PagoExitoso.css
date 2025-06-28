@@ -118,6 +118,28 @@
   color: #4b5563;
 }
 
+.desglose-costos {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.costo-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.costo-item.total-final {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
 .tiempo-entrega {
   background: #fef3c7;
   border: 1px solid #fbbf24;
