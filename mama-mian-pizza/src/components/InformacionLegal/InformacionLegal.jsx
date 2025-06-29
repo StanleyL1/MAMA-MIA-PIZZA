@@ -72,7 +72,7 @@ const InformacionLegal = () => {
 
             <div className="faq-item">
               <h3>¿Qué formas de pago aceptan?</h3>
-              <p>Tarjeta, transferencia bancaria, y efectivo contra entrega.</p>
+              <p>Efectivo contra entrega.</p>
             </div>
 
             <div className="faq-item">
@@ -163,8 +163,6 @@ const InformacionLegal = () => {
           <section id="formas-pago" className="legal-section">
             <h2><FaCreditCard className="section-icon" /> 8. Formas de Pago</h2>
             <ul>
-              <li>Tarjetas de crédito y débito (Wompi)</li>
-              <li>Transferencia bancaria (Banco Agrícola)</li>
               <li>Efectivo contra entrega</li>
             </ul>
           </section>
