@@ -2,9 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './PideAhora.css';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { useNavigate } from 'react-router-dom';
-import { getUserData } from '../../utils/userStorage';
-import useWompi from '../../hooks/useWompi';
-
 /* IMPORTA TUS ASSETS: íconos, imágenes, etc. Ajusta las rutas según tu proyecto */
 import { 
   FaCheck, 
@@ -13,13 +10,23 @@ import {
   FaSpinner, 
   FaUser, 
   FaUserTie,
-  FaCreditCard,
   FaMoneyBillWave,
   FaExclamationTriangle,
   FaPizzaSlice,
   FaMotorcycle,
   FaStore
 } from 'react-icons/fa';
+
+// Función auxiliar para obtener datos del usuario del localStorage
+const getUserData = () => {
+  try {
+    const userData = localStorage.getItem('userData');
+    return userData ? JSON.parse(userData) : null;
+  } catch (error) {
+    console.error('Error al obtener datos del usuario:', error);
+    return null;
+  }
+};
 
 // Google Maps API key
 const GOOGLE_MAPS_API_KEY = 'AIzaSyDAiO05_RG1ycHFVfvcUyCEG6g4pfWQ8VY';
@@ -33,14 +40,10 @@ const mapContainerStyle = {
 };
 
 const PideAhora = ({ cartItems = [], setCartItems }) => {
+  
   const navigate = useNavigate();
   
-  // Hook personalizado para Wompi
-  const { 
-    isProcessing: isProcessingWompi, 
-    error: wompiError, 
-    clearError: clearWompiError
-  } = useWompi();  const [step, setStep] = useState('Cuenta');
+  const [step, setStep] = useState('Cuenta');
   const [modo, setModo] = useState('invitado');
   const [modoDireccion, setModoDireccion] = useState('formulario');
   const [pagoMetodo, setPagoMetodo] = useState('');
@@ -60,13 +63,7 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   const [orderError, setOrderError] = useState('');
   const [orderCode, setOrderCode] = useState('');
 
-  // Estados para datos de tarjeta
-  const [tarjetaData, setTarjetaData] = useState({
-    numeroTarjeta: '',
-    cvv: '',
-    mesVencimiento: '',
-    anioVencimiento: ''
-  });
+
     const [invitadoData, setInvitadoData] = useState({
     nombreCompleto: '',
     telefono: '',
@@ -117,158 +114,9 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     });
   };
 
-  const handleInputTarjeta = (e) => {
-    const { name, value } = e.target;
-    
-    // Formatear número de tarjeta (agregar espacios cada 4 dígitos)
-    if (name === 'numeroTarjeta') {
-      const formattedValue = value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
-      if (formattedValue.replace(/\s/g, '').length <= 16) {
-        setTarjetaData({
-          ...tarjetaData,
-          [name]: formattedValue,
-        });
-      }
-    }
-    // Formatear CVV (máximo 4 dígitos)
-    else if (name === 'cvv') {
-      if (value.length <= 4 && /^\d*$/.test(value)) {
-        setTarjetaData({
-          ...tarjetaData,
-          [name]: value,
-        });
-      }
-    }
-    // Formatear mes (máximo 2 dígitos, 01-12)
-    else if (name === 'mesVencimiento') {
-      if (value.length <= 2 && /^\d*$/.test(value)) {
-        const monthValue = parseInt(value);
-        if (value === '' || (monthValue >= 1 && monthValue <= 12)) {
-          setTarjetaData({
-            ...tarjetaData,
-            [name]: value,
-          });
-        }
-      }
-    }
-    // Formatear año (4 dígitos)
-    else if (name === 'anioVencimiento') {
-      if (value.length <= 4 && /^\d*$/.test(value)) {
-        setTarjetaData({
-          ...tarjetaData,
-          [name]: value,
-        });
-      }
-    }
-    else {
-      setTarjetaData({
-        ...tarjetaData,
-        [name]: value,
-      });
-    }
-  };
 
-  // Función para detectar tipo de tarjeta
-  const detectCardType = (number) => {
-    const cleanNumber = number.replace(/\s/g, '');
-    
-    if (/^4/.test(cleanNumber)) {
-      return 'visa';
-    } else if (/^5[1-5]/.test(cleanNumber) || /^2[2-7]/.test(cleanNumber)) {
-      return 'mastercard';
-    } else if (/^3[47]/.test(cleanNumber)) {
-      return 'amex';
-    }
-    
-    return '';
-  };
 
-  // Función para procesar pago con Wompi
-  const procesarPagoWompi = async (pedidoData) => {
-    try {
-      // Limpiar errores anteriores
-      clearWompiError();
-      
-      // Validar datos de tarjeta
-      if (!tarjetaData.numeroTarjeta || !tarjetaData.cvv || !tarjetaData.mesVencimiento || !tarjetaData.anioVencimiento) {
-        alert('Por favor completa todos los datos de la tarjeta');
-        return;
-      }
-      
-      // Obtener datos del cliente
-      const customerName = modo === 'invitado' ? invitadoData.nombreCompleto : cuentaData.nombreCompleto;
-      const customerEmail = modo === 'cuenta' ? cuentaData.email : `temp_${Date.now()}@mamamianpizza.com`;
-      const customerPhone = modo === 'invitado' ? invitadoData.telefono : cuentaData.telefono;
-      
-      // Obtener dirección según el método seleccionado
-      let direccionCompleta = '';
-      
-      if (metodoEntrega === 'domicilio') {
-        if (modoDireccion === 'formulario') {
-          direccionCompleta = direccionData.direccionExacta;
-        } else {
-          direccionCompleta = addressInfo?.formattedAddress || 'Ubicación compartida en tiempo real';
-        }
-      } else {
-        direccionCompleta = 'CP #3417, Puerto El Triunfo';
-      }
-      
-      // Construir payload según el formato exacto requerido
-      const wompiPayload = {
-        amount: pedidoData.total,
-        customer: {
-          name: customerName,
-          email: customerEmail,
-          phone: customerPhone
-        },
-        cardData: {
-          numeroTarjeta: tarjetaData.numeroTarjeta.replace(/\s/g, ''), // Remover espacios
-          cvv: tarjetaData.cvv,
-          mesVencimiento: parseInt(tarjetaData.mesVencimiento),
-          anioVencimiento: parseInt(tarjetaData.anioVencimiento)
-        },
-        orderData: {
-          tipo_cliente: modo,
-          direccion: direccionCompleta,
-          metodo_entrega: metodoEntrega,
-          items: cartItems,
-          subtotal: pedidoData.subtotal,
-          impuestos: pedidoData.impuestos,
-          total: pedidoData.total,
-          referencias: direccionData.referencias || '',
-          pais: direccionData.pais || 'El Salvador',
-          departamento: direccionData.departamento || 'Usulután',
-          municipio: direccionData.municipio || 'Puerto El Triunfo'
-        }
-      };
 
-      // Enviar directamente al endpoint de Wompi
-      const response = await fetch('https://api.mamamianpizza.com/api/payments/create-transaction', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(wompiPayload)
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        
-        if (result.success && result.redirectUrl) {
-          // Redirigir a Wompi
-          window.location.href = result.redirectUrl;
-        } else {
-          throw new Error(result.message || 'Error al crear transacción Wompi');
-        }
-      } else {
-        const errorResult = await response.json();
-        throw new Error(errorResult.message || 'Error de servidor al crear transacción');
-      }
-    } catch (error) {
-      console.error('Error procesando pago Wompi:', error);
-      alert(`Error al procesar el pago: ${error.message}`);
-    }
-  };
 
   // Función para procesar pedido normal (efectivo)
   const procesarPedidoNormal = async (pedidoData) => {
@@ -306,9 +154,6 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
       throw error;
     }
   };
-
-
-
 
   // Función para obtener la ubicación del usuario
   const getLocation = () => {
@@ -478,48 +323,6 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
         alert('Por favor selecciona un método de pago.');
         return;
       }
-      
-      // Validar datos de tarjeta si es pago con tarjeta
-      if (pagoMetodo === 'tarjeta') {
-        if (!tarjetaData.numeroTarjeta || !tarjetaData.cvv || !tarjetaData.mesVencimiento || !tarjetaData.anioVencimiento) {
-          alert('Por favor completa todos los datos de la tarjeta.');
-          return;
-        }
-        
-        // Validaciones adicionales
-        const numeroTarjeta = tarjetaData.numeroTarjeta.replace(/\s/g, '');
-        if (numeroTarjeta.length < 15 || numeroTarjeta.length > 16) {
-          alert('El número de tarjeta debe tener entre 15 y 16 dígitos.');
-          return;
-        }
-        
-        if (tarjetaData.cvv.length < 3 || tarjetaData.cvv.length > 4) {
-          alert('El CVV debe tener entre 3 y 4 dígitos.');
-          return;
-        }
-        
-        const mes = parseInt(tarjetaData.mesVencimiento);
-        const anio = parseInt(tarjetaData.anioVencimiento);
-        const fechaActual = new Date();
-        const anioActual = fechaActual.getFullYear();
-        const mesActual = fechaActual.getMonth() + 1;
-        
-        if (mes < 1 || mes > 12) {
-          alert('El mes de vencimiento debe estar entre 01 y 12.');
-          return;
-        }
-        
-        if (anio < anioActual || (anio === anioActual && mes < mesActual)) {
-          alert('La tarjeta está vencida.');
-          return;
-        }
-        
-        if (anio < 2024 || anio > 2040) {
-          alert('El año de vencimiento no es válido.');
-          return;
-        }
-      }
-      
       setStep('Confirmar');
     }
   };
@@ -608,14 +411,8 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
         tiempo_estimado_entrega: metodoEntrega === 'domicilio' ? 30 : 25
       };
       
-      // Procesar según el método de pago
-      if (pagoMetodo === 'tarjeta') {
-        // Usar Wompi para pagos con tarjeta
-        await procesarPagoWompi(pedidoData);
-      } else {
-        // Usar flujo normal para pagos en efectivo
-        await procesarPedidoNormal(pedidoData);
-      }
+      // Procesar pedido normal para pagos en efectivo
+      await procesarPedidoNormal(pedidoData);
       
     } catch (error) {
       console.error('Error en enviarPedido:', error);
@@ -1138,116 +935,15 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     <h3 className="titulo-compra">Método de Pago</h3>
     <p className="descripcion-pago">Elige cómo quieres pagar tu pedido</p>
     
-    {wompiError && (
-      <div className="error-wompi">
-        <FaExclamationTriangle className="error-icon" />
-        <p>{wompiError}</p>
-      </div>
-    )}
-    
     <div className="toggle-pago">
-      <button
-        className={`toggle-btn ${pagoMetodo === 'tarjeta' ? 'activo' : ''}`}
-        onClick={() => setPagoMetodo('tarjeta')}
-        disabled={isProcessingWompi}
-      >
-        <FaCreditCard className={`icono-metodo ${pagoMetodo === 'tarjeta' ? 'active-icon' : ''}`} />
-        <span>Pago con tarjeta (Wompi)</span>
-        {isProcessingWompi && <FaSpinner className="spinner-icon" />}
-      </button>
-
       <button
         className={`toggle-btn ${pagoMetodo === 'efectivo' ? 'activo' : ''}`}
         onClick={() => setPagoMetodo('efectivo')}
-        disabled={isProcessingWompi}
       >
         <FaMoneyBillWave className={`icono-metodo ${pagoMetodo === 'efectivo' ? 'active-icon' : ''}`} />
         <span>Efectivo</span>
       </button>
     </div>
-
-    {pagoMetodo === 'tarjeta' && (
-      <div className="detalle-pagos">
-        <p>
-          <FaCreditCard className="info-icon" />
-          Procesado de forma segura por Wompi.
-        </p>
-        
-        {/* Formulario de datos de tarjeta */}
-        <div className="formulario-tarjeta">
-          <h4>Datos de la tarjeta</h4>
-          
-          <div className="campo">
-            <label htmlFor="numeroTarjeta">Número de tarjeta</label>
-            <input
-              type="text"
-              name="numeroTarjeta"
-              id="numeroTarjeta"
-              placeholder="1234 5678 9012 3456"
-              value={tarjetaData.numeroTarjeta}
-              onChange={handleInputTarjeta}
-              className={`input-tarjeta ${detectCardType(tarjetaData.numeroTarjeta)}`}
-              maxLength="19"
-            />
-            {detectCardType(tarjetaData.numeroTarjeta) && (
-              <div className="card-type-indicator">
-                {detectCardType(tarjetaData.numeroTarjeta).toUpperCase()}
-              </div>
-            )}
-          </div>
-          
-          <div className="campos-tarjeta">
-            <div className="campo campo-cvv">
-              <label htmlFor="cvv">CVV</label>
-              <input
-                type="text"
-                name="cvv"
-                id="cvv"
-                placeholder="123"
-                value={tarjetaData.cvv}
-                onChange={handleInputTarjeta}
-                className="input-cvv"
-                maxLength="4"
-              />
-            </div>
-            
-            <div className="campo campo-vencimiento">
-              <label htmlFor="mesVencimiento">Mes</label>
-              <input
-                type="text"
-                name="mesVencimiento"
-                id="mesVencimiento"
-                placeholder="12"
-                value={tarjetaData.mesVencimiento}
-                onChange={handleInputTarjeta}
-                className="input-mes"
-                maxLength="2"
-              />
-            </div>
-            
-            <div className="campo campo-vencimiento">
-              <label htmlFor="anioVencimiento">Año</label>
-              <input
-                type="text"
-                name="anioVencimiento"
-                id="anioVencimiento"
-                placeholder="2025"
-                value={tarjetaData.anioVencimiento}
-                onChange={handleInputTarjeta}
-                className="input-anio"
-                maxLength="4"
-              />
-            </div>
-          </div>
-        </div>
-        
-        <div className="wompi-info">
-          <small>✓ Pagos seguros con 3D Secure</small><br />
-          <small>✓ Aceptamos todas las tarjetas principales</small><br />
-          <small>✓ Tus datos están protegidos con encriptación SSL</small>
-        </div>
-      </div>
-    )}
 
     {pagoMetodo === 'efectivo' && (
       <div className="detalle-pagos">
@@ -1264,32 +960,15 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
       <button 
         className="btn-volver-Direccion" 
         onClick={() => setStep('Dirección')}
-        disabled={isProcessingWompi}
       >
         Atrás
       </button>
       <button 
         className="btn-continuar-pago" 
         onClick={handleContinuar}
-        disabled={
-          isProcessingWompi || 
-          !pagoMetodo || 
-          (pagoMetodo === 'tarjeta' && (
-            !tarjetaData.numeroTarjeta || 
-            !tarjetaData.cvv || 
-            !tarjetaData.mesVencimiento || 
-            !tarjetaData.anioVencimiento
-          ))
-        }
+        disabled={!pagoMetodo}
       >
-        {isProcessingWompi ? (
-          <>
-            <FaSpinner className="spinner-icon" />
-            Procesando...
-          </>
-        ) : (
-          'Continuar'
-        )}
+        Continuar
       </button>
     </div>
   </div>
@@ -1369,35 +1048,14 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     <div className="seccion-linea">
       <h4 className="subtitulo-seccion">Método de pago</h4>
       <div className="metodo-pago-info">
-        {pagoMetodo === 'efectivo' ? (
-          <div className="metodo-entrega-info">
-            <div className="metodo-icon-container">
-              <FaMoneyBillWave className="metodo-icon pago-icon" />
-            </div>
-            <div className="metodo-details">
-              <p className="metodo-tipo">Efectivo al momento de {metodoEntrega === 'recoger' ? 'recoger' : 'la entrega'}</p>
-            </div>
+        <div className="metodo-entrega-info">
+          <div className="metodo-icon-container">
+            <FaMoneyBillWave className="metodo-icon pago-icon" />
           </div>
-        ) : pagoMetodo === 'tarjeta' ? (
-          <div className="metodo-entrega-info">
-            <div className="metodo-icon-container">
-              <FaCreditCard className="metodo-icon pago-icon" />
-            </div>
-            <div className="metodo-details">
-              <p className="metodo-tipo">Pago con tarjeta (Wompi)</p>
-              <p><small>Procesamiento seguro 3D Secure</small></p>
-            </div>
+          <div className="metodo-details">
+            <p className="metodo-tipo">Efectivo al momento de {metodoEntrega === 'recoger' ? 'recoger' : 'la entrega'}</p>
           </div>
-        ) : (
-          <div className="metodo-entrega-info">
-            <div className="metodo-icon-container">
-              <FaCreditCard className="metodo-icon pago-icon" />
-            </div>
-            <div className="metodo-details">
-              <p className="metodo-tipo">Método de pago no especificado</p>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </div>
 
@@ -1411,6 +1069,8 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     </div>
   </div>
 )}
+
+
 
 
       {/* Modal Términos y Condiciones */}
@@ -1445,13 +1105,13 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
             <button
               className="btn-aceptar"
               onClick={handleAceptarTerminos}
-              disabled={!aceptoTerminos || isSubmitting || isProcessingWompi}
+              disabled={!aceptoTerminos || isSubmitting}
               style={{
-                opacity: (aceptoTerminos && !isSubmitting && !isProcessingWompi) ? 1 : 0.5,
-                cursor: (aceptoTerminos && !isSubmitting && !isProcessingWompi) ? 'pointer' : 'not-allowed'
+                opacity: (aceptoTerminos && !isSubmitting) ? 1 : 0.5,
+                cursor: (aceptoTerminos && !isSubmitting) ? 'pointer' : 'not-allowed'
               }}
             >
-              {isSubmitting || isProcessingWompi ? (
+              {isSubmitting ? (
                 <>
                   <FaSpinner className="spinner-icon" />
                   Procesando...
@@ -1491,8 +1151,6 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   </div>
 )}
 
-        </div>
-
         {/* Columna derecha: Card Resumen */}
         <div className="col-derecha">
           <div className="card-resumen wider right-align">
@@ -1529,9 +1187,10 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
             )}
           </div>
         </div>
-      </div>      
+      </div>
+      </div>
     </div>
   );
 };
 
-export default PideAhora;
+export default PideAhora ;
