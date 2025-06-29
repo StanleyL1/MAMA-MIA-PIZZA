@@ -282,7 +282,6 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
       }));
 
       // Calcular descuento (si aplica)
-      const subtotal = cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
       const descuento = 0.00; // Por ahora sin descuentos
 
       // Preparar el payload completo
