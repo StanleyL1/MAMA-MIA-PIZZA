@@ -10,11 +10,13 @@ import {
   FaSpinner, 
   FaUser, 
   FaUserTie,
+  FaCreditCard,
   FaMoneyBillWave,
   FaExclamationTriangle,
   FaPizzaSlice,
   FaMotorcycle,
-  FaStore
+  FaStore,
+  FaShieldAlt
 } from 'react-icons/fa';
 
 // Función auxiliar para obtener datos del usuario del localStorage
@@ -62,6 +64,14 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderError, setOrderError] = useState('');
   const [orderCode, setOrderCode] = useState('');
+  
+  // Estados para datos de tarjeta
+  const [tarjetaData, setTarjetaData] = useState({
+    numeroTarjeta: '',
+    cvv: '',
+    mesVencimiento: '',
+    anioVencimiento: ''
+  });
 
 
     const [invitadoData, setInvitadoData] = useState({
@@ -114,6 +124,72 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     });
   };
 
+  const handleInputTarjeta = (e) => {
+    const { name, value } = e.target;
+    
+    // Formatear número de tarjeta (agregar espacios cada 4 dígitos)
+    if (name === 'numeroTarjeta') {
+      const formattedValue = value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
+      if (formattedValue.replace(/\s/g, '').length <= 16) {
+        setTarjetaData({
+          ...tarjetaData,
+          [name]: formattedValue,
+        });
+      }
+    }
+    // Formatear CVV (máximo 4 dígitos)
+    else if (name === 'cvv') {
+      if (value.length <= 4 && /^\d*$/.test(value)) {
+        setTarjetaData({
+          ...tarjetaData,
+          [name]: value,
+        });
+      }
+    }
+    // Formatear mes (máximo 2 dígitos, 01-12)
+    else if (name === 'mesVencimiento') {
+      if (value.length <= 2 && /^\d*$/.test(value)) {
+        const monthValue = parseInt(value);
+        if (value === '' || (monthValue >= 1 && monthValue <= 12)) {
+          setTarjetaData({
+            ...tarjetaData,
+            [name]: value,
+          });
+        }
+      }
+    }
+    // Formatear año (4 dígitos)
+    else if (name === 'anioVencimiento') {
+      if (value.length <= 4 && /^\d*$/.test(value)) {
+        setTarjetaData({
+          ...tarjetaData,
+          [name]: value,
+        });
+      }
+    }
+    else {
+      setTarjetaData({
+        ...tarjetaData,
+        [name]: value,
+      });
+    }
+  };
+
+  // Función para detectar tipo de tarjeta
+  const detectCardType = (number) => {
+    const cleanNumber = number.replace(/\s/g, '');
+    
+    if (/^4/.test(cleanNumber)) {
+      return 'visa';
+    } else if (/^5[1-5]/.test(cleanNumber) || /^2[2-7]/.test(cleanNumber)) {
+      return 'mastercard';
+    } else if (/^3[47]/.test(cleanNumber)) {
+      return 'amex';
+    }
+    
+    return '';
+  };
+
 
 
 
@@ -152,6 +228,149 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
       setShowTerms(false);
       alert('Hubo un problema al procesar el pedido. Por favor intenta nuevamente más tarde.');
       throw error;
+    }
+  };
+
+  // Función para procesar pago con tarjeta
+  const procesarPagoConTarjeta = async () => {
+    try {
+      setIsSubmitting(true);
+      setOrderError('');
+
+      // Preparar datos del cliente según el modo
+      const clienteData = modo === 'invitado' 
+        ? {
+            nombre: invitadoData.nombreCompleto,
+            telefono: invitadoData.telefono,
+            email: '', // Email vacío para invitados
+            direccion: metodoEntrega === 'domicilio' 
+              ? (modoDireccion === 'formulario' 
+                  ? direccionData.direccionExacta 
+                  : addressInfo?.formattedAddress || "Ubicación en tiempo real")
+              : "CP #3417, Puerto El Triunfo, EL salvador"
+          }
+        : {
+            nombre: cuentaData.nombreCompleto,
+            telefono: cuentaData.telefono,
+            email: cuentaData.email,
+            direccion: metodoEntrega === 'domicilio' 
+              ? (modoDireccion === 'formulario' 
+                  ? direccionData.direccionExacta 
+                  : addressInfo?.formattedAddress || "Ubicación en tiempo real")
+              : "CP #3417, Puerto El Triunfo, EL salvador"
+          };
+
+      // Preparar datos de la tarjeta
+      const tarjetaDataClean = {
+        numeroTarjeta: tarjetaData.numeroTarjeta.replace(/\s/g, ''),
+        cvv: tarjetaData.cvv,
+        mesVencimiento: parseInt(tarjetaData.mesVencimiento),
+        anioVencimiento: parseInt(tarjetaData.anioVencimiento)
+      };
+
+      // Preparar productos con el formato requerido
+      const productosData = cartItems.map(item => ({
+        id_producto: item.id,
+        id_tamano: item.tamanoId || 2, // Default a mediana si no hay tamaño específico
+        cantidad: parseInt(item.cantidad),
+        precio_unitario: parseFloat(item.precio),
+        observaciones: [
+          item.masa ? `Masa: ${item.masa}` : '',
+          item.tamano ? `Tamaño: ${item.tamano}` : '',
+          item.instrucciones ? `Instrucciones: ${item.instrucciones}` : ''
+        ].filter(Boolean).join(', ') || ""
+      }));
+
+      // Calcular descuento (si aplica)
+      const subtotal = cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+      const descuento = 0.00; // Por ahora sin descuentos
+
+      // Preparar el payload completo
+      const paymentData = {
+        cliente: clienteData,
+        tarjeta: tarjetaDataClean,
+        productos: productosData,
+        tipo_entrega: metodoEntrega === 'domicilio' ? 'domicilio' : 'recoger',
+        observaciones_generales: direccionData.referencias || "",
+        descuento: descuento
+      };
+
+      console.log('Enviando datos de pago:', paymentData);
+
+      // Enviar al endpoint de pagos
+      const response = await fetch('https://api.mamamianpizza.com/api/payments/process-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(paymentData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Respuesta del servidor:', result);
+        
+        if (result.success) {
+          // Pago exitoso
+          console.log('Pago procesado exitosamente:', result);
+          
+          // Limpiar carrito
+          if (setCartItems) {
+            setCartItems([]);
+          }
+          
+          // Redirigir a página de éxito con parámetros
+          const successParams = new URLSearchParams({
+            transaction_id: result.transaction_id || result.transactionId || 'unknown',
+            order_id: result.order_id || result.codigo_pedido || 'unknown',
+            status: 'success'
+          });
+          
+          window.location.href = `/payment/success?${successParams.toString()}`;
+          
+        } else {
+          // El pago falló pero el servidor respondió correctamente
+          console.error('Error en el pago:', result);
+          
+          // Redirigir a página de fallo con parámetros
+          const failureParams = new URLSearchParams({
+            transaction_id: result.transaction_id || result.transactionId || 'unknown',
+            order_id: result.order_id || 'unknown',
+            error_code: result.error_code || 'PAYMENT_FAILED',
+            error_message: result.message || 'Error en el procesamiento del pago'
+          });
+          
+          window.location.href = `/payment/failure?${failureParams.toString()}`;
+        }
+      } else {
+        // Error HTTP del servidor
+        const errorResult = await response.json();
+        console.error('Error HTTP al procesar el pago:', errorResult);
+        
+        // Redirigir a página de fallo
+        const failureParams = new URLSearchParams({
+          transaction_id: 'unknown',
+          order_id: 'unknown', 
+          error_code: `HTTP_${response.status}`,
+          error_message: errorResult.message || `Error del servidor: ${response.status}`
+        });
+        
+        window.location.href = `/payment/failure?${failureParams.toString()}`;
+      }
+    } catch (error) {
+      console.error('Error en el procesamiento del pago:', error);
+      
+      // Redirigir a página de fallo por error de conexión
+      const failureParams = new URLSearchParams({
+        transaction_id: 'unknown',
+        order_id: 'unknown',
+        error_code: 'NETWORK_ERROR',
+        error_message: 'Error de conexión al procesar el pago'
+      });
+      
+      window.location.href = `/payment/failure?${failureParams.toString()}`;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -323,102 +542,139 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
         alert('Por favor selecciona un método de pago.');
         return;
       }
+      
+      // Validar datos de tarjeta si es pago con tarjeta
+      if (pagoMetodo === 'tarjeta') {
+        if (!tarjetaData.numeroTarjeta || !tarjetaData.cvv || !tarjetaData.mesVencimiento || !tarjetaData.anioVencimiento) {
+          alert('Por favor completa todos los datos de la tarjeta.');
+          return;
+        }
+        
+        // Validaciones adicionales
+        const numeroTarjeta = tarjetaData.numeroTarjeta.replace(/\s/g, '');
+        if (numeroTarjeta.length < 15 || numeroTarjeta.length > 16) {
+          alert('El número de tarjeta debe tener entre 15 y 16 dígitos.');
+          return;
+        }
+        
+        if (tarjetaData.cvv.length < 3 || tarjetaData.cvv.length > 4) {
+          alert('El CVV debe tener entre 3 y 4 dígitos.');
+          return;
+        }
+        
+        const mes = parseInt(tarjetaData.mesVencimiento);
+        const anio = parseInt(tarjetaData.anioVencimiento);
+        const fechaActual = new Date();
+        const anioActual = fechaActual.getFullYear();
+        const mesActual = fechaActual.getMonth() + 1;
+        
+        if (mes < 1 || mes > 12) {
+          alert('El mes de vencimiento debe estar entre 01 y 12.');
+          return;
+        }
+        
+        if (anio < anioActual || (anio === anioActual && mes < mesActual)) {
+          alert('La tarjeta está vencida.');
+          return;
+        }
+        
+        if (anio < 2024 || anio > 2040) {
+          alert('El año de vencimiento no es válido.');
+          return;
+        }
+      }
+      
       setStep('Confirmar');
     }
   };
-  // Función para enviar el pedido al servidor adaptada para el nuevo backend
+  // Función para enviar el pedido según el método de pago
   const enviarPedido = async () => {
-    
     if (!pagoMetodo) {
       alert('Por favor selecciona un método de pago.');
       return;
     }
     
-    setIsSubmitting(true);
-    setOrderError('');
-    
-    try {
-      // Construir objeto con la estructura exacta esperada por el backend
-      const pedidoData = {
-        // Tipo de cliente: registrado o invitado
-        tipo_cliente: modo === 'invitado' ? 'invitado' : 'registrado',        // Datos del cliente según el payload exacto
-        cliente: modo === 'invitado'
-          ? { 
-              nombre: invitadoData.nombreCompleto,
-              telefono: invitadoData.telefono
-            }          : {
-              nombre: cuentaData.nombreCompleto,
-              telefono: cuentaData.telefono,
-              email: cuentaData.email
-            },
-        
-        // Dirección según el tipo seleccionado
-        direccion: metodoEntrega === 'domicilio'
-          ? (modoDireccion === 'formulario' 
-              ? {
-                  tipo_direccion: 'formulario',
-                  direccion: direccionData.direccionExacta,
-                  referencias: direccionData.referencias,
-                  pais: direccionData.pais,
-                  departamento: direccionData.departamento,
-                  municipio: direccionData.municipio
-                }
-              : {
-                  tipo_direccion: 'tiempo_real',
-                  latitud: userLocation.lat,
-                  longitud: userLocation.lng,
-                  precision_ubicacion: Math.round(userLocation.accuracy),
-                  direccion_formateada: addressInfo?.formattedAddress || "Ubicación compartida en tiempo real"
-                })
-          : {
-              // Para recoger en local - usar dirección del local
-              tipo_direccion: 'formulario',
-              direccion: "CP #3417, Puerto El Triunfo, EL salvador",
-              referencias: "Local principal",
-              pais: "El Salvador",
-              departamento: "Usulután",
-              municipio: "Jiquilisco"
-            },
-        
-        // Productos con la estructura exacta del payload
-        productos: cartItems.map(item => ({
-          id_producto: item.id,
-          nombre_producto: item.nombre,
-          cantidad: parseInt(item.cantidad),
-          precio_unitario: parseFloat(item.precio),
-          subtotal: parseFloat(item.precio * item.cantidad),
-          masa: item.masa || null,
-          tamano: item.tamano || null,
-          instrucciones_especiales: item.instrucciones || null,
-          metodo_entrega: metodoEntrega === 'recoger' ? 1 : 0
-        })),
-        
-        // Método de pago
-        metodo_pago: pagoMetodo,
-        
-        // Cálculos financieros exactos
-        subtotal: parseFloat(cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0).toFixed(2)),
-        costo_envio: metodoEntrega === 'domicilio' ? 2.50 : 0.00,
-        impuestos: parseFloat((cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) * 0.13).toFixed(2)),
-        total: parseFloat((
-          cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) + 
-          (metodoEntrega === 'domicilio' ? 2.50 : 0.00) + 
-          (cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) * 0.13)
-        ).toFixed(2)),
-        
-        // Términos y tiempo estimado
-        aceptado_terminos: true,
-        tiempo_estimado_entrega: metodoEntrega === 'domicilio' ? 30 : 25
-      };
-      
+    if (pagoMetodo === 'tarjeta') {
+      // Procesar pago con tarjeta usando el nuevo endpoint
+      await procesarPagoConTarjeta();
+    } else {
       // Procesar pedido normal para pagos en efectivo
-      await procesarPedidoNormal(pedidoData);
+      setIsSubmitting(true);
+      setOrderError('');
       
-    } catch (error) {
-      console.error('Error en enviarPedido:', error);
-      // El manejo de errores específicos ya se hace en las funciones individuales
-    } finally {
-      setIsSubmitting(false);
+      try {
+        // Construir objeto con la estructura esperada por el backend para efectivo
+        const pedidoData = {
+          tipo_cliente: modo === 'invitado' ? 'invitado' : 'registrado',
+          cliente: modo === 'invitado'
+            ? { 
+                nombre: invitadoData.nombreCompleto,
+                telefono: invitadoData.telefono
+              }
+            : {
+                nombre: cuentaData.nombreCompleto,
+                telefono: cuentaData.telefono,
+                email: cuentaData.email
+              },
+          
+          direccion: metodoEntrega === 'domicilio'
+            ? (modoDireccion === 'formulario' 
+                ? {
+                    tipo_direccion: 'formulario',
+                    direccion: direccionData.direccionExacta,
+                    referencias: direccionData.referencias,
+                    pais: direccionData.pais,
+                    departamento: direccionData.departamento,
+                    municipio: direccionData.municipio
+                  }
+                : {
+                    tipo_direccion: 'tiempo_real',
+                    latitud: userLocation.lat,
+                    longitud: userLocation.lng,
+                    precision_ubicacion: Math.round(userLocation.accuracy),
+                    direccion_formateada: addressInfo?.formattedAddress || "Ubicación compartida en tiempo real"
+                  })
+            : {
+                tipo_direccion: 'formulario',
+                direccion: "CP #3417, Puerto El Triunfo, EL salvador",
+                referencias: "Local principal",
+                pais: "El Salvador",
+                departamento: "Usulután",
+                municipio: "Jiquilisco"
+              },
+          
+          productos: cartItems.map(item => ({
+            id_producto: item.id,
+            nombre_producto: item.nombre,
+            cantidad: parseInt(item.cantidad),
+            precio_unitario: parseFloat(item.precio),
+            subtotal: parseFloat(item.precio * item.cantidad),
+            masa: item.masa || null,
+            tamano: item.tamano || null,
+            instrucciones_especiales: item.instrucciones || null,
+            metodo_entrega: metodoEntrega === 'recoger' ? 1 : 0
+          })),
+          
+          metodo_pago: pagoMetodo,
+          subtotal: parseFloat(cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0).toFixed(2)),
+          costo_envio: metodoEntrega === 'domicilio' ? 2.50 : 0.00,
+          impuestos: parseFloat((cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) * 0.13).toFixed(2)),
+          total: parseFloat((
+            cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) + 
+            (metodoEntrega === 'domicilio' ? 2.50 : 0.00) + 
+            (cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) * 0.13)
+          ).toFixed(2)),
+          
+          aceptado_terminos: true,
+          tiempo_estimado_entrega: metodoEntrega === 'domicilio' ? 30 : 25
+        };
+        
+        await procesarPedidoNormal(pedidoData);
+      } catch (error) {
+        console.error('Error en enviarPedido:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -937,6 +1193,14 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     
     <div className="toggle-pago">
       <button
+        className={`toggle-btn ${pagoMetodo === 'tarjeta' ? 'activo' : ''}`}
+        onClick={() => setPagoMetodo('tarjeta')}
+      >
+        <FaCreditCard className={`icono-metodo ${pagoMetodo === 'tarjeta' ? 'active-icon' : ''}`} />
+        <span>Pago con tarjeta</span>
+      </button>
+
+      <button
         className={`toggle-btn ${pagoMetodo === 'efectivo' ? 'activo' : ''}`}
         onClick={() => setPagoMetodo('efectivo')}
       >
@@ -944,6 +1208,81 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
         <span>Efectivo</span>
       </button>
     </div>
+
+    {pagoMetodo === 'tarjeta' && (
+      <div className="detalle-pago">
+        <h4 className="subtitulo-pago">Datos de la tarjeta</h4>
+        <div className="form-tarjeta">
+          <div className="campo">
+            <label htmlFor="numeroTarjeta">Número de tarjeta</label>
+            <input
+              name="numeroTarjeta"
+              id="numeroTarjeta"
+              type="text"
+              placeholder="1234 5678 9012 3456"
+              value={tarjetaData.numeroTarjeta}
+              onChange={handleInputTarjeta}
+              className={`input-tarjeta ${detectCardType(tarjetaData.numeroTarjeta)}`}
+              maxLength="19"
+            />
+            {detectCardType(tarjetaData.numeroTarjeta) && (
+              <div className="card-type">
+                {detectCardType(tarjetaData.numeroTarjeta).toUpperCase()}
+              </div>
+            )}
+          </div>
+          
+          <div className="fila-tarjeta">
+            <div className="campo">
+              <label htmlFor="mesVencimiento">Mes</label>
+              <input
+                name="mesVencimiento"
+                id="mesVencimiento"
+                type="text"
+                placeholder="MM"
+                value={tarjetaData.mesVencimiento}
+                onChange={handleInputTarjeta}
+                className="input-small"
+                maxLength="2"
+              />
+            </div>
+            
+            <div className="campo">
+              <label htmlFor="anioVencimiento">Año</label>
+              <input
+                name="anioVencimiento"
+                id="anioVencimiento"
+                type="text"
+                placeholder="YYYY"
+                value={tarjetaData.anioVencimiento}
+                onChange={handleInputTarjeta}
+                className="input-small"
+                maxLength="4"
+              />
+            </div>
+            
+            <div className="campo">
+              <label htmlFor="cvv">CVV</label>
+              <input
+                name="cvv"
+                id="cvv"
+                type="text"
+                placeholder="123"
+                value={tarjetaData.cvv}
+                onChange={handleInputTarjeta}
+                className="input-small"
+                maxLength="4"
+              />
+            </div>
+          </div>
+          
+          <div className="seguridad-info">
+            <FaShieldAlt className="icono-seguridad" />
+            <span>Procesado de forma segura por nuestro sistema de pagos.</span>
+          </div>
+        </div>
+      </div>
+    )}
 
     {pagoMetodo === 'efectivo' && (
       <div className="detalle-pagos">
@@ -1048,14 +1387,26 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
     <div className="seccion-linea">
       <h4 className="subtitulo-seccion">Método de pago</h4>
       <div className="metodo-pago-info">
-        <div className="metodo-entrega-info">
-          <div className="metodo-icon-container">
-            <FaMoneyBillWave className="metodo-icon pago-icon" />
+        {pagoMetodo === 'efectivo' ? (
+          <div className="metodo-entrega-info">
+            <div className="metodo-icon-container">
+              <FaMoneyBillWave className="metodo-icon pago-icon" />
+            </div>
+            <div className="metodo-details">
+              <p className="metodo-tipo">Efectivo al momento de {metodoEntrega === 'recoger' ? 'recoger' : 'la entrega'}</p>
+            </div>
           </div>
-          <div className="metodo-details">
-            <p className="metodo-tipo">Efectivo al momento de {metodoEntrega === 'recoger' ? 'recoger' : 'la entrega'}</p>
+        ) : (
+          <div className="metodo-entrega-info">
+            <div className="metodo-icon-container">
+              <FaCreditCard className="metodo-icon pago-icon" />
+            </div>
+            <div className="metodo-details">
+              <p className="metodo-tipo">Pago con tarjeta</p>
+              <p>Tarjeta terminada en {tarjetaData.numeroTarjeta.slice(-4)}</p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
 
