@@ -1,0 +1,193 @@
+/* PaymentConfirmation.css */
+.payment-confirmation-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.payment-confirmation-card {
+  background: white;
+  border-radius: 20px;
+  padding: 50px 40px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.payment-confirmation-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.confirmation-icon-container {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 30px;
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.confirmation-spinner {
+  color: white;
+  font-size: 2.5rem;
+  animation: spin 1s linear infinite;
+}
+
+.payment-confirmation-card h2 {
+  color: #333;
+  font-size: 2.2rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.confirmation-message {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+.processing-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 40px 0;
+  padding: 0 20px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  border-radius: 12px;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+}
+
+.step.active {
+  background: linear-gradient(135deg, #e8f4f8, #f0f8ff);
+  border-left: 4px solid #667eea;
+  transform: translateX(5px);
+}
+
+.step-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #667eea;
+  flex-shrink: 0;
+}
+
+.step-icon.spinner {
+  animation: spin 1s linear infinite;
+}
+
+.step-icon.pending {
+  width: 12px;
+  height: 12px;
+  background: #dee2e6;
+  border-radius: 50%;
+}
+
+.step span {
+  color: #555;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.step.active span {
+  color: #333;
+  font-weight: 600;
+}
+
+.confirmation-note {
+  color: #777;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-top: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border-left: 4px solid #ffc107;
+}
+
+/* Animaciones */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.payment-confirmation-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.step {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.step:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.step:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .payment-confirmation-container {
+    padding: 10px;
+  }
+  
+  .payment-confirmation-card {
+    padding: 40px 25px;
+  }
+  
+  .payment-confirmation-card h2 {
+    font-size: 1.8rem;
+  }
+  
+  .processing-steps {
+    padding: 0 10px;
+  }
+  
+  .step {
+    padding: 12px 15px;
+  }
+  
+  .confirmation-note {
+    padding: 15px;
+    font-size: 0.9rem;
+  }
+}

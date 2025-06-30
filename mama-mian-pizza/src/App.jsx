@@ -20,6 +20,7 @@ import TestExperiencias from './components/TestExperiencias/TestExperiencias';
 import Toast from './components/Toast/Toast';
 import PaymentSuccess from './components/PaymentSuccess/PaymentSuccess';
 import PaymentFailure from './components/PaymentFailure/PaymentFailure';
+import PaymentConfirmation from './components/PaymentConfirmation/PaymentConfirmation';
 import { saveUserData, clearUserData } from './utils/userStorage';
 
 function App() {  const [isCartOpen, setIsCartOpen] = useState(false);
@@ -216,6 +217,7 @@ function App() {  const [isCartOpen, setIsCartOpen] = useState(false);
         {/* Rutas para Wompi - páginas de resultado de pago */}
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/payment/failure" element={<PaymentFailure />} />
+        <Route path="/confirmacion" element={<PaymentConfirmation />} />
         
         <Route path="/admin/experiencias" element={<AdminExperiencias />} />
         <Route path="/test/experiencias" element={<TestExperiencias />} />

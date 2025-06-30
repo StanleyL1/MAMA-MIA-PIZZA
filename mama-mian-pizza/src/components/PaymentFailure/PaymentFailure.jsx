@@ -13,6 +13,8 @@ const PaymentFailure = () => {
   const orderId = searchParams.get('order_id');
   const errorCode = searchParams.get('error_code');
   const errorMessage = searchParams.get('error_message');
+  const amount = searchParams.get('amount');
+  const paymentMethod = searchParams.get('payment_method');
 
   useEffect(() => {
     const processFailure = async () => {
@@ -49,12 +51,17 @@ const PaymentFailure = () => {
 
   const getErrorMessage = () => {
     if (errorMessage) {
-      return errorMessage;
+      // Si el mensaje contiene "Fondos insuficientes", mostrar un mensaje más amigable
+      if (errorMessage.toLowerCase().includes('fondos insuficientes')) {
+        return 'No hay fondos suficientes en tu tarjeta';
+      }
+      // Decodificar mensaje de Wompi que viene codificado en URL
+      return decodeURIComponent(errorMessage);
     }
 
     switch (errorCode) {
       case 'INSUFFICIENT_FUNDS':
-        return 'Fondos insuficientes en tu tarjeta';
+        return 'No hay fondos suficientes en tu tarjeta';
       case 'CARD_DECLINED':
         return 'Tu tarjeta fue rechazada por el banco';
       case 'EXPIRED_CARD':
@@ -67,6 +74,8 @@ const PaymentFailure = () => {
         return 'Error de conexión durante el proceso';
       case 'USER_CANCELLED':
         return 'El pago fue cancelado por el usuario';
+      case 'PAYMENT_DECLINED':
+        return 'El pago fue rechazado';
       default:
         return 'Ocurrió un error durante el procesamiento del pago';
     }
@@ -75,20 +84,22 @@ const PaymentFailure = () => {
   const getErrorSolution = () => {
     switch (errorCode) {
       case 'INSUFFICIENT_FUNDS':
-        return 'Verifica el saldo de tu tarjeta o intenta con otra tarjeta';
+        return 'Te recomendamos: verificar el saldo de tu tarjeta, intentar con otra tarjeta o contactar a tu banco';
       case 'CARD_DECLINED':
-        return 'Contacta a tu banco o intenta con otra tarjeta';
+        return 'Te recomendamos: contactar a tu banco para verificar el estado de tu tarjeta o intentar con otra tarjeta';
       case 'EXPIRED_CARD':
-        return 'Usa una tarjeta vigente';
+        return 'Usa una tarjeta con fecha de vencimiento vigente';
       case 'INVALID_CARD':
-        return 'Verifica que los datos ingresados sean correctos';
+        return 'Verifica que todos los datos de la tarjeta sean correctos (número, CVV, fecha de vencimiento)';
       case 'TIMEOUT':
       case 'NETWORK_ERROR':
-        return 'Intenta nuevamente en unos minutos';
+        return 'Intenta nuevamente en unos minutos. Si el problema persiste, contacta a soporte';
       case 'USER_CANCELLED':
         return 'Puedes reintentar el pago cuando desees';
+      case 'PAYMENT_DECLINED':
+        return 'Verifica los datos de tu tarjeta o intenta con otra tarjeta. Si el problema persiste, contacta a tu banco';
       default:
-        return 'Puedes intentar nuevamente o contactar a soporte';
+        return 'Puedes intentar nuevamente o contactar a nuestro equipo de soporte para recibir ayuda';
     }
   };
 
@@ -109,7 +120,15 @@ const PaymentFailure = () => {
   const handleContactSupport = () => {
     // Abrir WhatsApp o modal de contacto
     const message = encodeURIComponent(
-      `Hola, tuve un problema con mi pago. ID de transacción: ${transactionId || 'N/A'}, Error: ${getErrorMessage()}`
+      `Hola, tuve un problema con mi pago en Mama Mia Pizza.
+      
+📋 Detalles:
+• ID de transacción: ${transactionId || 'N/A'}
+• Monto: $${amount || 'N/A'}
+• Error: ${getErrorMessage()}
+• Método de pago: ${paymentMethod || 'Tarjeta'}
+
+¿Podrían ayudarme?`
     );
     window.open(`https://wa.me/50375155863?text=${message}`, '_blank');
   };
@@ -146,6 +165,20 @@ const PaymentFailure = () => {
               <span className="error-value">{getErrorMessage()}</span>
             </div>
             
+            {amount && (
+              <div className="error-row">
+                <span className="error-label">Monto del pago:</span>
+                <span className="error-value">${amount}</span>
+              </div>
+            )}
+            
+            {paymentMethod && (
+              <div className="error-row">
+                <span className="error-label">Método de pago:</span>
+                <span className="error-value">{paymentMethod}</span>
+              </div>
+            )}
+            
             {transactionId && (
               <div className="error-row">
                 <span className="error-label">ID de transacción:</span>
@@ -158,6 +191,12 @@ const PaymentFailure = () => {
         <div className="solution-info">
           <h4>¿Cómo solucionarlo?</h4>
           <p>{getErrorSolution()}</p>
+          
+          {errorCode === 'INSUFFICIENT_FUNDS' && (
+            <div className="special-suggestion">
+              <strong>💡 Sugerencia:</strong> También puedes elegir pagar en efectivo al momento de la entrega o recoger tu pedido sin necesidad de tarjeta.
+            </div>
+          )}
         </div>
 
         <div className="payment-options">

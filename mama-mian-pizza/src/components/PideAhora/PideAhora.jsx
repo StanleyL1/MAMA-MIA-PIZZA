@@ -309,34 +309,34 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
         const result = await response.json();
         console.log('Respuesta del servidor:', result);
         
-        if (result.success) {
-          // Pago exitoso
-          console.log('Pago procesado exitosamente:', result);
+        if (result.success && result.data && result.data.instructions && result.data.instructions.redirectUrl) {
+          // El backend devolvió la URL de pago de Wompi
+          console.log('Redirigiendo a Wompi:', result.data.instructions.redirectUrl);
           
-          // Limpiar carrito
-          if (setCartItems) {
-            setCartItems([]);
-          }
+          // Guardar datos temporalmente para recuperar después del pago
+          const tempOrderData = {
+            transactionId: result.data.transactionId,
+            monto: result.data.monto,
+            cartItems: cartItems,
+            pedidoStatus: result.data.pedidoStatus,
+            timestamp: Date.now()
+          };
           
-          // Redirigir a página de éxito con parámetros
-          const successParams = new URLSearchParams({
-            transaction_id: result.transaction_id || result.transactionId || 'unknown',
-            order_id: result.order_id || result.codigo_pedido || 'unknown',
-            status: 'success'
-          });
+          localStorage.setItem('tempOrderData', JSON.stringify(tempOrderData));
           
-          window.location.href = `/payment/success?${successParams.toString()}`;
+          // Redirigir a la URL de pago de Wompi
+          window.location.href = result.data.instructions.redirectUrl;
           
         } else {
-          // El pago falló pero el servidor respondió correctamente
-          console.error('Error en el pago:', result);
+          // El pago falló en el procesamiento inicial
+          console.error('Error en el procesamiento inicial:', result);
           
           // Redirigir a página de fallo con parámetros
           const failureParams = new URLSearchParams({
-            transaction_id: result.transaction_id || result.transactionId || 'unknown',
-            order_id: result.order_id || 'unknown',
-            error_code: result.error_code || 'PAYMENT_FAILED',
-            error_message: result.message || 'Error en el procesamiento del pago'
+            transaction_id: result.data?.transactionId || 'unknown',
+            order_id: 'unknown',
+            error_code: 'PROCESSING_ERROR',
+            error_message: result.message || 'Error en el procesamiento inicial del pago'
           });
           
           window.location.href = `/payment/failure?${failureParams.toString()}`;
