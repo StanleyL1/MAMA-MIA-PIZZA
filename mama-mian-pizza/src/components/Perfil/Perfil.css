@@ -2334,9 +2334,7 @@
   gap: 4px;
 }
 
-.perfil__pedido-subtotal,
-.perfil__pedido-envio,
-.perfil__pedido-impuestos {
+.perfil__pedido-subtotal {
   font-size: 0.9rem;
   color: #6c757d;
 }

@@ -656,13 +656,8 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
           
           metodo_pago: pagoMetodo,
           subtotal: parseFloat(cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0).toFixed(2)),
-          costo_envio: metodoEntrega === 'domicilio' ? 2.50 : 0.00,
-          impuestos: parseFloat((cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) * 0.13).toFixed(2)),
-          total: parseFloat((
-            cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) + 
-            (metodoEntrega === 'domicilio' ? 2.50 : 0.00) + 
-            (cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0) * 0.13)
-          ).toFixed(2)),
+          costo_envio: 0.00,
+          total: parseFloat(cartItems.reduce((sum, item) => sum + (item.precio * item.cantidad), 0).toFixed(2)),
           
           aceptado_terminos: true,
           tiempo_estimado_entrega: metodoEntrega === 'domicilio' ? 30 : 25

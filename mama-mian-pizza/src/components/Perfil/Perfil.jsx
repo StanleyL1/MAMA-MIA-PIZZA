@@ -908,8 +908,6 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                   <div className="perfil__pedido-resumen">
                     <div className="perfil__pedido-resumen-left">
                       <div className="perfil__pedido-subtotal">Subtotal: ${parseFloat(pedido.subtotal).toFixed(2)}</div>
-                      <div className="perfil__pedido-envio">Envío: ${parseFloat(pedido.costo_envio).toFixed(2)}</div>
-                      <div className="perfil__pedido-impuestos">Impuestos: ${parseFloat(pedido.impuestos).toFixed(2)}</div>
                     </div>
                     <div className="perfil__pedido-total-final">${parseFloat(pedido.total).toFixed(2)}</div>
                   </div>
