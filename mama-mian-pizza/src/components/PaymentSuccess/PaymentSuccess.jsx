@@ -1,4 +1,4 @@
-https://mamamianpizza.com/payment/success?transaction_id=c446eb99-dd1d-4250-9821-0eb9e0e3e844&order_id=WOMPI-c446eb99-dd1d-4250-9821-0eb9e0e3e844&status=success&amount=4.00&authorization_code=764300&note=Pago+confirmado+por+Wompi+-+Pedido+procesadoimport React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FaCheck, FaFilePdf, FaHome, FaSpinner } from 'react-icons/fa';
 import './PaymentSuccess.css';
