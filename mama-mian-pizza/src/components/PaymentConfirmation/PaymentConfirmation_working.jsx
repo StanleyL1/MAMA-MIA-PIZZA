@@ -14,9 +14,12 @@ const PaymentConfirmation = () => {
         // Obtener parámetros de Wompi
         const idTransaccion = searchParams.get('idTransaccion');
         const monto = searchParams.get('monto');
+        const esReal = searchParams.get('esReal');
+        const formaPago = searchParams.get('formaPago');
         const esAprobada = searchParams.get('esAprobada');
         const codigoAutorizacion = searchParams.get('codigoAutorizacion');
         const mensaje = searchParams.get('mensaje');
+        const hash = searchParams.get('hash');
 
         console.log('🎉 PaymentConfirmation - Parámetros de Wompi:', {
           idTransaccion,
@@ -52,8 +55,11 @@ const PaymentConfirmation = () => {
         if (paymentSuccessful) {
           setProcessingMessage('Pago aprobado. Creando tu pedido...');
           
-          // FLUJO SIMPLIFICADO: Crear el pedido usando el endpoint que funciona
+          // FLUJO SIMPLIFICADO: Intentar crear el pedido usando los datos originales
+          // Si el backend original funcionaba, usemos la misma estructura
+          
           try {
+            // Usar el endpoint original que funcionaba para efectivo, pero con los datos de tarjeta
             const pedidoData = {
               cliente: tempOrderData.clienteData,
               productos: tempOrderData.cartItems.map(item => ({
