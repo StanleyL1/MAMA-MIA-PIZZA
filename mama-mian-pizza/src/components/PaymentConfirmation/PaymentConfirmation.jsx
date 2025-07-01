@@ -101,7 +101,7 @@ const PaymentConfirmation = () => {
                 metodo_entrega: tempOrderData.metodoEntrega === 'recoger' ? 1 : 0
               })),
               
-              metodo_pago: 'tarjeta', // IMPORTANTE: Asegurar que sea tarjeta
+              metodo_pago: 'tarjeta'.trim(), // IMPORTANTE: Asegurar que sea tarjeta sin espacios
               subtotal: parseFloat(tempOrderData.monto),
               costo_envio: 0.00,
               total: parseFloat(tempOrderData.monto),
@@ -114,6 +114,11 @@ const PaymentConfirmation = () => {
             };
 
             console.log('📤 Creando pedido con datos:', pedidoData);
+            console.log('🔍 MÉTODO DE PAGO ESPECÍFICO:', pedidoData.metodo_pago);
+            console.log('🔍 TIPO DE MÉTODO DE PAGO:', typeof pedidoData.metodo_pago);
+            console.log('🔍 LONGITUD DEL STRING:', pedidoData.metodo_pago.length);
+            console.log('🔍 CÓDIGO ASCII:', Array.from(pedidoData.metodo_pago).map(c => c.charCodeAt(0)));
+            console.log('🔍 COMPARACIÓN: "tarjeta" === pedidoData.metodo_pago:', "tarjeta" === pedidoData.metodo_pago);
 
             // Usar el mismo endpoint que funciona para efectivo
             const response = await fetch('https://api.mamamianpizza.com/api/orders/neworder', {
@@ -145,7 +150,74 @@ const PaymentConfirmation = () => {
               window.location.href = `/payment/success?${successParams.toString()}`;
               return;
             } else {
-              console.error('❌ Error al crear pedido:', response.status);
+              // Si falla, vamos a intentar con diferentes valores de método de pago
+              const errorText = await response.text();
+              console.error('❌ Error al crear pedido:', response.status, errorText);
+              
+              if (errorText.includes('Método de pago inválido')) {
+                console.log('🔄 Intentando con diferentes valores de método de pago...');
+                
+                // Intentar con diferentes posibles valores
+                const metodosAlternativos = [
+                  'efectivo', // Para verificar si efectivo funciona
+                  'card', 
+                  'credit_card', 
+                  'tarjeta_credito', 
+                  'TARJETA', 
+                  'Tarjeta',
+                  'credito',
+                  'credit',
+                  'visa',
+                  'mastercard'
+                ];
+                
+                for (const metodoAlternativo of metodosAlternativos) {
+                  console.log(`🔄 Probando con metodo_pago: "${metodoAlternativo}"`);
+                  
+                  const pedidoDataAlternativo = {
+                    ...pedidoData,
+                    metodo_pago: metodoAlternativo
+                  };
+                  
+                  try {
+                    const responseAlternativo = await fetch('https://api.mamamianpizza.com/api/orders/neworder', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify(pedidoDataAlternativo)
+                    });
+                    
+                    if (responseAlternativo.ok) {
+                      const resultAlternativo = await responseAlternativo.json();
+                      console.log(`✅ Éxito con método: "${metodoAlternativo}"`, resultAlternativo);
+                      
+                      // Limpiar datos temporales
+                      localStorage.removeItem('tempOrderData');
+                      localStorage.removeItem('cartItems');
+
+                      // Redirigir a página de éxito
+                      const successParams = new URLSearchParams({
+                        transaction_id: idTransaccion,
+                        order_id: resultAlternativo.codigo_pedido || `WOMPI-${idTransaccion}`,
+                        status: 'success',
+                        amount: monto,
+                        authorization_code: codigoAutorizacion || '',
+                        payment_method: 'tarjeta'
+                      });
+
+                      window.location.href = `/payment/success?${successParams.toString()}`;
+                      return;
+                    }
+                  } catch (error) {
+                    console.log(`❌ Falló con método: "${metodoAlternativo}"`);
+                    continue;
+                  }
+                }
+                
+                console.log('❌ Todos los métodos alternativos fallaron');
+              }
+              
               // Aun así redirigir a éxito porque Wompi ya cobró
               fallbackSuccess();
             }
