@@ -197,6 +197,9 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   // Función para procesar pedido normal (efectivo)
   const procesarPedidoNormal = async (pedidoData) => {
     try {
+      console.log('📤 ENVIANDO AL BACKEND - Datos completos:', pedidoData);
+      console.log('📤 ENVIANDO AL BACKEND - Método de pago específico:', pedidoData.metodo_pago);
+      
       // Enviar los datos al servidor
       const response = await fetch('https://api.mamamianpizza.com/api/orders/neworder', {
         method: 'POST',
@@ -291,10 +294,13 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
         productos: productosData,
         tipo_entrega: metodoEntrega === 'domicilio' ? 'domicilio' : 'recoger',
         observaciones_generales: direccionData.referencias || "",
-        descuento: descuento
+        descuento: descuento,
+        metodo_pago: 'tarjeta'  // Especificar que es pago con tarjeta
       };
 
-      console.log('Enviando datos de pago:', paymentData);
+      console.log('🔴 DEBUG PAGO TARJETA - Método de pago configurado:', 'tarjeta');
+      console.log('🔴 DEBUG PAGO TARJETA - PaymentData completo:', paymentData);
+      console.log('🔴 DEBUG PAGO TARJETA - Campo metodo_pago específico:', paymentData.metodo_pago);
 
       // Enviar al endpoint de pagos
       const response = await fetch('https://api.mamamianpizza.com/api/payments/process-order', {
@@ -319,6 +325,7 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
             monto: result.data.monto,
             cartItems: cartItems,
             pedidoStatus: result.data.pedidoStatus,
+            metodo_pago: 'tarjeta',  // Especificar que es pago con tarjeta
             timestamp: Date.now()
           };
           
@@ -588,6 +595,9 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
   };
   // Función para enviar el pedido según el método de pago
   const enviarPedido = async () => {
+    console.log('🚀 INICIANDO ENVIO DE PEDIDO');
+    console.log('🚀 Método de pago seleccionado:', pagoMetodo);
+    
     if (!pagoMetodo) {
       alert('Por favor selecciona un método de pago.');
       return;
@@ -662,6 +672,10 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
           aceptado_terminos: true,
           tiempo_estimado_entrega: metodoEntrega === 'domicilio' ? 30 : 25
         };
+        
+        console.log('🟡 DEBUG PAGO EFECTIVO - Variable pagoMetodo:', pagoMetodo);
+        console.log('🟡 DEBUG PAGO EFECTIVO - PedidoData completo:', pedidoData);
+        console.log('🟡 DEBUG PAGO EFECTIVO - Campo metodo_pago específico:', pedidoData.metodo_pago);
         
         await procesarPedidoNormal(pedidoData);
       } catch (error) {

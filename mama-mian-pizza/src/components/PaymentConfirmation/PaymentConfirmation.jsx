@@ -92,7 +92,9 @@ const PaymentConfirmation = () => {
             mensaje: mensaje || '',
             hash: hash || '',
             // También incluir el transactionId interno para el backend
-            transactionId: tempOrderData.transactionId.toString()
+            transactionId: tempOrderData.transactionId.toString(),
+            // Especificar que es un pago con tarjeta
+            metodo_pago: tempOrderData.metodo_pago || 'tarjeta'
           });
 
           const queryString = queryParams.toString();
@@ -144,7 +146,8 @@ const PaymentConfirmation = () => {
                   order_id: confirmResult.codigo_pedido || confirmResult.order_id || confirmResult.pedido_id || 'unknown',
                   status: 'success',
                   amount: monto,
-                  authorization_code: codigoAutorizacion || ''
+                  authorization_code: codigoAutorizacion || '',
+                  payment_method: 'tarjeta'
                 });
                 
                 window.location.href = `/payment/success?${successParams.toString()}`;
