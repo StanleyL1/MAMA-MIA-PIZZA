@@ -81,24 +81,33 @@ const PaymentConfirmation = () => {
           setProcessingMessage('Pago aprobado. Creando tu pedido...');
           console.log('✅ Pago aprobado, procediendo a crear el pedido...');
           
-          // Preparar query string con todos los parámetros de Wompi
-          const queryParams = new URLSearchParams({
-            idTransaccion: idTransaccion || '',
-            monto: monto || '',
-            esReal: esReal || '',
-            formaPago: formaPago || '',
-            esAprobada: esAprobada || '',
-            codigoAutorizacion: codigoAutorizacion || '',
-            mensaje: mensaje || '',
-            hash: hash || '',
-            // También incluir el transactionId interno para el backend
+          // Preparar datos completos para crear el pedido
+          const confirmationData = {
+            // Datos de Wompi
+            wompi: {
+              idTransaccion: idTransaccion || '',
+              monto: monto || '',
+              esReal: esReal || '',
+              formaPago: formaPago || '',
+              esAprobada: esAprobada || '',
+              codigoAutorizacion: codigoAutorizacion || '',
+              mensaje: mensaje || '',
+              hash: hash || ''
+            },
+            // Datos internos
             transactionId: tempOrderData.transactionId.toString(),
-            // Especificar que es un pago con tarjeta
-            metodo_pago: tempOrderData.metodo_pago || 'tarjeta'
-          });
+            metodo_pago: tempOrderData.metodo_pago || 'tarjeta',
+            // Datos del pedido si están disponibles
+            clienteData: tempOrderData.clienteData || null,
+            direccionData: tempOrderData.direccionData || null,
+            metodoEntrega: tempOrderData.metodoEntrega || null,
+            cartItems: tempOrderData.cartItems || [],
+            originalPaymentData: tempOrderData.originalPaymentData || null
+          };
 
-          const queryString = queryParams.toString();
-          console.log('📤 Query string para confirmación:', queryString);
+          console.log('📤 Datos de confirmación completos:', confirmationData);
+          console.log('📤 Datos de confirmación completos:', confirmationData);
+          console.log('📤 URL que se va a llamar:', 'https://api.mamamianpizza.com/api/payments/confirmation');
           
           // El pago fue exitoso, proceder a crear el pedido
           // Si el endpoint falla pero Wompi aprobó el pago, asumir éxito
@@ -106,22 +115,28 @@ const PaymentConfirmation = () => {
           let endpointWorked = false;
           
           try {
-            confirmResponse = await fetch(`/api/payments/confirmation?${queryString}`, {
-              method: 'GET',
+            console.log('🔄 Intentando llamar al endpoint de confirmación...');
+            confirmResponse = await fetch(`/api/payments/confirmation`, {
+              method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
-              }
+              },
+              body: JSON.stringify(confirmationData)
             });
+            console.log('📥 Respuesta recibida (URL relativa):', confirmResponse.status, confirmResponse.statusText);
             endpointWorked = true;
           } catch (fetchError) {
             console.log('❌ Error con URL relativa, intentando con URL completa:', fetchError);
             try {
-              confirmResponse = await fetch(`https://api.mamamianpizza.com/api/payments/confirmation?${queryString}`, {
-                method: 'GET',
+              console.log('🔄 Intentando con URL completa...');
+              confirmResponse = await fetch(`https://api.mamamianpizza.com/api/payments/confirmation`, {
+                method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify(confirmationData)
               });
+              console.log('📥 Respuesta recibida (URL completa):', confirmResponse.status, confirmResponse.statusText);
               endpointWorked = true;
             } catch (secondError) {
               console.log('❌ Error también con URL completa:', secondError);
@@ -130,9 +145,12 @@ const PaymentConfirmation = () => {
           }
 
           if (endpointWorked && confirmResponse.ok) {
+            console.log('✅ Endpoint respondió correctamente, parseando respuesta...');
             try {
               const confirmResult = await confirmResponse.json();
               console.log('📥 Respuesta del servidor - Data:', confirmResult);
+              console.log('📥 Respuesta del servidor - Success:', confirmResult.success);
+              console.log('📥 Respuesta del servidor - Order ID:', confirmResult.codigo_pedido || confirmResult.order_id || confirmResult.pedido_id);
               
               if (confirmResult.success) {
                 console.log('✅ Pedido creado exitosamente:', confirmResult);
@@ -150,13 +168,26 @@ const PaymentConfirmation = () => {
                   payment_method: 'tarjeta'
                 });
                 
+                console.log('🚀 Redirigiendo a página de éxito con parámetros:', successParams.toString());
                 window.location.href = `/payment/success?${successParams.toString()}`;
                 return; // Salir exitosamente
+              } else {
+                console.log('❌ Backend reportó fallo:', confirmResult.message || 'Sin mensaje');
               }
             } catch (parseError) {
               console.log('❌ Error parseando respuesta:', parseError);
               endpointWorked = false;
             }
+          } else if (endpointWorked) {
+            console.log('❌ Endpoint respondió con error:', confirmResponse.status, confirmResponse.statusText);
+            try {
+              const errorText = await confirmResponse.text();
+              console.log('❌ Contenido de error:', errorText);
+            } catch (e) {
+              console.log('❌ No se pudo leer el contenido del error');
+            }
+          } else {
+            console.log('❌ No se pudo conectar con el endpoint');
           }
           
           // Si llegamos aquí, el endpoint falló PERO Wompi aprobó el pago

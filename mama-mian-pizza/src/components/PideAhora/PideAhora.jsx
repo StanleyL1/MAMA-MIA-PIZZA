@@ -326,8 +326,15 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
             cartItems: cartItems,
             pedidoStatus: result.data.pedidoStatus,
             metodo_pago: 'tarjeta',  // Especificar que es pago con tarjeta
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            // Agregar datos adicionales necesarios para crear el pedido
+            clienteData: clienteData,
+            direccionData: direccionData,
+            metodoEntrega: metodoEntrega,
+            originalPaymentData: paymentData
           };
+          
+          console.log('💾 Guardando datos temporales completos:', tempOrderData);
           
           localStorage.setItem('tempOrderData', JSON.stringify(tempOrderData));
           
