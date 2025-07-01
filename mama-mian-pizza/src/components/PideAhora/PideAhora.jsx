@@ -328,9 +328,15 @@ const PideAhora = ({ cartItems = [], setCartItems }) => {
             metodo_pago: 'tarjeta',  // Especificar que es pago con tarjeta
             timestamp: Date.now(),
             // Agregar datos adicionales necesarios para crear el pedido
-            clienteData: clienteData,
+            clienteData: {
+              ...clienteData,
+              modo: modo // Agregar el modo (invitado/registrado)
+            },
             direccionData: direccionData,
             metodoEntrega: metodoEntrega,
+            modoDireccion: modoDireccion, // Agregar modo de dirección
+            userLocation: userLocation, // Agregar ubicación del usuario si aplica
+            addressInfo: addressInfo, // Agregar información de dirección si aplica
             originalPaymentData: paymentData
           };
           

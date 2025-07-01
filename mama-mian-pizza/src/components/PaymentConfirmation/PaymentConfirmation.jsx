@@ -54,8 +54,41 @@ const PaymentConfirmation = () => {
           
           // FLUJO SIMPLIFICADO: Crear el pedido usando el endpoint que funciona
           try {
+            // Reconstruir la estructura exacta que espera el backend
             const pedidoData = {
-              cliente: tempOrderData.clienteData,
+              tipo_cliente: tempOrderData.clienteData.modo || 'invitado',
+              cliente: {
+                nombre: tempOrderData.clienteData.nombre,
+                telefono: tempOrderData.clienteData.telefono,
+                ...(tempOrderData.clienteData.email && { email: tempOrderData.clienteData.email })
+              },
+              
+              direccion: tempOrderData.metodoEntrega === 'domicilio'
+                ? (tempOrderData.modoDireccion === 'formulario' 
+                    ? {
+                        tipo_direccion: 'formulario',
+                        direccion: tempOrderData.direccionData.direccionExacta || tempOrderData.direccionData.direccion,
+                        referencias: tempOrderData.direccionData.referencias || '',
+                        pais: tempOrderData.direccionData.pais || 'El Salvador',
+                        departamento: tempOrderData.direccionData.departamento || '',
+                        municipio: tempOrderData.direccionData.municipio || ''
+                      }
+                    : {
+                        tipo_direccion: 'tiempo_real',
+                        latitud: tempOrderData.userLocation?.lat || 0,
+                        longitud: tempOrderData.userLocation?.lng || 0,
+                        precision_ubicacion: Math.round(tempOrderData.userLocation?.accuracy || 0),
+                        direccion_formateada: tempOrderData.addressInfo?.formattedAddress || "Ubicación compartida en tiempo real"
+                      })
+                : {
+                    tipo_direccion: 'formulario',
+                    direccion: "CP #3417, Puerto El Triunfo, EL salvador",
+                    referencias: "Local principal",
+                    pais: "El Salvador",
+                    departamento: "Usulután",
+                    municipio: "Jiquilisco"
+                  },
+              
               productos: tempOrderData.cartItems.map(item => ({
                 id_producto: item.id,
                 nombre_producto: item.nombre,
@@ -67,10 +100,12 @@ const PaymentConfirmation = () => {
                 instrucciones_especiales: item.instrucciones || null,
                 metodo_entrega: tempOrderData.metodoEntrega === 'recoger' ? 1 : 0
               })),
+              
               metodo_pago: 'tarjeta', // IMPORTANTE: Asegurar que sea tarjeta
               subtotal: parseFloat(tempOrderData.monto),
               costo_envio: 0.00,
               total: parseFloat(tempOrderData.monto),
+              
               // Agregar información de la transacción de Wompi
               wompi_transaction_id: idTransaccion,
               wompi_authorization_code: codigoAutorizacion,
