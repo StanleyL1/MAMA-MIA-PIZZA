@@ -380,6 +380,7 @@ input:checked + .modal__slider:before {
 .modal__checkbox-container {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   position: relative;
   cursor: pointer;
   font-size: 14px;
@@ -395,6 +396,21 @@ input:checked + .modal__slider:before {
   min-height: 40px;
   width: 100%;
   box-sizing: border-box;
+}
+
+.modal__ingrediente-nombre {
+  flex: 1;
+  margin-right: 8px;
+}
+
+.modal__ingrediente-precio {
+  font-size: 12px;
+  color: #059669;
+  font-weight: 600;
+  background-color: #d1fae5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 
 .modal__checkbox-container:hover {

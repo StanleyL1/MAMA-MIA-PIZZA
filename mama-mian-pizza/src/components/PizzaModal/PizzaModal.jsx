@@ -19,18 +19,68 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
   const [showAuthAlert, setShowAuthAlert] = useState(false);
 
   const maxIngredientes = 4;
-  const [ingredientes, setIngredientes] = useState([
-    { id: 1, nombre: 'Queso', seleccionado: false },
-    { id: 2, nombre: 'Pepperoni', seleccionado: false },
-    { id: 3, nombre: 'Jamón', seleccionado: false },
-    { id: 4, nombre: 'Piña', seleccionado: false },
-    { id: 5, nombre: 'Carne', seleccionado: false },
-    { id: 6, nombre: 'Champiñones', seleccionado: false },
-    { id: 7, nombre: 'Aceitunas', seleccionado: false },
-    { id: 8, nombre: 'Cebolla', seleccionado: false }  ]);  const [ingredientesSeleccionados, setIngredientesSeleccionados] = useState(0);
+  const [ingredientes, setIngredientes] = useState([]);
+  const [cargandoIngredientes, setCargandoIngredientes] = useState(false);
+  const [ingredientesSeleccionados, setIngredientesSeleccionados] = useState(0);
 
   // La función cargarFotoUsuario ya no es necesaria porque obtenemos
   // la foto directamente del endpoint de reseñas
+
+  // Función para cargar ingredientes desde la API
+  const cargarIngredientes = useCallback(async () => {
+    setCargandoIngredientes(true);
+    try {
+      console.log('🥩 Cargando ingredientes desde la API...');
+      const response = await fetch('https://api.mamamianpizza.com/api/pizza-ingredients/getPizzaIngredients');
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Ingredientes cargados desde la API:', data);
+        
+        // Transformar los datos de la API al formato que usa el componente
+        const ingredientesFormateados = data.map(ingrediente => ({
+          id: ingrediente.id,
+          nombre: ingrediente.nombre,
+          categoria: ingrediente.categoria,
+          precio_extra: ingrediente.precio_extra,
+          seleccionado: false
+        }));
+        
+        setIngredientes(ingredientesFormateados);
+        console.log('🎯 Ingredientes formateados:', ingredientesFormateados);
+      } else {
+        console.error('❌ Error al cargar ingredientes:', response.status);
+        // En caso de error, usar ingredientes por defecto
+        const ingredientesPorDefecto = [
+          { id: 1, nombre: 'Queso', categoria: 'Lácteos', precio_extra: '1.00', seleccionado: false },
+          { id: 2, nombre: 'Pepperoni', categoria: 'Carnes', precio_extra: '1.50', seleccionado: false },
+          { id: 3, nombre: 'Jamón', categoria: 'Carnes', precio_extra: '1.00', seleccionado: false },
+          { id: 4, nombre: 'Piña', categoria: 'Frutas', precio_extra: '0.75', seleccionado: false },
+          { id: 5, nombre: 'Carne', categoria: 'Carnes', precio_extra: '1.50', seleccionado: false },
+          { id: 6, nombre: 'Champiñones', categoria: 'Vegetales', precio_extra: '1.00', seleccionado: false },
+          { id: 7, nombre: 'Aceitunas', categoria: 'Vegetales', precio_extra: '1.00', seleccionado: false },
+          { id: 8, nombre: 'Cebolla', categoria: 'Vegetales', precio_extra: '0.50', seleccionado: false }
+        ];
+        setIngredientes(ingredientesPorDefecto);
+      }
+    } catch (error) {
+      console.error('❌ Error de conexión al cargar ingredientes:', error);
+      // En caso de error, usar ingredientes por defecto
+      const ingredientesPorDefecto = [
+        { id: 1, nombre: 'Queso', categoria: 'Lácteos', precio_extra: '1.00', seleccionado: false },
+        { id: 2, nombre: 'Pepperoni', categoria: 'Carnes', precio_extra: '1.50', seleccionado: false },
+        { id: 3, nombre: 'Jamón', categoria: 'Carnes', precio_extra: '1.00', seleccionado: false },
+        { id: 4, nombre: 'Piña', categoria: 'Frutas', precio_extra: '0.75', seleccionado: false },
+        { id: 5, nombre: 'Carne', categoria: 'Carnes', precio_extra: '1.50', seleccionado: false },
+        { id: 6, nombre: 'Champiñones', categoria: 'Vegetales', precio_extra: '1.00', seleccionado: false },
+        { id: 7, nombre: 'Aceitunas', categoria: 'Vegetales', precio_extra: '1.00', seleccionado: false },
+        { id: 8, nombre: 'Cebolla', categoria: 'Vegetales', precio_extra: '0.50', seleccionado: false }
+      ];
+      setIngredientes(ingredientesPorDefecto);
+    } finally {
+      setCargandoIngredientes(false);
+    }
+  }, []);
   
   // Función para cargar reseñas desde la API
   const cargarReseñas = useCallback(async () => {
@@ -129,6 +179,11 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
     console.log('Tamaños únicos procesados:', tamanosUnicos);
     return tamanosUnicos.sort((a, b) => a.indice - b.indice);
   };
+  // Cargar ingredientes cuando se monta el componente
+  useEffect(() => {
+    cargarIngredientes();
+  }, [cargarIngredientes]);
+
   // Cargar reseñas cuando se monta el componente o cambia la pizza
   useEffect(() => {
     if (pizza && activeTab === 'resenas') {
@@ -317,23 +372,31 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
 
   const handleTogglePersonalizar = () => {
     if (personalizarIngredientes) {
-      setIngredientes(ingredientes.map(ing => ({ ...ing, seleccionado: false })));
+      // Al desactivar, resetear todos los ingredientes
+      setIngredientes(prev => prev.map(ing => ({ ...ing, seleccionado: false })));
     }
     setPersonalizarIngredientes(!personalizarIngredientes);
   };
 
   const handleIngredienteChange = (id) => {
-    const ingrediente = ingredientes.find(ing => ing.id === id);
-
-    if (ingrediente.seleccionado) {
-      setIngredientes(ingredientes.map(ing =>
-        ing.id === id ? { ...ing, seleccionado: false } : ing
-      ));
-    } else if (ingredientesSeleccionados < maxIngredientes) {
-      setIngredientes(ingredientes.map(ing =>
-        ing.id === id ? { ...ing, seleccionado: true } : ing
-      ));
-    }
+    setIngredientes(prev => {
+      const ingrediente = prev.find(ing => ing.id === id);
+      
+      if (ingrediente.seleccionado) {
+        // Si está seleccionado, lo deseleccionamos
+        return prev.map(ing =>
+          ing.id === id ? { ...ing, seleccionado: false } : ing
+        );
+      } else if (ingredientesSeleccionados < maxIngredientes) {
+        // Si no está seleccionado y no hemos alcanzado el máximo, lo seleccionamos
+        return prev.map(ing =>
+          ing.id === id ? { ...ing, seleccionado: true } : ing
+        );
+      }
+      
+      // Si ya alcanzamos el máximo, no hacemos cambios
+      return prev;
+    });
   };  const handlePublicarResena = async () => {
     // Validar que la calificación esté en el rango correcto (1-5)
     if (nuevaResena.rating < 1 || nuevaResena.rating > 5) {
@@ -568,20 +631,31 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
                               : `Selecciona hasta ${maxIngredientes} ingredientes`}
                           </div>
                           <div className="modal__ingredientes-container">
-                            {ingredientes.map(ingrediente => (
-                              <div key={ingrediente.id} className="modal__ingrediente-item">
-                                <label className={`modal__checkbox-container ${!ingrediente.seleccionado && ingredientesSeleccionados >= maxIngredientes ? 'modal__disabled' : ''}`}>
-                                  <input
-                                    type="checkbox"
-                                    checked={ingrediente.seleccionado}
-                                    onChange={() => handleIngredienteChange(ingrediente.id)}
-                                    disabled={!ingrediente.seleccionado && ingredientesSeleccionados >= maxIngredientes}
-                                  />
-                                  <span className="modal__checkbox-custom"></span>
-                                  {ingrediente.nombre}
-                                </label>
+                            {cargandoIngredientes ? (
+                              <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                                Cargando ingredientes...
                               </div>
-                            ))}
+                            ) : (
+                              ingredientes.map(ingrediente => (
+                                <div key={ingrediente.id} className="modal__ingrediente-item">
+                                  <label className={`modal__checkbox-container ${!ingrediente.seleccionado && ingredientesSeleccionados >= maxIngredientes ? 'modal__disabled' : ''}`}>
+                                    <input
+                                      type="checkbox"
+                                      checked={ingrediente.seleccionado}
+                                      onChange={() => handleIngredienteChange(ingrediente.id)}
+                                      disabled={!ingrediente.seleccionado && ingredientesSeleccionados >= maxIngredientes}
+                                    />
+                                    <span className="modal__checkbox-custom"></span>
+                                    <span className="modal__ingrediente-nombre">{ingrediente.nombre}</span>
+                                    {ingrediente.precio_extra && parseFloat(ingrediente.precio_extra) > 0 && (
+                                      <span className="modal__ingrediente-precio">
+                                        (+${parseFloat(ingrediente.precio_extra).toFixed(2)})
+                                      </span>
+                                    )}
+                                  </label>
+                                </div>
+                              ))
+                            )}
                           </div>
                         </div>
                       )}
