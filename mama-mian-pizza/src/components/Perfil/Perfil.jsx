@@ -1206,7 +1206,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
               <div className="perfil__form-row">
                 <label className="perfil__label">
                   <FontAwesomeIcon icon={faEnvelope} />
-                  Email (Bloqueado)
+                  Email
                 </label>
                 <input
                   type="email"
@@ -1221,7 +1221,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
               </div>              <div className="perfil__form-row">
                 <label className="perfil__label">
                   <FontAwesomeIcon icon={faUser} />
-                  DUI (Bloqueado)
+                  DUI
                 </label>
                 <input
                   type="text"
@@ -1239,7 +1239,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
               <div className="perfil__form-row">
                 <label className="perfil__label">
                   <FontAwesomeIcon icon={faCalendarAlt} />
-                  Fecha de Nacimiento (Bloqueado)
+                  Fecha de Nacimiento
                 </label>
                 <input
                   type="text"
