@@ -32,7 +32,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
   // Estados para editar perfil
   const [editMode, setEditMode] = useState(false);  const [formData, setFormData] = useState({
     nombre: '',
-    celular: ''
+    celular: '',
+    correo: ''
   });// Estados para información del usuario desde API se manejan en el hook useUsuario
   // Estados para cambiar foto
   const [photoMode, setPhotoMode] = useState(false);
@@ -217,7 +218,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
           console.log('Información del usuario cargada exitosamente:', userData);            // Inicializar formData con los datos reales del usuario desde la API
           const newFormData = {
             nombre: userData.nombre || '',
-            celular: userData.celular || ''
+            celular: userData.celular || '',
+            correo: userData.correo || ''
           };
           
           console.log('Inicializando formulario con datos:', newFormData);
@@ -458,7 +460,7 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
     }    try {      
       const updateData = {
         nombre: formData.nombre,
-        correo: userInfo.correo, // Mantener el correo existente
+        correo: formData.correo, // Usar el correo del formulario
         telefono: formData.celular,
         fecha_nacimiento: userInfo.fecha_nacimiento || null, // Mantener fecha existente
         sexo: userInfo.sexo || null // Mantener sexo existente
@@ -1210,14 +1212,13 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                 </label>
                 <input
                   type="email"
-                  value={loadingUserInfo ? 'Cargando...' : (userInfo?.correo || 'No disponible')}
-                  disabled
-                  className="perfil__input disabled"
-                  title="El correo electrónico no puede ser modificado por seguridad"
+                  name="correo"
+                  value={formData.correo}
+                  onChange={handleFormChange}
+                  disabled={!editMode}
+                  className={`perfil__input ${!editMode ? 'disabled' : ''}`}
+                  placeholder="Ingresa tu correo electrónico"
                 />
-                <small className="perfil__field-note">
-                  El correo electrónico no puede ser modificado por razones de seguridad
-                </small>
               </div>              <div className="perfil__form-row">
                 <label className="perfil__label">
                   <FontAwesomeIcon icon={faUser} />
@@ -1269,7 +1270,8 @@ export default function Perfil({ onAddToCart, user, setToast, onOrderUpdate, upd
                         if (userInfo) {
                           setFormData({
                             nombre: userInfo.nombre || '',
-                            celular: userInfo.celular || ''
+                            celular: userInfo.celular || '',
+                            correo: userInfo.correo || ''
                           });
                         }
                       }}
