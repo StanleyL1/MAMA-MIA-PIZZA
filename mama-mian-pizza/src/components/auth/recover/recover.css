@@ -61,9 +61,26 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
+  gap: 1rem;
 }
 
-/* Input de correo */
+.recover__form-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.recover__label {
+  align-self: flex-start;
+  margin-left: 5%;
+  color: #991B1B;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Input de correo y otros */
 .recover__input {
   width: 90%;
   height: 40px;
@@ -73,6 +90,23 @@
   font-size: clamp(1rem, 2vw, 1.2rem);
   color: #991B1B;
   box-sizing: border-box;
+}
+
+.recover__input:focus {
+  outline: none;
+  border: 2px solid #991B1B;
+  box-shadow: 0 0 5px rgba(153, 27, 27, 0.3);
+}
+
+.recover__input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.recover__input--otp {
+  letter-spacing: 0.5em;
+  text-align: center;
+  font-size: 1.5em;
 }
 
 /* Botón para restablecer contraseña */
@@ -94,6 +128,176 @@
   color: #FFFFFF;
 }
 
+.recover__btn:disabled {
+  background-color: #ddd;
+  color: #777;
+  cursor: not-allowed;
+}
+
+/* Estilos para los mensajes de error y éxito */
+.recover__error {
+  width: 90%;
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #ffcdd2;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.recover__success {
+  width: 90%;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #c8e6c9;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+/* Estilos para la secuencia de pasos */
+.recover__steps {
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  margin: 1rem 0;
+}
+
+.recover__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30%;
+}
+
+.recover__step-number {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: #ddd;
+  color: #777;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.recover__step-text {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.recover__step.active .recover__step-number {
+  background-color: #feb248;
+  color: #991B1B;
+}
+
+.recover__step.active .recover__step-text {
+  color: #991B1B;
+  font-weight: bold;
+}
+
+.recover__step.completed .recover__step-number {
+  background-color: #991B1B;
+  color: white;
+}
+
+/* Estilos para la información de email enmascarado */
+.recover__email-info {
+  background-color: #f5f5f5;
+  padding: 0.75rem;
+  border-radius: 4px;
+  width: 90%;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+/* Estilos para el contador */
+.recover__countdown {
+  background-color: #fff8e1;
+  padding: 0.5rem;
+  border-radius: 4px;
+  width: 90%;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  border: 1px solid #ffe082;
+}
+
+.recover__countdown-time {
+  font-weight: bold;
+  color: #ff6f00;
+}
+
+/* Estilos para los botones de acciones */
+.recover__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.recover__resend, .recover__back {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.recover__link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #991B1B;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.recover__link-button:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+/* Estilos para validación de contraseña */
+.recover__password-requirements {
+  width: 90%;
+  background-color: #f5f5f5;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+}
+
+.recover__password-requirements p {
+  margin: 0 0 0.5rem 0;
+  font-weight: bold;
+}
+
+.recover__password-requirements ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.recover__password-requirements li {
+  margin-bottom: 0.25rem;
+  color: #777;
+}
+
+.recover__password-requirements li.valid {
+  color: #2e7d32;
+}
+
+.recover__password-mismatch {
+  color: #c62828;
+  margin: 0.25rem 0 0 0;
+  align-self: flex-start;
+  margin-left: 5%;
+  font-size: 0.8rem;
+}
+
 /* Pie de página */
 .recover__footer {
   display: flex;
@@ -101,6 +305,7 @@
   align-items: center;
   gap: 0.5rem;
   width: 100%;
+  margin-top: 1rem;
 }
 
 .recover__link {
@@ -131,6 +336,14 @@
   .recover__input {
     width: 100%;
   }
+  
+  .recover__steps {
+    width: 100%;
+  }
+  
+  .recover__step-text {
+    font-size: 0.8rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -153,5 +366,15 @@
   .recover__text {
     width: 100%;
     font-size: 1rem;
+  }
+  
+  .recover__step-number {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .recover__step-text {
+    font-size: 0.7rem;
   }
 }
