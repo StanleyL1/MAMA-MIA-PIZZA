@@ -30,17 +30,21 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
   const isPizza = pizza?.id_categoria === 1 || 
                  (pizza?.titulo && pizza?.titulo.toLowerCase().includes('pizza'));
                  
-  // Función para obtener ingredientes por defecto
-  const getDefaultIngredients = () => {
+  // Función para obtener ingredientes disponibles para personalización
+  const getAvailableIngredients = () => {
     return [
-      { id: 1, nombre: 'Queso extra', seleccionado: false },
+      { id: 1, nombre: 'Queso Mozzarella Extra', seleccionado: false },
       { id: 2, nombre: 'Pepperoni', seleccionado: false },
       { id: 3, nombre: 'Jamón', seleccionado: false },
-      { id: 4, nombre: 'Tocino', seleccionado: false },
+      { id: 4, nombre: 'Salami', seleccionado: false },
       { id: 5, nombre: 'Champiñones', seleccionado: false },
       { id: 6, nombre: 'Pimientos', seleccionado: false },
-      { id: 7, nombre: 'Cebolla', seleccionado: false },
-      { id: 8, nombre: 'Aceituna', seleccionado: false }
+      { id: 7, nombre: 'Cebolla Blanca', seleccionado: false },
+      { id: 8, nombre: 'Aceitunas Negras', seleccionado: false },
+      { id: 9, nombre: 'Tomate Cherry', seleccionado: false },
+      { id: 10, nombre: 'Piña', seleccionado: false },
+      { id: 11, nombre: 'Maíz Dulce', seleccionado: false },
+      { id: 12, nombre: 'Tocino Ahumado', seleccionado: false }
     ];
   };
   
@@ -49,33 +53,39 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
     // Solo cargar ingredientes si es una pizza y se activa la personalización
     if (personalizarIngredientes && isPizza && ingredientes.length === 0) {
       const fetchIngredientes = async () => {
+        console.log('🍕 Cargando ingredientes desde la API...');
         setCargandoIngredientes(true);
+        
         try {
-          const response = await fetch('https://api.mamamianpizza.com/api/ingredientes');
+          const response = await fetch('https://api.mamamianpizza.com/api/pizza-ingredients/getPizzaIngredients');
           
           if (response.ok) {
             const data = await response.json();
-            console.log('✅ Ingredientes cargados:', data);
+            console.log('✅ Ingredientes cargados desde API:', data);
             
-            if (data && data.ingredientes && Array.isArray(data.ingredientes)) {
-              const ingredientesFormateados = data.ingredientes.map(ing => ({
-                id: ing.id_ingrediente || ing.id,
-                nombre: ing.nombre,
+            if (Array.isArray(data) && data.length > 0) {
+              const ingredientesFormateados = data.map(ingrediente => ({
+                id: ingrediente.id || ingrediente.id_ingrediente,
+                id_ingrediente: ingrediente.id_ingrediente,
+                nombre: ingrediente.nombre,
+                categoria: ingrediente.categoria,
+                precio_extra: parseFloat(ingrediente.precio_extra || 0),
                 seleccionado: false
               }));
               
               setIngredientes(ingredientesFormateados);
+              console.log('📋 Ingredientes formateados:', ingredientesFormateados);
             } else {
-              console.warn('⚠️ Formato de respuesta de ingredientes inesperado');
-              setIngredientes(getDefaultIngredients());
+              console.warn('⚠️ No se encontraron ingredientes en la API');
+              setIngredientes(getAvailableIngredients());
             }
           } else {
             console.error('❌ Error al cargar ingredientes:', response.status);
-            setIngredientes(getDefaultIngredients());
+            setIngredientes(getAvailableIngredients());
           }
         } catch (error) {
           console.error('❌ Error de conexión al cargar ingredientes:', error);
-          setIngredientes(getDefaultIngredients());
+          setIngredientes(getAvailableIngredients());
         } finally {
           setCargandoIngredientes(false);
         }
@@ -343,15 +353,28 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
   // Si es una pizza, incluir masa, tamaño e instrucciones, de lo contrario, enviar solo el producto
   if (isPizza) {
     const ingredientesSeleccionadosArray = personalizarIngredientes 
-      ? ingredientes.filter(ing => ing.seleccionado).map(ing => ing.nombre)
+      ? ingredientes.filter(ing => ing.seleccionado).map(ing => ({
+          nombre: ing.nombre,
+          categoria: ing.categoria,
+          precio_extra: ing.precio_extra || 0
+        }))
       : [];
+    
+    // Calcular precio extra de ingredientes seleccionados
+    const precioExtraIngredientes = ingredientesSeleccionadosArray.reduce((total, ing) => {
+      return total + (ing.precio_extra || 0);
+    }, 0);
     
     // Encontrar el precio actual del tamaño seleccionado
     const tamanosSeleccionado = tamanos.find(t => t.nombre === tamano);
-    // Asegurar que el precio final sea el del tamaño seleccionado actual
-    // Usar precioActual directamente sin el símbolo $ para mantener coherencia
+    // Asegurar que el precio final sea el del tamaño seleccionado actual más ingredientes extra
     const precioNumerico = precioActual.replace('$', '');
-    const precioFinal = tamanosSeleccionado ? tamanosSeleccionado.precio : precioNumerico;
+    const precioBase = tamanosSeleccionado ? parseFloat(tamanosSeleccionado.precio) : parseFloat(precioNumerico);
+    const precioFinal = (precioBase + precioExtraIngredientes).toFixed(2);
+    
+    console.log('🍕 Precio base:', precioBase);
+    console.log('🍕 Precio extra ingredientes:', precioExtraIngredientes);
+    console.log('🍕 Precio final:', precioFinal);
       
     onAddToCart(
       {...pizza, precio: precioFinal}, 
@@ -380,7 +403,7 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
       // Al desactivar personalización, reiniciar selecciones
       setIngredientes(ingredientes.map(ing => ({ ...ing, seleccionado: false })));
       
-      // Al deshabilitar la personalización, actualizamos el precio según el tamaño actual
+      // Al deshabilitar la personalización, volver al precio base del tamaño actual
       const tamanosSeleccionado = tamanos.find(t => t.nombre === tamano);
       if (tamanosSeleccionado) {
         setPrecioActual(calcularPrecio(tamanosSeleccionado));
@@ -389,9 +412,6 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
       // Si no hay ingredientes cargados, el useEffect se encargará de cargarlos
       // cuando personalizarIngredientes cambie a true
       console.log('🍕 Activando personalización de ingredientes');
-      
-      // Si ya tenemos ingredientes pero todas las selecciones están en false,
-      // no necesitamos hacer nada más que activar la personalización
     }
     
     // Cambiar el estado de personalización
@@ -649,13 +669,13 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
                             {cargandoIngredientes ? (
                               <div style={{ textAlign: 'center', padding: '15px 0', width: '100%' }}>
                                 <p style={{ color: '#666', fontSize: '14px' }}>
-                                  Cargando ingredientes disponibles...
+                                  Cargando ingredientes desde la base de datos...
                                 </p>
                               </div>
                             ) : ingredientes.length === 0 ? (
                               <div style={{ textAlign: 'center', padding: '15px 0', width: '100%' }}>
                                 <p style={{ color: '#666', fontSize: '14px' }}>
-                                  No hay ingredientes disponibles
+                                  No hay ingredientes disponibles para personalización
                                 </p>
                               </div>
                             ) : (
@@ -669,7 +689,17 @@ function PizzaModal({ pizza, onClose, onAddToCart, user, isRecommendation = fals
                                       disabled={!ingrediente.seleccionado && ingredientesSeleccionados >= maxIngredientes}
                                     />
                                     <span className="modal__checkbox-custom"></span>
-                                    {ingrediente.nombre}
+                                    <span style={{ flex: 1 }}>{ingrediente.nombre}</span>
+                                    {ingrediente.precio_extra && parseFloat(ingrediente.precio_extra) > 0 && (
+                                      <span style={{ 
+                                        color: '#991B1B', 
+                                        fontSize: '12px', 
+                                        fontWeight: '600',
+                                        marginLeft: '8px'
+                                      }}>
+                                        +${parseFloat(ingrediente.precio_extra).toFixed(0)}
+                                      </span>
+                                    )}
                                   </label>
                                 </div>
                               ))
